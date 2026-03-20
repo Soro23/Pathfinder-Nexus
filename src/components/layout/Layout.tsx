@@ -1,16 +1,30 @@
 import { useEffect } from 'react'
-import { Outlet, Link, useLocation, useMatch } from 'react-router-dom'
-import { Users, PlusCircle, BookOpen, Backpack, Sparkles, Map, Sword, PawPrint, LogOut, Sun, Moon, Settings } from 'lucide-react'
-import { useCharacterStore } from '../../store'
+import { Outlet, Link, useLocation } from 'react-router-dom'
+import {
+  Users, Map, BookOpen, LayoutList, Shield, Globe, Star, Zap,
+  Sparkles, Backpack, Gem, PawPrint, Settings, Sun, Moon, LogOut, Sword,
+} from 'lucide-react'
 import { useSRDStore } from '../../store/srdStore'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../hooks/useTheme'
 import styles from './Layout.module.css'
 
-const navItems = [
-  { path: '/', icon: Users, label: 'Mis Personajes', exact: true },
-  { path: '/characters/new', icon: PlusCircle, label: 'Crear Personaje', exact: true },
-  { path: '/rules', icon: BookOpen, label: 'Compendio', exact: false },
+const compendiumSoon = [
+  { icon: LayoutList, label: 'Tablas' },
+  { icon: Shield,     label: 'Clases' },
+  { icon: Globe,      label: 'Razas' },
+  { icon: Star,       label: 'Dotes' },
+  { icon: Zap,        label: 'Habilidades' },
+  { icon: Sparkles,   label: 'Conjuros' },
+  { icon: Backpack,   label: 'Equipación' },
+  { icon: Gem,        label: 'Objetos Mágicos' },
+  { icon: PawPrint,   label: 'Bestiario' },
+]
+
+const bottomNavItems = [
+  { path: '/',          icon: Users,     label: 'Personajes', exact: true },
+  { path: '/campaigns', icon: Map,       label: 'Campañas',   exact: false },
+  { path: '/rules',     icon: BookOpen,  label: 'Reglas',     exact: false },
 ]
 
 export function Layout() {
@@ -20,34 +34,10 @@ export function Layout() {
   const fetchAll = useSRDStore((s) => s.fetchAll)
   useEffect(() => { fetchAll() }, [fetchAll])
 
-  // Detect active character from URL
-  const charMatch = useMatch('/characters/:id')
-  const charMatchPlay = useMatch('/characters/:id/play')
-  const activeCharId = (charMatch ?? charMatchPlay)?.params.id ?? null
-
-  const character = useCharacterStore((state) =>
-    activeCharId ? state.getCharacter(activeCharId) : undefined
-  )
-
   function isActive(path: string, exact: boolean) {
     if (exact) return location.pathname === path
     return location.pathname.startsWith(path)
   }
-
-  // Contextual character links — enabled when inside a character route
-  const contextualItems = [
-    { icon: Backpack, label: 'Inventario', tab: 'inventory' },
-    { icon: Sparkles, label: 'Hechizos', tab: 'spells' },
-    { icon: PawPrint, label: 'Compañero', tab: 'companion' },
-  ]
-
-  // Bottom nav items for mobile
-  const bottomNavItems = [
-    { path: '/', icon: Users, label: 'Héroes', exact: true },
-    { path: '/characters/new', icon: PlusCircle, label: 'Crear', exact: true },
-    { path: '/rules', icon: BookOpen, label: 'Reglas', exact: false },
-    { path: '/campaigns', icon: Map, label: 'Campañas', exact: false },
-  ]
 
   return (
     <div className={styles.layout}>
@@ -78,53 +68,17 @@ export function Layout() {
           </div>
         </Link>
 
-        {/* Primary navigation */}
+        {/* Navigation */}
         <nav className={styles.nav}>
+          {/* ── GESTIÓN ── */}
           <span className={styles.navSection}>Gestión</span>
-          {navItems.map(({ path, icon: Icon, label, exact }) => (
-            <Link
-              key={path}
-              to={path}
-              className={`${styles.navItem} ${isActive(path, exact) ? styles.active : ''}`}
-            >
-              <Icon size={18} />
-              <span>{label}</span>
-            </Link>
-          ))}
-
-          {/* Active character section */}
-          <span className={styles.navSection}>Personaje Activo</span>
-          {activeCharId && character ? (
-            <>
-              <div className={styles.activeCharacterChip}>
-                <div className={styles.activeCharAvatar}>
-                  {character.name.charAt(0).toUpperCase()}
-                </div>
-                <div className={styles.activeCharInfo}>
-                  <span className={styles.activeCharName}>{character.name}</span>
-                  <span className={styles.activeCharLevel}>Nivel {character.level}</span>
-                </div>
-              </div>
-              {contextualItems.map(({ icon: Icon, label }) => (
-                <Link
-                  key={label}
-                  to={`/characters/${activeCharId}`}
-                  className={`${styles.navItem} ${styles.contextualItem}`}
-                >
-                  <Icon size={18} />
-                  <span>{label}</span>
-                </Link>
-              ))}
-            </>
-          ) : (
-            contextualItems.map(({ icon: Icon, label }) => (
-              <span key={label} className={`${styles.navItem} ${styles.disabled}`} title="Selecciona un personaje">
-                <Icon size={18} />
-                <span>{label}</span>
-              </span>
-            ))
-          )}
-
+          <Link
+            to="/"
+            className={`${styles.navItem} ${isActive('/', true) ? styles.active : ''}`}
+          >
+            <Users size={18} />
+            <span>Mis Personajes</span>
+          </Link>
           <Link
             to="/campaigns"
             className={`${styles.navItem} ${isActive('/campaigns', false) ? styles.active : ''}`}
@@ -132,40 +86,48 @@ export function Layout() {
             <Map size={18} />
             <span>Campañas</span>
           </Link>
+
+          {/* ── COMPENDIO ── */}
+          <span className={styles.navSection}>Compendio</span>
           <Link
-            to="/admin"
-            className={`${styles.navItem} ${isActive('/admin', false) ? styles.active : ''}`}
+            to="/rules"
+            className={`${styles.navItem} ${isActive('/rules', false) ? styles.active : ''}`}
           >
-            <Settings size={18} />
-            <span>Admin</span>
+            <BookOpen size={18} />
+            <span>Reglas Rápidas</span>
           </Link>
+          {compendiumSoon.map(({ icon: Icon, label }) => (
+            <span key={label} className={`${styles.navItem} ${styles.disabled}`}>
+              <Icon size={18} />
+              <span>{label}</span>
+              <span className={styles.badge}>Pronto</span>
+            </span>
+          ))}
         </nav>
 
-        {/* CTA in sidebar */}
-        <Link to="/characters/new" className={styles.sidebarCta}>
-          <PlusCircle size={16} />
-          Nueva Aventura
-        </Link>
-
-        {/* Theme toggle */}
-        <button
-          onClick={toggleTheme}
-          className={styles.themeToggleBtn}
-          title={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
-        >
-          {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
-          <span>{theme === 'light' ? 'Modo Oscuro' : 'Modo Claro'}</span>
-        </button>
-
-        {/* Sign out */}
-        <button
-          onClick={signOut}
-          className={styles.signOutBtn}
-          title="Cerrar sesión"
-        >
-          <LogOut size={16} />
-          <span>Cerrar sesión</span>
-        </button>
+        {/* ── Footer icons ── */}
+        <div className={styles.sidebarFooter}>
+          <div className={styles.footerTopRow}>
+            <Link
+              to="/admin"
+              className={`${styles.footerBtn} ${isActive('/admin', false) ? styles.footerBtnActive : ''}`}
+              title="Administración"
+            >
+              <Settings size={18} />
+            </Link>
+            <button
+              onClick={toggleTheme}
+              className={styles.footerBtn}
+              title={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
+            >
+              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            </button>
+          </div>
+          <button onClick={signOut} className={styles.signOutBtn}>
+            <LogOut size={16} />
+            <span>Cerrar sesión</span>
+          </button>
+        </div>
       </aside>
 
       {/* ── Main content ── */}
