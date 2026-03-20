@@ -28,7 +28,7 @@ export function mapSpellRow(row: Record<string, unknown>): Spell {
     subschool: (row.subschool as string) ?? undefined,
     descriptor: (row.descriptor as string) ?? undefined,
     level: ((row.level as number) ?? 0) as SpellLevel,
-    type: (row.type as 'arcane' | 'divine') || 'arcane',
+    type: (row.type as 'arcane' | 'divine' | 'both') || 'arcane',
     castingTime: (row.casting_time as string) || '',
     range: (row.range as string) || '',
     target: (row.target as string) ?? undefined,
@@ -96,10 +96,11 @@ export function useSpells(filters: SpellFilters) {
         }
 
         if (filters.type !== 'all') {
-          query = query.eq('type', filters.type)
+          // Include 'both' spells when filtering by a specific type
+          query = query.in('type', [filters.type, 'both'])
         } else if (allowedTypes.length === 1) {
-          // Only one spell type available to this character's classes
-          query = query.eq('type', allowedTypes[0])
+          // Character only has access to one type — still include 'both'
+          query = query.in('type', [allowedTypes[0], 'both'])
         }
 
         if (filters.school !== 'all') {
@@ -124,11 +125,11 @@ export function useSpells(filters: SpellFilters) {
         // Custom spells: filter client-side (usually few)
         const filteredCustom = customSpells.filter((cs) => {
           if (filters.search && !cs.name.toLowerCase().includes(filters.search.toLowerCase())) return false
-          if (filters.type !== 'all' && cs.type !== filters.type) return false
+          if (filters.type !== 'all' && cs.type !== filters.type && cs.type !== 'both') return false
           if (filters.school !== 'all' && cs.school !== filters.school) return false
           if (filters.level !== 'all' && cs.level !== parseInt(filters.level)) return false
           if (filters.showKnownOnly && !filters.knownSpellIds.includes(cs.id)) return false
-          if (allowedTypes.length === 1 && cs.type !== allowedTypes[0]) return false
+          if (allowedTypes.length === 1 && cs.type !== allowedTypes[0] && cs.type !== 'both') return false
           return true
         })
 

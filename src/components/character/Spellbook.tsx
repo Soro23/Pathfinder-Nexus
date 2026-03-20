@@ -243,6 +243,9 @@ export function Spellbook({
                       {spell.school} {spell.descriptor && `(${spell.descriptor})`}
                     </span>
                   </div>
+                  {spell.type === 'both' && (
+                    <span className={styles.bothBadge} title="Arcano y Divino">A+D</span>
+                  )}
                   <span className={styles.spellLevel}>
                     {spell.level === 0 ? 'C' : spell.level}
                   </span>

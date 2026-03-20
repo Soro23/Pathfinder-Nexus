@@ -344,3 +344,15 @@
   color: var(--color-text-muted);
   padding: var(--space-1) 0 var(--space-2);
 }
+
+/* ── Both-type badge ── */
+.bothBadge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, rgba(100,120,220,0.2), rgba(180,120,60,0.2));
+  color: var(--color-text-secondary);
+  border: 1px solid rgba(180,180,180,0.2);
+  white-space: nowrap;
+}

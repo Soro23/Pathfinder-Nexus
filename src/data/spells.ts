@@ -7,7 +7,7 @@ export interface Spell {
   subschool?: string
   descriptor?: string
   level: SpellLevel
-  type: 'arcane' | 'divine'
+  type: 'arcane' | 'divine' | 'both'
   /** classLists maps classId -> spell level for that class (may differ from generic level) */
   classLists?: Record<string, SpellLevel>
   castingTime: string
@@ -5154,6 +5154,7 @@ export const SPELL_TYPES = [
   { value: 'all', label: 'Todos' },
   { value: 'arcane', label: 'Arcano' },
   { value: 'divine', label: 'Divino' },
+  { value: 'both', label: 'Ambos' },
 ] as const
 
 export const SPELL_SCHOOLS = [

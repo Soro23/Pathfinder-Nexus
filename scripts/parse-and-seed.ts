@@ -72,10 +72,12 @@ function parseClassLevels(classStr: string): Record<string, number> {
 }
 
 function determineType(classMap: Record<string, number>): string {
-  const divineClasses = ['cleric', 'druid', 'paladin', 'ranger', 'inquisitor', 'oracle', 'shaman', 'hunter', 'warpriest', 'antipaladin'];
-  for (const cls of divineClasses) {
-    if (cls in classMap) return 'divine';
-  }
+  const divineClasses = ['cleric', 'druid', 'paladin', 'ranger', 'inquisitor', 'oracle', 'shaman', 'hunter', 'warpriest', 'antipaladin', 'adept'];
+  const arcaneClasses = ['sorcerer', 'wizard', 'bard', 'magus', 'alchemist', 'witch', 'psychic', 'bloodrager', 'summoner', 'unchained summoner', 'arcanist', 'skald', 'investigator'];
+  const hasDivine = divineClasses.some(cls => cls in classMap);
+  const hasArcane = arcaneClasses.some(cls => cls in classMap);
+  if (hasDivine && hasArcane) return 'both';
+  if (hasDivine) return 'divine';
   return 'arcane';
 }
 

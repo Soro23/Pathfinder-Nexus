@@ -350,3 +350,254 @@
 .removeBtn:hover {
   color: #f87171;
 }
+
+/* ── Spell Editor ── */
+.editorCard {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.editorCard h2 {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2);
+}
+
+.editorSearchRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  position: relative;
+  margin-bottom: var(--space-4);
+}
+
+.editorSearchIcon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.editorSearchInput {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+}
+
+.editorSearchInput:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+/* Search results list */
+.searchResults {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.searchResultItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.searchResultItem:hover {
+  border-color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.05);
+}
+
+.searchResultMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.searchResultName {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+}
+
+.searchResultMeta {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.typePill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.typePill_arcane  { background: rgba(100,120,220,0.15); color: #8899ee; }
+.typePill_divine  { background: rgba(220,160,60,0.15);  color: var(--color-accent-gold); }
+.typePill_both    { background: rgba(150,150,150,0.12); color: var(--color-text-secondary); }
+
+.editHint {
+  color: var(--color-text-muted);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.searchResultItem:hover .editHint {
+  opacity: 1;
+}
+
+.noResults {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  padding: var(--space-3) 0;
+}
+
+/* Edit form */
+.editFormHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.editFormTitle {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  color: var(--color-accent-gold);
+  margin: 0;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.backBtn:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-text-muted);
+}
+
+.editGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldWide {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.fieldInput {
+  padding: var(--space-2) var(--space-2);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-family: var(--font-body);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fieldInput:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+.checkboxRow {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.saveRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-5);
+}
+
+.saveBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-accent-gold);
+  color: var(--color-bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveBtn:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.loadingMsg {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
