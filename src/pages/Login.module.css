@@ -1,0 +1,257 @@
+/* ============================================================
+   Login — "El Cronista" Stitch Design
+   ============================================================ */
+
+.page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+/* ── Left panel ── */
+.leftPanel {
+  background: var(--color-primary);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  position: relative;
+  overflow: hidden;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+}
+
+.brandIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandName {
+  font-family: var(--font-display);
+  font-size: var(--text-title-lg);
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.quote {
+  margin-top: auto;
+  margin-bottom: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.quoteText {
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.7;
+}
+
+.quoteAuthor {
+  font-size: var(--text-body-md);
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.04em;
+}
+
+.decorDots {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.decorDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.decorDot:first-child {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Right panel ── */
+.rightPanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  background: var(--color-surface);
+}
+
+.formContainer {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.formHeader h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-sm);
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-2);
+}
+
+.formHeader p {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+  line-height: 1.6;
+}
+
+/* ── Form ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.inputIcon {
+  position: absolute;
+  top: 32px;
+  left: var(--space-3);
+  color: var(--color-on-surface-variant);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.passwordToggle {
+  position: absolute;
+  top: 32px;
+  right: var(--space-3);
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  z-index: 1;
+  transition: color var(--transition-fast);
+}
+
+.passwordToggle:hover { color: var(--color-primary); }
+
+.remember {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-body-md);
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+}
+
+.checkbox {
+  accent-color: var(--color-primary);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.forgotLink {
+  color: var(--color-primary);
+  font-size: var(--text-body-md);
+  font-weight: 500;
+}
+
+/* ── Divider ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-surface-container-highest);
+}
+
+.divider span {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+}
+
+/* ── Social buttons ── */
+.social {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.socialBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-container-lowest);
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.socialBtn:hover {
+  background: var(--color-surface-container);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Links ── */
+.registerLink {
+  text-align: center;
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+}
+
+.registerLink a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.localNote {
+  text-align: center;
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.localNote a { color: var(--color-secondary); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .page { grid-template-columns: 1fr; }
+  .leftPanel { display: none; }
+  .rightPanel { padding: var(--space-6) var(--space-4); }
+}

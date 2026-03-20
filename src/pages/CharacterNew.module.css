@@ -1,0 +1,761 @@
+/* ============================================================
+   CharacterNew — "El Cronista" 4-step Wizard
+   Stitch Design: parchment, visual selectors, scribe advisor
+   ============================================================ */
+
+.container {
+  max-width: 900px;
+}
+
+.header {
+  margin-bottom: var(--space-6);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-on-surface-variant);
+  margin-bottom: var(--space-3);
+  font-size: var(--text-body-md);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.backLink:hover { color: var(--color-primary); }
+
+.header h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-md);
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-1);
+}
+
+.headerSub {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+}
+
+/* ── Progress indicator ── */
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: var(--space-6);
+}
+
+.progressStep {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  padding: var(--space-2) var(--space-1);
+  cursor: default;
+  color: var(--color-on-surface-variant);
+  font-size: var(--text-body-md);
+  flex-shrink: 0;
+}
+
+.progressStep.progressDone { cursor: pointer; color: var(--color-secondary); }
+.progressStep.progressActive { color: var(--color-primary); font-weight: 600; }
+
+.progressDot {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.progressDone .progressDot {
+  background: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+}
+
+.progressActive .progressDot {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.progressLine {
+  flex: 1;
+  height: 2px;
+  background: var(--color-surface-container-highest);
+  margin: 0 var(--space-1);
+  min-width: 20px;
+}
+
+.progressLineDone { background: var(--color-secondary-container); }
+
+/* ── Layout ── */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+/* ── Form card ── */
+.formCard {
+  animation: slideUp var(--transition-normal);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.stepContent h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-sm);
+  color: var(--color-primary);
+  margin-bottom: 0;
+}
+
+.stepDesc {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+  margin-top: calc(-1 * var(--space-3));
+}
+
+/* ── Name row ── */
+.nameRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.nameLabel {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.nameInput {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  transition: box-shadow var(--transition-fast);
+  box-shadow: inset 0 0 0 1px rgba(123, 0, 31, 0.12);
+}
+
+.nameInput:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.3);
+}
+
+/* ── Race grid ── */
+.raceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-bg-primary);
+}
+
+.raceCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-2);
+  background: var(--color-surface-container);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  text-align: center;
+}
+
+.raceCard:hover {
+  background: var(--color-surface-container-high);
+  box-shadow: var(--shadow-sm);
+}
+
+.raceCard.selected {
+  background: var(--color-surface-container-lowest);
+  box-shadow: inset 0 0 0 2px var(--color-primary), var(--shadow-sm);
+}
+
+
+.raceName {
+  font-family: var(--font-display);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.raceBonus {
+  font-size: var(--text-label-sm);
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.selectedCheck {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  color: var(--color-primary);
+}
+
+.raceDesc {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-container);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+  font-style: italic;
+  line-height: 1.55;
+}
+
+/* ── Class grid ── */
+.classGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-bg-primary);
+}
+
+.classCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-surface-container);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.classCard:hover {
+  background: var(--color-surface-container-high);
+  box-shadow: var(--shadow-sm);
+}
+
+.classCard.selected {
+  background: var(--color-surface-container-lowest);
+  box-shadow: inset 0 0 0 2px var(--color-primary), var(--shadow-sm);
+}
+
+.classHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.className {
+  font-family: var(--font-display);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.classRole {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-secondary);
+  background: var(--color-secondary-container);
+  padding: 1px var(--space-1);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.classDie {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.classDesc {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  line-height: 1.5;
+}
+
+/* ── Alignment row ── */
+.alignmentRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.alignSelect {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(123, 88, 0, 0.15);
+  align-self: flex-start;
+  min-width: 200px;
+}
+
+/* ── Abilities ── */
+.pointsLeft { color: var(--color-secondary); }
+.pointsOver { color: var(--color-error); font-weight: 600; }
+.pointsExact { color: #2d6a2d; font-weight: 600; }
+
+.abilityGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.abilityCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--color-surface-container);
+  border-radius: var(--radius-md);
+}
+
+.abilityLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.abilityAbbr {
+  font-size: var(--text-label-sm);
+  color: var(--color-secondary);
+  font-weight: 700;
+}
+
+.abilityControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.abilityBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface);
+  font-size: var(--text-title-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.abilityBtn:hover:not(:disabled) {
+  background: var(--color-surface-container-high);
+  color: var(--color-primary);
+}
+
+.abilityBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.abilityNumber {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  min-width: 40px;
+  text-align: center;
+}
+
+.abilityMod {
+  font-size: var(--text-body-md);
+  font-weight: 700;
+}
+
+.modPos { color: #2d6a2d; }
+.modNeg { color: var(--color-primary); }
+
+/* ── Summary ── */
+.summaryCard {
+  background: var(--color-surface-container);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.summaryTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.summaryAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-high);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.summaryName {
+  font-family: var(--font-display);
+  font-size: var(--text-title-lg);
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-1);
+}
+
+.summaryMeta {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+  margin-bottom: 2px;
+}
+
+.summaryAlign {
+  font-size: var(--text-label-md);
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.summaryStats {
+  display: flex;
+  justify-content: space-around;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-sm);
+}
+
+.summaryStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.summaryStatVal {
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.summaryStatLbl {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summaryAbilities {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+}
+
+.summaryAbility {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-sm);
+}
+
+.summaryAbilityAbbr {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.summaryAbilityVal {
+  font-family: var(--font-display);
+  font-size: var(--text-title-sm);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.summaryAbilityMod {
+  font-size: var(--text-body-md);
+  font-weight: 700;
+}
+
+/* ── Step actions ── */
+.stepActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-surface-container-high);
+}
+
+/* ── Scribe advisor ── */
+.advisor {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  align-self: start;
+  position: sticky;
+  top: var(--space-4);
+}
+
+.advisorIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--color-secondary-container);
+  color: var(--color-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.advisorTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-2);
+}
+
+.advisorText {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+  line-height: 1.6;
+}
+
+/* ── Ability method chips ── */
+.methodChips {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.methodChip {
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-surface-container);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: var(--text-label-sm);
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.methodChip:hover { background: var(--color-surface-container-high); }
+
+.methodChipActive {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.methodChipActive:hover { background: var(--color-primary); }
+
+/* ── Roll row ── */
+.rollRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.rollBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-secondary-container);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-secondary-container);
+  font-size: var(--text-label-md);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.rollBtn:hover { background: var(--color-surface-container-highest); }
+
+/* ── Array pool ── */
+.arrayPool {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.arrayChips {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.arrayChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+  border-radius: var(--radius-full);
+  font-family: var(--font-display);
+  font-size: var(--text-label-md);
+  font-weight: 700;
+  transition: background var(--transition-fast), opacity var(--transition-fast);
+}
+
+.arrayChipUsed {
+  background: var(--color-surface-container-highest);
+  color: var(--color-on-surface-variant);
+  opacity: 0.5;
+}
+
+/* ── Free input & array select ── */
+.freeInput {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  text-align: center;
+  width: 64px;
+  transition: box-shadow var(--transition-fast);
+}
+
+.freeInput:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.3);
+}
+
+.arraySelect {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  cursor: pointer;
+  width: 100%;
+  max-width: 120px;
+}
+
+/* ── Accordion ── */
+.accordionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.accordionGroup {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.accordionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-secondary);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.accordionHeader:hover {
+  background: var(--color-bg-elevated);
+}
+
+.accordionHasSelected {
+  border-left: 3px solid var(--color-primary);
+  padding-left: calc(var(--space-4) - 3px);
+}
+
+.accordionLabel {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  flex: 1;
+}
+
+.accordionMeta {
+  font-size: 0.75rem;
+  color: var(--color-on-surface-dim);
+}
+
+.accordionChevron {
+  color: var(--color-on-surface-dim);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.accordionChevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; }
+  .advisor { order: -1; position: static; }
+  .raceGrid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+  .classGrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .abilityGrid { grid-template-columns: repeat(2, 1fr); }
+  .summaryAbilities { grid-template-columns: repeat(3, 1fr); }
+  .progress { flex-wrap: wrap; gap: var(--space-2); }
+  .progressLine { display: none; }
+}
+
+@media (max-width: 480px) {
+  .abilityGrid { grid-template-columns: repeat(2, 1fr); }
+}

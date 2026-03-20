@@ -1,0 +1,170 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.headerTitle h4 {
+  font-size: 0.875rem;
+  color: var(--color-accent-gold);
+  margin: 0;
+}
+
+.headerTitle svg {
+  color: var(--color-accent-gold);
+}
+
+.addForm {
+  animation: fadeIn var(--transition-normal);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.weaponsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.weaponRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-accent-gold);
+  gap: var(--space-3);
+}
+
+.weaponInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.weaponName {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+}
+
+.weaponType {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-transform: capitalize;
+}
+
+.weaponNotes {
+  font-size: 0.75rem;
+  color: var(--color-accent-gold);
+  font-style: italic;
+}
+
+.weaponStats {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.attackCol,
+.damageCol,
+.critCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 50px;
+}
+
+.statLabel {
+  font-size: 0.625rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.attackBonus {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+}
+
+.damage,
+.critical {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-accent-red);
+}
+
+.deleteBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
+}
+
+.deleteBtn:hover {
+  color: var(--color-accent-red);
+  background: rgba(139, 58, 58, 0.2);
+}
+
+@media (max-width: 600px) {
+  .weaponRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .weaponStats {
+    justify-content: space-around;
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .deleteBtn {
+    align-self: flex-end;
+  }
+}

@@ -1,0 +1,449 @@
+/* ============================================================
+   AnimalCompanion — "El Cronista" Stitch Design
+   ============================================================ */
+
+.companion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Empty state ── */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.emptyIcon {
+  color: var(--color-outline);
+  opacity: 0.45;
+}
+
+.empty h3 {
+  font-family: var(--font-display);
+  color: var(--color-on-surface);
+  font-size: var(--text-title-md);
+}
+
+.empty p {
+  color: var(--color-on-surface-variant);
+  font-size: var(--text-body-md);
+  max-width: 360px;
+  line-height: 1.55;
+}
+
+/* ── Header ── */
+.companionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.companionAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-highest);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.companionInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.companionName {
+  font-family: var(--font-display);
+  font-size: var(--text-title-lg);
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-1);
+}
+
+.companionMeta {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+}
+
+/* ── Stats row (HP + Saves) ── */
+.statsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+/* HP Card */
+.hpCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.hpIcon { color: var(--color-primary); }
+
+.hpValues {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.hpCurrent {
+  font-family: var(--font-display);
+  font-size: var(--text-display-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.hpSlash {
+  font-size: var(--text-title-md);
+  color: var(--color-outline);
+}
+
+.hpMax {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.hpInput {
+  width: 64px;
+  text-align: center;
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  font-weight: 700;
+  color: var(--color-primary);
+  padding: var(--space-1) var(--space-2);
+  box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.2);
+}
+
+.hpInput:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.4);
+}
+
+.hpLabel {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hpBar {
+  width: 100%;
+  height: 6px;
+  background: var(--color-surface-container-high);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.hpBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-container));
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal);
+}
+
+.hpQuickBtns {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.hpBtn {
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-surface-container);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface);
+  font-weight: 700;
+  cursor: pointer;
+  font-size: var(--text-body-md);
+  transition: background var(--transition-fast);
+}
+
+.hpBtn:hover {
+  background: var(--color-surface-container-high);
+  color: var(--color-primary);
+}
+
+/* Saves Card */
+.savesCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.savesIcon { color: var(--color-secondary); }
+
+.savesTitle {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-1);
+}
+
+.saveRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-body-md);
+}
+
+.saveVal {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-secondary);
+}
+
+/* ── Generic section ── */
+.section {
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-title-sm);
+  color: var(--color-primary);
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
+  background: linear-gradient(to bottom, transparent calc(100% - 2px), var(--color-surface-container-high) 100%);
+}
+
+.sectionHeader .sectionTitle {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  background: none;
+}
+
+/* ── Ability grid ── */
+.abilityGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+}
+
+.abilityBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2);
+  background: var(--color-surface-container);
+  border-radius: var(--radius-sm);
+}
+
+.abilityAbbr {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.abilityScore {
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  line-height: 1;
+}
+
+.abilityMod {
+  font-size: var(--text-body-md);
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.abilityInput {
+  width: 100%;
+  text-align: center;
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-title-sm);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  padding: 2px;
+  box-shadow: inset 0 0 0 1px rgba(123, 0, 31, 0.15);
+}
+
+.abilityInput:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.3);
+}
+
+/* ── Attacks table ── */
+.attacksTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-body-md);
+}
+
+.attacksTable th {
+  text-align: left;
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: var(--space-1) var(--space-2);
+  font-weight: 700;
+}
+
+.attacksTable td {
+  padding: var(--space-2);
+  background: var(--color-surface-container);
+  border-radius: var(--radius-sm);
+}
+
+.attacksTable tbody tr + tr td {
+  margin-top: 2px;
+}
+
+.attackBonus {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.attackDamage {
+  font-family: var(--font-display);
+  color: var(--color-secondary);
+}
+
+.tableInput {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  width: 100%;
+  box-shadow: inset 0 0 0 1px rgba(123, 0, 31, 0.15);
+}
+
+.tableInput:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.3);
+}
+
+.tableInputSm { width: 64px; }
+
+.removeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1);
+  background: transparent;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.removeBtn:hover {
+  color: var(--color-error);
+  background: var(--color-error-container);
+}
+
+.emptyRow {
+  text-align: center;
+  color: var(--color-on-surface-variant);
+  padding: var(--space-4) !important;
+  font-style: italic;
+}
+
+/* ── Special abilities ── */
+.addAbility {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.abilitiesChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.abilityChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+  border-radius: var(--radius-full);
+  font-size: var(--text-label-md);
+  font-weight: 600;
+}
+
+.chipRemove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-on-secondary-container);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.chipRemove:hover { opacity: 1; }
+
+.emptyText {
+  color: var(--color-on-surface-variant);
+  font-style: italic;
+  font-size: var(--text-body-md);
+}
+
+@media (max-width: 600px) {
+  .statsRow { grid-template-columns: 1fr; }
+  .abilityGrid { grid-template-columns: repeat(3, 1fr); }
+}

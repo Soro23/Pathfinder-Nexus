@@ -1,0 +1,85 @@
+.wrapper {
+  overflow: hidden;
+}
+
+.scrollArea {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-body-sm);
+  min-width: 540px;
+}
+
+.table th {
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-1) var(--space-2);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-1) var(--space-2);
+  text-align: center;
+  color: var(--color-on-surface-variant);
+  font-size: var(--text-body-sm);
+  border-bottom: 1px solid var(--color-surface-container-high);
+}
+
+.row:hover td {
+  background: var(--color-surface-container);
+}
+
+.currentLevel td {
+  background: var(--color-primary-container);
+  color: var(--color-on-surface);
+  font-weight: 700;
+}
+
+.currentLevel:hover td {
+  background: var(--color-primary-container);
+}
+
+.thNv,
+.tdNv {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  min-width: 28px;
+}
+
+.tdNum {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface);
+  min-width: 34px;
+}
+
+.thSpell,
+.tdSpell {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-label-sm);
+  min-width: 24px;
+  color: var(--color-secondary);
+}
+
+.thFeatures {
+  text-align: left;
+}
+
+.tdFeatures {
+  text-align: left;
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  max-width: 260px;
+  white-space: normal;
+  padding-left: var(--space-3);
+}

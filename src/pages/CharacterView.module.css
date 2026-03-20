@@ -1,0 +1,988 @@
+/* ============================================================
+   CharacterView — "El Cronista" character sheet
+   Stitch Design: tonal layering, editorial stats, no borders
+   ============================================================ */
+
+.container {
+  max-width: 1100px;
+}
+
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-12);
+  text-align: center;
+}
+
+/* ── Page Header ── */
+.header {
+  margin-bottom: var(--space-6);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-on-surface-variant);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-body-md);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.backLink:hover {
+  color: var(--color-primary);
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.titleRow h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-md);
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  color: var(--color-on-surface-variant);
+  font-size: var(--text-body-md);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+/* ── HP Banner ── */
+.hpBanner {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.hpCardLarge {
+  flex: 1;
+  background: var(--color-surface-container-lowest) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.hpContent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.hpIcon {
+  color: var(--color-primary);
+}
+
+.hpValues {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+/* HP numbers — Noto Serif for "narrative power" */
+.hpCurrent {
+  font-family: var(--font-display);
+  font-size: var(--text-display-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.hpSeparator {
+  font-size: var(--text-headline-sm);
+  color: var(--color-outline);
+}
+
+.hpMax {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-md);
+  color: var(--color-on-surface-variant);
+}
+
+/* HP Bar — gradient primary to primary-container */
+.hpBar {
+  height: 6px;
+  background: var(--color-surface-container-high);
+  border-radius: var(--radius-full);
+  margin-top: var(--space-2);
+  overflow: hidden;
+}
+
+.hpBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal);
+}
+
+.hpControls {
+  display: flex;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.hpBtn {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-container);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.hpBtn:hover {
+  background: var(--color-surface-container-high);
+  color: var(--color-primary);
+}
+
+/* Quick stats row */
+.quickStats {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.quickStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  min-width: 72px;
+}
+
+.quickStat svg {
+  color: var(--color-secondary);
+}
+
+.quickStatValue {
+  font-family: var(--font-display);   /* Narrative numbers */
+  font-size: var(--text-title-md);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  line-height: 1;
+}
+
+.quickStatLabel {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: var(--space-6);
+  background: var(--color-surface-container-low);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-body);
+  font-size: var(--text-label-lg);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: var(--color-surface-container);
+  color: var(--color-on-surface);
+}
+
+.activeTab {
+  background: var(--color-surface-container-lowest);
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.tabContent {
+  animation: fadeIn var(--transition-normal);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Combat Tab ── */
+.combatTab {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.colSpan2 {
+  grid-column: 1 / -1;
+}
+
+.alignStart {
+  align-self: start;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--text-title-sm);
+  color: var(--color-primary);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-2);
+  /* Tonal line instead of 1px border */
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    transparent calc(100% - 2px),
+    var(--color-surface-container-high) 100%
+  );
+}
+
+/* Ability scores grid */
+.abilityGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+}
+
+.abilityBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.abilityAbbr {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.abilityScore {
+  font-family: var(--font-display);  /* Narrative power number */
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  line-height: 1;
+}
+
+.abilityMod {
+  font-size: var(--text-body-md);
+  font-weight: 700;
+}
+
+.positive { color: #2d6a2d; }
+.negative { color: var(--color-primary); }
+
+/* Saving throws */
+.savesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.saveBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Combat stats */
+.combatStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.combatStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.combatLabel {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.combatValue {
+  font-family: var(--font-display);   /* Narrative power */
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  color: var(--color-secondary);
+}
+
+/* ── Misc ── */
+.editHint {
+  color: var(--color-on-surface-variant);
+  font-style: italic;
+  text-align: center;
+  padding: var(--space-6);
+  font-size: var(--text-body-md);
+}
+
+.emptyCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-12) !important;
+}
+
+.emptyIcon {
+  color: var(--color-outline);
+  opacity: 0.5;
+  margin-bottom: var(--space-4);
+}
+
+.emptyCard h3 {
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-2);
+}
+
+.emptyCard p {
+  color: var(--color-on-surface-variant);
+  font-size: var(--text-body-md);
+}
+
+/* Notes */
+.notesTextarea {
+  width: 100%;
+  min-height: 300px;
+  padding: var(--space-4);
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  line-height: 1.7;
+  resize: vertical;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.notesTextarea:focus {
+  outline: none;
+  background: var(--color-surface-container-high);
+  box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.25);
+}
+
+.notesTextarea::placeholder {
+  color: var(--color-on-surface-variant);
+  opacity: 0.5;
+}
+
+.notesDisplay {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  color: var(--color-on-surface-variant);
+  font-size: var(--text-body-md);
+}
+
+/* Combat stats — 4-col → 8-col grid */
+.combatStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+/* Section header with action button */
+.sectionHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.sectionHeaderRow .sectionTitle {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  background: none;
+}
+
+/* ── Status Effects ── */
+.addEffectBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  border: none;
+  color: var(--color-secondary);
+  font-size: var(--text-label-lg);
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.addEffectBtn:hover { background: var(--color-surface-container-low); }
+
+.effectForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-surface-container);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+}
+
+.effectInput {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  box-shadow: inset 0 0 0 1px rgba(123, 0, 31, 0.15);
+}
+
+.effectInput:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.3);
+}
+
+.effectFormActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.effectsChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}
+
+.emptyEffects {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+  font-style: italic;
+}
+
+.effectChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-2);
+  background: var(--color-surface-container-high);
+  border-radius: var(--radius-full);
+  font-size: var(--text-label-lg);
+}
+
+.effectName {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.effectDesc {
+  color: var(--color-on-surface-variant);
+  font-size: var(--text-body-sm);
+}
+
+.effectRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-on-surface-variant);
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+}
+
+.effectRemove:hover { color: var(--color-error); }
+
+/* ── Skills table ── */
+.skillsTable {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--text-body-md);
+}
+
+.skillsTableHeader {
+  display: grid;
+  grid-template-columns: 1fr 48px 56px 56px;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--color-surface-container-highest);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.skillRow {
+  display: grid;
+  grid-template-columns: 1fr 48px 56px 56px;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  align-items: center;
+  border-bottom: 1px solid rgba(140, 112, 113, 0.1);
+  transition: background var(--transition-fast);
+}
+
+.skillRow:hover { background: var(--color-surface-container-lowest); }
+
+.skillRowActive { background: var(--color-surface-container-lowest); }
+
+.skillName {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-on-surface);
+}
+
+.classSkillDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-secondary);
+  flex-shrink: 0;
+}
+
+.skillAbility {
+  color: var(--color-on-surface-variant);
+  font-size: var(--text-label-sm);
+  text-align: center;
+}
+
+.skillRanks {
+  font-family: var(--font-display);
+  text-align: center;
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.skillTotal {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-align: right;
+  color: var(--color-on-surface-variant);
+}
+
+/* ── Journal / Diario ── */
+.journalTab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.journalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.journalTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-title-lg);
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-1);
+}
+
+.journalSubtitle {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+}
+
+.journalEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-12);
+  text-align: center;
+  color: var(--color-on-surface-variant);
+}
+
+.journalEmptyIcon { opacity: 0.35; color: var(--color-outline); }
+
+.journalEmptyHint {
+  font-size: var(--text-body-sm);
+  opacity: 0.7;
+}
+
+.journalEntryCard {
+  cursor: default;
+}
+
+.journalEntryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  cursor: pointer;
+  gap: var(--space-4);
+}
+
+.journalDate {
+  font-family: var(--font-display);
+  font-size: var(--text-title-sm);
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.journalDateInput {
+  background: transparent;
+  border: none;
+  font-family: var(--font-display);
+  font-size: var(--text-title-sm);
+  color: var(--color-secondary);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(123, 88, 0, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-2);
+}
+
+.journalDateInput:focus { outline: none; box-shadow: inset 0 0 0 2px rgba(123, 88, 0, 0.4); }
+
+.journalPreview {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  margin-top: var(--space-1);
+  line-height: 1.5;
+}
+
+.journalEntryActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.expandIcon {
+  font-size: 10px;
+  color: var(--color-on-surface-variant);
+}
+
+.journalEntryBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-surface-container-high);
+}
+
+.journalTextarea {
+  width: 100%;
+  min-height: 160px;
+  padding: var(--space-3);
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.journalTextarea:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.2);
+}
+
+.journalContent {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  color: var(--color-on-surface);
+  font-size: var(--text-body-md);
+}
+
+.journalSection { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.journalSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.journalSectionLabel {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.addSmBtn {
+  background: none;
+  border: none;
+  color: var(--color-secondary);
+  font-size: var(--text-label-lg);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px var(--space-1);
+}
+
+.journalCharRow,
+.journalPlaceRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.journalInlineInput {
+  flex: 1;
+  min-width: 100px;
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  box-shadow: inset 0 0 0 1px rgba(123, 0, 31, 0.12);
+}
+
+.journalInlineInput:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.25);
+}
+
+.journalSelect {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(123, 0, 31, 0.12);
+}
+
+.journalCharName {
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.journalCharNotes, .placeDesc {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.placeName {
+  font-weight: 600;
+  color: var(--color-secondary);
+}
+
+.roleBadge {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.roleBadge.ally { background: rgba(74, 124, 74, 0.15); color: #2d6a2d; }
+.roleBadge.enemy { background: var(--color-error-container); color: var(--color-error); }
+.roleBadge.neutral { background: var(--color-surface-container-high); color: var(--color-on-surface-variant); }
+
+.legacyNotesTitle {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: var(--space-3);
+}
+
+.removeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-on-surface-variant);
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.removeBtn:hover {
+  color: var(--color-error);
+  background: var(--color-error-container);
+}
+
+.emptyText { font-style: italic; color: var(--color-on-surface-variant); }
+
+/* ── Feats read mode ── */
+.featsReadGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.featReadCard {
+  padding: var(--space-3);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.featReadHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.featReadName {
+  font-family: var(--font-display);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.featReadType {
+  font-size: var(--text-label-sm);
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.featReadBenefit {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  line-height: 1.5;
+}
+
+/* ── Journal modal ── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 28, 23, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: var(--space-4);
+}
+
+.modalPanel {
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 8px 32px rgba(28, 28, 23, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-surface-container-high);
+}
+
+.modalTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  transition: color var(--transition-fast);
+}
+.modalClose:hover { color: var(--color-on-surface); }
+
+.modalBody {
+  padding: var(--space-4) var(--space-5);
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5) var(--space-4);
+  border-top: 1px solid var(--color-surface-container-high);
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .titleRow { flex-direction: column; }
+  .actions { width: 100%; }
+  .actions a, .actions button { flex: 1; }
+  .hpBanner { flex-direction: column; }
+  .hpContent { flex-wrap: wrap; justify-content: center; }
+  .hpControls { width: 100%; justify-content: center; margin-left: 0; margin-top: var(--space-3); }
+  .quickStats { width: 100%; justify-content: space-around; }
+  .abilityGrid { grid-template-columns: repeat(3, 1fr); }
+  .combatStats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .abilityGrid { grid-template-columns: repeat(2, 1fr); }
+}

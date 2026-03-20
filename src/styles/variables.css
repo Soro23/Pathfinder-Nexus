@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ============================================================
+     COLOR SYSTEM — "The Chronicler's Interface" (Stitch Design)
+     ============================================================ */
+
+  /* Primary — Carmesí */
+  --color-primary:               #7b001f;
+  --color-primary-container:     #9e1b32;
+  --color-primary-fixed:         #ffdada;
+  --color-primary-fixed-dim:     #ffb3b5;
+  --color-on-primary:            #ffffff;
+  --color-on-primary-container:  #ffb0b3;
+  --color-on-primary-fixed:      #40000c;
+  --color-inverse-primary:       #ffb3b5;
+
+  /* Secondary — Dorado */
+  --color-secondary:             #7b5800;
+  --color-secondary-container:   #fdc34d;
+  --color-secondary-fixed:       #ffdea6;
+  --color-secondary-fixed-dim:   #f7bd48;
+  --color-on-secondary:          #ffffff;
+  --color-on-secondary-container: #715000;
+
+  /* Tertiary — Warm Brown */
+  --color-tertiary:              #4f342b;
+  --color-tertiary-container:    #694a41;
+  --color-on-tertiary:           #ffffff;
+  --color-on-tertiary-container: #e5bcaf;
+
+  /* Surface Hierarchy — Parchment Layers */
+  --color-surface:               #fcf9f0;   /* Base vellum */
+  --color-surface-bright:        #fcf9f0;
+  --color-surface-dim:           #dddad1;
+  --color-surface-container-lowest: #ffffff;   /* Lifted cards */
+  --color-surface-container-low:    #f6f3ea;   /* Sidebar sections */
+  --color-surface-container:        #f1eee5;   /* Default container */
+  --color-surface-container-high:   #ebe8df;   /* Highlighted sections */
+  --color-surface-container-highest: #e5e2da;  /* Header/top areas */
+  --color-surface-tint:          #b02a3e;
+  --color-surface-variant:       #e5e2da;
+  --color-inverse-surface:       #31312b;
+  --color-inverse-on-surface:    #f4f1e8;
+
+  /* Background */
+  --color-background:            #fcf9f0;
+  --color-on-background:         #1c1c17;
+
+  /* Text */
+  --color-on-surface:            #1c1c17;
+  --color-on-surface-variant:    #594141;
+
+  /* Outline (Ghost Border Rule — use at low opacity) */
+  --color-outline:               #8c7071;
+  --color-outline-variant:       #e0bfbf;
+
+  /* Error */
+  --color-error:                 #ba1a1a;
+  --color-error-container:       #ffdad6;
+  --color-on-error:              #ffffff;
+  --color-on-error-container:    #93000a;
+
+  /* ============================================================
+     LEGACY ALIASES (backward-compat with existing components)
+     ============================================================ */
+  --color-bg-primary:        var(--color-surface);
+  --color-bg-secondary:      var(--color-surface-container-low);
+  --color-bg-tertiary:       var(--color-surface-container);
+  --color-text-primary:      var(--color-on-surface);
+  --color-text-secondary:    var(--color-on-surface-variant);
+  --color-accent-gold:       var(--color-secondary);
+  --color-accent-gold-dim:   var(--color-secondary-container);
+  --color-accent-red:        var(--color-primary);
+  --color-accent-green:      #4a7c4a;
+  --color-border:            rgba(140, 112, 113, 0.2);   /* outline at ~20% */
+  --color-border-light:      rgba(224, 191, 191, 0.3);   /* outline-variant at ~30% */
+
+  /* ============================================================
+     TYPOGRAPHY — Noto Serif + Inter
+     ============================================================ */
+  --font-display:  'Noto Serif', Georgia, serif;
+  --font-body:     'Inter', system-ui, sans-serif;
+  --font-mono:     'Fira Code', 'Courier New', monospace;
+
+  /* Type Scale */
+  --text-display-lg:  3.5rem;    /* 56px — Character name hero */
+  --text-display-md:  2.75rem;   /* 44px */
+  --text-display-sm:  2.25rem;   /* 36px */
+  --text-headline-lg: 2rem;      /* 32px */
+  --text-headline-md: 1.75rem;   /* 28px — Section headers */
+  --text-headline-sm: 1.5rem;    /* 24px */
+  --text-title-lg:    1.375rem;  /* 22px */
+  --text-title-md:    1.125rem;  /* 18px — Stat labels */
+  --text-title-sm:    1rem;      /* 16px */
+  --text-body-lg:     1rem;      /* 16px */
+  --text-body-md:     0.875rem;  /* 14px — Descriptions */
+  --text-body-sm:     0.75rem;   /* 12px */
+  --text-label-lg:    0.875rem;  /* 14px */
+  --text-label-md:    0.75rem;   /* 12px */
+  --text-label-sm:    0.6875rem; /* 11px — Micro-data, ALL CAPS */
+
+  /* ============================================================
+     SPACING
+     ============================================================ */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ============================================================
+     BORDER RADIUS — "Cut Paper" aesthetic (sm or none only)
+     ============================================================ */
+  --radius-none: 0px;
+  --radius-sm:   2px;   /* Default for most elements — paper-cut feel */
+  --radius-md:   4px;   /* Stitch ROUND_FOUR */
+  --radius-lg:   8px;   /* Proficiency chips / pill badges */
+  --radius-full: 9999px;
+
+  /* ============================================================
+     ELEVATION — Tonal layering, not structural shadows
+     ============================================================ */
+
+  /* Ambient shadows — tinted with on-surface, never pure black */
+  --shadow-sm:   0 2px 6px rgba(28, 28, 23, 0.04);
+  --shadow-md:   0 4px 12px rgba(28, 28, 23, 0.05);
+  --shadow-lg:   0 10px 30px rgba(28, 28, 23, 0.06);
+  --shadow-float: 0 12px 32px rgba(123, 0, 31, 0.08); /* primary-tinted for FABs */
+
+  /* Glassmorphism — for modals/overlays */
+  --glass-bg:     rgba(252, 249, 240, 0.80);
+  --glass-blur:   20px;
+
+  /* ============================================================
+     TRANSITIONS
+     ============================================================ */
+  --transition-fast:   150ms ease-out;
+  --transition-normal: 250ms ease-out;
+  --transition-slow:   400ms ease-out;
+}
+
+/* ============================================================
+   GLOBAL BASE STYLES
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  color: var(--color-on-surface);
+  line-height: 1.2;
+}
+
+h4, h5, h6 {
+  font-family: var(--font-body);
+  color: var(--color-on-surface);
+  line-height: 1.3;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-primary-container);
+}

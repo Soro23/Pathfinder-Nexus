@@ -1,0 +1,366 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.coinsCard {
+  background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(212, 164, 76, 0.1) 100%) !important;
+}
+
+.coinsHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.coinsHeader h4 {
+  font-size: 0.875rem;
+  color: var(--color-accent-gold);
+  margin: 0;
+}
+
+.coinsIcon {
+  color: var(--color-accent-gold);
+}
+
+.coinsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.coinRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.coinLabel {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.coinRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.coinBtn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.coinBtn:hover {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+}
+
+.coinValue {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  min-width: 32px;
+  text-align: center;
+  color: var(--color-accent-gold);
+}
+
+.totalGold {
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  text-align: right;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.totalGold strong {
+  color: var(--color-accent-gold);
+}
+
+.weightCard {
+  padding: var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.weightInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  font-size: 0.875rem;
+}
+
+.weightInfo svg {
+  color: var(--color-text-secondary);
+}
+
+.weightInfo span {
+  color: var(--color-text-secondary);
+}
+
+.weightInfo strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+}
+
+.overweight {
+  color: var(--color-accent-red) !important;
+}
+
+.capacity {
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+.weightBar {
+  height: 8px;
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.weightFill {
+  height: 100%;
+  background: var(--color-accent-green);
+  border-radius: var(--radius-sm);
+  transition: width var(--transition-normal);
+}
+
+.overweightFill {
+  background: var(--color-accent-red);
+}
+
+.encumberedWarning {
+  margin-top: var(--space-2);
+  font-size: 0.75rem;
+  color: var(--color-accent-red);
+  font-style: italic;
+}
+
+.inventoryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inventoryTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.inventoryTitle h4 {
+  font-size: 0.875rem;
+  color: var(--color-accent-gold);
+  margin: 0;
+}
+
+.inventoryTitle svg {
+  color: var(--color-accent-gold);
+}
+
+.addForm {
+  animation: fadeIn var(--transition-normal);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.itemRow:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.itemRow.equipped {
+  border-left-color: var(--color-accent-green);
+  background: rgba(74, 124, 74, 0.1);
+}
+
+.itemInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+.equipBtn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.equipBtn:hover {
+  border-color: var(--color-accent-green);
+}
+
+.equipBtn.isEquipped {
+  background: var(--color-accent-green);
+  border-color: var(--color-accent-green);
+  color: white;
+}
+
+.itemName {
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.equippedBadge {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-accent-green);
+  color: white;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.itemControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.qtyBtn {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.qtyBtn:hover {
+  border-color: var(--color-accent-gold);
+}
+
+.qty {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  min-width: 24px;
+  text-align: center;
+}
+
+.itemWeight {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  min-width: 50px;
+  text-align: right;
+}
+
+.deleteBtn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  border-radius: var(--radius-sm);
+}
+
+.deleteBtn:hover {
+  color: var(--color-accent-red);
+  background: rgba(139, 58, 58, 0.2);
+}
+
+@media (max-width: 600px) {
+  .coinsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .itemRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .itemControls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
