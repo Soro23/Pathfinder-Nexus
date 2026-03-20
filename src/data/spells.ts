@@ -1776,7 +1776,7 @@ export const SPELLS: Spell[] = [
   {
     id: 'haste',
     type: 'arcane',
-    name: 'Celeridad',
+    name: 'Acelerar',
     school: 'Transmutation',
     level: 3,
     castingTime: '1 action',

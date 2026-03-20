@@ -1,5 +1,5 @@
 .container {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
@@ -13,6 +13,7 @@
   text-align: center;
 }
 
+/* ── Header ── */
 .header {
   margin-bottom: var(--space-6);
 }
@@ -30,29 +31,71 @@
   color: var(--color-accent-gold);
 }
 
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .header h1 {
   font-size: 1.5rem;
   color: var(--color-accent-gold);
+  flex: 1;
 }
 
-.grid {
+.statusBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all var(--transition-fast);
+}
+
+.statusBtn:hover,
+.statusBtnActive {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+}
+
+.statusBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--color-accent-gold);
+  color: var(--color-bg-primary);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Page Layout ── */
+.pageLayout {
   display: grid;
   grid-template-columns: 1fr 300px;
   gap: var(--space-4);
+  align-items: start;
 }
 
-.mainPanel {
+/* ── Tab Shell ── */
+.tabShell {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-.sidePanel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
+/* ── HP Panel ── */
 .hpPanel {
   background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(139, 58, 58, 0.3) 100%) !important;
 }
@@ -101,6 +144,52 @@
   justify-content: center;
 }
 
+/* ── Tab Nav ── */
+.tabNav {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1);
+}
+
+.tabBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tabBtn:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+}
+
+.tabBtnActive {
+  background: var(--color-accent-gold) !important;
+  color: var(--color-bg-primary) !important;
+}
+
+/* ── Tab Content ── */
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Section Title ── */
 .sectionTitle {
   display: flex;
   align-items: center;
@@ -110,12 +199,239 @@
   margin-bottom: var(--space-3);
 }
 
+/* ── Combat Stats Bar ── */
+.combatStats {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.statPill {
+  flex: 1;
+  min-width: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.statPillLabel {
+  font-size: 0.6rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.statPillValue {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+}
+
+/* ── Weapons ── */
+.weaponList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.weaponRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+
+.weaponInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 120px;
+}
+
+.weaponName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.weaponCrit {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.weaponBtns {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
 .quickRolls {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-2);
 }
 
+/* ── Skills ── */
+.skillsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+.skillBtn {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.skillBtn:hover {
+  border-color: var(--color-accent-gold);
+  background: var(--color-bg-primary);
+}
+
+.skillName {
+  font-size: 0.8rem;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.classSkillDot {
+  color: var(--color-accent-gold);
+  font-size: 0.5rem;
+}
+
+.skillAbility {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-secondary);
+}
+
+.skillBonus {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+  min-width: 28px;
+  text-align: right;
+}
+
+/* ── Spell Slots ── */
+.slotContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.slotRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.slotLevel {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  min-width: 36px;
+}
+
+.slotPips {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.slotPip {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.slotPipAvail {
+  background: none;
+  border-color: var(--color-accent-gold);
+}
+
+.slotPipAvail:hover {
+  background: rgba(212, 164, 76, 0.3);
+}
+
+.slotPipUsed {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border);
+}
+
+.slotCount {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  min-width: 32px;
+  text-align: right;
+}
+
+/* ── Spell List ── */
+.spellList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.spellRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  flex-wrap: wrap;
+}
+
+.spellInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spellName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.spellMeta {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+/* ── Dice Tab ── */
 .diceRoller {
   display: flex;
   flex-direction: column;
@@ -167,6 +483,27 @@
   color: var(--color-accent-gold);
 }
 
+/* Inline result (mobile only, hidden on desktop) */
+.inlineResult {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+/* ── Side Panel ── */
+.sidePanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: sticky;
+  top: var(--space-4);
+}
+
 .resultCard {
   background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(212, 164, 76, 0.2) 100%) !important;
 }
@@ -198,6 +535,7 @@
   font-size: 0.75rem;
   color: var(--color-text-secondary);
   text-transform: uppercase;
+  text-align: center;
 }
 
 @keyframes rollIn {
@@ -262,6 +600,8 @@
 .miniStats {
   display: flex;
   justify-content: space-around;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .miniStats > div {
@@ -272,7 +612,7 @@
 }
 
 .miniStats span {
-  font-size: 0.625rem;
+  font-size: 0.6rem;
   color: var(--color-text-secondary);
   text-transform: uppercase;
 }
@@ -281,6 +621,88 @@
   font-family: var(--font-mono);
   font-size: 1rem;
   color: var(--color-accent-gold);
+}
+
+/* ── Status Effects Drawer ── */
+.effectsOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 6, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.effectsDrawer {
+  background: var(--color-surface-container);
+  width: 320px;
+  max-width: 90vw;
+  height: 100vh;
+  overflow-y: auto;
+  padding: var(--space-6);
+  animation: slideIn 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.effectsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.effectsHeader h3 {
+  color: var(--color-accent-gold);
+  font-size: 1rem;
+}
+
+.effectsList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.effectItem {
+  padding: var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-accent-gold);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.effectName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.effectBonus {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-accent-gold);
+}
+
+.effectDuration {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.effectDesc {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
 }
 
 /* ── Critical / Fumble Modal ── */
@@ -400,8 +822,21 @@
 .historyItemCrit .historyResult { color: var(--color-primary) !important; }
 .historyItemFumble { background: var(--color-surface-container-highest) !important; }
 
+/* ── Mobile ── */
 @media (max-width: 768px) {
-  .grid {
+  .pageLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidePanel {
+    display: none;
+  }
+
+  .inlineResult {
+    display: flex;
+  }
+
+  .skillsGrid {
     grid-template-columns: 1fr;
   }
 
@@ -411,5 +846,22 @@
 
   .hpValue span:first-child {
     font-size: 3rem;
+  }
+
+  .tabBtn {
+    font-size: 0.65rem;
+    padding: var(--space-2);
+  }
+
+  .combatStats {
+    gap: var(--space-1);
+  }
+
+  .statPill {
+    padding: var(--space-2);
+  }
+
+  .statPillValue {
+    font-size: 1rem;
   }
 }

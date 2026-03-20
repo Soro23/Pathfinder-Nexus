@@ -14,6 +14,7 @@ import { CampaignList } from './pages/CampaignList'
 import { CampaignNew } from './pages/CampaignNew'
 import { CampaignView } from './pages/CampaignView'
 import { PartyView } from './pages/PartyView'
+import { Admin } from './pages/Admin'
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
               <Route path="campaigns" element={<CampaignList />} />
               <Route path="campaigns/new" element={<CampaignNew />} />
               <Route path="campaigns/:id" element={<CampaignView />} />
+              <Route path="admin" element={<Admin />} />
             </Route>
           </Route>
         </Routes>

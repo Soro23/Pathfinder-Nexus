@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Plus, Minus, ChevronDown, ChevronUp } from 'lucide-react'
 import { Card, Select } from '../ui'
-import { SPELLS, SPELL_SCHOOLS, SPELL_TYPES, SpellLevel } from '../../data'
+import { SPELL_SCHOOLS, SPELL_TYPES, SpellLevel } from '../../data'
+import { useSpells } from '../../hooks/useSpells'
 import styles from './Spellbook.module.css'
 
 interface SpellSlot {
@@ -50,16 +51,6 @@ export function Spellbook({
   onUseSlot,
   onRestoreSlot,
 }: SpellbookProps) {
-  // Collect all spell types available to the character's classes
-  const allowedTypes = new Set<string>(
-    classIds.flatMap((id) => CLASS_SPELL_TYPES[id] ?? [])
-  )
-  // If no mapping found (unknown class), show all spells
-  const filterByClass = allowedTypes.size > 0
-
-  // Derive which type chips and schools are actually present for this character
-  const classFilteredSpells = SPELLS.filter((s) => !filterByClass || allowedTypes.has(s.type))
-  const presentTypes = [...new Set(classFilteredSpells.map((s) => s.type))]
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
   const [filterSchool, setFilterSchool] = useState<string>('all')
@@ -69,24 +60,27 @@ export function Spellbook({
 
   const levels: SpellLevel[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+  const { spells, loading, total } = useSpells({
+    search,
+    type: filterType,
+    school: filterSchool,
+    level: filterLevel,
+    classIds,
+    showKnownOnly,
+    knownSpellIds: knownSpells,
+  })
+
+  // Collect all spell types available to the character's classes
+  const allowedTypes = new Set<string>(
+    classIds.flatMap((id) => CLASS_SPELL_TYPES[id] ?? [])
+  )
+  const filterByClass = allowedTypes.size > 0
+  const presentTypes = filterByClass ? [...allowedTypes] as ('arcane' | 'divine')[] : ['arcane', 'divine'] as const
+
   // RF-P07: Derive unique magic type labels for badge display
   const magicTypeBadges = [...new Set(
     classIds.map((id) => CLASS_MAGIC_LABEL[id]).filter(Boolean)
   )]
-
-  const filteredSpells = SPELLS.filter((spell) => {
-    const matchesClass = !filterByClass || allowedTypes.has(spell.type)
-    const matchesSearch = spell.name.toLowerCase().includes(search.toLowerCase())
-    const matchesType = filterType === 'all' || spell.type === filterType
-    const matchesSchool = filterSchool === 'all' || spell.school === filterSchool
-    const matchesLevel = filterLevel === 'all' || spell.level === parseInt(filterLevel)
-    const matchesKnown = !showKnownOnly || knownSpells.includes(spell.id)
-    return matchesClass && matchesSearch && matchesType && matchesSchool && matchesLevel && matchesKnown
-  })
-
-  const toggleSpell = (spellId: string) => {
-    onToggleKnown(spellId)
-  }
 
   return (
     <div className={styles.container}>
@@ -206,8 +200,20 @@ export function Spellbook({
           </label>
         </div>
 
+        {loading && (
+          <div className={styles.loadingRow}>Cargando hechizos…</div>
+        )}
+
+        {!loading && (
+          <div className={styles.resultsCount}>
+            {total > spells.length
+              ? `Mostrando ${spells.length} de ${total} hechizos`
+              : `${spells.length} hechizo${spells.length !== 1 ? 's' : ''}`}
+          </div>
+        )}
+
         <div className={styles.spellsContainer}>
-          {filteredSpells.map((spell) => {
+          {spells.map((spell) => {
             const isKnown = knownSpells.includes(spell.id)
             const isExpanded = expandedSpell === spell.id
 
@@ -226,7 +232,7 @@ export function Spellbook({
                     className={`${styles.knowBtn} ${isKnown ? styles.isKnown : ''}`}
                     onClick={(e) => {
                       e.stopPropagation()
-                      toggleSpell(spell.id)
+                      onToggleKnown(spell.id)
                     }}
                   >
                     {isKnown ? '★' : '☆'}

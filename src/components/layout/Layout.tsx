@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useMatch } from 'react-router-dom'
-import { Users, PlusCircle, BookOpen, Backpack, Sparkles, Map, Sword, PawPrint, LogOut, Sun, Moon } from 'lucide-react'
+import { Users, PlusCircle, BookOpen, Backpack, Sparkles, Map, Sword, PawPrint, LogOut, Sun, Moon, Settings } from 'lucide-react'
 import { useCharacterStore } from '../../store'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../hooks/useTheme'
@@ -127,6 +127,13 @@ export function Layout() {
           >
             <Map size={18} />
             <span>Campañas</span>
+          </Link>
+          <Link
+            to="/admin"
+            className={`${styles.navItem} ${isActive('/admin', false) ? styles.active : ''}`}
+          >
+            <Settings size={18} />
+            <span>Admin</span>
           </Link>
         </nav>
 

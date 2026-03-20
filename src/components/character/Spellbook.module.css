@@ -329,3 +329,18 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
+
+/* ── Loading / results count ── */
+.loadingRow {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  font-size: var(--text-sm);
+}
+
+.resultsCount {
+  font-size: var(--text-label-sm);
+  color: var(--color-text-muted);
+  padding: var(--space-1) 0 var(--space-2);
+}
