@@ -73,6 +73,7 @@ Notes on field values:
 - race: use lowercase English slug (e.g., "human", "elf", "dwarf", "halfling", "gnome", "half-elf", "half-orc")
 - class: use lowercase English slug (e.g., "fighter", "wizard", "cleric", "rogue", "paladin", "barbarian", "ranger", "druid", "bard", "sorcerer", "monk")
 - skills: only include skills with ranks > 0; use lowercase English IDs (e.g., "acrobatics", "climb", "perception", "stealth", "bluff", "diplomacy", "knowledge_arcana", "spellcraft", "use_magic_device")
+- weapons[].range: use exactly "melee" for melee weapons (swords, axes, etc.) or "ranged" for ranged weapons (bows, crossbows, etc.)
 - armor.type: "light", "medium", "heavy", or "shield"
 - If multiple pages are provided, combine all data from all images.
 `

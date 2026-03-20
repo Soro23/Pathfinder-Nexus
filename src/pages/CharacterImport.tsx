@@ -565,15 +565,29 @@ export function CharacterImport() {
         {character.weapons.length > 0 && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Armas</h2>
-            {character.weapons.map((w, i) => (
-              <div key={w.id} className={styles.weaponRow}>
-                <input className={styles.input} value={w.name} onChange={(e) => updateWeapon(i, 'name', e.target.value)} placeholder="Nombre" />
-                <input className={styles.inputSm} type="number" value={w.attackBonus} onChange={(e) => updateWeapon(i, 'attackBonus', Number(e.target.value))} placeholder="Ataque" title="Bono de ataque" />
-                <input className={styles.inputSm} value={w.damage} onChange={(e) => updateWeapon(i, 'damage', e.target.value)} placeholder="Daño" />
-                <input className={styles.inputSm} value={w.critical} onChange={(e) => updateWeapon(i, 'critical', e.target.value)} placeholder="Crítico" />
-                <button className={styles.removeBtn} onClick={() => removeWeapon(i)}><X size={14} /></button>
-              </div>
-            ))}
+            {character.weapons.map((w, i) => {
+              const isRanged = w.range === 'ranged'
+              const abilityLabel = isRanged ? 'DES' : 'FUE'
+              return (
+                <div key={w.id} className={styles.weaponRow}>
+                  <input className={styles.input} value={w.name} onChange={(e) => updateWeapon(i, 'name', e.target.value)} placeholder="Nombre" />
+                  <select
+                    className={styles.rangeSelect}
+                    value={isRanged ? 'ranged' : 'melee'}
+                    onChange={(e) => updateWeapon(i, 'range', e.target.value)}
+                    title="Tipo de ataque"
+                  >
+                    <option value="melee">Cuerpo a cuerpo (FUE)</option>
+                    <option value="ranged">A distancia (DES)</option>
+                  </select>
+                  <span className={styles.abilityTag}>{abilityLabel}</span>
+                  <input className={styles.inputSm} type="number" value={w.attackBonus} onChange={(e) => updateWeapon(i, 'attackBonus', Number(e.target.value))} placeholder="Ataque" title="Bono de ataque base" />
+                  <input className={styles.inputSm} value={w.damage} onChange={(e) => updateWeapon(i, 'damage', e.target.value)} placeholder="Daño" />
+                  <input className={styles.inputSm} value={w.critical} onChange={(e) => updateWeapon(i, 'critical', e.target.value)} placeholder="Crítico" />
+                  <button className={styles.removeBtn} onClick={() => removeWeapon(i)}><X size={14} /></button>
+                </div>
+              )
+            })}
           </section>
         )}
 

@@ -146,6 +146,90 @@
 }
 
 /* ============================================================
+   DARK MODE — "The Chronicler's Interface" (Night Theme)
+   ============================================================ */
+
+[data-theme="dark"] {
+  /* Primary — Carmesí claro */
+  --color-primary:               #ffb3b5;
+  --color-primary-container:     #7b001f;
+  --color-primary-fixed:         #ffdada;
+  --color-primary-fixed-dim:     #ffb3b5;
+  --color-on-primary:            #680014;
+  --color-on-primary-container:  #ffdada;
+  --color-on-primary-fixed:      #40000c;
+  --color-inverse-primary:       #9e1b32;
+
+  /* Secondary — Dorado claro */
+  --color-secondary:             #f7bd48;
+  --color-secondary-container:   #5d4200;
+  --color-secondary-fixed:       #ffdea6;
+  --color-secondary-fixed-dim:   #f7bd48;
+  --color-on-secondary:          #3e2c00;
+  --color-on-secondary-container: #ffdea6;
+
+  /* Tertiary — Brown claro */
+  --color-tertiary:              #e5bcaf;
+  --color-tertiary-container:    #53332b;
+  --color-on-tertiary:           #4c2317;
+  --color-on-tertiary-container: #e5bcaf;
+
+  /* Surface Hierarchy — Dark Parchment */
+  --color-surface:               #141210;
+  --color-surface-bright:        #3a3630;
+  --color-surface-dim:           #141210;
+  --color-surface-container-lowest: #0f0d0b;
+  --color-surface-container-low:    #1c1a16;
+  --color-surface-container:        #201e1a;
+  --color-surface-container-high:   #2b2822;
+  --color-surface-container-highest: #36322c;
+  --color-surface-tint:          #ffb3b5;
+  --color-surface-variant:       #4d3738;
+  --color-inverse-surface:       #e5e2da;
+  --color-inverse-on-surface:    #31312b;
+
+  /* Background */
+  --color-background:            #141210;
+  --color-on-background:         #e8e5dc;
+
+  /* Text */
+  --color-on-surface:            #e8e5dc;
+  --color-on-surface-variant:    #d4b8b8;
+
+  /* Outline */
+  --color-outline:               #a08080;
+  --color-outline-variant:       #4d3738;
+
+  /* Error */
+  --color-error:                 #ffb4ab;
+  --color-error-container:       #93000a;
+  --color-on-error:              #690005;
+  --color-on-error-container:    #ffdad6;
+
+  /* Legacy aliases (override for dark) */
+  --color-bg-primary:        var(--color-surface);
+  --color-bg-secondary:      var(--color-surface-container-low);
+  --color-bg-tertiary:       var(--color-surface-container);
+  --color-text-primary:      var(--color-on-surface);
+  --color-text-secondary:    var(--color-on-surface-variant);
+  --color-accent-gold:       var(--color-secondary);
+  --color-accent-gold-dim:   var(--color-secondary-container);
+  --color-accent-red:        var(--color-primary);
+  --color-accent-green:      #7ab87a;
+  --color-border:            rgba(160, 128, 128, 0.2);
+  --color-border-light:      rgba(77, 55, 56, 0.4);
+
+  /* Shadows — deeper for dark */
+  --shadow-sm:   0 2px 6px rgba(0, 0, 0, 0.2);
+  --shadow-md:   0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg:   0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 12px 32px rgba(255, 179, 181, 0.12);
+
+  /* Glass */
+  --glass-bg:    rgba(20, 18, 16, 0.85);
+}
+
+/* ============================================================
    GLOBAL BASE STYLES
    ============================================================ */
 

@@ -1,7 +1,8 @@
 import { Outlet, Link, useLocation, useMatch } from 'react-router-dom'
-import { Users, PlusCircle, BookOpen, Backpack, Sparkles, Map, Sword, PawPrint, LogOut } from 'lucide-react'
+import { Users, PlusCircle, BookOpen, Backpack, Sparkles, Map, Sword, PawPrint, LogOut, Sun, Moon } from 'lucide-react'
 import { useCharacterStore } from '../../store'
 import { useAuth } from '../../contexts/AuthContext'
+import { useTheme } from '../../hooks/useTheme'
 import styles from './Layout.module.css'
 
 const navItems = [
@@ -13,6 +14,7 @@ const navItems = [
 export function Layout() {
   const location = useLocation()
   const { signOut } = useAuth()
+  const { theme, toggle: toggleTheme } = useTheme()
 
   // Detect active character from URL
   const charMatch = useMatch('/characters/:id')
@@ -133,6 +135,16 @@ export function Layout() {
           <PlusCircle size={16} />
           Nueva Aventura
         </Link>
+
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className={styles.themeToggleBtn}
+          title={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
+        >
+          {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+          <span>{theme === 'light' ? 'Modo Oscuro' : 'Modo Claro'}</span>
+        </button>
 
         {/* Sign out */}
         <button

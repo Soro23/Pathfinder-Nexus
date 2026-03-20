@@ -30,8 +30,8 @@ export function WeaponManager({ weapons, bab, strMod, dexMod, onChange }: Weapon
     attackBonus: 0,
     damage: '1d6',
     critical: 'x2',
-    range: 'Melee',
-    type: ' slashing',
+    range: 'melee',
+    type: 'slashing',
     notes: '',
   })
 
@@ -49,8 +49,8 @@ export function WeaponManager({ weapons, bab, strMod, dexMod, onChange }: Weapon
       attackBonus: 0,
       damage: '1d6',
       critical: 'x2',
-      range: 'Melee',
-      type: ' slashing',
+      range: 'melee',
+      type: 'slashing',
       notes: '',
     })
     setIsAdding(false)
@@ -105,6 +105,17 @@ export function WeaponManager({ weapons, bab, strMod, dexMod, onChange }: Weapon
               onChange={(e) => setNewWeapon({ ...newWeapon, critical: e.target.value })}
               placeholder="x2"
             />
+            <div className={styles.rangeField}>
+              <label className={styles.rangeLabel}>Distancia</label>
+              <select
+                className={styles.rangeSelect}
+                value={newWeapon.range}
+                onChange={(e) => setNewWeapon({ ...newWeapon, range: e.target.value })}
+              >
+                <option value="melee">Cuerpo a cuerpo (FUE)</option>
+                <option value="ranged">A distancia (DES)</option>
+              </select>
+            </div>
             <Input
               label="Tipo"
               value={newWeapon.type}
@@ -136,7 +147,7 @@ export function WeaponManager({ weapons, bab, strMod, dexMod, onChange }: Weapon
       ) : (
         <div className={styles.weaponsList}>
           {weapons.map((weapon) => {
-            const isRanged = weapon.range.toLowerCase().includes('ft') || weapon.range.toLowerCase().includes('ranged')
+            const isRanged = weapon.range === 'ranged'
             const totalAttack = calculateAttack(weapon.attackBonus, isRanged)
             
             return (
@@ -144,7 +155,7 @@ export function WeaponManager({ weapons, bab, strMod, dexMod, onChange }: Weapon
                 <div className={styles.weaponInfo}>
                   <span className={styles.weaponName}>{weapon.name}</span>
                   <span className={styles.weaponType}>
-                    {weapon.type} {weapon.range && `(${weapon.range})`}
+                    {weapon.type} · {isRanged ? 'A distancia' : 'Cuerpo a cuerpo'}
                   </span>
                   {weapon.notes && (
                     <span className={styles.weaponNotes}>{weapon.notes}</span>
