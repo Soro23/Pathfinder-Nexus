@@ -876,7 +876,7 @@ function SkillsEditor() {
         />
       )}
       <ul className={styles.searchResults}>
-        {skills.map(skill => (
+        {[...skills].sort((a, b) => a.name.localeCompare(b.name, 'es')).map(skill => (
           <li key={skill.id} className={styles.searchResultItem} onClick={() => selectSkill(skill)}>
             <div className={styles.searchResultMain}>
               <span className={styles.searchResultName}>{skill.name}</span>
@@ -930,7 +930,8 @@ function FeatsEditor() {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       const q = search.toLowerCase()
-      setFiltered(q ? feats.filter(f => f.name.toLowerCase().includes(q)) : feats.slice(0, 30))
+      const base = q ? feats.filter(f => f.name.toLowerCase().includes(q)) : feats.slice(0, 30)
+      setFiltered([...base].sort((a, b) => a.name.localeCompare(b.name, 'es')))
     }, 200)
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [search, feats])
@@ -1238,7 +1239,7 @@ function ClassesEditor() {
         />
       )}
       <ul className={styles.searchResults}>
-        {classes.map(cls => (
+        {[...classes].sort((a, b) => a.name.localeCompare(b.name, 'es')).map(cls => (
           <li key={cls.id} className={styles.searchResultItem} onClick={() => selectClass(cls)}>
             <div className={styles.searchResultMain}>
               <span className={styles.searchResultName}>{cls.name}</span>
@@ -1391,7 +1392,7 @@ function RacesEditor() {
         />
       )}
       <ul className={styles.searchResults}>
-        {races.map(race => (
+        {[...races].sort((a, b) => a.label.localeCompare(b.label, 'es')).map(race => (
           <li key={race.id} className={styles.searchResultItem} onClick={() => selectRace(race)}>
             <div className={styles.searchResultMain}>
               <span className={styles.searchResultName}>{race.label}</span>
