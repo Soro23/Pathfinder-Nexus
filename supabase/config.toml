@@ -1,0 +1,2 @@
+[functions.extract-character]
+verify_jwt = false

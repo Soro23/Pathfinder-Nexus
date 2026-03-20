@@ -77,6 +77,15 @@ Notes on field values:
 - If multiple pages are provided, combine all data from all images.
 `
 
+function cleanJson(raw: string): string {
+  return raw
+    .replace(/```(?:json)?\s*/gi, '').replace(/```/g, '') // strip markdown fences
+    .replace(/,(\s*[}\]])/g, '$1')                        // trailing commas
+    .replace(/\/\/[^\n]*/g, '')                           // line comments
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')        // control chars except \t \n \r
+    .trim()
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
@@ -87,14 +96,19 @@ serve(async (req) => {
 
     if (!images || images.length === 0) {
       return new Response(JSON.stringify({ error: 'No images provided' }), {
-        status: 400,
         headers: { ...corsHeaders, 'content-type': 'application/json' },
       })
     }
 
-    const apiKey = Deno.env.get('GEMINI_API_KEY')!
+    const apiKey = Deno.env.get('GEMINI_API_KEY')
+    if (!apiKey) {
+      return new Response(JSON.stringify({ error: 'GEMINI_API_KEY secret not configured in Edge Function' }), {
+        headers: { ...corsHeaders, 'content-type': 'application/json' },
+      })
+    }
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -107,39 +121,49 @@ serve(async (req) => {
               { text: EXTRACTION_PROMPT },
             ],
           }],
-          generationConfig: { maxOutputTokens: 4096 },
+          generationConfig: {
+            maxOutputTokens: 8192,
+            responseMimeType: 'application/json',
+          },
         }),
       }
     )
 
     if (!response.ok) {
       const err = await response.text()
-      return new Response(JSON.stringify({ error: `Gemini API error: ${err}` }), {
-        status: 502,
+      return new Response(JSON.stringify({ error: `Gemini API error (${response.status}): ${err}` }), {
         headers: { ...corsHeaders, 'content-type': 'application/json' },
       })
     }
 
     const data = await response.json()
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+    // gemini-2.5-flash may return thinking parts before the actual text part
+    const parts: Array<{ text?: string; thought?: boolean }> = data.candidates?.[0]?.content?.parts ?? []
+    const text = parts.find((p) => !p.thought && p.text)?.text ?? ''
 
-    // Extract JSON from response (Claude may wrap it in backticks despite instructions)
-    const match = text.match(/\{[\s\S]*\}/)
-    if (!match) {
-      return new Response(JSON.stringify({ error: 'No JSON found in response', raw: text }), {
-        status: 422,
+    if (!text) {
+      return new Response(JSON.stringify({ error: 'Empty response from Gemini', raw: JSON.stringify(data) }), {
         headers: { ...corsHeaders, 'content-type': 'application/json' },
       })
     }
 
-    const character = JSON.parse(match[0])
+    let character: unknown
+    try {
+      character = JSON.parse(cleanJson(text))
+    } catch (parseErr) {
+      return new Response(JSON.stringify({
+        error: `JSON parse failed: ${String(parseErr)}`,
+        raw: JSON.stringify(text.slice(310, 340)), // escaped so special chars are visible
+      }), {
+        headers: { ...corsHeaders, 'content-type': 'application/json' },
+      })
+    }
 
     return new Response(JSON.stringify({ character }), {
       headers: { ...corsHeaders, 'content-type': 'application/json' },
     })
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), {
-      status: 500,
+    return new Response(JSON.stringify({ error: String(err), stack: err instanceof Error ? err.stack : undefined }), {
       headers: { ...corsHeaders, 'content-type': 'application/json' },
     })
   }

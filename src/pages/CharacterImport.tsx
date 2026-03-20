@@ -229,7 +229,10 @@ export function CharacterImport() {
       })
 
       if (fnError) throw new Error(fnError.message)
-      if (data?.error) throw new Error(data.error)
+      if (data?.error) {
+        console.error('Edge function error:', data)
+        throw new Error(data.raw ? `${data.error}\n\nRAW: ${data.raw}` : data.error)
+      }
 
       const mapped = mapExtractedToCharacter(data.character as ExtractedData)
       setCharacter(mapped)
