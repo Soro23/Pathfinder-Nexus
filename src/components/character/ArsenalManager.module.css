@@ -226,6 +226,23 @@
 
 .equipBtnOn:hover { background: var(--color-primary); opacity: 0.9; }
 
+/* ── Edit button ── */
+.editBtn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.editBtn:hover { opacity: 1; color: var(--color-accent-gold); }
+
 /* ── Remove button ── */
 .removeBtn {
   background: none;

@@ -289,17 +289,20 @@ export function CharacterNew() {
   // ── Submit ──
   const selectedRace = RACES.find((r) => r.value === form.race)
   const selectedClass = CLASSES.find((c) => c.value === form.class)
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = () => {
-    if (!form.name.trim() || !form.race || !form.class) return
+  const handleSubmit = async () => {
+    if (!form.name.trim() || !form.race || !form.class || submitting) return
+    setSubmitting(true)
 
     const classData = getClassById(form.class)
     const hitDie = classData?.hitDie ?? 8
     const conMod = Math.floor((form.constitution - 10) / 2)
     const startingHp = Math.max(1, hitDie + conMod)
+    const id = generateId()
 
     const newCharacter = {
-      id: generateId(),
+      id,
       name: form.name,
       race: form.race,
       classes: [{ id: form.class, level: 1 }],
@@ -328,8 +331,8 @@ export function CharacterNew() {
       updatedAt: new Date().toISOString(),
     }
 
-    addCharacter(newCharacter)
-    navigate(`/characters/${newCharacter.id}`)
+    await addCharacter(newCharacter)
+    navigate(`/characters/${id}`)
   }
 
   return (
@@ -738,10 +741,10 @@ export function CharacterNew() {
                 <Button
                   variant="primary"
                   onClick={handleSubmit}
-                  disabled={!form.name.trim()}
+                  disabled={!form.name.trim() || submitting}
                 >
                   <Check size={18} />
-                  Crear Personaje
+                  {submitting ? 'Guardando...' : 'Crear Personaje'}
                 </Button>
               </div>
             </div>

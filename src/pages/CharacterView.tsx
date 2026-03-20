@@ -424,12 +424,6 @@ export function CharacterView() {
           <Card padding="md">
             <div className={styles.sectionHeaderRow}>
               <h3 className={styles.sectionTitle}>Habilidades</h3>
-              {!isEditing && (
-                <Button variant="secondary" size="sm" onClick={() => setIsEditing(true)}>
-                  <Edit2 size={14} />
-                  Editar ranks
-                </Button>
-              )}
             </div>
             {isEditing ? (
               <SkillsList
@@ -457,7 +451,9 @@ export function CharacterView() {
                   const isClass = classData?.classSkills?.includes(skill.id)
                   const classBonus = ranks > 0 && isClass ? 3 : 0
                   const acp = skill.hasArmorCheckPenalty ? equippedArmorAcp : 0
-                  const total = ranks + abilityMod + classBonus + acp
+                  const misc = rankEntry?.miscBonuses?.reduce((s, b) => s + b.value, 0) ?? 0
+                  const featBonus = resolvedStats.skillBonuses?.[skill.id] ?? 0
+                  const total = ranks + abilityMod + classBonus + acp + misc + featBonus
                   return (
                     <div
                       key={skill.id}
@@ -485,12 +481,6 @@ export function CharacterView() {
           <Card padding="md">
             <div className={styles.sectionHeaderRow}>
               <h3 className={styles.sectionTitle}>Dotes ({character.feats.length})</h3>
-              {!isEditing && (
-                <Button variant="secondary" size="sm" onClick={() => setIsEditing(true)}>
-                  <Edit2 size={14} />
-                  Editar
-                </Button>
-              )}
             </div>
             {isEditing ? (
               <FeatsSelector

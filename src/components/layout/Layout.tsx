@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation, useMatch } from 'react-router-dom'
-import { Users, PlusCircle, BookOpen, Backpack, Sparkles, Map, Sword, PawPrint } from 'lucide-react'
+import { Users, PlusCircle, BookOpen, Backpack, Sparkles, Map, Sword, PawPrint, LogOut } from 'lucide-react'
 import { useCharacterStore } from '../../store'
+import { useAuth } from '../../contexts/AuthContext'
 import styles from './Layout.module.css'
 
 const navItems = [
@@ -11,6 +12,7 @@ const navItems = [
 
 export function Layout() {
   const location = useLocation()
+  const { signOut } = useAuth()
 
   // Detect active character from URL
   const charMatch = useMatch('/characters/:id')
@@ -131,6 +133,16 @@ export function Layout() {
           <PlusCircle size={16} />
           Nueva Aventura
         </Link>
+
+        {/* Sign out */}
+        <button
+          onClick={signOut}
+          className={styles.signOutBtn}
+          title="Cerrar sesión"
+        >
+          <LogOut size={16} />
+          <span>Cerrar sesión</span>
+        </button>
       </aside>
 
       {/* ── Main content ── */}

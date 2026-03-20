@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { supabase } from '../lib/supabase'
 import { generateId } from './characterStore'
 
 // ── Interfaces ──────────────────────────────────────────────────────────────
@@ -41,148 +41,182 @@ export interface Campaign {
 
 interface CampaignStore {
   campaigns: Campaign[]
-  addCampaign: (data: Omit<Campaign, 'id' | 'characterIds' | 'notes' | 'npcs' | 'sessionCount' | 'createdAt' | 'updatedAt'>) => string
-  updateCampaign: (id: string, updates: Partial<Campaign>) => void
-  deleteCampaign: (id: string) => void
+  loading: boolean
+  fetchCampaigns: () => Promise<void>
+  addCampaign: (data: Omit<Campaign, 'id' | 'characterIds' | 'notes' | 'npcs' | 'sessionCount' | 'createdAt' | 'updatedAt'>) => Promise<string>
+  updateCampaign: (id: string, updates: Partial<Campaign>) => Promise<void>
+  deleteCampaign: (id: string) => Promise<void>
   getCampaign: (id: string) => Campaign | undefined
-  addCharacterToCampaign: (campaignId: string, characterId: string) => void
-  removeCharacterFromCampaign: (campaignId: string, characterId: string) => void
-  addNote: (campaignId: string, note: Omit<CampaignNote, 'id' | 'createdAt' | 'updatedAt'>) => void
-  updateNote: (campaignId: string, noteId: string, updates: Partial<CampaignNote>) => void
-  deleteNote: (campaignId: string, noteId: string) => void
-  addNPC: (campaignId: string, npc: Omit<CampaignNPC, 'id'>) => void
-  updateNPC: (campaignId: string, npcId: string, updates: Partial<CampaignNPC>) => void
-  deleteNPC: (campaignId: string, npcId: string) => void
+  addCharacterToCampaign: (campaignId: string, characterId: string) => Promise<void>
+  removeCharacterFromCampaign: (campaignId: string, characterId: string) => Promise<void>
+  addNote: (campaignId: string, note: Omit<CampaignNote, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>
+  updateNote: (campaignId: string, noteId: string, updates: Partial<CampaignNote>) => Promise<void>
+  deleteNote: (campaignId: string, noteId: string) => Promise<void>
+  addNPC: (campaignId: string, npc: Omit<CampaignNPC, 'id'>) => Promise<void>
+  updateNPC: (campaignId: string, npcId: string, updates: Partial<CampaignNPC>) => Promise<void>
+  deleteNPC: (campaignId: string, npcId: string) => Promise<void>
 }
 
-export const useCampaignStore = create<CampaignStore>()(
-  persist(
-    (set, get) => ({
-      campaigns: [],
+async function persistCampaign(id: string, campaigns: Campaign[]) {
+  const campaign = campaigns.find((c) => c.id === id)
+  if (!campaign) return
+  await supabase.from('campaigns').update({ data: campaign }).eq('id', id)
+}
 
-      addCampaign: (data) => {
-        const id = generateId()
-        const now = new Date().toISOString()
-        const campaign: Campaign = {
-          id,
-          ...data,
-          characterIds: [],
-          notes: [],
-          npcs: [],
-          sessionCount: 0,
-          createdAt: now,
-          updatedAt: now,
-        }
-        set((s) => ({ campaigns: [...s.campaigns, campaign] }))
-        return id
-      },
+export const useCampaignStore = create<CampaignStore>()((set, get) => ({
+  campaigns: [],
+  loading: false,
 
-      updateCampaign: (id, updates) => {
-        set((s) => ({
-          campaigns: s.campaigns.map((c) =>
-            c.id === id ? { ...c, ...updates, updatedAt: new Date().toISOString() } : c
-          ),
-        }))
-      },
+  fetchCampaigns: async () => {
+    set({ loading: true })
+    const { data, error } = await supabase.from('campaigns').select('id, data')
+    if (!error && data) {
+      const campaigns = data.map((row) => ({ ...row.data as Campaign, id: row.id }))
+      set({ campaigns })
+    }
+    set({ loading: false })
+  },
 
-      deleteCampaign: (id) => {
-        set((s) => ({ campaigns: s.campaigns.filter((c) => c.id !== id) }))
-      },
+  addCampaign: async (data) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return ''
+    const id = generateId()
+    const now = new Date().toISOString()
+    const campaign: Campaign = {
+      id,
+      ...data,
+      characterIds: [],
+      notes: [],
+      npcs: [],
+      sessionCount: 0,
+      createdAt: now,
+      updatedAt: now,
+    }
+    const { data: row, error } = await supabase
+      .from('campaigns')
+      .insert({ id: campaign.id, user_id: user.id, data: campaign })
+      .select('id')
+      .single()
+    if (!error && row) {
+      const finalCampaign = { ...campaign, id: row.id }
+      set((s) => ({ campaigns: [...s.campaigns, finalCampaign] }))
+      return row.id
+    }
+    return ''
+  },
 
-      getCampaign: (id) => get().campaigns.find((c) => c.id === id),
+  updateCampaign: async (id, updates) => {
+    const existing = get().campaigns.find((c) => c.id === id)
+    if (!existing) return
+    const merged = { ...existing, ...updates, updatedAt: new Date().toISOString() }
+    const { error } = await supabase.from('campaigns').update({ data: merged }).eq('id', id)
+    if (!error) {
+      set((s) => ({ campaigns: s.campaigns.map((c) => c.id === id ? merged : c) }))
+    }
+  },
 
-      addCharacterToCampaign: (campaignId, characterId) => {
-        set((s) => ({
-          campaigns: s.campaigns.map((c) => {
-            if (c.id !== campaignId) return c
-            if (c.characterIds.includes(characterId)) return c
-            return { ...c, characterIds: [...c.characterIds, characterId], updatedAt: new Date().toISOString() }
-          }),
-        }))
-      },
+  deleteCampaign: async (id) => {
+    const { error } = await supabase.from('campaigns').delete().eq('id', id)
+    if (!error) {
+      set((s) => ({ campaigns: s.campaigns.filter((c) => c.id !== id) }))
+    }
+  },
 
-      removeCharacterFromCampaign: (campaignId, characterId) => {
-        set((s) => ({
-          campaigns: s.campaigns.map((c) =>
-            c.id === campaignId
-              ? { ...c, characterIds: c.characterIds.filter((id) => id !== characterId), updatedAt: new Date().toISOString() }
-              : c
-          ),
-        }))
-      },
+  getCampaign: (id) => get().campaigns.find((c) => c.id === id),
 
-      addNote: (campaignId, note) => {
-        const now = new Date().toISOString()
-        const newNote: CampaignNote = { id: generateId(), ...note, createdAt: now, updatedAt: now }
-        set((s) => ({
-          campaigns: s.campaigns.map((c) =>
-            c.id === campaignId
-              ? { ...c, notes: [...c.notes, newNote], updatedAt: now }
-              : c
-          ),
-        }))
-      },
+  addCharacterToCampaign: async (campaignId, characterId) => {
+    set((s) => {
+      const campaigns = s.campaigns.map((c) => {
+        if (c.id !== campaignId) return c
+        if (c.characterIds.includes(characterId)) return c
+        return { ...c, characterIds: [...c.characterIds, characterId], updatedAt: new Date().toISOString() }
+      })
+      persistCampaign(campaignId, campaigns)
+      return { campaigns }
+    })
+  },
 
-      updateNote: (campaignId, noteId, updates) => {
-        const now = new Date().toISOString()
-        set((s) => ({
-          campaigns: s.campaigns.map((c) =>
-            c.id === campaignId
-              ? {
-                  ...c,
-                  notes: c.notes.map((n) => n.id === noteId ? { ...n, ...updates, updatedAt: now } : n),
-                  updatedAt: now,
-                }
-              : c
-          ),
-        }))
-      },
+  removeCharacterFromCampaign: async (campaignId, characterId) => {
+    set((s) => {
+      const campaigns = s.campaigns.map((c) =>
+        c.id === campaignId
+          ? { ...c, characterIds: c.characterIds.filter((id) => id !== characterId), updatedAt: new Date().toISOString() }
+          : c
+      )
+      persistCampaign(campaignId, campaigns)
+      return { campaigns }
+    })
+  },
 
-      deleteNote: (campaignId, noteId) => {
-        set((s) => ({
-          campaigns: s.campaigns.map((c) =>
-            c.id === campaignId
-              ? { ...c, notes: c.notes.filter((n) => n.id !== noteId), updatedAt: new Date().toISOString() }
-              : c
-          ),
-        }))
-      },
+  addNote: async (campaignId, note) => {
+    const now = new Date().toISOString()
+    const newNote: CampaignNote = { id: generateId(), ...note, createdAt: now, updatedAt: now }
+    set((s) => {
+      const campaigns = s.campaigns.map((c) =>
+        c.id === campaignId ? { ...c, notes: [...c.notes, newNote], updatedAt: now } : c
+      )
+      persistCampaign(campaignId, campaigns)
+      return { campaigns }
+    })
+  },
 
-      addNPC: (campaignId, npc) => {
-        const newNPC: CampaignNPC = { id: generateId(), ...npc }
-        set((s) => ({
-          campaigns: s.campaigns.map((c) =>
-            c.id === campaignId
-              ? { ...c, npcs: [...c.npcs, newNPC], updatedAt: new Date().toISOString() }
-              : c
-          ),
-        }))
-      },
+  updateNote: async (campaignId, noteId, updates) => {
+    const now = new Date().toISOString()
+    set((s) => {
+      const campaigns = s.campaigns.map((c) =>
+        c.id === campaignId
+          ? { ...c, notes: c.notes.map((n) => n.id === noteId ? { ...n, ...updates, updatedAt: now } : n), updatedAt: now }
+          : c
+      )
+      persistCampaign(campaignId, campaigns)
+      return { campaigns }
+    })
+  },
 
-      updateNPC: (campaignId, npcId, updates) => {
-        set((s) => ({
-          campaigns: s.campaigns.map((c) =>
-            c.id === campaignId
-              ? {
-                  ...c,
-                  npcs: c.npcs.map((n) => n.id === npcId ? { ...n, ...updates } : n),
-                  updatedAt: new Date().toISOString(),
-                }
-              : c
-          ),
-        }))
-      },
+  deleteNote: async (campaignId, noteId) => {
+    set((s) => {
+      const campaigns = s.campaigns.map((c) =>
+        c.id === campaignId
+          ? { ...c, notes: c.notes.filter((n) => n.id !== noteId), updatedAt: new Date().toISOString() }
+          : c
+      )
+      persistCampaign(campaignId, campaigns)
+      return { campaigns }
+    })
+  },
 
-      deleteNPC: (campaignId, npcId) => {
-        set((s) => ({
-          campaigns: s.campaigns.map((c) =>
-            c.id === campaignId
-              ? { ...c, npcs: c.npcs.filter((n) => n.id !== npcId), updatedAt: new Date().toISOString() }
-              : c
-          ),
-        }))
-      },
-    }),
-    { name: 'pathfinder-nexus-campaigns' }
-  )
-)
+  addNPC: async (campaignId, npc) => {
+    const newNPC: CampaignNPC = { id: generateId(), ...npc }
+    set((s) => {
+      const campaigns = s.campaigns.map((c) =>
+        c.id === campaignId ? { ...c, npcs: [...c.npcs, newNPC], updatedAt: new Date().toISOString() } : c
+      )
+      persistCampaign(campaignId, campaigns)
+      return { campaigns }
+    })
+  },
+
+  updateNPC: async (campaignId, npcId, updates) => {
+    set((s) => {
+      const campaigns = s.campaigns.map((c) =>
+        c.id === campaignId
+          ? { ...c, npcs: c.npcs.map((n) => n.id === npcId ? { ...n, ...updates } : n), updatedAt: new Date().toISOString() }
+          : c
+      )
+      persistCampaign(campaignId, campaigns)
+      return { campaigns }
+    })
+  },
+
+  deleteNPC: async (campaignId, npcId) => {
+    set((s) => {
+      const campaigns = s.campaigns.map((c) =>
+        c.id === campaignId
+          ? { ...c, npcs: c.npcs.filter((n) => n.id !== npcId), updatedAt: new Date().toISOString() }
+          : c
+      )
+      persistCampaign(campaignId, campaigns)
+      return { campaigns }
+    })
+  },
+}))

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash2, Sword, Shield, Check } from 'lucide-react'
+import { Plus, Trash2, Sword, Shield, Check, Pencil } from 'lucide-react'
 import { Card, Button, Input } from '../ui'
 import { generateId } from '../../store'
 import type { Weapon, Armor } from '../../store'
@@ -37,6 +37,34 @@ export function ArsenalManager({
   const [addingArmor, setAddingArmor]   = useState(false)
   const [newWeapon, setNewWeapon] = useState(DEFAULT_WEAPON)
   const [newArmor, setNewArmor]   = useState<Omit<Armor, 'id'>>(DEFAULT_ARMOR)
+  const [editingWeaponId, setEditingWeaponId] = useState<string | null>(null)
+  const [editingWeapon, setEditingWeapon] = useState<Weapon | null>(null)
+  const [editingArmorId, setEditingArmorId] = useState<string | null>(null)
+  const [editingArmor, setEditingArmor] = useState<Armor | null>(null)
+
+  const startEditWeapon = (w: Weapon) => {
+    setEditingWeaponId(w.id)
+    setEditingWeapon({ ...w })
+    setAddingWeapon(false)
+  }
+  const saveWeapon = () => {
+    if (!editingWeapon) return
+    onWeaponsChange(weapons.map((w) => w.id === editingWeapon.id ? editingWeapon : w))
+    setEditingWeaponId(null)
+    setEditingWeapon(null)
+  }
+
+  const startEditArmor = (a: Armor) => {
+    setEditingArmorId(a.id)
+    setEditingArmor({ ...a })
+    setAddingArmor(false)
+  }
+  const saveArmor = () => {
+    if (!editingArmor) return
+    onArmorChange(armor.map((a) => a.id === editingArmor.id ? editingArmor : a))
+    setEditingArmorId(null)
+    setEditingArmor(null)
+  }
 
   // ── AC computation ──
   const equippedBody   = armor.find((a) => a.equipped && a.type !== 'shield')
@@ -125,6 +153,32 @@ export function ArsenalManager({
         ) : (
           <div className={styles.itemList}>
             {weapons.map((w) => {
+              if (editingWeaponId === w.id && editingWeapon) {
+                return (
+                  <Card key={w.id} padding="md" className={styles.addForm}>
+                    <div className={styles.formGrid}>
+                      <Input label="Nombre" value={editingWeapon.name}
+                        onChange={(e) => setEditingWeapon({ ...editingWeapon, name: e.target.value })}/>
+                      <Input label="Bono ataque" type="number" value={editingWeapon.attackBonus}
+                        onChange={(e) => setEditingWeapon({ ...editingWeapon, attackBonus: +e.target.value || 0 })}/>
+                      <Input label="Daño" value={editingWeapon.damage}
+                        onChange={(e) => setEditingWeapon({ ...editingWeapon, damage: e.target.value })}/>
+                      <Input label="Crítico" value={editingWeapon.critical}
+                        onChange={(e) => setEditingWeapon({ ...editingWeapon, critical: e.target.value })}/>
+                      <Input label="Alcance" value={editingWeapon.range}
+                        onChange={(e) => setEditingWeapon({ ...editingWeapon, range: e.target.value })}/>
+                      <Input label="Tipo de daño" value={editingWeapon.type}
+                        onChange={(e) => setEditingWeapon({ ...editingWeapon, type: e.target.value })}/>
+                      <Input label="Notas" value={editingWeapon.notes}
+                        onChange={(e) => setEditingWeapon({ ...editingWeapon, notes: e.target.value })}/>
+                    </div>
+                    <div className={styles.formActions}>
+                      <Button variant="ghost" onClick={() => { setEditingWeaponId(null); setEditingWeapon(null) }}>Cancelar</Button>
+                      <Button variant="primary" onClick={saveWeapon}>Guardar</Button>
+                    </div>
+                  </Card>
+                )
+              }
               const isRanged = /ft|ranged/i.test(w.range)
               const total = calcAttack(w.attackBonus, isRanged)
               return (
@@ -147,6 +201,9 @@ export function ArsenalManager({
                       <span className={styles.statVal}>{w.critical}</span>
                     </div>
                   </div>
+                  <button className={styles.editBtn} onClick={() => startEditWeapon(w)}>
+                    <Pencil size={14} />
+                  </button>
                   <button className={styles.removeBtn}
                     onClick={() => onWeaponsChange(weapons.filter((x) => x.id !== w.id))}>
                     <Trash2 size={14} />
@@ -221,35 +278,75 @@ export function ArsenalManager({
           <p className={styles.emptyMsg}>Sin armadura equipada</p>
         ) : (
           <div className={styles.itemList}>
-            {armor.map((a) => (
-              <div key={a.id} className={`${styles.armorRow} ${a.equipped ? styles.armorEquipped : ''}`}>
-                <div className={styles.armorInfo}>
-                  <div className={styles.armorNameRow}>
-                    <span className={styles.itemName}>{a.name}</span>
-                    <span className={`${styles.typeChip} ${styles[`type_${a.type}`]}`}>
-                      {ARMOR_TYPE_LABELS[a.type]}
+            {armor.map((a) => {
+              if (editingArmorId === a.id && editingArmor) {
+                return (
+                  <Card key={a.id} padding="md" className={styles.addForm}>
+                    <div className={styles.formGrid}>
+                      <Input label="Nombre" value={editingArmor.name}
+                        onChange={(e) => setEditingArmor({ ...editingArmor, name: e.target.value })}/>
+                      <div className={styles.formField}>
+                        <label className={styles.formLabel}>Tipo</label>
+                        <select className={styles.formSelect} value={editingArmor.type}
+                          onChange={(e) => setEditingArmor({ ...editingArmor, type: e.target.value as Armor['type'] })}>
+                          <option value="light">Ligera</option>
+                          <option value="medium">Media</option>
+                          <option value="heavy">Pesada</option>
+                          <option value="shield">Escudo</option>
+                        </select>
+                      </div>
+                      <Input label="Bonus CA" type="number" value={editingArmor.acBonus}
+                        onChange={(e) => setEditingArmor({ ...editingArmor, acBonus: +e.target.value || 0 })}/>
+                      <Input label="Pen. armadura" type="number" value={editingArmor.armorCheckPenalty}
+                        onChange={(e) => setEditingArmor({ ...editingArmor, armorCheckPenalty: +e.target.value || 0 })}/>
+                      <Input label="DES máx (vacío=∞)" type="number"
+                        value={editingArmor.maxDex ?? ''}
+                        onChange={(e) => setEditingArmor({ ...editingArmor, maxDex: e.target.value === '' ? null : +e.target.value })}/>
+                      <Input label="% Fallo arcano" type="number" value={editingArmor.spellFailure}
+                        onChange={(e) => setEditingArmor({ ...editingArmor, spellFailure: +e.target.value || 0 })}/>
+                      <Input label="Peso (lbs)" type="number" value={editingArmor.weight}
+                        onChange={(e) => setEditingArmor({ ...editingArmor, weight: +e.target.value || 0 })}/>
+                    </div>
+                    <div className={styles.formActions}>
+                      <Button variant="ghost" onClick={() => { setEditingArmorId(null); setEditingArmor(null) }}>Cancelar</Button>
+                      <Button variant="primary" onClick={saveArmor}>Guardar</Button>
+                    </div>
+                  </Card>
+                )
+              }
+              return (
+                <div key={a.id} className={`${styles.armorRow} ${a.equipped ? styles.armorEquipped : ''}`}>
+                  <div className={styles.armorInfo}>
+                    <div className={styles.armorNameRow}>
+                      <span className={styles.itemName}>{a.name}</span>
+                      <span className={`${styles.typeChip} ${styles[`type_${a.type}`]}`}>
+                        {ARMOR_TYPE_LABELS[a.type]}
+                      </span>
+                    </div>
+                    <span className={styles.itemMeta}>
+                      CA +{a.acBonus}
+                      {a.armorCheckPenalty !== 0 && ` · ACP ${a.armorCheckPenalty}`}
+                      {a.maxDex !== null && ` · DES máx ${a.maxDex}`}
+                      {a.spellFailure > 0 && ` · ${a.spellFailure}% fallo arc.`}
                     </span>
                   </div>
-                  <span className={styles.itemMeta}>
-                    CA +{a.acBonus}
-                    {a.armorCheckPenalty !== 0 && ` · ACP ${a.armorCheckPenalty}`}
-                    {a.maxDex !== null && ` · DES máx ${a.maxDex}`}
-                    {a.spellFailure > 0 && ` · ${a.spellFailure}% fallo arc.`}
-                  </span>
+                  <button
+                    className={`${styles.equipBtn} ${a.equipped ? styles.equipBtnOn : ''}`}
+                    onClick={() => toggleEquip(a.id, a.type)}
+                    title={a.equipped ? 'Desequipar' : 'Equipar'}
+                  >
+                    {a.equipped ? <Check size={14} /> : 'Equipar'}
+                  </button>
+                  <button className={styles.editBtn} onClick={() => startEditArmor(a)}>
+                    <Pencil size={14} />
+                  </button>
+                  <button className={styles.removeBtn}
+                    onClick={() => onArmorChange(armor.filter((x) => x.id !== a.id))}>
+                    <Trash2 size={14} />
+                  </button>
                 </div>
-                <button
-                  className={`${styles.equipBtn} ${a.equipped ? styles.equipBtnOn : ''}`}
-                  onClick={() => toggleEquip(a.id, a.type)}
-                  title={a.equipped ? 'Desequipar' : 'Equipar'}
-                >
-                  {a.equipped ? <Check size={14} /> : 'Equipar'}
-                </button>
-                <button className={styles.removeBtn}
-                  onClick={() => onArmorChange(armor.filter((x) => x.id !== a.id))}>
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

@@ -12,7 +12,14 @@
       "Bash(done)",
       "Bash(npm install:*)",
       "Bash(npm test:*)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Bash(npm list:*)",
+      "Bash(\"C:\\\\Users\\\\aitol\\\\Documents\\\\Code\\\\ClaudeWorkspace\\\\Pathfinder-Nexus\\\\src\\\\components\\\\layout\\\\Layout.module.css\")",
+      "Bash(supabase --version)",
+      "Bash(npx supabase:*)",
+      "Bash(curl:*)",
+      "Bash(find C:UsersaitolDocumentsCodeClaudeWorkspacePathfinder-Nexus -name campaignStore.ts -o -name campaign*.ts)",
+      "Bash(xargs grep:*)"
     ]
   }
 }

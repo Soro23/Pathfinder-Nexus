@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { supabase } from '../lib/supabase'
 
 export interface CharacterClass {
   id: string
@@ -126,51 +126,68 @@ export interface Character {
 
 interface CharacterStore {
   characters: Character[]
-  addCharacter: (character: Character) => void
-  updateCharacter: (id: string, updates: Partial<Character>) => void
-  deleteCharacter: (id: string) => void
+  loading: boolean
+  fetchCharacters: () => Promise<void>
+  addCharacter: (character: Character) => Promise<void>
+  updateCharacter: (id: string, updates: Partial<Character>) => Promise<void>
+  deleteCharacter: (id: string) => Promise<void>
   getCharacter: (id: string) => Character | undefined
 }
 
-export const useCharacterStore = create<CharacterStore>()(
-  persist(
-    (set, get) => ({
-      characters: [],
+export const useCharacterStore = create<CharacterStore>()((set, get) => ({
+  characters: [],
+  loading: false,
 
-      addCharacter: (character) => {
-        set((state) => ({
-          characters: [...state.characters, character],
-        }))
-      },
-
-      updateCharacter: (id, updates) => {
-        set((state) => ({
-          characters: state.characters.map((char) =>
-            char.id === id
-              ? { ...char, ...updates, updatedAt: new Date().toISOString() }
-              : char
-          ),
-        }))
-      },
-
-      deleteCharacter: (id) => {
-        set((state) => ({
-          characters: state.characters.filter((char) => char.id !== id),
-        }))
-      },
-
-      getCharacter: (id) => {
-        return get().characters.find((char) => char.id === id)
-      },
-    }),
-    {
-      name: 'pathfinder-nexus-characters',
+  fetchCharacters: async () => {
+    set({ loading: true })
+    const { data, error } = await supabase.from('characters').select('id, data')
+    if (!error && data) {
+      const characters = data.map((row) => ({ ...row.data as Character, id: row.id }))
+      set({ characters })
     }
-  )
-)
+    set({ loading: false })
+  },
+
+  addCharacter: async (character) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data, error } = await supabase
+      .from('characters')
+      .insert({ id: character.id, user_id: user.id, data: character })
+      .select('id')
+      .single()
+    if (!error && data) {
+      set((state) => ({ characters: [...state.characters, { ...character, id: data.id }] }))
+    }
+  },
+
+  updateCharacter: async (id, updates) => {
+    const existing = get().characters.find((c) => c.id === id)
+    if (!existing) return
+    const merged = { ...existing, ...updates, updatedAt: new Date().toISOString() }
+    const { error } = await supabase
+      .from('characters')
+      .update({ data: merged })
+      .eq('id', id)
+    if (!error) {
+      set((state) => ({
+        characters: state.characters.map((c) => c.id === id ? merged : c),
+      }))
+    }
+  },
+
+  deleteCharacter: async (id) => {
+    const { error } = await supabase.from('characters').delete().eq('id', id)
+    if (!error) {
+      set((state) => ({ characters: state.characters.filter((c) => c.id !== id) }))
+    }
+  },
+
+  getCharacter: (id) => get().characters.find((c) => c.id === id),
+}))
 
 export function generateId(): string {
-  return Math.random().toString(36).substring(2, 15) + Date.now().toString(36)
+  return crypto.randomUUID()
 }
 
 export function calculateModifier(score: number): number {
