@@ -647,17 +647,23 @@ function UrlImporterPanel({
   const [fetchError, setFetchError] = useState('')
   const [jsonText, setJsonText] = useState('')
   const [missing, setMissing] = useState<string[]>([])
+  const [duplicate, setDuplicate] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
 
   async function handleFetch() {
     if (!url.trim()) return
-    setFetchStatus('loading'); setFetchError(''); setJsonText(''); setMissing([])
+    setFetchStatus('loading'); setFetchError(''); setJsonText(''); setMissing([]); setDuplicate(null)
     try {
       const html = await fetchWithProxy(url.trim())
       const data = parser(html)
       setJsonText(JSON.stringify(data, null, 2))
       setMissing(requiredFields.filter(f => !(f in data) || data[f] === null || data[f] === undefined))
+      // Check for duplicate by id
+      if (data.id) {
+        const { data: existing } = await supabase.from(table).select('id').eq('id', data.id).limit(1)
+        if (existing && existing.length > 0) setDuplicate(data.id as string)
+      }
       setFetchStatus('done')
     } catch (e) {
       setFetchError(e instanceof Error ? e.message : 'Error desconocido')
@@ -665,7 +671,7 @@ function UrlImporterPanel({
     }
   }
 
-  async function handleSave() {
+  async function handleSave(forceNewId = false) {
     let data: Record<string, unknown>
     try {
       data = JSON.parse(jsonText)
@@ -674,9 +680,9 @@ function UrlImporterPanel({
     }
     const miss = requiredFields.filter(f => !(f in data) || data[f] === null || data[f] === undefined)
     if (miss.length > 0) { setSaveError(`Faltan campos requeridos: ${miss.join(', ')}`); return }
-    const record = Object.fromEntries(Object.entries(data).filter(([k]) => k !== 'id'))
+    if (forceNewId) data.id = String(data.id) + '_' + Date.now()
     setSaving(true); setSaveError('')
-    const { error: err } = await supabase.from(table).insert(record)
+    const { error: err } = await supabase.from(table).insert(data)
     if (err) { setSaveError(err.message); setSaving(false); return }
     await refreshSRD()
     onImported()
@@ -713,22 +719,36 @@ function UrlImporterPanel({
               <span>Faltan campos requeridos: <strong>{missing.join(', ')}</strong>. Edita el JSON para añadirlos.</span>
             </div>
           )}
-          <Field label="JSON del registro (editable)" wide>
-            <textarea
-              className={styles.descriptionBox}
-              rows={12}
-              value={jsonText}
-              onChange={e => { setJsonText(e.target.value); setSaveError('') }}
-              style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
-            />
-          </Field>
-          {saveError && <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{saveError}</span></div>}
-          <div className={styles.dupActions}>
-            <button className={styles.btnSecondary} onClick={onCancel}>Cancelar</button>
-            <button className={styles.addBtn} onClick={handleSave} disabled={saving}>
-              {saving ? <span className={styles.spinner} /> : <><CheckCircle size={16} /> Guardar nuevo</>}
-            </button>
-          </div>
+          {duplicate && (
+            <div className={styles.duplicateWarning}>
+              <AlertTriangle size={16} />
+              <strong>Duplicado:</strong> Ya existe un registro con id <code>{duplicate}</code>.
+              <div className={styles.dupActions}>
+                <button className={styles.btnSecondary} onClick={onCancel}>Cancelar</button>
+                <button className={styles.btnPrimary} onClick={() => handleSave(true)}>Guardar con nuevo ID</button>
+              </div>
+            </div>
+          )}
+          {!duplicate && (
+            <>
+              <Field label="JSON del registro (editable)" wide>
+                <textarea
+                  className={styles.descriptionBox}
+                  rows={12}
+                  value={jsonText}
+                  onChange={e => { setJsonText(e.target.value); setSaveError('') }}
+                  style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+                />
+              </Field>
+              {saveError && <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{saveError}</span></div>}
+              <div className={styles.dupActions}>
+                <button className={styles.btnSecondary} onClick={onCancel}>Cancelar</button>
+                <button className={styles.addBtn} onClick={() => handleSave(false)} disabled={saving}>
+                  {saving ? <span className={styles.spinner} /> : <><CheckCircle size={16} /> Guardar nuevo</>}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

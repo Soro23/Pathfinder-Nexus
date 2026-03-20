@@ -133,6 +133,14 @@ export function parseD20SpellPage(html: string): ParsedSpell {
   return spell
 }
 
+// ── Shared slug helper ────────────────────────────────────────────────────────
+
+export function makeSlug(name: string): string {
+  return name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')
+}
+
 // ── Skill Parser ─────────────────────────────────────────────────────────────
 
 const ABILITY_ABBR_MAP: Record<string, string> = {
@@ -162,7 +170,7 @@ export function parseD20SkillPage(html: string): Record<string, unknown> {
     : []
   const description = (paras.join('\n\n') || name).substring(0, 2000)
 
-  return { name, ability, is_class_skill: false, has_armor_check_penalty, description }
+  return { id: makeSlug(name), name, ability, is_class_skill: false, has_armor_check_penalty, description }
 }
 
 // ── Feat Parser ───────────────────────────────────────────────────────────────
@@ -190,7 +198,7 @@ export function parseD20FeatPage(html: string): Record<string, unknown> {
   const normal = textAfterBold(doc, 'Normal') || null
   const special = textAfterBold(doc, 'Special') || null
 
-  return { name, type, prerequisite, benefit, normal, special, effects: null }
+  return { id: makeSlug(name), name, type, prerequisite, benefit, normal, special, effects: null }
 }
 
 // ── Class Parser ──────────────────────────────────────────────────────────────
@@ -300,7 +308,7 @@ export function parseD20ClassPage(html: string): Record<string, unknown> {
   }
 
   return {
-    name, hit_die, ...progression,
+    id: makeSlug(name), name, hit_die, ...progression,
     skill_points_per_level, magic_type: null, caster_ability: null,
     starting_gold_dice, description: description || name,
     class_skills: classSkills, features: [], alignment: [], spells_per_day: null,
@@ -374,5 +382,5 @@ export function parseD20RacePage(html: string): Record<string, unknown> {
         .join('\n\n')
     : label
 
-  return { label, size, speed, bonus_desc, favored_class: null, desc: desc || label, bonuses, traits, subraces: null }
+  return { id: makeSlug(label), label, size, speed, bonus_desc, favored_class: null, desc: desc || label, bonuses, traits, subraces: null }
 }
