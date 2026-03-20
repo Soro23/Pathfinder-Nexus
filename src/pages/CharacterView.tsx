@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { StatusEffect, JournalEntry } from '../store'
-import { getClassById, getBABForLevel, getSaveForLevel, SpellLevel, useSRDStore } from '../data'
+import { getClassById, getMulticlassStats, SpellLevel, useSRDStore } from '../data'
 import { resolveModifiers } from '../engine'
 import { Card, Button } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal } from '../components/character'
@@ -39,6 +39,7 @@ export function CharacterView() {
   const [expandedJournalEntry, setExpandedJournalEntry] = useState<string | null>(null)
   const [showJournalModal, setShowJournalModal] = useState(false)
   const [newJournalContent, setNewJournalContent] = useState('')
+  const [progressionTab, setProgressionTab] = useState<string>(() => character?.classes[0]?.id ?? '')
 
   const resolvedStats = useMemo(
     () => character ? resolveModifiers(character) : {
@@ -76,10 +77,11 @@ export function CharacterView() {
   const ac      = 10 + effectiveDex + (equippedBody?.acBonus ?? 0) + (equippedShield?.acBonus ?? 0) + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
   const acTouch = 10 + effectiveDex + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
   const acFlat  = 10 + (equippedBody?.acBonus ?? 0) + (equippedShield?.acBonus ?? 0) + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection
-  const fortitude = getSaveForLevel(character.level, classData?.fortitudeSave || 'poor') + calculateModifier(abilities.constitution) + resolvedStats.saveBonuses.fort
-  const reflex = getSaveForLevel(character.level, classData?.reflexSave || 'poor') + calculateModifier(abilities.dexterity) + resolvedStats.saveBonuses.ref
-  const will = getSaveForLevel(character.level, classData?.willSave || 'poor') + calculateModifier(abilities.wisdom) + resolvedStats.saveBonuses.will
-  const bab = getBABForLevel(character.level, classData?.baseAttackBonus || 'poor')
+  const mcStats   = getMulticlassStats(character.classes)
+  const fortitude = mcStats.fortitude + calculateModifier(abilities.constitution) + resolvedStats.saveBonuses.fort
+  const reflex    = mcStats.reflex    + calculateModifier(abilities.dexterity)    + resolvedStats.saveBonuses.ref
+  const will      = mcStats.will      + calculateModifier(abilities.wisdom)       + resolvedStats.saveBonuses.will
+  const bab       = mcStats.bab
   const initiative = calculateModifier(abilities.dexterity) + resolvedStats.initiativeBonus
   const strMod = calculateModifier(abilities.strength)
   const cmb = bab + strMod
@@ -368,12 +370,35 @@ export function CharacterView() {
             </Card>
 
             {/* Class Progression */}
-            {classData && (
-              <Card padding="md" className={styles.colSpan2}>
-                <h3 className={styles.sectionTitle}>Progresión de Clase — {classData.name}</h3>
-                <ClassProgressionTable classData={classData} currentLevel={character.level} />
-              </Card>
-            )}
+            {character.classes.length > 0 && (() => {
+              const activeClassEntry = character.classes.find((c) => c.id === progressionTab) ?? character.classes[0]
+              const activeClassData = getClassById(activeClassEntry.id)
+              return (
+                <Card padding="md" className={styles.colSpan2}>
+                  <h3 className={styles.sectionTitle}>Progresión de Clase</h3>
+                  {character.classes.length > 1 && (
+                    <div className={styles.tabs}>
+                      {character.classes.map((cc) => {
+                        const cd = getClassById(cc.id)
+                        return (
+                          <button
+                            key={cc.id}
+                            className={`${styles.tab} ${progressionTab === cc.id ? styles.activeTab : ''}`}
+                            onClick={() => setProgressionTab(cc.id)}
+                          >
+                            {cd?.name ?? cc.id}
+                            <span style={{ opacity: 0.6, fontSize: '0.85em' }}> Nv {cc.level}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+                  {activeClassData && (
+                    <ClassProgressionTable classData={activeClassData} currentLevel={activeClassEntry.level} />
+                  )}
+                </Card>
+              )
+            })()}
 
             {/* Status Effects */}
             <Card padding="md" className={styles.alignStart}>

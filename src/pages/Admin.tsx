@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users } from 'lucide-react'
+import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users, Wand2 } from 'lucide-react'
 import type { Spell } from '../data/spells'
 import { SPELL_SCHOOLS } from '../data/spells'
 import { useCustomSpellsStore } from '../store/customSpellsStore'
@@ -82,46 +82,11 @@ async function findDuplicateInDB(name: string, customSpells: Spell[]): Promise<S
 
 // ── Admin page ────────────────────────────────────────────────────────────────
 
-type TabId = 'importer' | 'editor' | 'skills' | 'feats' | 'classes' | 'races'
+type TabId = 'spells' | 'skills' | 'feats' | 'classes' | 'races'
 type ImportStatus = 'idle' | 'loading' | 'done' | 'error'
 
 export function Admin() {
-  const [activeTab, setActiveTab] = useState<TabId>('importer')
-
-  // Importer state
-  const [url, setUrl] = useState('')
-  const [importStatus, setImportStatus] = useState<ImportStatus>('idle')
-  const [preview, setPreview] = useState<Partial<Spell> | null>(null)
-  const [duplicate, setDuplicate] = useState<Spell | null>(null)
-  const [importError, setImportError] = useState('')
-  const [added, setAdded] = useState(false)
-
-  const { customSpells, fetchCustomSpells, addSpell, removeSpell, loading } = useCustomSpellsStore()
-  useEffect(() => { fetchCustomSpells() }, [fetchCustomSpells])
-
-  async function handleImport() {
-    if (!url.trim()) return
-    setImportStatus('loading')
-    setPreview(null); setDuplicate(null); setAdded(false); setImportError('')
-    try {
-      const html = await fetchWithProxy(url.trim())
-      const parsed = parseD20SpellPage(html)
-      const dup = await findDuplicateInDB(parsed.rawName ?? '', customSpells)
-      setPreview(parsed); setDuplicate(dup); setImportStatus('done')
-    } catch (e) {
-      setImportError(e instanceof Error ? e.message : 'Error desconocido')
-      setImportStatus('error')
-    }
-  }
-
-  async function handleAdd(forceNewId = false) {
-    if (!preview) return
-    const spell = { ...preview } as Spell
-    if (forceNewId) spell.id = spell.id + '_custom_' + Date.now()
-    const { error } = await addSpell(spell)
-    if (error) { setImportError(error); setImportStatus('error') }
-    else { setAdded(true); setPreview(null); setDuplicate(null) }
-  }
+  const [activeTab, setActiveTab] = useState<TabId>('spells')
 
   return (
     <div className={styles.page}>
@@ -132,16 +97,10 @@ export function Admin() {
 
       <nav className={styles.tabNav}>
         <button
-          className={`${styles.tabBtn} ${activeTab === 'importer' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('importer')}
+          className={`${styles.tabBtn} ${activeTab === 'spells' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('spells')}
         >
-          <Download size={16} /> Importador
-        </button>
-        <button
-          className={`${styles.tabBtn} ${activeTab === 'editor' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('editor')}
-        >
-          <Pencil size={16} /> Editor Conjuros
+          <Wand2 size={16} /> Conjuros
         </button>
         <button
           className={`${styles.tabBtn} ${activeTab === 'skills' ? styles.tabBtnActive : ''}`}
@@ -170,64 +129,7 @@ export function Admin() {
       </nav>
 
       <div className={styles.tabContent}>
-        {activeTab === 'importer' && (
-          <>
-            <div className={styles.importerCard}>
-              <h2>Importar desde d20pfsrd.com</h2>
-              <p className={styles.cardDesc}>Pega la URL de cualquier hechizo de d20pfsrd.com para añadirlo a la biblioteca.</p>
-              <div className={styles.urlRow}>
-                <input
-                  className={styles.urlInput}
-                  type="url"
-                  value={url}
-                  onChange={e => setUrl(e.target.value)}
-                  placeholder="https://www.d20pfsrd.com/magic/all-spells/f/fireball"
-                  onKeyDown={e => e.key === 'Enter' && handleImport()}
-                />
-                <button className={styles.importBtn} onClick={handleImport} disabled={importStatus === 'loading' || !url.trim()}>
-                  {importStatus === 'loading' ? <span className={styles.spinner} /> : <><Download size={16} /> Importar</>}
-                </button>
-              </div>
-              {importStatus === 'error' && (
-                <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{importError}</span></div>
-              )}
-              {added && (
-                <div className={styles.successBanner}><CheckCircle size={16} />Hechizo añadido correctamente a la biblioteca.</div>
-              )}
-              {duplicate && preview && (
-                <div className={styles.duplicateWarning}>
-                  <AlertTriangle size={16} />
-                  <strong>Posible duplicado:</strong> Ya existe un hechizo similar llamado &ldquo;{duplicate.name}&rdquo;.
-                  <div className={styles.dupActions}>
-                    <button className={styles.btnSecondary} onClick={() => { setPreview(null); setDuplicate(null) }}>Cancelar</button>
-                    <button className={styles.btnPrimary} onClick={() => handleAdd(true)}>Añadir igualmente</button>
-                  </div>
-                </div>
-              )}
-              {preview && <SpellPreviewCard spell={preview} onAdd={() => handleAdd(false)} />}
-            </div>
-
-            {customSpells.length > 0 && (
-              <div className={styles.customListCard}>
-                <h2>Hechizos importados ({customSpells.length})</h2>
-                {loading && <p>Cargando...</p>}
-                <ul className={styles.customList}>
-                  {customSpells.map(sp => (
-                    <li key={sp.id} className={styles.customListItem}>
-                      <span className={styles.customSpellName}>{sp.name}</span>
-                      <span className={styles.customSpellMeta}>{sp.school} · Nivel {sp.level}</span>
-                      <button className={styles.removeBtn} onClick={() => removeSpell(sp.id)} title="Eliminar">
-                        <Trash2 size={14} />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </>
-        )}
-
-        {activeTab === 'editor' && <SpellEditor />}
+        {activeTab === 'spells' && <SpellsEditor />}
         {activeTab === 'skills' && <SkillsEditor />}
         {activeTab === 'feats' && <FeatsEditor />}
         {activeTab === 'classes' && <ClassesEditor />}
@@ -237,18 +139,21 @@ export function Admin() {
   )
 }
 
-// ── Spell Editor ──────────────────────────────────────────────────────────────
+// ── Spells Editor ─────────────────────────────────────────────────────────────
 
-type EditorPhase = 'search' | 'edit'
-
-function SpellEditor() {
-  const [phase, setPhase] = useState<EditorPhase>('search')
+function SpellsEditor() {
+  const [phase, setPhase] = useState<'list' | 'edit'>('list')
+  const [showImporter, setShowImporter] = useState(false)
+  const [importedMsg, setImportedMsg] = useState(false)
   const [search, setSearch] = useState('')
   const [results, setResults] = useState<Spell[]>([])
   const [searching, setSearching] = useState(false)
   const [selectedId, setSelectedId] = useState('')
   const [selectedName, setSelectedName] = useState('')
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const { customSpells, fetchCustomSpells, removeSpell, loading } = useCustomSpellsStore()
+  useEffect(() => { fetchCustomSpells() }, [fetchCustomSpells])
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -265,26 +170,27 @@ function SpellEditor() {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [search])
 
-  function selectSpell(spell: Spell) {
-    setSelectedId(spell.id)
-    setSelectedName(spell.name)
-    setPhase('edit')
-  }
-
-  function backToSearch() {
-    setPhase('search')
-    setSelectedId('')
-    setSelectedName('')
-  }
-
   if (phase === 'edit' && selectedId) {
-    return <SpellEditForm spellId={selectedId} spellName={selectedName} onBack={backToSearch} />
+    return <SpellEditForm spellId={selectedId} spellName={selectedName} onBack={() => setPhase('list')} />
   }
 
   return (
     <div className={styles.editorCard}>
-      <h2>Buscar conjuro para editar</h2>
-      <p className={styles.cardDesc}>Escribe el nombre del conjuro que quieres modificar.</p>
+      <div className={styles.editorListHeader}>
+        <h2>Conjuros{search && results.length > 0 ? ` (${results.length})` : ''}</h2>
+        <button className={styles.importBtn} onClick={() => { setShowImporter(true); setImportedMsg(false) }}>
+          <Download size={16} /> Importar desde URL
+        </button>
+      </div>
+
+      {importedMsg && <div className={styles.successBanner}><CheckCircle size={16} />Conjuro añadido a la biblioteca.</div>}
+
+      {showImporter && (
+        <SpellImporterPanel
+          onImported={() => { setShowImporter(false); setImportedMsg(true) }}
+          onCancel={() => setShowImporter(false)}
+        />
+      )}
 
       <div className={styles.editorSearchRow}>
         <Search size={16} className={styles.editorSearchIcon} />
@@ -302,7 +208,8 @@ function SpellEditor() {
       {results.length > 0 && (
         <ul className={styles.searchResults}>
           {results.map(spell => (
-            <li key={spell.id} className={styles.searchResultItem} onClick={() => selectSpell(spell)}>
+            <li key={spell.id} className={styles.searchResultItem}
+                onClick={() => { setSelectedId(spell.id); setSelectedName(spell.name); setPhase('edit') }}>
               <div className={styles.searchResultMain}>
                 <span className={styles.searchResultName}>{spell.name}</span>
                 <span className={styles.searchResultMeta}>
@@ -320,6 +227,24 @@ function SpellEditor() {
 
       {search.trim() && !searching && results.length === 0 && (
         <p className={styles.noResults}>Sin resultados para &ldquo;{search}&rdquo;</p>
+      )}
+
+      {customSpells.length > 0 && (
+        <div className={styles.customListCard} style={{ marginTop: 'var(--space-5)' }}>
+          <h2>Hechizos importados ({customSpells.length})</h2>
+          {loading && <p>Cargando...</p>}
+          <ul className={styles.customList}>
+            {customSpells.map(sp => (
+              <li key={sp.id} className={styles.customListItem}>
+                <span className={styles.customSpellName}>{sp.name}</span>
+                <span className={styles.customSpellMeta}>{sp.school} · Nivel {sp.level}</span>
+                <button className={styles.removeBtn} onClick={() => removeSpell(sp.id)} title="Eliminar">
+                  <Trash2 size={14} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   )
@@ -751,6 +676,76 @@ function UrlImporterPanel({
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+// ── Spell Importer Panel ───────────────────────────────────────────────────
+
+function SpellImporterPanel({ onImported, onCancel }: { onImported: () => void; onCancel: () => void }) {
+  const [url, setUrl] = useState('')
+  const [importStatus, setImportStatus] = useState<ImportStatus>('idle')
+  const [preview, setPreview] = useState<Partial<Spell> | null>(null)
+  const [duplicate, setDuplicate] = useState<Spell | null>(null)
+  const [importError, setImportError] = useState('')
+
+  const { customSpells, addSpell } = useCustomSpellsStore()
+
+  async function handleImport() {
+    if (!url.trim()) return
+    setImportStatus('loading')
+    setPreview(null); setDuplicate(null); setImportError('')
+    try {
+      const html = await fetchWithProxy(url.trim())
+      const parsed = parseD20SpellPage(html)
+      const dup = await findDuplicateInDB(parsed.rawName ?? '', customSpells)
+      setPreview(parsed); setDuplicate(dup); setImportStatus('done')
+    } catch (e) {
+      setImportError(e instanceof Error ? e.message : 'Error desconocido')
+      setImportStatus('error')
+    }
+  }
+
+  async function handleAdd(forceNewId = false) {
+    if (!preview) return
+    const spell = { ...preview } as Spell
+    if (forceNewId) spell.id = spell.id + '_custom_' + Date.now()
+    const { error } = await addSpell(spell)
+    if (error) { setImportError(error); setImportStatus('error') }
+    else { setPreview(null); setDuplicate(null); onImported() }
+  }
+
+  return (
+    <div className={styles.importerCard} style={{ marginBottom: 'var(--space-4)' }}>
+      <h2>Importar desde d20pfsrd.com</h2>
+      <p className={styles.cardDesc}>Pega la URL de cualquier conjuro de d20pfsrd.com para añadirlo a la biblioteca.</p>
+      <div className={styles.urlRow}>
+        <input
+          className={styles.urlInput}
+          type="url"
+          value={url}
+          onChange={e => setUrl(e.target.value)}
+          placeholder="https://www.d20pfsrd.com/magic/all-spells/f/fireball"
+          onKeyDown={e => e.key === 'Enter' && handleImport()}
+        />
+        <button className={styles.importBtn} onClick={handleImport} disabled={importStatus === 'loading' || !url.trim()}>
+          {importStatus === 'loading' ? <span className={styles.spinner} /> : <><Download size={16} /> Importar</>}
+        </button>
+      </div>
+      {importStatus === 'error' && (
+        <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{importError}</span></div>
+      )}
+      {duplicate && preview && (
+        <div className={styles.duplicateWarning}>
+          <AlertTriangle size={16} />
+          <strong>Posible duplicado:</strong> Ya existe un hechizo similar llamado &ldquo;{duplicate.name}&rdquo;.
+          <div className={styles.dupActions}>
+            <button className={styles.btnSecondary} onClick={onCancel}>Cancelar</button>
+            <button className={styles.btnPrimary} onClick={() => handleAdd(true)}>Añadir igualmente</button>
+          </div>
+        </div>
+      )}
+      {preview && !duplicate && <SpellPreviewCard spell={preview} onAdd={() => handleAdd(false)} />}
     </div>
   )
 }

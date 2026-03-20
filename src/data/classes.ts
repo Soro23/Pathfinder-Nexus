@@ -1,3 +1,5 @@
+import type { CharacterClass } from '../store/characterStore'
+
 export interface ClassFeature {
   name: string
   level: number
@@ -1417,4 +1419,24 @@ export function getSaveForLevel(level: number, saveType: 'good' | 'poor'): numbe
     return 2 + Math.floor(level / 2)
   }
   return Math.floor(level / 3)
+}
+
+export interface MulticlassStats {
+  bab: number
+  fortitude: number
+  reflex: number
+  will: number
+}
+
+export function getMulticlassStats(classes: CharacterClass[]): MulticlassStats {
+  let bab = 0, fortitude = 0, reflex = 0, will = 0
+  for (const cc of classes) {
+    const cd = getClassById(cc.id)
+    if (!cd) continue
+    bab       += getBABForLevel(cc.level, cd.baseAttackBonus)
+    fortitude += getSaveForLevel(cc.level, cd.fortitudeSave)
+    reflex    += getSaveForLevel(cc.level, cd.reflexSave)
+    will      += getSaveForLevel(cc.level, cd.willSave)
+  }
+  return { bab, fortitude, reflex, will }
 }

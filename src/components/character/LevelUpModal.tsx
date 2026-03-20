@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { X, Dice6 } from 'lucide-react'
 import type { Character, CharacterClass } from '../../store'
 import { calculateModifier } from '../../store'
-import { getClassById } from '../../data'
+import { getClassById, CLASSES } from '../../data'
 import { Button } from '../ui'
 import styles from './LevelUpModal.module.css'
 
@@ -20,19 +20,27 @@ interface LevelUpModalProps {
 }
 
 type HpMode = 'roll' | 'manual'
+type ClassChoice = { type: 'existing'; classId: string } | { type: 'new'; classId: string }
 
 export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProps) {
   const newLevel = character.level + 1
-  const primaryClass = character.classes[0]
-  const classData = getClassById(primaryClass?.id || '')
-  const hitDie = classData?.hitDie ?? 8
   const conMod = calculateModifier(character.abilities.constitution)
   const intMod = calculateModifier(character.abilities.intelligence)
-  const skillPointsGained = Math.max(1, (classData?.skillPointsPerLevel ?? 2) + intMod)
 
+  const [classChoice, setClassChoice] = useState<ClassChoice>({
+    type: 'existing',
+    classId: character.classes[0].id,
+  })
+  const [showNewClassPicker, setShowNewClassPicker] = useState(false)
   const [hpMode, setHpMode] = useState<HpMode>('roll')
   const [rolledValue, setRolledValue] = useState<number | null>(null)
   const [manualValue, setManualValue] = useState<number>(1)
+
+  const resolvedClassData = getClassById(classChoice.classId)
+  const hitDie            = resolvedClassData?.hitDie ?? 8
+  const skillPointsGained = resolvedClassData
+    ? Math.max(1, resolvedClassData.skillPointsPerLevel + intMod)
+    : null
 
   const handleRoll = () => {
     const result = Math.floor(Math.random() * hitDie) + 1
@@ -46,17 +54,15 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
 
   const handleConfirm = () => {
     if (hpGained === null) return
-
-    const newClassLevels: CharacterClass[] = character.classes.map((c, i) =>
-      i === 0 ? { ...c, level: c.level + 1 } : c
-    )
-
-    onConfirm({
-      newLevel,
-      newClassLevels,
-      hpGained,
-      hpRolled: hpMode === 'roll' ? rolledValue : null,
-    })
+    let newClassLevels: CharacterClass[]
+    if (classChoice.type === 'existing') {
+      newClassLevels = character.classes.map((c) =>
+        c.id === classChoice.classId ? { ...c, level: c.level + 1 } : c
+      )
+    } else {
+      newClassLevels = [...character.classes, { id: classChoice.classId, level: 1 }]
+    }
+    onConfirm({ newLevel, newClassLevels, hpGained, hpRolled: hpMode === 'roll' ? rolledValue : null })
   }
 
   return (
@@ -68,6 +74,54 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
           <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar">
             <X size={18} />
           </button>
+        </div>
+
+        {/* Class Choice Section */}
+        <div className={styles.section}>
+          <p className={styles.sectionLabel}>Clase a subir</p>
+          <div className={styles.classChoiceList}>
+            {character.classes.map((cc) => {
+              const cd = getClassById(cc.id)
+              const isSelected = classChoice.type === 'existing' && classChoice.classId === cc.id
+              return (
+                <button
+                  key={cc.id}
+                  className={`${styles.modeBtn} ${isSelected ? styles.modeBtnActive : ''}`}
+                  onClick={() => { setClassChoice({ type: 'existing', classId: cc.id }); setRolledValue(null) }}
+                >
+                  {cd?.name ?? cc.id}
+                  <span className={styles.mono}> Nv {cc.level}</span>
+                </button>
+              )
+            })}
+            {!showNewClassPicker && (
+              <button
+                className={styles.modeBtn}
+                onClick={() => setShowNewClassPicker(true)}
+              >
+                + Nueva clase
+              </button>
+            )}
+          </div>
+          {showNewClassPicker && (
+            <select
+              className={styles.newClassSelect}
+              value={classChoice.type === 'new' ? classChoice.classId : ''}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setClassChoice({ type: 'new', classId: e.target.value })
+                  setRolledValue(null)
+                }
+              }}
+            >
+              <option value="">Elige clase…</option>
+              {CLASSES
+                .filter((cd) => !character.classes.some((c) => c.id === cd.id))
+                .map((cd) => (
+                  <option key={cd.id} value={cd.id}>{cd.name}</option>
+                ))}
+            </select>
+          )}
         </div>
 
         {/* Hit Die Section */}
@@ -135,9 +189,11 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
         <div className={styles.section}>
           <p className={styles.sectionLabel}>Al subir de nivel</p>
           <ul className={styles.infoList}>
-            <li className={styles.infoItem}>
-              Puntos de habilidad: <strong>+{skillPointsGained} puntos disponibles</strong>
-            </li>
+            {skillPointsGained !== null && (
+              <li className={styles.infoItem}>
+                Puntos de habilidad: <strong>+{skillPointsGained} puntos disponibles</strong>
+              </li>
+            )}
             {newLevel % 2 === 1 && (
               <li className={styles.infoItem}>
                 Puedes elegir una nueva dote

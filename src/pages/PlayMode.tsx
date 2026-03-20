@@ -5,7 +5,7 @@ import {
   Swords, Flame, X, Zap, BookOpen, Activity
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString } from '../store'
-import { getClassById, getSaveForLevel, getBABForLevel, useSRDStore } from '../data'
+import { getClassById, getMulticlassStats, useSRDStore } from '../data'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card } from '../components/ui'
 import styles from './PlayMode.module.css'
@@ -62,12 +62,12 @@ export function PlayMode() {
   }
 
   const { abilities } = character
-  const classData = getClassById(character.classes[0]?.id || '')
-
-  const fortSave = getSaveForLevel(character.level, classData?.fortitudeSave || 'poor') + calculateModifier(abilities.constitution)
-  const refSave = getSaveForLevel(character.level, classData?.reflexSave || 'poor') + calculateModifier(abilities.dexterity)
-  const willSave = getSaveForLevel(character.level, classData?.willSave || 'poor') + calculateModifier(abilities.wisdom)
-  const bab = getBABForLevel(character.level, classData?.baseAttackBonus || 'poor')
+  const classData = getClassById(character.classes[0]?.id || '')   // mantener — se usa en hasSpells, concentrationBonus, classSkillIds
+  const mcStats  = getMulticlassStats(character.classes)
+  const fortSave = mcStats.fortitude + calculateModifier(abilities.constitution)
+  const refSave  = mcStats.reflex    + calculateModifier(abilities.dexterity)
+  const willSave = mcStats.will      + calculateModifier(abilities.wisdom)
+  const bab      = mcStats.bab
 
   // Correct AC calculation using equipped armor
   const equippedArmor = (character.armor ?? []).filter((a) => a.equipped)
