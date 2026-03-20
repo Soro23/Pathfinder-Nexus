@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { PlusCircle, Heart, Shield, BookOpen, Sparkles, Backpack, Upload, Wand2, X } from 'lucide-react'
+import { PlusCircle, Heart, Shield, BookOpen, Sparkles, Backpack, Upload, Wand2, X, ImagePlus } from 'lucide-react'
 import { useCharacterStore, calculateModifier } from '../store'
 import type { Character } from '../store'
 import { getClassById } from '../data'
@@ -90,9 +90,13 @@ export function Dashboard() {
             style={{ display: 'none' }}
             onChange={handleImport}
           />
+          <Button variant="secondary" size="md" onClick={() => navigate('/characters/import')} title="Importar personaje desde imagen">
+            <ImagePlus size={16} />
+            Importar Imagen
+          </Button>
           <Button variant="secondary" size="md" onClick={() => fileInputRef.current?.click()} title="Importar personaje desde JSON">
             <Upload size={16} />
-            Importar
+            Importar JSON
           </Button>
           <Button variant="secondary" size="md" onClick={() => setShowTemplates(true)}>
             <Wand2 size={16} />

@@ -7,6 +7,7 @@ import { CharacterNew } from './pages/CharacterNew'
 import { CharacterView } from './pages/CharacterView'
 import { Rules } from './pages/Rules'
 import { PlayMode } from './pages/PlayMode'
+import { CharacterImport } from './pages/CharacterImport'
 import { Landing } from './pages/Landing'
 import { Login } from './pages/Login'
 import { CampaignList } from './pages/CampaignList'
@@ -31,6 +32,7 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Dashboard />} />
               <Route path="characters/new" element={<CharacterNew />} />
+              <Route path="characters/import" element={<CharacterImport />} />
               <Route path="characters/:id" element={<CharacterView />} />
               <Route path="characters/:id/play" element={<PlayMode />} />
               <Route path="rules" element={<Rules />} />

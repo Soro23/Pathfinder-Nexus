@@ -1,0 +1,377 @@
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pageHeader h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-lg);
+  color: var(--color-on-surface);
+  margin: 0 0 var(--space-2);
+}
+
+.subtitle {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+  margin: 0;
+}
+
+/* ── Error banner ── */
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-error-container);
+  color: var(--color-error);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body-md);
+}
+
+/* ── Drop zone ── */
+.dropZone {
+  border: 2px dashed var(--color-surface-container-highest);
+  border-radius: var(--radius-lg);
+  padding: var(--space-10) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  background: var(--color-surface-container-low);
+  min-height: 200px;
+}
+
+.dropZone:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface-container);
+}
+
+.dropZoneHasFiles {
+  cursor: default;
+  padding: var(--space-4);
+  align-items: flex-start;
+}
+
+.dropIcon {
+  color: var(--color-on-surface-variant);
+}
+
+.dropText {
+  font-size: var(--text-body-lg);
+  color: var(--color-on-surface);
+  margin: 0;
+  font-weight: 500;
+}
+
+.dropHint {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  margin: 0;
+}
+
+/* ── Thumbnails ── */
+.thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.thumbnail {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-surface-container-highest);
+}
+
+.thumbnailImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnailRemove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: var(--color-error);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.addMoreBtn {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--color-surface-container-highest);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  color: var(--color-on-surface-variant);
+  font-size: var(--text-body-sm);
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.addMoreBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ── Loading ── */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-16) 0;
+  text-align: center;
+  color: var(--color-on-surface-variant);
+}
+
+.loadingState h2 {
+  font-family: var(--font-display);
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+.loadingState p {
+  margin: 0;
+  font-size: var(--text-body-md);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--color-primary);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Review form ── */
+.reviewForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.section {
+  background: var(--color-surface-container-low);
+  border: 1px solid var(--color-surface-container-highest);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+/* ── Fields ── */
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.field label {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.input,
+.select {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-surface-container-highest);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font-size: var(--text-body-md);
+  font-family: var(--font-body);
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.inputSm {
+  composes: input;
+  width: 80px;
+}
+
+/* ── Abilities ── */
+.abilitiesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.abilityBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.abilityBox label {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.abilityInput {
+  composes: input;
+  width: 70px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-title-md);
+}
+
+/* ── Skills table ── */
+.skillsTable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.skillRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.skillName {
+  flex: 1;
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  font-family: var(--font-mono);
+}
+
+.skillRanksInput {
+  composes: input;
+  width: 60px;
+  text-align: center;
+}
+
+/* ── Chips (feats) ── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-secondary-container);
+  color: var(--color-on-surface);
+  border-radius: var(--radius-full);
+  font-size: var(--text-body-sm);
+}
+
+.chipRemove {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+}
+
+.chipRemove:hover {
+  opacity: 1;
+}
+
+/* ── Weapon rows ── */
+.weaponRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.weaponRow .input {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* ── Remove button ── */
+.removeBtn {
+  background: none;
+  border: none;
+  padding: var(--space-1);
+  cursor: pointer;
+  color: var(--color-error);
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.removeBtn:hover {
+  background: var(--color-error-container);
+}
+
+/* ── Textarea ── */
+.textarea {
+  composes: input;
+  resize: vertical;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+/* ── Actions ── */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-bottom: var(--space-8);
+}
