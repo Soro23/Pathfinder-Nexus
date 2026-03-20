@@ -601,3 +601,19 @@
   color: var(--color-text-muted);
   font-style: italic;
 }
+
+.editorListHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.editorListHeader h2 {
+  margin: 0;
+}
+
+.addBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

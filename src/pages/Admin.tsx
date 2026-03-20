@@ -625,6 +625,123 @@ function PreviewField({ label, children }: { label: string; children: React.Reac
   )
 }
 
+// ── URL Importer Panel (generic, JSON-based) ──────────────────────────────
+
+function UrlImporterPanel({
+  table,
+  requiredFields,
+  placeholder,
+  onImported,
+  onCancel,
+}: {
+  table: string
+  requiredFields: string[]
+  placeholder: string
+  onImported: () => void
+  onCancel: () => void
+}) {
+  const [url, setUrl] = useState('')
+  const [fetchStatus, setFetchStatus] = useState<ImportStatus>('idle')
+  const [fetchError, setFetchError] = useState('')
+  const [jsonText, setJsonText] = useState('')
+  const [missing, setMissing] = useState<string[]>([])
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+
+  async function handleFetch() {
+    if (!url.trim()) return
+    setFetchStatus('loading'); setFetchError(''); setJsonText(''); setMissing([])
+    try {
+      let text: string
+      try {
+        const res = await fetch(url.trim())
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        text = await res.text()
+      } catch {
+        text = await fetchWithProxy(url.trim())
+      }
+      const parsed = JSON.parse(text)
+      const data = Array.isArray(parsed) ? parsed[0] : parsed
+      if (!data || typeof data !== 'object') throw new Error('El JSON no contiene un objeto válido')
+      setJsonText(JSON.stringify(data, null, 2))
+      setMissing(requiredFields.filter(f => !(f in data) || data[f] === null || data[f] === undefined))
+      setFetchStatus('done')
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Error desconocido')
+      setFetchStatus('error')
+    }
+  }
+
+  async function handleSave() {
+    let data: Record<string, unknown>
+    try {
+      data = JSON.parse(jsonText)
+    } catch {
+      setSaveError('JSON inválido'); return
+    }
+    const miss = requiredFields.filter(f => !(f in data) || data[f] === null || data[f] === undefined)
+    if (miss.length > 0) { setSaveError(`Faltan campos requeridos: ${miss.join(', ')}`); return }
+    const record = Object.fromEntries(Object.entries(data).filter(([k]) => k !== 'id'))
+    setSaving(true); setSaveError('')
+    const { error: err } = await supabase.from(table).insert(record)
+    if (err) { setSaveError(err.message); setSaving(false); return }
+    await refreshSRD()
+    onImported()
+    setSaving(false)
+  }
+
+  return (
+    <div className={styles.importerCard} style={{ marginBottom: 'var(--space-4)' }}>
+      <h2>Importar desde URL</h2>
+      <p className={styles.cardDesc}>
+        Pega la URL de un endpoint JSON con los datos del nuevo registro. Campos requeridos: <strong>{requiredFields.join(', ')}</strong>.
+      </p>
+      <div className={styles.urlRow}>
+        <input
+          className={styles.urlInput}
+          type="url"
+          value={url}
+          onChange={e => setUrl(e.target.value)}
+          placeholder={placeholder}
+          onKeyDown={e => e.key === 'Enter' && handleFetch()}
+        />
+        <button className={styles.importBtn} onClick={handleFetch} disabled={fetchStatus === 'loading' || !url.trim()}>
+          {fetchStatus === 'loading' ? <span className={styles.spinner} /> : <><Download size={16} /> Obtener</>}
+        </button>
+      </div>
+      {fetchStatus === 'error' && (
+        <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{fetchError}</span></div>
+      )}
+      {fetchStatus === 'done' && (
+        <div className={styles.previewCard}>
+          {missing.length > 0 && (
+            <div className={styles.duplicateWarning}>
+              <AlertTriangle size={16} />
+              <span>Faltan campos requeridos: <strong>{missing.join(', ')}</strong>. Edita el JSON para añadirlos.</span>
+            </div>
+          )}
+          <Field label="JSON del registro (editable)" wide>
+            <textarea
+              className={styles.descriptionBox}
+              rows={12}
+              value={jsonText}
+              onChange={e => { setJsonText(e.target.value); setSaveError('') }}
+              style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+            />
+          </Field>
+          {saveError && <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{saveError}</span></div>}
+          <div className={styles.dupActions}>
+            <button className={styles.btnSecondary} onClick={onCancel}>Cancelar</button>
+            <button className={styles.addBtn} onClick={handleSave} disabled={saving}>
+              {saving ? <span className={styles.spinner} /> : <><CheckCircle size={16} /> Guardar nuevo</>}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Shared SRD list/edit pattern ───────────────────────────────────────────
 
 async function refreshSRD() {
@@ -659,6 +776,8 @@ function SkillsEditor() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
+  const [showImporter, setShowImporter] = useState(false)
+  const [importedMsg, setImportedMsg] = useState(false)
 
   function selectSkill(skill: Skill) {
     setSelected(skill)
@@ -731,7 +850,22 @@ function SkillsEditor() {
 
   return (
     <div className={styles.editorCard}>
-      <h2>Skills ({skills.length})</h2>
+      <div className={styles.editorListHeader}>
+        <h2>Skills ({skills.length})</h2>
+        <button className={styles.importBtn} onClick={() => { setShowImporter(true); setImportedMsg(false) }}>
+          <Download size={16} /> Importar desde URL
+        </button>
+      </div>
+      {importedMsg && <div className={styles.successBanner}><CheckCircle size={16} />Skill importada correctamente.</div>}
+      {showImporter && (
+        <UrlImporterPanel
+          table="skills"
+          requiredFields={['name', 'ability']}
+          placeholder='{ "name": "Acrobatics", "ability": "dexterity", ... }'
+          onImported={() => { setShowImporter(false); setImportedMsg(true) }}
+          onCancel={() => setShowImporter(false)}
+        />
+      )}
       <ul className={styles.searchResults}>
         {skills.map(skill => (
           <li key={skill.id} className={styles.searchResultItem} onClick={() => selectSkill(skill)}>
@@ -780,6 +914,8 @@ function FeatsEditor() {
   const [jsonError, setJsonError] = useState('')
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [filtered, setFiltered] = useState<Feat[]>([])
+  const [showImporter, setShowImporter] = useState(false)
+  const [importedMsg, setImportedMsg] = useState(false)
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -872,7 +1008,22 @@ function FeatsEditor() {
 
   return (
     <div className={styles.editorCard}>
-      <h2>Feats ({feats.length})</h2>
+      <div className={styles.editorListHeader}>
+        <h2>Feats ({feats.length})</h2>
+        <button className={styles.importBtn} onClick={() => { setShowImporter(true); setImportedMsg(false) }}>
+          <Download size={16} /> Importar desde URL
+        </button>
+      </div>
+      {importedMsg && <div className={styles.successBanner}><CheckCircle size={16} />Dote importada correctamente.</div>}
+      {showImporter && (
+        <UrlImporterPanel
+          table="feats"
+          requiredFields={['name', 'type', 'benefit']}
+          placeholder='{ "name": "Power Attack", "type": "combat", "benefit": "...", ... }'
+          onImported={() => { setShowImporter(false); setImportedMsg(true) }}
+          onCancel={() => setShowImporter(false)}
+        />
+      )}
       <div className={styles.editorSearchRow}>
         <Search size={16} className={styles.editorSearchIcon} />
         <input className={styles.editorSearchInput} placeholder="Buscar dote…" value={search} onChange={e => setSearch(e.target.value)} autoFocus />
@@ -921,6 +1072,8 @@ function ClassesEditor() {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
   const [jsonErrors, setJsonErrors] = useState<Record<string, string>>({})
+  const [showImporter, setShowImporter] = useState(false)
+  const [importedMsg, setImportedMsg] = useState(false)
 
   function selectClass(cls: ClassData) {
     setSelected(cls)
@@ -1057,7 +1210,22 @@ function ClassesEditor() {
 
   return (
     <div className={styles.editorCard}>
-      <h2>Clases ({classes.length})</h2>
+      <div className={styles.editorListHeader}>
+        <h2>Clases ({classes.length})</h2>
+        <button className={styles.importBtn} onClick={() => { setShowImporter(true); setImportedMsg(false) }}>
+          <Download size={16} /> Importar desde URL
+        </button>
+      </div>
+      {importedMsg && <div className={styles.successBanner}><CheckCircle size={16} />Clase importada correctamente.</div>}
+      {showImporter && (
+        <UrlImporterPanel
+          table="classes"
+          requiredFields={['name', 'hit_die', 'base_attack_bonus', 'fortitude_save', 'reflex_save', 'will_save', 'skill_points_per_level']}
+          placeholder='{ "name": "Ranger", "hit_die": 10, "base_attack_bonus": "good", ... }'
+          onImported={() => { setShowImporter(false); setImportedMsg(true) }}
+          onCancel={() => setShowImporter(false)}
+        />
+      )}
       <ul className={styles.searchResults}>
         {classes.map(cls => (
           <li key={cls.id} className={styles.searchResultItem} onClick={() => selectClass(cls)}>
@@ -1095,6 +1263,8 @@ function RacesEditor() {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
   const [jsonErrors, setJsonErrors] = useState<Record<string, string>>({})
+  const [showImporter, setShowImporter] = useState(false)
+  const [importedMsg, setImportedMsg] = useState(false)
 
   function selectRace(race: Race) {
     setSelected(race)
@@ -1192,7 +1362,22 @@ function RacesEditor() {
 
   return (
     <div className={styles.editorCard}>
-      <h2>Razas ({races.length})</h2>
+      <div className={styles.editorListHeader}>
+        <h2>Razas ({races.length})</h2>
+        <button className={styles.importBtn} onClick={() => { setShowImporter(true); setImportedMsg(false) }}>
+          <Download size={16} /> Importar desde URL
+        </button>
+      </div>
+      {importedMsg && <div className={styles.successBanner}><CheckCircle size={16} />Raza importada correctamente.</div>}
+      {showImporter && (
+        <UrlImporterPanel
+          table="races"
+          requiredFields={['label', 'size', 'speed']}
+          placeholder='{ "label": "Aasimar", "size": "medium", "speed": 30, ... }'
+          onImported={() => { setShowImporter(false); setImportedMsg(true) }}
+          onCancel={() => setShowImporter(false)}
+        />
+      )}
       <ul className={styles.searchResults}>
         {races.map(race => (
           <li key={race.id} className={styles.searchResultItem} onClick={() => selectRace(race)}>

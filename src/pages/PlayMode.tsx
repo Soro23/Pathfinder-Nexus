@@ -378,7 +378,7 @@ export function PlayMode() {
               {/* Saving Throws */}
               <Card padding="md">
                 <h3 className={styles.sectionTitle}><Heart size={18} />Tiros de Salvación</h3>
-                <div className={styles.quickRolls}>
+                <div className={styles.savesRow}>
                   <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${fortSave}`, `Fortaleza (+${fortSave})`)}>
                     Fortaleza {fortSave >= 0 ? `+${fortSave}` : fortSave}
                   </Button>

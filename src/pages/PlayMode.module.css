@@ -283,6 +283,12 @@
   gap: var(--space-2);
 }
 
+.savesRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
 /* ── Skills ── */
 .skillsGrid {
   display: grid;
