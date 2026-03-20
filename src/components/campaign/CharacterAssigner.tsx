@@ -1,7 +1,6 @@
 import { X, UserPlus, UserMinus } from 'lucide-react'
 import { useCharacterStore, useCampaignStore, calculateModifier } from '../../store'
-import { getClassById, getSaveForLevel } from '../../data'
-import { SKILLS } from '../../data/skills'
+import { getClassById, getSaveForLevel, useSRDStore } from '../../data'
 import { Button } from '../ui'
 import styles from './CharacterAssigner.module.css'
 
@@ -14,6 +13,7 @@ interface CharacterAssignerProps {
 }
 
 export function CharacterAssigner({ campaignId, assignedIds, onClose }: CharacterAssignerProps) {
+  const { skills: SKILLS } = useSRDStore()
   const characters = useCharacterStore((s) => s.characters)
   const updateCharacter = useCharacterStore((s) => s.updateCharacter)
   const addCharacterToCampaign = useCampaignStore((s) => s.addCharacterToCampaign)

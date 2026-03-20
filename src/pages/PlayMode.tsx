@@ -5,7 +5,7 @@ import {
   Swords, Flame, X, Zap, BookOpen, Activity
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString } from '../store'
-import { getClassById, getSaveForLevel, getBABForLevel, getSkillById, CLASS_SKILLS } from '../data'
+import { getClassById, getSaveForLevel, getBABForLevel, useSRDStore } from '../data'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card } from '../components/ui'
 import styles from './PlayMode.module.css'
@@ -31,6 +31,7 @@ type CritEvent = { type: 'crit' | 'fumble'; name: string; roll: number }
 type TabId = 'combat' | 'skills' | 'spells' | 'dice'
 
 export function PlayMode() {
+  const { skills: SKILLS, classes: CLASSES_DATA } = useSRDStore()
   const { id } = useParams<{ id: string }>()
   const character = useCharacterStore((state) => state.getCharacter(id || ''))
   const updateCharacter = useCharacterStore((state) => state.updateCharacter)
@@ -146,7 +147,7 @@ export function PlayMode() {
     intelligence: 'INT', wisdom: 'SAB', charisma: 'CAR'
   }
 
-  const classSkillIds = classData?.classSkills ?? CLASS_SKILLS[character.classes[0]?.id ?? ''] ?? []
+  const classSkillIds = classData?.classSkills ?? CLASSES_DATA.find(c => c.id === character.classes[0]?.id)?.classSkills ?? []
 
   return (
     <div className={styles.container}>
@@ -402,7 +403,7 @@ export function PlayMode() {
                     {character.skills
                       .filter((sr) => sr.ranks > 0)
                       .map((skillRank) => {
-                        const skillDef = getSkillById(skillRank.id)
+                        const skillDef = SKILLS.find((s) => s.id === skillRank.id)
                         if (!skillDef) return null
                         const abilityMod = calculateModifier(abilities[skillDef.ability])
                         const miscTotal = (skillRank.miscBonuses ?? []).reduce((s, b) => s + b.value, 0)

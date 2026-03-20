@@ -8,12 +8,11 @@ import {
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { StatusEffect, JournalEntry } from '../store'
-import { getClassById, getBABForLevel, getSaveForLevel, SpellLevel, FEATS } from '../data'
+import { getClassById, getBABForLevel, getSaveForLevel, SpellLevel, useSRDStore } from '../data'
 import { resolveModifiers } from '../engine'
 import { Card, Button } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal } from '../components/character'
 import type { LevelUpUpdates } from '../components/character'
-import { SKILLS } from '../data/skills'
 import styles from './CharacterView.module.css'
 
 type Tab = 'combat' | 'skills' | 'feats' | 'weapons' | 'inventory' | 'spells' | 'notes' | 'companion'
@@ -24,6 +23,7 @@ const ABILITY_ABBR: Record<string, string> = {
 }
 
 export function CharacterView() {
+  const { skills: SKILLS, feats: FEATS } = useSRDStore()
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const character = useCharacterStore((state) => state.getCharacter(id || ''))
@@ -39,6 +39,16 @@ export function CharacterView() {
   const [expandedJournalEntry, setExpandedJournalEntry] = useState<string | null>(null)
   const [showJournalModal, setShowJournalModal] = useState(false)
   const [newJournalContent, setNewJournalContent] = useState('')
+
+  const resolvedStats = useMemo(
+    () => character ? resolveModifiers(character) : {
+      skillBonuses: {}, saveBonuses: { fort: 0, ref: 0, will: 0 },
+      acBonuses: { natural: 0, deflection: 0, dodge: 0, armor: 0, total: 0 },
+      initiativeBonus: 0, attackBonus: 0, damageBonus: 0,
+      hpBonus: 0, speedBonus: 0, cmbBonus: 0, cmdBonus: 0, allModifiers: [],
+    },
+    [character]
+  )
 
   if (!character) {
     return (
@@ -57,8 +67,6 @@ export function CharacterView() {
   const { abilities } = character
   const primaryClass = character.classes[0]
   const classData = getClassById(primaryClass?.id || '')
-
-  const resolvedStats = useMemo(() => resolveModifiers(character), [character])
 
   const equippedBody   = (character.armor ?? []).find((a) => a.equipped && a.type !== 'shield')
   const equippedShield = (character.armor ?? []).find((a) => a.equipped && a.type === 'shield')

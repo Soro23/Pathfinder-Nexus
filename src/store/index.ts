@@ -2,3 +2,4 @@ export { useCharacterStore, generateId, calculateModifier, getModifierString } f
 export type { Character, CharacterClass, InventoryItem, SkillRank, AnimalCompanion, JournalEntry, StatusEffect, MiscBonus, Armor, Weapon } from './characterStore'
 export { useCampaignStore } from './campaignStore'
 export type { Campaign, CampaignNote, CampaignNPC } from './campaignStore'
+export { useSRDStore, srdStore } from './srdStore'

@@ -1,11 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
-import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save } from 'lucide-react'
+import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users } from 'lucide-react'
 import type { Spell } from '../data/spells'
 import { SPELL_SCHOOLS } from '../data/spells'
 import { useCustomSpellsStore } from '../store/customSpellsStore'
 import { parseD20SpellPage } from '../utils/d20pfsrdParser'
 import { supabase } from '../lib/supabase'
 import { mapSpellRow } from '../hooks/useSpells'
+import { useSRDStore, srdStore } from '../store/srdStore'
+import type { Skill } from '../data/skills'
+import type { Feat } from '../data/feats'
+import type { ClassData } from '../data/classes'
+import type { Race } from '../data/races'
 import styles from './Admin.module.css'
 
 // ── Proxy helpers ─────────────────────────────────────────────────────────────
@@ -77,7 +82,7 @@ async function findDuplicateInDB(name: string, customSpells: Spell[]): Promise<S
 
 // ── Admin page ────────────────────────────────────────────────────────────────
 
-type TabId = 'importer' | 'editor'
+type TabId = 'importer' | 'editor' | 'skills' | 'feats' | 'classes' | 'races'
 type ImportStatus = 'idle' | 'loading' | 'done' | 'error'
 
 export function Admin() {
@@ -130,13 +135,37 @@ export function Admin() {
           className={`${styles.tabBtn} ${activeTab === 'importer' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('importer')}
         >
-          <Download size={16} /> Importador de Hechizos
+          <Download size={16} /> Importador
         </button>
         <button
           className={`${styles.tabBtn} ${activeTab === 'editor' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('editor')}
         >
-          <Pencil size={16} /> Editor de Conjuros
+          <Pencil size={16} /> Editor Conjuros
+        </button>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'skills' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('skills')}
+        >
+          <BookOpen size={16} /> Skills
+        </button>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'feats' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('feats')}
+        >
+          <Star size={16} /> Feats
+        </button>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'classes' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('classes')}
+        >
+          <Sword size={16} /> Clases
+        </button>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'races' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('races')}
+        >
+          <Users size={16} /> Razas
         </button>
       </nav>
 
@@ -199,6 +228,10 @@ export function Admin() {
         )}
 
         {activeTab === 'editor' && <SpellEditor />}
+        {activeTab === 'skills' && <SkillsEditor />}
+        {activeTab === 'feats' && <FeatsEditor />}
+        {activeTab === 'classes' && <ClassesEditor />}
+        {activeTab === 'races' && <RacesEditor />}
       </div>
     </div>
   )
@@ -588,6 +621,589 @@ function PreviewField({ label, children }: { label: string; children: React.Reac
     <div className={styles.previewField}>
       <span className={styles.previewLabel}>{label}</span>
       <span className={styles.previewValue}>{children}</span>
+    </div>
+  )
+}
+
+// ── Shared SRD list/edit pattern ───────────────────────────────────────────
+
+async function refreshSRD() {
+  // Force re-fetch by resetting initialized flag, then fetching
+  srdStore.setState({ initialized: false })
+  await srdStore.getState().fetchAll()
+}
+
+// ── Skills Editor ──────────────────────────────────────────────────────────
+
+type SkillForm = {
+  name: string
+  ability: Skill['ability']
+  is_class_skill: boolean
+  has_armor_check_penalty: boolean
+  description: string
+}
+
+const ABILITY_OPTIONS: Array<{ value: Skill['ability']; label: string }> = [
+  { value: 'strength', label: 'Fuerza' },
+  { value: 'dexterity', label: 'Destreza' },
+  { value: 'constitution', label: 'Constitución' },
+  { value: 'intelligence', label: 'Inteligencia' },
+  { value: 'wisdom', label: 'Sabiduría' },
+  { value: 'charisma', label: 'Carisma' },
+]
+
+function SkillsEditor() {
+  const { skills } = useSRDStore()
+  const [selected, setSelected] = useState<Skill | null>(null)
+  const [form, setForm] = useState<SkillForm | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+
+  function selectSkill(skill: Skill) {
+    setSelected(skill)
+    setForm({
+      name: skill.name,
+      ability: skill.ability,
+      is_class_skill: skill.isClassSkill,
+      has_armor_check_penalty: skill.hasArmorCheckPenalty,
+      description: skill.description,
+    })
+    setSaved(false)
+    setError('')
+  }
+
+  function back() { setSelected(null); setForm(null) }
+
+  async function save() {
+    if (!selected || !form) return
+    setSaving(true); setError(''); setSaved(false)
+    const { error: err } = await supabase.from('skills').update({
+      name: form.name,
+      ability: form.ability,
+      is_class_skill: form.is_class_skill,
+      has_armor_check_penalty: form.has_armor_check_penalty,
+      description: form.description,
+    }).eq('id', selected.id)
+    if (err) setError(err.message)
+    else { setSaved(true); await refreshSRD() }
+    setSaving(false)
+  }
+
+  if (selected && form) {
+    return (
+      <div className={styles.editorCard}>
+        <div className={styles.editFormHeader}>
+          <button className={styles.backBtn} onClick={back}><ArrowLeft size={16} /> Volver</button>
+          <h2 className={styles.editFormTitle}>{selected.name}</h2>
+        </div>
+        {error && <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{error}</span></div>}
+        {saved && <div className={styles.successBanner}><CheckCircle size={16} />Habilidad guardada.</div>}
+        <div className={styles.editGrid}>
+          <Field label="Nombre"><input className={styles.fieldInput} value={form.name} onChange={e => setForm(f => f && ({ ...f, name: e.target.value }))} /></Field>
+          <Field label="Atributo">
+            <select className={styles.fieldInput} value={form.ability} onChange={e => setForm(f => f && ({ ...f, ability: e.target.value as Skill['ability'] }))}>
+              {ABILITY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </Field>
+          <div className={styles.checkboxRow}>
+            <label className={styles.checkboxLabel}>
+              <input type="checkbox" checked={form.is_class_skill} onChange={e => setForm(f => f && ({ ...f, is_class_skill: e.target.checked }))} />
+              Habilidad de clase
+            </label>
+            <label className={styles.checkboxLabel}>
+              <input type="checkbox" checked={form.has_armor_check_penalty} onChange={e => setForm(f => f && ({ ...f, has_armor_check_penalty: e.target.checked }))} />
+              Penalización por armadura
+            </label>
+          </div>
+        </div>
+        <Field label="Descripción" wide>
+          <textarea className={styles.descriptionBox} rows={4} value={form.description} onChange={e => setForm(f => f && ({ ...f, description: e.target.value }))} />
+        </Field>
+        <div className={styles.saveRow}>
+          <button className={styles.saveBtn} onClick={save} disabled={saving}>
+            {saving ? <span className={styles.spinner} /> : <><Save size={16} /> Guardar</>}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.editorCard}>
+      <h2>Skills ({skills.length})</h2>
+      <ul className={styles.searchResults}>
+        {skills.map(skill => (
+          <li key={skill.id} className={styles.searchResultItem} onClick={() => selectSkill(skill)}>
+            <div className={styles.searchResultMain}>
+              <span className={styles.searchResultName}>{skill.name}</span>
+              <span className={styles.searchResultMeta}>{skill.ability.substring(0, 3).toUpperCase()}{skill.hasArmorCheckPenalty ? ' · ACP' : ''}</span>
+            </div>
+            <Pencil size={14} className={styles.editHint} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+// ── Feats Editor ───────────────────────────────────────────────────────────
+
+const FEAT_TYPE_OPTIONS = [
+  { value: 'combat', label: 'Combate' },
+  { value: 'general', label: 'General' },
+  { value: 'metamagic', label: 'Metamagia' },
+  { value: 'item_creation', label: 'Creación de Objetos' },
+  { value: 'teamwork', label: 'Trabajo en Equipo' },
+  { value: 'critical', label: 'Crítico' },
+  { value: 'style', label: 'Estilo' },
+]
+
+type FeatForm = {
+  name: string
+  type: Feat['type']
+  prerequisite: string
+  benefit: string
+  normal: string
+  special: string
+  effects: string
+}
+
+function FeatsEditor() {
+  const { feats } = useSRDStore()
+  const [search, setSearch] = useState('')
+  const [selected, setSelected] = useState<Feat | null>(null)
+  const [form, setForm] = useState<FeatForm | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+  const [jsonError, setJsonError] = useState('')
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [filtered, setFiltered] = useState<Feat[]>([])
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      const q = search.toLowerCase()
+      setFiltered(q ? feats.filter(f => f.name.toLowerCase().includes(q)) : feats.slice(0, 30))
+    }, 200)
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [search, feats])
+
+  function selectFeat(feat: Feat) {
+    setSelected(feat)
+    setForm({
+      name: feat.name,
+      type: feat.type,
+      prerequisite: feat.prerequisite ?? '',
+      benefit: feat.benefit,
+      normal: feat.normal ?? '',
+      special: feat.special ?? '',
+      effects: feat.effects ? JSON.stringify(feat.effects, null, 2) : '',
+    })
+    setSaved(false); setError(''); setJsonError('')
+  }
+
+  function back() { setSelected(null); setForm(null) }
+
+  function validateEffects(val: string): unknown[] | null {
+    if (!val.trim()) return []
+    try { return JSON.parse(val) } catch { return null }
+  }
+
+  async function save() {
+    if (!selected || !form) return
+    const effects = validateEffects(form.effects)
+    if (effects === null) { setJsonError('JSON de effects inválido'); return }
+    setSaving(true); setError(''); setSaved(false); setJsonError('')
+    const { error: err } = await supabase.from('feats').update({
+      name: form.name,
+      type: form.type,
+      prerequisite: form.prerequisite || null,
+      benefit: form.benefit,
+      normal: form.normal || null,
+      special: form.special || null,
+      effects: effects.length > 0 ? effects : null,
+    }).eq('id', selected.id)
+    if (err) setError(err.message)
+    else { setSaved(true); await refreshSRD() }
+    setSaving(false)
+  }
+
+  if (selected && form) {
+    return (
+      <div className={styles.editorCard}>
+        <div className={styles.editFormHeader}>
+          <button className={styles.backBtn} onClick={back}><ArrowLeft size={16} /> Volver</button>
+          <h2 className={styles.editFormTitle}>{selected.name}</h2>
+        </div>
+        {error && <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{error}</span></div>}
+        {saved && <div className={styles.successBanner}><CheckCircle size={16} />Dote guardada.</div>}
+        <div className={styles.editGrid}>
+          <Field label="Nombre"><input className={styles.fieldInput} value={form.name} onChange={e => setForm(f => f && ({ ...f, name: e.target.value }))} /></Field>
+          <Field label="Tipo">
+            <select className={styles.fieldInput} value={form.type} onChange={e => setForm(f => f && ({ ...f, type: e.target.value as Feat['type'] }))}>
+              {FEAT_TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </Field>
+          <Field label="Prerrequisito" wide><input className={styles.fieldInput} value={form.prerequisite} onChange={e => setForm(f => f && ({ ...f, prerequisite: e.target.value }))} /></Field>
+        </div>
+        <Field label="Beneficio" wide>
+          <textarea className={styles.descriptionBox} rows={4} value={form.benefit} onChange={e => setForm(f => f && ({ ...f, benefit: e.target.value }))} />
+        </Field>
+        <Field label="Normal" wide>
+          <textarea className={styles.descriptionBox} rows={2} value={form.normal} onChange={e => setForm(f => f && ({ ...f, normal: e.target.value }))} />
+        </Field>
+        <Field label="Especial" wide>
+          <textarea className={styles.descriptionBox} rows={2} value={form.special} onChange={e => setForm(f => f && ({ ...f, special: e.target.value }))} />
+        </Field>
+        <Field label="Effects (JSON)" wide>
+          <textarea className={styles.descriptionBox} rows={4} value={form.effects} onChange={e => { setForm(f => f && ({ ...f, effects: e.target.value })); setJsonError('') }} style={{ fontFamily: 'monospace', fontSize: '0.8rem' }} />
+        </Field>
+        {jsonError && <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{jsonError}</span></div>}
+        <div className={styles.saveRow}>
+          <button className={styles.saveBtn} onClick={save} disabled={saving}>
+            {saving ? <span className={styles.spinner} /> : <><Save size={16} /> Guardar</>}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.editorCard}>
+      <h2>Feats ({feats.length})</h2>
+      <div className={styles.editorSearchRow}>
+        <Search size={16} className={styles.editorSearchIcon} />
+        <input className={styles.editorSearchInput} placeholder="Buscar dote…" value={search} onChange={e => setSearch(e.target.value)} autoFocus />
+      </div>
+      <ul className={styles.searchResults}>
+        {filtered.map(feat => (
+          <li key={feat.id} className={styles.searchResultItem} onClick={() => selectFeat(feat)}>
+            <div className={styles.searchResultMain}>
+              <span className={styles.searchResultName}>{feat.name}</span>
+              <span className={styles.searchResultMeta}>{feat.type}</span>
+            </div>
+            <Pencil size={14} className={styles.editHint} />
+          </li>
+        ))}
+      </ul>
+      {!search && <p className={styles.noResults}>Mostrando primeras 30 — busca para filtrar</p>}
+    </div>
+  )
+}
+
+// ── Classes Editor ─────────────────────────────────────────────────────────
+
+type ClassForm = {
+  name: string
+  hit_die: string
+  base_attack_bonus: string
+  fortitude_save: string
+  reflex_save: string
+  will_save: string
+  skill_points_per_level: string
+  magic_type: string
+  caster_ability: string
+  starting_gold_dice: string
+  description: string
+  class_skills: string
+  features: string
+  alignment: string
+  spells_per_day: string
+}
+
+function ClassesEditor() {
+  const { classes } = useSRDStore()
+  const [selected, setSelected] = useState<ClassData | null>(null)
+  const [form, setForm] = useState<ClassForm | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+  const [jsonErrors, setJsonErrors] = useState<Record<string, string>>({})
+
+  function selectClass(cls: ClassData) {
+    setSelected(cls)
+    setForm({
+      name: cls.name,
+      hit_die: String(cls.hitDie),
+      base_attack_bonus: cls.baseAttackBonus,
+      fortitude_save: cls.fortitudeSave,
+      reflex_save: cls.reflexSave,
+      will_save: cls.willSave,
+      skill_points_per_level: String(cls.skillPointsPerLevel),
+      magic_type: cls.magicType ?? '',
+      caster_ability: cls.casterAbility ?? '',
+      starting_gold_dice: cls.startingGoldDice,
+      description: cls.description,
+      class_skills: JSON.stringify(cls.classSkills, null, 2),
+      features: JSON.stringify(cls.features, null, 2),
+      alignment: JSON.stringify(cls.alignment, null, 2),
+      spells_per_day: cls.spellsPerDay ? JSON.stringify(cls.spellsPerDay, null, 2) : '',
+    })
+    setSaved(false); setError(''); setJsonErrors({})
+  }
+
+  function back() { setSelected(null); setForm(null) }
+
+  function parseField(key: string, val: string): [unknown, string | null] {
+    if (!val.trim()) return [null, null]
+    try { return [JSON.parse(val), null] } catch { return [null, `JSON inválido en ${key}`] }
+  }
+
+  async function save() {
+    if (!selected || !form) return
+    const errs: Record<string, string> = {}
+    const [classSkills, e1] = parseField('class_skills', form.class_skills)
+    const [features, e2] = parseField('features', form.features)
+    const [alignment, e3] = parseField('alignment', form.alignment)
+    const [spellsPerDay, e4] = parseField('spells_per_day', form.spells_per_day)
+    if (e1) errs.class_skills = e1
+    if (e2) errs.features = e2
+    if (e3) errs.alignment = e3
+    if (e4) errs.spells_per_day = e4
+    if (Object.keys(errs).length > 0) { setJsonErrors(errs); return }
+
+    setSaving(true); setError(''); setSaved(false); setJsonErrors({})
+    const { error: err } = await supabase.from('classes').update({
+      name: form.name,
+      hit_die: parseInt(form.hit_die),
+      base_attack_bonus: form.base_attack_bonus,
+      fortitude_save: form.fortitude_save,
+      reflex_save: form.reflex_save,
+      will_save: form.will_save,
+      skill_points_per_level: parseInt(form.skill_points_per_level),
+      magic_type: form.magic_type || null,
+      caster_ability: form.caster_ability || null,
+      starting_gold_dice: form.starting_gold_dice,
+      description: form.description,
+      class_skills: classSkills,
+      features,
+      alignment,
+      spells_per_day: spellsPerDay,
+    }).eq('id', selected.id)
+    if (err) setError(err.message)
+    else { setSaved(true); await refreshSRD() }
+    setSaving(false)
+  }
+
+  if (selected && form) {
+    const setF = (key: keyof ClassForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+      setForm(f => f && ({ ...f, [key]: e.target.value }))
+
+    return (
+      <div className={styles.editorCard}>
+        <div className={styles.editFormHeader}>
+          <button className={styles.backBtn} onClick={back}><ArrowLeft size={16} /> Volver</button>
+          <h2 className={styles.editFormTitle}>{selected.name}</h2>
+        </div>
+        {error && <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{error}</span></div>}
+        {saved && <div className={styles.successBanner}><CheckCircle size={16} />Clase guardada.</div>}
+        <div className={styles.editGrid}>
+          <Field label="Nombre"><input className={styles.fieldInput} value={form.name} onChange={setF('name')} /></Field>
+          <Field label="Dado de Golpe (d?)"><input className={styles.fieldInput} type="number" value={form.hit_die} onChange={setF('hit_die')} /></Field>
+          <Field label="BAB">
+            <select className={styles.fieldInput} value={form.base_attack_bonus} onChange={setF('base_attack_bonus')}>
+              <option value="good">good</option><option value="medium">medium</option><option value="poor">poor</option>
+            </select>
+          </Field>
+          <Field label="Fort">
+            <select className={styles.fieldInput} value={form.fortitude_save} onChange={setF('fortitude_save')}>
+              <option value="good">good</option><option value="poor">poor</option>
+            </select>
+          </Field>
+          <Field label="Ref">
+            <select className={styles.fieldInput} value={form.reflex_save} onChange={setF('reflex_save')}>
+              <option value="good">good</option><option value="poor">poor</option>
+            </select>
+          </Field>
+          <Field label="Vol">
+            <select className={styles.fieldInput} value={form.will_save} onChange={setF('will_save')}>
+              <option value="good">good</option><option value="poor">poor</option>
+            </select>
+          </Field>
+          <Field label="Puntos de Hab/Nivel"><input className={styles.fieldInput} type="number" value={form.skill_points_per_level} onChange={setF('skill_points_per_level')} /></Field>
+          <Field label="Tipo de Magia">
+            <select className={styles.fieldInput} value={form.magic_type} onChange={setF('magic_type')}>
+              <option value="">Ninguna</option><option value="arcane">arcane</option><option value="divine">divine</option><option value="bardic">bardic</option><option value="alchemist">alchemist</option>
+            </select>
+          </Field>
+          <Field label="Atributo de Lanzamiento">
+            <select className={styles.fieldInput} value={form.caster_ability} onChange={setF('caster_ability')}>
+              <option value="">Ninguno</option><option value="intelligence">intelligence</option><option value="wisdom">wisdom</option><option value="charisma">charisma</option>
+            </select>
+          </Field>
+          <Field label="Oro inicial (dados)"><input className={styles.fieldInput} value={form.starting_gold_dice} onChange={setF('starting_gold_dice')} /></Field>
+          <Field label="Descripción" wide>
+            <textarea className={styles.descriptionBox} rows={3} value={form.description} onChange={setF('description')} />
+          </Field>
+        </div>
+        {(['class_skills', 'features', 'alignment', 'spells_per_day'] as const).map(key => (
+          <div key={key}>
+            <Field label={key} wide>
+              <textarea className={styles.descriptionBox} rows={key === 'spells_per_day' ? 8 : 4} value={form[key]} onChange={setF(key)} style={{ fontFamily: 'monospace', fontSize: '0.8rem' }} />
+            </Field>
+            {jsonErrors[key] && <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{jsonErrors[key]}</span></div>}
+          </div>
+        ))}
+        <div className={styles.saveRow}>
+          <button className={styles.saveBtn} onClick={save} disabled={saving}>
+            {saving ? <span className={styles.spinner} /> : <><Save size={16} /> Guardar</>}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.editorCard}>
+      <h2>Clases ({classes.length})</h2>
+      <ul className={styles.searchResults}>
+        {classes.map(cls => (
+          <li key={cls.id} className={styles.searchResultItem} onClick={() => selectClass(cls)}>
+            <div className={styles.searchResultMain}>
+              <span className={styles.searchResultName}>{cls.name}</span>
+              <span className={styles.searchResultMeta}>d{cls.hitDie} · {cls.baseAttackBonus} BAB{cls.magicType ? ` · ${cls.magicType}` : ''}</span>
+            </div>
+            <Pencil size={14} className={styles.editHint} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+// ── Races Editor ───────────────────────────────────────────────────────────
+
+type RaceForm = {
+  label: string
+  size: string
+  speed: string
+  bonus_desc: string
+  favored_class: string
+  desc: string
+  bonuses: string
+  traits: string
+  subraces: string
+}
+
+function RacesEditor() {
+  const { races } = useSRDStore()
+  const [selected, setSelected] = useState<Race | null>(null)
+  const [form, setForm] = useState<RaceForm | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+  const [jsonErrors, setJsonErrors] = useState<Record<string, string>>({})
+
+  function selectRace(race: Race) {
+    setSelected(race)
+    setForm({
+      label: race.label,
+      size: race.size,
+      speed: String(race.speed),
+      bonus_desc: race.bonusDesc,
+      favored_class: race.favoredClass ?? '',
+      desc: race.desc,
+      bonuses: JSON.stringify(race.bonuses, null, 2),
+      traits: JSON.stringify(race.traits, null, 2),
+      subraces: race.subraces ? JSON.stringify(race.subraces, null, 2) : '',
+    })
+    setSaved(false); setError(''); setJsonErrors({})
+  }
+
+  function back() { setSelected(null); setForm(null) }
+
+  function parseField(key: string, val: string): [unknown, string | null] {
+    if (!val.trim()) return [null, null]
+    try { return [JSON.parse(val), null] } catch { return [null, `JSON inválido en ${key}`] }
+  }
+
+  async function save() {
+    if (!selected || !form) return
+    const errs: Record<string, string> = {}
+    const [bonuses, e1] = parseField('bonuses', form.bonuses)
+    const [traits, e2] = parseField('traits', form.traits)
+    const [subraces, e3] = parseField('subraces', form.subraces)
+    if (e1) errs.bonuses = e1
+    if (e2) errs.traits = e2
+    if (e3) errs.subraces = e3
+    if (Object.keys(errs).length > 0) { setJsonErrors(errs); return }
+
+    setSaving(true); setError(''); setSaved(false); setJsonErrors({})
+    const { error: err } = await supabase.from('races').update({
+      label: form.label,
+      size: form.size,
+      speed: parseInt(form.speed),
+      bonus_desc: form.bonus_desc,
+      favored_class: form.favored_class || null,
+      desc: form.desc,
+      bonuses,
+      traits,
+      subraces,
+    }).eq('id', selected.id)
+    if (err) setError(err.message)
+    else { setSaved(true); await refreshSRD() }
+    setSaving(false)
+  }
+
+  if (selected && form) {
+    const setF = (key: keyof RaceForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+      setForm(f => f && ({ ...f, [key]: e.target.value }))
+
+    return (
+      <div className={styles.editorCard}>
+        <div className={styles.editFormHeader}>
+          <button className={styles.backBtn} onClick={back}><ArrowLeft size={16} /> Volver</button>
+          <h2 className={styles.editFormTitle}>{selected.label}</h2>
+        </div>
+        {error && <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{error}</span></div>}
+        {saved && <div className={styles.successBanner}><CheckCircle size={16} />Raza guardada.</div>}
+        <div className={styles.editGrid}>
+          <Field label="Nombre"><input className={styles.fieldInput} value={form.label} onChange={setF('label')} /></Field>
+          <Field label="Tamaño">
+            <select className={styles.fieldInput} value={form.size} onChange={setF('size')}>
+              <option value="small">small</option><option value="medium">medium</option>
+            </select>
+          </Field>
+          <Field label="Velocidad (ft)"><input className={styles.fieldInput} type="number" value={form.speed} onChange={setF('speed')} /></Field>
+          <Field label="Descripción de Bonos" wide><input className={styles.fieldInput} value={form.bonus_desc} onChange={setF('bonus_desc')} /></Field>
+          <Field label="Clase Favorecida"><input className={styles.fieldInput} value={form.favored_class} onChange={setF('favored_class')} /></Field>
+          <Field label="Descripción" wide>
+            <textarea className={styles.descriptionBox} rows={3} value={form.desc} onChange={setF('desc')} />
+          </Field>
+        </div>
+        {(['bonuses', 'traits', 'subraces'] as const).map(key => (
+          <div key={key}>
+            <Field label={key} wide>
+              <textarea className={styles.descriptionBox} rows={key === 'traits' ? 6 : 4} value={form[key]} onChange={setF(key)} style={{ fontFamily: 'monospace', fontSize: '0.8rem' }} />
+            </Field>
+            {jsonErrors[key] && <div className={styles.errorAlert}><AlertTriangle size={16} /><span>{jsonErrors[key]}</span></div>}
+          </div>
+        ))}
+        <div className={styles.saveRow}>
+          <button className={styles.saveBtn} onClick={save} disabled={saving}>
+            {saving ? <span className={styles.spinner} /> : <><Save size={16} /> Guardar</>}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.editorCard}>
+      <h2>Razas ({races.length})</h2>
+      <ul className={styles.searchResults}>
+        {races.map(race => (
+          <li key={race.id} className={styles.searchResultItem} onClick={() => selectRace(race)}>
+            <div className={styles.searchResultMain}>
+              <span className={styles.searchResultName}>{race.label}</span>
+              <span className={styles.searchResultMeta}>{race.size} · {race.speed}ft{race.favoredClass ? ` · ${race.favoredClass}` : ''}</span>
+            </div>
+            <Pencil size={14} className={styles.editHint} />
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

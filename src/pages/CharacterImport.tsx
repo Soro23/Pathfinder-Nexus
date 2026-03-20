@@ -4,8 +4,9 @@ import { ImagePlus, X, Loader2, AlertCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useCharacterStore, generateId } from '../store'
 import type { Character, Weapon, Armor, SkillRank } from '../store'
-import { CLASSES } from '../data/classes'
-import { FEATS } from '../data/feats'
+import { useSRDStore } from '../store/srdStore'
+import type { ClassData } from '../data/classes'
+import type { Feat } from '../data/feats'
 import { Button } from '../components/ui'
 import styles from './CharacterImport.module.css'
 
@@ -76,7 +77,7 @@ const ALIGNMENTS = [
   { value: 'ce', label: 'Caótico Malvado' },
 ]
 
-function mapExtractedToCharacter(extracted: ExtractedData): Character {
+function mapExtractedToCharacter(extracted: ExtractedData, CLASSES: ClassData[], FEATS: Feat[]): Character {
   const id = generateId()
   const now = new Date().toISOString()
 
@@ -171,6 +172,7 @@ function mapExtractedToCharacter(extracted: ExtractedData): Character {
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function CharacterImport() {
+  const { classes: classesData, feats: featsData } = useSRDStore()
   const navigate = useNavigate()
   const addCharacter = useCharacterStore((state) => state.addCharacter)
 
@@ -234,7 +236,7 @@ export function CharacterImport() {
         throw new Error(data.raw ? `${data.error}\n\nRAW: ${data.raw}` : data.error)
       }
 
-      const mapped = mapExtractedToCharacter(data.character as ExtractedData)
+      const mapped = mapExtractedToCharacter(data.character as ExtractedData, classesData, featsData)
       setCharacter(mapped)
       setStep('review')
     } catch (err) {
@@ -426,7 +428,7 @@ export function CharacterImport() {
                 value={primaryClassId}
                 onChange={(e) => updateField('classes', [{ id: e.target.value, level: character.classes[0]?.level ?? 1 }])}
               >
-                {CLASSES.map((c) => (
+                {classesData.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
                 <option value={primaryClassId}>{primaryClassId}</option>

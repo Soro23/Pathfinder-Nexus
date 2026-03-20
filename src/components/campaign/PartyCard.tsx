@@ -1,7 +1,6 @@
 import { Heart, Shield } from 'lucide-react'
 import { calculateModifier } from '../../store'
-import { getClassById, getSaveForLevel, getBABForLevel } from '../../data'
-import { SKILLS } from '../../data/skills'
+import { getClassById, getSaveForLevel, getBABForLevel, useSRDStore } from '../../data'
 import type { Character } from '../../store'
 import styles from './PartyCard.module.css'
 
@@ -12,6 +11,7 @@ interface PartyCardProps {
 }
 
 export function PartyCard({ character }: PartyCardProps) {
+  const { skills: SKILLS } = useSRDStore()
   const { abilities } = character
   const primaryClass = character.classes[0]
   const classData = getClassById(primaryClass?.id || '')

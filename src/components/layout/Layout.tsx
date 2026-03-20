@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { Outlet, Link, useLocation, useMatch } from 'react-router-dom'
 import { Users, PlusCircle, BookOpen, Backpack, Sparkles, Map, Sword, PawPrint, LogOut, Sun, Moon, Settings } from 'lucide-react'
 import { useCharacterStore } from '../../store'
+import { useSRDStore } from '../../store/srdStore'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../hooks/useTheme'
 import styles from './Layout.module.css'
@@ -15,6 +17,8 @@ export function Layout() {
   const location = useLocation()
   const { signOut } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
+  const fetchAll = useSRDStore((s) => s.fetchAll)
+  useEffect(() => { fetchAll() }, [fetchAll])
 
   // Detect active character from URL
   const charMatch = useMatch('/characters/:id')

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Card, Select } from '../ui'
-import { FEATS, FEAT_TYPES } from '../../data'
+import { FEAT_TYPES, useSRDStore } from '../../data'
 import styles from './FeatsSelector.module.css'
 
 interface FeatsSelectorProps {
@@ -10,6 +10,7 @@ interface FeatsSelectorProps {
 }
 
 export function FeatsSelector({ selectedFeats, onToggle, maxFeats }: FeatsSelectorProps) {
+  const { feats: FEATS } = useSRDStore()
   const [filter, setFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
 

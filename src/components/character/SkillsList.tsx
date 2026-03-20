@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { ChevronDown, ChevronUp, Lock, Unlock, Plus, Trash2 } from 'lucide-react'
 import { Button } from '../ui'
-import { SKILLS, CLASS_SKILLS, calculateModifier, CharacterClass } from '../../data'
+import { CLASS_SKILLS, calculateModifier, CharacterClass, useSRDStore } from '../../data'
 import type { MiscBonus } from '../../store'
 import styles from './SkillsList.module.css'
 
@@ -32,6 +32,7 @@ export function SkillsList({
   equippedArmorAcp = 0,
   featSkillBonuses = {},
 }: SkillsListProps) {
+  const { skills: SKILLS } = useSRDStore()
   const [showAll, setShowAll] = useState(false)
   const [sortBy, setSortBy] = useState<'name' | 'total'>('name')
   const [openMiscPanel, setOpenMiscPanel] = useState<string | null>(null)
