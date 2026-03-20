@@ -3,7 +3,7 @@ import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft
 import type { Spell } from '../data/spells'
 import { SPELL_SCHOOLS } from '../data/spells'
 import { useCustomSpellsStore } from '../store/customSpellsStore'
-import { parseD20SpellPage } from '../utils/d20pfsrdParser'
+import { parseD20SpellPage, parseD20SkillPage, parseD20FeatPage, parseD20ClassPage, parseD20RacePage } from '../utils/d20pfsrdParser'
 import { supabase } from '../lib/supabase'
 import { mapSpellRow } from '../hooks/useSpells'
 import { useSRDStore, srdStore } from '../store/srdStore'
@@ -631,12 +631,14 @@ function UrlImporterPanel({
   table,
   requiredFields,
   placeholder,
+  parser,
   onImported,
   onCancel,
 }: {
   table: string
   requiredFields: string[]
   placeholder: string
+  parser: (html: string) => Record<string, unknown>
   onImported: () => void
   onCancel: () => void
 }) {
@@ -652,17 +654,8 @@ function UrlImporterPanel({
     if (!url.trim()) return
     setFetchStatus('loading'); setFetchError(''); setJsonText(''); setMissing([])
     try {
-      let text: string
-      try {
-        const res = await fetch(url.trim())
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        text = await res.text()
-      } catch {
-        text = await fetchWithProxy(url.trim())
-      }
-      const parsed = JSON.parse(text)
-      const data = Array.isArray(parsed) ? parsed[0] : parsed
-      if (!data || typeof data !== 'object') throw new Error('El JSON no contiene un objeto válido')
+      const html = await fetchWithProxy(url.trim())
+      const data = parser(html)
       setJsonText(JSON.stringify(data, null, 2))
       setMissing(requiredFields.filter(f => !(f in data) || data[f] === null || data[f] === undefined))
       setFetchStatus('done')
@@ -692,9 +685,9 @@ function UrlImporterPanel({
 
   return (
     <div className={styles.importerCard} style={{ marginBottom: 'var(--space-4)' }}>
-      <h2>Importar desde URL</h2>
+      <h2>Importar desde d20pfsrd.com</h2>
       <p className={styles.cardDesc}>
-        Pega la URL de un endpoint JSON con los datos del nuevo registro. Campos requeridos: <strong>{requiredFields.join(', ')}</strong>.
+        Pega la URL de la página de d20pfsrd.com. Se parseará automáticamente — revisa el JSON antes de guardar.
       </p>
       <div className={styles.urlRow}>
         <input
@@ -861,7 +854,8 @@ function SkillsEditor() {
         <UrlImporterPanel
           table="skills"
           requiredFields={['name', 'ability']}
-          placeholder='{ "name": "Acrobatics", "ability": "dexterity", ... }'
+          placeholder="https://www.d20pfsrd.com/skills/acrobatics"
+          parser={parseD20SkillPage}
           onImported={() => { setShowImporter(false); setImportedMsg(true) }}
           onCancel={() => setShowImporter(false)}
         />
@@ -1019,7 +1013,8 @@ function FeatsEditor() {
         <UrlImporterPanel
           table="feats"
           requiredFields={['name', 'type', 'benefit']}
-          placeholder='{ "name": "Power Attack", "type": "combat", "benefit": "...", ... }'
+          placeholder="https://www.d20pfsrd.com/feats/combat-feats/power-attack-combat"
+          parser={parseD20FeatPage}
           onImported={() => { setShowImporter(false); setImportedMsg(true) }}
           onCancel={() => setShowImporter(false)}
         />
@@ -1221,7 +1216,8 @@ function ClassesEditor() {
         <UrlImporterPanel
           table="classes"
           requiredFields={['name', 'hit_die', 'base_attack_bonus', 'fortitude_save', 'reflex_save', 'will_save', 'skill_points_per_level']}
-          placeholder='{ "name": "Ranger", "hit_die": 10, "base_attack_bonus": "good", ... }'
+          placeholder="https://www.d20pfsrd.com/classes/core-classes/barbarian"
+          parser={parseD20ClassPage}
           onImported={() => { setShowImporter(false); setImportedMsg(true) }}
           onCancel={() => setShowImporter(false)}
         />
@@ -1373,7 +1369,8 @@ function RacesEditor() {
         <UrlImporterPanel
           table="races"
           requiredFields={['label', 'size', 'speed']}
-          placeholder='{ "label": "Aasimar", "size": "medium", "speed": 30, ... }'
+          placeholder="https://www.d20pfsrd.com/races/core-races/dwarf"
+          parser={parseD20RacePage}
           onImported={() => { setShowImporter(false); setImportedMsg(true) }}
           onCancel={() => setShowImporter(false)}
         />

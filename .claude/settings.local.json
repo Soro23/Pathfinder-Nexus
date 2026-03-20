@@ -21,7 +21,8 @@
       "Bash(find C:UsersaitolDocumentsCodeClaudeWorkspacePathfinder-Nexus -name campaignStore.ts -o -name campaign*.ts)",
       "Bash(xargs grep:*)",
       "Bash(find /c/Users/aitol/Documents/Code/ClaudeWorkspace/Pathfinder-Nexus/src -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.css \\\\\\))",
-      "Bash(echo \"EXIT: $?\")"
+      "Bash(echo \"EXIT: $?\")",
+      "WebFetch(domain:www.d20pfsrd.com)"
     ]
   }
 }
