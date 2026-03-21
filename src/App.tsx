@@ -13,6 +13,7 @@ import { Login } from './pages/Login'
 import { CampaignList } from './pages/CampaignList'
 import { CampaignNew } from './pages/CampaignNew'
 import { CampaignView } from './pages/CampaignView'
+import { CampaignImport } from './pages/CampaignImport'
 import { PartyView } from './pages/PartyView'
 import { Admin } from './pages/Admin'
 
@@ -39,6 +40,7 @@ function App() {
               <Route path="rules" element={<Rules />} />
               <Route path="campaigns" element={<CampaignList />} />
               <Route path="campaigns/new" element={<CampaignNew />} />
+              <Route path="campaigns/import" element={<CampaignImport />} />
               <Route path="campaigns/:id" element={<CampaignView />} />
               <Route path="admin" element={<Admin />} />
             </Route>

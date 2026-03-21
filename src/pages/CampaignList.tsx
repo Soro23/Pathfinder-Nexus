@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { PlusCircle, Map, Users, BookOpen, Scroll, Trash2 } from 'lucide-react'
+import { PlusCircle, Map, Users, BookOpen, Scroll, Trash2, FileText } from 'lucide-react'
 import { useCampaignStore } from '../store'
 import type { Campaign } from '../store'
 import { Button, Card } from '../components/ui'
@@ -31,6 +31,10 @@ export function CampaignList() {
           <h1 className={styles.title}>Crónicas</h1>
           <p className={styles.subtitle}>Gestiona tus campañas y aventuras</p>
         </div>
+        <Button variant="secondary" onClick={() => navigate('/campaigns/import')}>
+          <FileText size={18} />
+          Importar PDF
+        </Button>
         <Button variant="primary" onClick={() => navigate('/campaigns/new')}>
           <PlusCircle size={18} />
           Nueva Campaña

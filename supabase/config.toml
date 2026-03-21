@@ -1,2 +1,5 @@
 [functions.extract-character]
 verify_jwt = false
+
+[functions.extract-campaign]
+verify_jwt = false
