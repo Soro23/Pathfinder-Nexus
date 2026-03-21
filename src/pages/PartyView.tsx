@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Sword, RefreshCw } from 'lucide-react'
 import { useCampaignStore, useCharacterStore } from '../store'
-import { PartyCard } from '../components/campaign'
+import { PartyCard, CampaignCharacterCard } from '../components/campaign'
 import styles from './PartyView.module.css'
 
 export function PartyView() {
   const { id } = useParams<{ id: string }>()
   const campaign = useCampaignStore((s) => s.getCampaign(id || ''))
+  const updateCampaignCharacter = useCampaignStore((s) => s.updateCampaignCharacter)
+  const deleteCampaignCharacter = useCampaignStore((s) => s.deleteCampaignCharacter)
   const characters = useCharacterStore((s) => s.characters)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -21,6 +23,8 @@ export function PartyView() {
   }
 
   const partyMembers = characters.filter((c) => campaign.characterIds.includes(c.id))
+  const localChars = (campaign.campaignCharacters ?? []).filter((c) => c.inParty !== false)
+  const totalMembers = partyMembers.length + localChars.length
 
   return (
     <div className={styles.page} key={refreshKey}>
@@ -40,7 +44,7 @@ export function PartyView() {
         </button>
       </header>
 
-      {partyMembers.length === 0 ? (
+      {totalMembers === 0 ? (
         <div className={styles.empty}>
           <p>No hay personajes en esta campaña.</p>
           <Link to={`/campaigns/${campaign.id}`}>Ir a la campaña para añadir personajes</Link>
@@ -49,6 +53,14 @@ export function PartyView() {
         <div className={styles.grid}>
           {partyMembers.map((char) => (
             <PartyCard key={char.id} character={char} />
+          ))}
+          {localChars.map((char) => (
+            <CampaignCharacterCard
+              key={char.id}
+              char={char}
+              onUpdate={(updates) => updateCampaignCharacter(campaign.id, char.id, updates)}
+              onDelete={() => deleteCampaignCharacter(campaign.id, char.id)}
+            />
           ))}
         </div>
       )}

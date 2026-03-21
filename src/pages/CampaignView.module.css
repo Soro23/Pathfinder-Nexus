@@ -539,11 +539,508 @@
 }
 .npcDeleteBtn:hover { opacity: 1; color: var(--color-error, #b00020); }
 
+/* ── Sessions ── */
+.sessionsTab { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.sessionCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sessionCardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  flex-wrap: wrap;
+}
+
+.sessionNumber {
+  font-family: var(--font-display);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+  min-width: 3ch;
+}
+
+.sessionTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  flex: 1;
+}
+
+.sessionDate {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.sessionXp {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-secondary);
+  background: var(--color-secondary-container);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.sessionBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-surface-container-high);
+}
+
+.sessionSummary {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.sessionHighlights {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sessionHighlightsTitle {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.highlightItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface);
+}
+.highlightItem::before {
+  content: '•';
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* ── Locations ── */
+.locationsTab { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.locationCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.locationHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.locationName {
+  font-family: var(--font-display);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  flex: 1;
+}
+
+.locationTypeChip {
+  font-size: var(--text-label-sm);
+  font-weight: 600;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface-variant);
+}
+
+.locationStatusChip {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  border: none;
+  transition: background var(--transition-fast);
+}
+.locStatus_unknown  { background: var(--color-surface-container-highest); color: var(--color-on-surface-variant); }
+.locStatus_known    { background: #d0e8ff; color: #0b5394; }
+.locStatus_explored { background: #d4edda; color: #1a6633; }
+.locStatus_cleared  { background: var(--color-primary-container); color: var(--color-primary); }
+
+.locationDesc {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.locationIndented {
+  margin-left: var(--space-5);
+  border-left: 2px solid var(--color-surface-container-high);
+  padding-left: var(--space-3);
+}
+
+/* ── Quests ── */
+.questsTab { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.questCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.questHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.questTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  flex: 1;
+}
+
+.questTypeChip {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+}
+.questType_main     { background: var(--color-primary-container); color: var(--color-primary); }
+.questType_side     { background: var(--color-secondary-container); color: var(--color-on-secondary-container); }
+.questType_personal { background: #fdf3d8; color: #7b5800; }
+
+.questStatusSelect {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-2);
+  font-size: var(--text-label-sm);
+  font-weight: 600;
+  color: var(--color-on-surface);
+  cursor: pointer;
+}
+
+.questRewards {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.questRewardBadge {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: #fdf3d8;
+  color: #7b5800;
+}
+
+.questDesc {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.questGroup { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.questGroupTitle {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--color-surface-container-high);
+}
+
+/* ── Encounters ── */
+.encountersTab { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.encounterCard { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.encounterHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  flex-wrap: wrap;
+}
+
+.encounterName {
+  font-family: var(--font-display);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  flex: 1;
+}
+
+.difficultyChip {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+}
+.diff_trivial  { background: var(--color-surface-container-highest); color: var(--color-on-surface-variant); }
+.diff_low      { background: #d4edda; color: #1a6633; }
+.diff_moderate { background: #fdf3d8; color: #7b5800; }
+.diff_severe   { background: var(--color-primary-container); color: var(--color-primary); }
+.diff_extreme  { background: #fde8e8; color: #b00020; }
+
+.encounterStatusChip {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+}
+.encStatus_pending   { background: var(--color-surface-container-high); color: var(--color-on-surface-variant); }
+.encStatus_active    { background: var(--color-primary-container); color: var(--color-primary); }
+.encStatus_completed { background: #d4edda; color: #1a6633; }
+
+/* ── Loot ── */
+.lootTab { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.lootTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lootTable th {
+  text-align: left;
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 2px solid var(--color-surface-container-high);
+}
+
+.lootRow {
+  border-bottom: 1px solid var(--color-surface-container-high);
+}
+.lootRow:last-child { border-bottom: none; }
+
+.lootRow td {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface);
+  vertical-align: middle;
+}
+
+.lootTypeChip {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+}
+.lootType_weapon { background: #fde8e8; color: #b00020; }
+.lootType_armor  { background: #d0e8ff; color: #0b5394; }
+.lootType_magic  { background: #e8d4ff; color: #5b0b94; }
+.lootType_coin   { background: #fdf3d8; color: #7b5800; }
+.lootType_misc   { background: var(--color-surface-container-high); color: var(--color-on-surface-variant); }
+
+.lootAssignSelect {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-2);
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface);
+  cursor: pointer;
+}
+
+.lootFooter {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-surface-container-high);
+  font-size: var(--text-body-sm);
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  gap: var(--space-2);
+}
+
+.lootTotal {
+  color: #7b5800;
+  font-weight: 700;
+}
+
+/* ── NPC expanded ── */
+.npcExpanded {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-surface-container-high);
+}
+
+.npcFieldsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.npcField {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.npcFieldLabel {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.npcFieldValue {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface);
+  line-height: 1.5;
+}
+
+.npcStatsRow {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.npcStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 48px;
+}
+
+.npcStatVal {
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.npcStatLabel {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Overview enhancements ── */
+.statsRow5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-3);
+}
+
+.overviewSections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.overviewSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.overviewSessionItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2);
+  background: var(--color-surface-container-low);
+  border-radius: var(--radius-sm);
+}
+
+.overviewSessionTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.overviewSessionMeta {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.overviewQuestItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-surface-container-low);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Inline form helpers ── */
+.highlightInputRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.highlightInputRow input {
+  flex: 1;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-label-sm);
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.tagRemoveBtn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 1;
+}
+.tagRemoveBtn:hover { color: var(--color-error, #b00020); }
+
 /* ── Responsive ── */
 @media (max-width: 700px) {
   .container { padding: var(--space-4); }
   .statsRow { grid-template-columns: repeat(2, 1fr); }
+  .statsRow5 { grid-template-columns: repeat(3, 1fr); }
   .partyGrid { grid-template-columns: 1fr; }
   .noteFormGrid { grid-template-columns: 1fr; }
   .tab { padding: var(--space-2) var(--space-2); font-size: var(--text-label-sm); }
+  .overviewSections { grid-template-columns: 1fr; }
+  .npcFieldsGrid { grid-template-columns: 1fr; }
 }

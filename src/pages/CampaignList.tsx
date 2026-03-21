@@ -78,12 +78,18 @@ export function CampaignList() {
                   </span>
                   <span className={styles.cardStat}>
                     <BookOpen size={13} />
-                    {c.sessionCount} sesiones
+                    {c.sessions?.length ?? c.sessionCount} sesiones
                   </span>
                   <span className={styles.cardStat}>
                     <Scroll size={13} />
                     {c.notes.length} notas
                   </span>
+                  {(c.quests?.filter((q) => q.status === 'active').length ?? 0) > 0 && (
+                    <span className={styles.cardStat}>
+                      <Scroll size={13} />
+                      {c.quests!.filter((q) => q.status === 'active').length} misiones
+                    </span>
+                  )}
                   {c.gmName && (
                     <span className={styles.cardGm}>GM: {c.gmName}</span>
                   )}

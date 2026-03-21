@@ -14,16 +14,16 @@ export function CampaignNew() {
   const [setting, setSetting] = useState('')
   const [gmName, setGmName] = useState('')
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name.trim()) return
-    const id = addCampaign({
+    const id = await addCampaign({
       name: name.trim(),
       description: description.trim(),
       setting: setting.trim(),
       gmName: gmName.trim(),
       status: 'active',
     })
-    navigate(`/campaigns/${id}`)
+    if (id) navigate(`/campaigns/${id}`)
   }
 
   return (
