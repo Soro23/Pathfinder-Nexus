@@ -16,6 +16,7 @@ import { CampaignView } from './pages/CampaignView'
 import { CampaignImport } from './pages/CampaignImport'
 import { PartyView } from './pages/PartyView'
 import { Admin } from './pages/Admin'
+import { Homebrew } from './pages/Homebrew'
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
               <Route path="campaigns/new" element={<CampaignNew />} />
               <Route path="campaigns/import" element={<CampaignImport />} />
               <Route path="campaigns/:id" element={<CampaignView />} />
+              <Route path="homebrew" element={<Homebrew />} />
               <Route path="admin" element={<Admin />} />
             </Route>
           </Route>

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import {
   Users, Map, BookOpen, LayoutList, Shield, Globe, Star, Zap,
-  Sparkles, Backpack, Gem, PawPrint, Settings, Sun, Moon, LogOut, Sword,
+  Sparkles, Backpack, Gem, PawPrint, Settings, Sun, Moon, LogOut, Sword, Wand2,
 } from 'lucide-react'
 import { useSRDStore } from '../../store/srdStore'
 import { useAuth } from '../../contexts/AuthContext'
@@ -95,6 +95,13 @@ export function Layout() {
           >
             <BookOpen size={18} />
             <span>Reglas Rápidas</span>
+          </Link>
+          <Link
+            to="/homebrew"
+            className={`${styles.navItem} ${isActive('/homebrew', false) ? styles.active : ''}`}
+          >
+            <Wand2 size={18} />
+            <span>Homebrew</span>
           </Link>
           {compendiumSoon.map(({ icon: Icon, label }) => (
             <span key={label} className={`${styles.navItem} ${styles.disabled}`}>
