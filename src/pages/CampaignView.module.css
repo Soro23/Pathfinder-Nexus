@@ -111,7 +111,13 @@
   gap: 2px;
   border-bottom: 2px solid var(--color-surface-container-high);
   margin-bottom: var(--space-5);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab { white-space: nowrap; flex-shrink: 0; }
 
 .tab {
   display: flex;
