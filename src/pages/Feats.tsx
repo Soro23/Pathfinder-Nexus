@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Sword, Shield, Sparkles, Wand2, Users, Target, Zap } from 'lucide-react'
-import { FEATS, type Feat } from '../data/feats'
+import { Sword, Shield, Sparkles, Wand2, Users, Target, Zap, BookOpen, Scroll } from 'lucide-react'
+import { FEATS, type FeatType } from '../data/feats'
 import styles from './Feats.module.css'
 
-const CATEGORIES: { id: Feat['type']; label: string; icon: React.ReactNode }[] = [
+const CATEGORIES: { id: FeatType; label: string; icon: React.ReactNode }[] = [
   { id: 'combat', label: 'Combate', icon: <Sword size={14} /> },
   { id: 'general', label: 'General', icon: <Shield size={14} /> },
   { id: 'metamagic', label: 'Metamagia', icon: <Sparkles size={14} /> },
@@ -11,9 +11,11 @@ const CATEGORIES: { id: Feat['type']; label: string; icon: React.ReactNode }[] =
   { id: 'teamwork', label: 'Cooperación', icon: <Users size={14} /> },
   { id: 'critical', label: 'Crítico', icon: <Target size={14} /> },
   { id: 'style', label: 'Estilo', icon: <Zap size={14} /> },
+  { id: 'race', label: 'Raza', icon: <BookOpen size={14} /> },
+  { id: 'story', label: 'Historia', icon: <Scroll size={14} /> },
 ]
 
-const TYPE_LABELS: Record<Feat['type'], string> = {
+const TYPE_LABELS: Record<FeatType, string> = {
   combat: 'Combate',
   general: 'General',
   metamagic: 'Metamagia',
@@ -21,14 +23,16 @@ const TYPE_LABELS: Record<Feat['type'], string> = {
   teamwork: 'Cooperación',
   critical: 'Crítico',
   style: 'Estilo',
+  race: 'Raza',
+  story: 'Historia',
 }
 
 export function Feats() {
-  const [activeCategory, setActiveCategory] = useState<Feat['type'] | 'all'>('all')
+  const [activeCategory, setActiveCategory] = useState<FeatType | 'all'>('all')
   const [search, setSearch] = useState('')
 
   const filteredFeats = FEATS.filter((feat) => {
-    const matchesCategory = activeCategory === 'all' || feat.type === activeCategory
+    const matchesCategory = activeCategory === 'all' || feat.type.includes(activeCategory)
     const matchesSearch = search === '' || 
       feat.name.toLowerCase().includes(search.toLowerCase()) ||
       feat.benefit.toLowerCase().includes(search.toLowerCase())
@@ -57,7 +61,7 @@ export function Feats() {
                 {cat.icon}
                 <span>{cat.label}</span>
                 <span className={styles.featCount}>
-                  {FEATS.filter((f) => f.type === cat.id).length}
+                  {FEATS.filter((f) => f.type.includes(cat.id)).length}
                 </span>
               </button>
             ))}
@@ -99,14 +103,18 @@ export function Feats() {
         </p>
 
         {/* Feats grid */}
-        <div className={styles.featsGrid}>
+        <div key={activeCategory} className={styles.featsGrid}>
           {filteredFeats.map((feat) => (
             <div key={feat.id} id={feat.id} className={styles.featCard}>
               <div className={styles.featHeader}>
                 <h3 className={styles.featName}>{feat.name}</h3>
-                <span className={`${styles.featType} ${styles[feat.type]}`}>
-                  {TYPE_LABELS[feat.type]}
-                </span>
+                <div className={styles.featTypes}>
+                  {feat.type.map((t) => (
+                    <span key={t} className={`${styles.featType} ${styles[t]}`}>
+                      {TYPE_LABELS[t]}
+                    </span>
+                  ))}
+                </div>
               </div>
 
               {feat.prerequisite && (

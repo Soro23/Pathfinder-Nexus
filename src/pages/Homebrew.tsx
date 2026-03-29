@@ -6,9 +6,21 @@ import {
 import { useHomebrewStore } from '../store/homebrewStore'
 import type { HomebrewType } from '../store/homebrewStore'
 import { SPELL_SCHOOLS } from '../data/spells'
-import { FEAT_TYPES } from '../data/feats'
+import { FEAT_TYPES, type FeatType } from '../data/feats'
 import { Button, Card } from '../components/ui'
 import styles from './Homebrew.module.css'
+
+const FEAT_TYPE_LABELS: Record<FeatType, string> = {
+  combat: 'Combate',
+  general: 'General',
+  metamagic: 'Metamagia',
+  item_creation: 'Creación',
+  teamwork: 'Cooperación',
+  critical: 'Crítico',
+  style: 'Estilo',
+  race: 'Raza',
+  story: 'Historia',
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -52,7 +64,7 @@ const emptySpell = () => ({
 })
 
 const emptyFeat = () => ({
-  name: '', type: 'general' as const, prerequisite: '', benefit: '', normal: '', special: '',
+  name: '', type: ['general'] as FeatType[], prerequisite: '', benefit: '', normal: '', special: '',
 })
 
 const emptySkill = () => ({
@@ -120,8 +132,8 @@ function FeatForm({ onSave, saving }: { onSave: (d: object) => void; saving: boo
     <div className={styles.formGrid}>
       <Field label="Nombre *"><Inp value={f.name} onChange={e => set('name', e.target.value)} /></Field>
       <Field label="Tipo">
-        <Sel value={f.type} onChange={e => set('type', e.target.value)}>
-          {FEAT_TYPES.filter(t => t.value !== 'all').map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+        <Sel value={f.type[0] || ''} onChange={e => set('type', [e.target.value as FeatType])}>
+          {FEAT_TYPES.map(t => <option key={t} value={t}>{FEAT_TYPE_LABELS[t]}</option>)}
         </Sel>
       </Field>
       <Field label="Prerrequisito"><Inp value={f.prerequisite} onChange={e => set('prerequisite', e.target.value)} /></Field>

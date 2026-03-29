@@ -1,7 +1,19 @@
 import { useState } from 'react'
 import { Card, Select } from '../ui'
-import { FEAT_TYPES, useSRDStore } from '../../data'
+import { FEAT_TYPES, useSRDStore, type FeatType } from '../../data'
 import styles from './FeatsSelector.module.css'
+
+const TYPE_LABELS: Record<FeatType, string> = {
+  combat: 'Combate',
+  general: 'General',
+  metamagic: 'Metamagia',
+  item_creation: 'Creación',
+  teamwork: 'Cooperación',
+  critical: 'Crítico',
+  style: 'Estilo',
+  race: 'Raza',
+  story: 'Historia',
+}
 
 interface FeatsSelectorProps {
   selectedFeats: string[]
@@ -15,7 +27,7 @@ export function FeatsSelector({ selectedFeats, onToggle, maxFeats }: FeatsSelect
   const [search, setSearch] = useState('')
 
   const filteredFeats = FEATS.filter((feat) => {
-    const matchesType = filter === 'all' || feat.type === filter
+    const matchesType = filter === 'all' || feat.type.includes(filter as FeatType)
     const matchesSearch = feat.name.toLowerCase().includes(search.toLowerCase())
     return matchesType && matchesSearch
   })
@@ -39,7 +51,10 @@ export function FeatsSelector({ selectedFeats, onToggle, maxFeats }: FeatsSelect
           <Select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            options={FEAT_TYPES.map((t) => ({ value: t.value, label: t.label }))}
+            options={[
+              { value: 'all', label: 'Todas' },
+              ...FEAT_TYPES.map((t) => ({ value: t, label: TYPE_LABELS[t] }))
+            ]}
           />
         </div>
       </div>
@@ -63,7 +78,7 @@ export function FeatsSelector({ selectedFeats, onToggle, maxFeats }: FeatsSelect
             >
               <div className={styles.featHeader}>
                 <h4>{feat.name}</h4>
-                <span className={styles.type}>{FEAT_TYPES.find((t) => t.value === feat.type)?.label}</span>
+                <span className={styles.type}>{feat.type.map(t => TYPE_LABELS[t]).join(', ')}</span>
               </div>
               {feat.prerequisite && (
                 <p className={styles.prereq}>Prerrequisito: {feat.prerequisite}</p>

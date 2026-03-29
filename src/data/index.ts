@@ -1,5 +1,5 @@
 export { FEATS, FEAT_TYPES, getFeatById } from './feats'
-export type { Feat } from './feats'
+export type { Feat, FeatType } from './feats'
 export { SKILLS, CLASS_SKILLS, getSkillById, getAbilityModifier } from './skills'
 export type { Skill } from './skills'
 export { CLASSES, getClassById, getBABForLevel, getSaveForLevel, getMulticlassStats } from './classes'

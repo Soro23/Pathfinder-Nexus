@@ -5,7 +5,7 @@ import { FEATS } from '../data/feats'
 import { CLASSES } from '../data/classes'
 import { RACES } from '../data/races'
 import type { Skill } from '../data/skills'
-import type { Feat } from '../data/feats'
+import type { Feat, FeatType } from '../data/feats'
 import type { ClassData } from '../data/classes'
 import type { Race } from '../data/races'
 
@@ -36,7 +36,7 @@ function mapFeatRow(r: Record<string, unknown>): Feat {
   return {
     id: r.id as string,
     name: r.name as string,
-    type: r.type as Feat['type'],
+    type: (r.type as string || '').split(',').map(t => t.trim()) as FeatType[],
     prerequisite: r.prerequisite as string | undefined,
     benefit: r.benefit as string,
     normal: r.normal as string | undefined,

@@ -90,7 +90,7 @@
 
 @media (min-width: 901px) {
   .content {
-    margin-left: 224px;
+    margin-left: 264px;
   }
 }
 
@@ -237,6 +237,22 @@
 .featType.style {
   background: rgba(241, 196, 15, 0.15);
   color: #f1c40f;
+}
+
+.featType.race {
+  background: rgba(211, 84, 0, 0.15);
+  color: #d35400;
+}
+
+.featType.story {
+  background: rgba(142, 68, 173, 0.15);
+  color: #8e44ad;
+}
+
+.featTypes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .featPrereq {

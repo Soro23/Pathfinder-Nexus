@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase'
 import { mapSpellRow } from '../hooks/useSpells'
 import { useSRDStore, srdStore } from '../store/srdStore'
 import type { Skill } from '../data/skills'
-import type { Feat } from '../data/feats'
+import type { Feat, FeatType } from '../data/feats'
 import type { ClassData } from '../data/classes'
 import type { Race } from '../data/races'
 import styles from './Admin.module.css'
@@ -931,11 +931,13 @@ const FEAT_TYPE_OPTIONS = [
   { value: 'teamwork', label: 'Trabajo en Equipo' },
   { value: 'critical', label: 'Crítico' },
   { value: 'style', label: 'Estilo' },
+  { value: 'race', label: 'Raza' },
+  { value: 'story', label: 'Historia' },
 ]
 
 type FeatForm = {
   name: string
-  type: Feat['type']
+  type: FeatType[]
   prerequisite: string
   benefit: string
   normal: string
@@ -1019,7 +1021,7 @@ function FeatsEditor() {
         <div className={styles.editGrid}>
           <Field label="Nombre"><input className={styles.fieldInput} value={form.name} onChange={e => setForm(f => f && ({ ...f, name: e.target.value }))} /></Field>
           <Field label="Tipo">
-            <select className={styles.fieldInput} value={form.type} onChange={e => setForm(f => f && ({ ...f, type: e.target.value as Feat['type'] }))}>
+            <select className={styles.fieldInput} value={form.type[0] || ''} onChange={e => setForm(f => f && ({ ...f, type: [e.target.value as FeatType] }))}>
               {FEAT_TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </Field>
