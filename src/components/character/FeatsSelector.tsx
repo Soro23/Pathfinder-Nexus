@@ -53,7 +53,7 @@ export function FeatsSelector({ selectedFeats, onToggle, maxFeats }: FeatsSelect
             onChange={(e) => setFilter(e.target.value)}
             options={[
               { value: 'all', label: 'Todas' },
-              ...FEAT_TYPES.map((t) => ({ value: t, label: TYPE_LABELS[t] }))
+              ...FEAT_TYPES.map((t: FeatType) => ({ value: t, label: TYPE_LABELS[t] }))
             ]}
           />
         </div>

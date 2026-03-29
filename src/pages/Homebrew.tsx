@@ -133,7 +133,7 @@ function FeatForm({ onSave, saving }: { onSave: (d: object) => void; saving: boo
       <Field label="Nombre *"><Inp value={f.name} onChange={e => set('name', e.target.value)} /></Field>
       <Field label="Tipo">
         <Sel value={f.type[0] || ''} onChange={e => set('type', [e.target.value as FeatType])}>
-          {FEAT_TYPES.map(t => <option key={t} value={t}>{FEAT_TYPE_LABELS[t]}</option>)}
+          {FEAT_TYPES.map((t: FeatType) => <option key={t} value={t}>{FEAT_TYPE_LABELS[t]}</option>)}
         </Sel>
       </Field>
       <Field label="Prerrequisito"><Inp value={f.prerequisite} onChange={e => set('prerequisite', e.target.value)} /></Field>
