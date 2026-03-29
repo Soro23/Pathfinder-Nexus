@@ -83,3 +83,70 @@
   white-space: normal;
   padding-left: var(--space-3);
 }
+
+.archetypeBanner {
+  font-size: 0.78rem;
+  color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.08);
+  border: 1px solid rgba(212, 164, 76, 0.25);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.featureList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.featureItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+}
+
+.featureReplaced {
+  text-decoration: line-through;
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+.featureArchetype {
+  color: var(--color-accent-gold);
+}
+
+.featureBadge {
+  font-size: 0.62rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.featureBadgeReplaced {
+  background: rgba(220, 80, 80, 0.15);
+  color: #e05c5c;
+  border: 1px solid rgba(220, 80, 80, 0.3);
+}
+
+.featureBadgeChanged {
+  background: rgba(80, 130, 220, 0.15);
+  color: #5b9bd5;
+  border: 1px solid rgba(80, 130, 220, 0.3);
+}
+
+.featureBadgeOptional {
+  background: rgba(212, 164, 76, 0.15);
+  color: var(--color-accent-gold);
+  border: 1px solid rgba(212, 164, 76, 0.3);
+}
+
+.featureBadgeArchetype {
+  background: rgba(212, 164, 76, 0.15);
+  color: var(--color-accent-gold);
+  border: 1px solid rgba(212, 164, 76, 0.3);
+}

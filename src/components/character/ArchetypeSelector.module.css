@@ -1,0 +1,100 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.select {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  padding: var(--space-2) var(--space-3);
+  width: 100%;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+.detail {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.desc {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.replaceList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.replaceItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.78rem;
+}
+
+.featureName {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.atLevel {
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+}
+
+.badge {
+  font-size: 0.68rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.badgeReplaces {
+  background: rgba(220, 80, 80, 0.15);
+  color: #e05c5c;
+  border: 1px solid rgba(220, 80, 80, 0.3);
+}
+
+.badgeChanges {
+  background: rgba(80, 130, 220, 0.15);
+  color: #5b9bd5;
+  border: 1px solid rgba(80, 130, 220, 0.3);
+}
+
+.badgeOptional {
+  background: rgba(212, 164, 76, 0.15);
+  color: var(--color-accent-gold);
+  border: 1px solid rgba(212, 164, 76, 0.3);
+}

@@ -11,6 +11,8 @@ import type { Skill } from '../data/skills'
 import type { Feat, FeatType } from '../data/feats'
 import type { ClassData } from '../data/classes'
 import type { Race } from '../data/races'
+import type { Archetype, ReplacementType } from '../data/archetypes'
+import { CLASSES } from '../data/classes'
 import styles from './Admin.module.css'
 
 // ── Proxy helpers ─────────────────────────────────────────────────────────────
@@ -82,7 +84,7 @@ async function findDuplicateInDB(name: string, customSpells: Spell[]): Promise<S
 
 // ── Admin page ────────────────────────────────────────────────────────────────
 
-type TabId = 'spells' | 'skills' | 'feats' | 'classes' | 'races'
+type TabId = 'spells' | 'skills' | 'feats' | 'classes' | 'races' | 'archetypes'
 type ImportStatus = 'idle' | 'loading' | 'done' | 'error'
 
 export function Admin() {
@@ -151,6 +153,12 @@ export function Admin() {
           >
             <Users size={16} /> Razas
           </button>
+          <button
+            className={`${styles.tabBtn} ${activeTab === 'archetypes' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('archetypes')}
+          >
+            <Sword size={16} /> Arquetipos
+          </button>
         </nav>
         {showRightArrow && (
           <button className={`${styles.tabArrow} ${styles.right}`} onClick={() => scrollTabs('right')}>
@@ -165,6 +173,7 @@ export function Admin() {
         {activeTab === 'feats' && <FeatsEditor />}
         {activeTab === 'classes' && <ClassesEditor />}
         {activeTab === 'races' && <RacesEditor />}
+        {activeTab === 'archetypes' && <ArchetypesEditor />}
       </div>
     </div>
   )
@@ -1435,6 +1444,208 @@ function RacesEditor() {
           </li>
         ))}
       </ul>
+    </div>
+  )
+}
+
+
+// -- Archetypes Editor --------------------------------------------------------
+
+const EMPTY_ARCHETYPE: Omit<Archetype, 'id'> = {
+  classId: '',
+  name: '',
+  description: '',
+  replaces: [],
+  features: [],
+  classSkillsAdded: [],
+  classSkillsRemoved: [],
+}
+
+function ArchetypesEditor() {
+  const { archetypes } = useSRDStore()
+  const [selected, setSelected] = useState<Archetype | null>(null)
+  const [form, setForm] = useState<Omit<Archetype, 'id'>>(EMPTY_ARCHETYPE)
+  const [saving, setSaving] = useState(false)
+  const [status, setStatus] = useState<string>('')
+  const [filterClass, setFilterClass] = useState<string>('')
+
+  const grouped = CLASSES.reduce<Record<string, Archetype[]>>((acc, cls) => {
+    acc[cls.id] = archetypes.filter((a) => a.classId === cls.id)
+    return acc
+  }, {})
+
+  function startNew() {
+    setSelected(null)
+    setForm(EMPTY_ARCHETYPE)
+    setStatus('')
+  }
+
+  function startEdit(a: Archetype) {
+    setSelected(a)
+    setForm({
+      classId: a.classId,
+      name: a.name,
+      description: a.description,
+      replaces: a.replaces,
+      features: a.features,
+      classSkillsAdded: a.classSkillsAdded ?? [],
+      classSkillsRemoved: a.classSkillsRemoved ?? [],
+      spellsPerDayOverride: a.spellsPerDayOverride,
+    })
+    setStatus('')
+  }
+
+  async function handleSave() {
+    if (!form.classId || !form.name) { setStatus('Completa clase y nombre'); return }
+    setSaving(true)
+    setStatus('')
+    try {
+      const payload = {
+        class_id: form.classId,
+        name: form.name,
+        description: form.description,
+        replaces: form.replaces,
+        features: form.features,
+        class_skills_added: form.classSkillsAdded,
+        class_skills_removed: form.classSkillsRemoved,
+        spells_per_day_override: form.spellsPerDayOverride ?? null,
+      }
+      if (selected) {
+        await supabase.from('archetypes').update(payload).eq('id', selected.id)
+      } else {
+        await supabase.from('archetypes').insert({ id: form.name.toLowerCase().replace(/\s+/g, '-'), ...payload })
+      }
+      setStatus('Guardado')
+      srdStore.setState({ initialized: false })
+      await srdStore.getState().fetchAll()
+    } catch (e) {
+      setStatus('Error: ' + (e instanceof Error ? e.message : String(e)))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Eliminar este arquetipo?')) return
+    await supabase.from('archetypes').delete().eq('id', id)
+    srdStore.setState({ initialized: false })
+    await srdStore.getState().fetchAll()
+    if (selected?.id === id) startNew()
+  }
+
+  const addReplacement = () =>
+    setForm((f) => ({ ...f, replaces: [...f.replaces, { featureName: '', atLevel: 1, type: 'replaces' as ReplacementType }] }))
+
+  const updateReplacement = (i: number, key: string, value: string | number) =>
+    setForm((f) => ({ ...f, replaces: f.replaces.map((r, idx) => idx === i ? { ...r, [key]: value } : r) }))
+
+  const removeReplacement = (i: number) =>
+    setForm((f) => ({ ...f, replaces: f.replaces.filter((_, idx) => idx !== i) }))
+
+  const visibleClasses = CLASSES.filter((c) =>
+    filterClass ? c.id === filterClass : (grouped[c.id] ?? []).length > 0
+  )
+
+  return (
+    <div className={styles.editorLayout}>
+      <aside className={styles.editorSidebar}>
+        <div className={styles.editorSidebarHeader}>
+          <select className={styles.filterSelect} value={filterClass} onChange={(e) => setFilterClass(e.target.value)}>
+            <option value="">Todas las clases</option>
+            {CLASSES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+          <button className={styles.newBtn} onClick={startNew}>+ Nuevo</button>
+        </div>
+        <ul className={styles.itemList}>
+          {visibleClasses.map((cls) => {
+            const list = grouped[cls.id] ?? []
+            if (list.length === 0) return null
+            return (
+              <li key={cls.id}>
+                <span className={styles.listGroupLabel}>{cls.name}</span>
+                {list.map((a) => (
+                  <div
+                    key={a.id}
+                    className={[styles.listItem, selected?.id === a.id ? styles.listItemActive : ''].join(' ')}
+                    onClick={() => startEdit(a)}
+                  >
+                    <span className={styles.listItemName}>{a.name}</span>
+                    <button className={styles.deleteBtn} onClick={(e) => { e.stopPropagation(); handleDelete(a.id) }}>
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                ))}
+              </li>
+            )
+          })}
+        </ul>
+      </aside>
+      <div className={styles.editorForm}>
+        <h3 className={styles.formTitle}>{selected ? 'Editar: ' + selected.name : 'Nuevo Arquetipo'}</h3>
+        <div className={styles.formRow}>
+          <label>Clase</label>
+          <select className={styles.inputFull} value={form.classId} onChange={(e) => setForm((f) => ({ ...f, classId: e.target.value }))}>
+            <option value="">Selecciona clase...</option>
+            {CLASSES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </div>
+        <div className={styles.formRow}>
+          <label>Nombre</label>
+          <input className={styles.inputFull} value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Nombre del arquetipo" />
+        </div>
+        <div className={styles.formRow}>
+          <label>Descripcion</label>
+          <textarea className={styles.textareaFull} rows={3} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+        </div>
+        <div className={styles.formSection}>
+          <div className={styles.formSectionHeader}>
+            <span>Reemplazos</span>
+            <button className={styles.addRowBtn} onClick={addReplacement}>+ Anadir</button>
+          </div>
+          {form.replaces.map((r, i) => (
+            <div key={i} className={styles.replacementRow}>
+              <input className={styles.inputMd} placeholder="Nombre de la caracteristica" value={r.featureName} onChange={(e) => updateReplacement(i, 'featureName', e.target.value)} />
+              <input className={styles.inputSm} type="number" min={1} max={20} value={r.atLevel} onChange={(e) => updateReplacement(i, 'atLevel', parseInt(e.target.value) || 1)} />
+              <select className={styles.inputSm} value={r.type} onChange={(e) => updateReplacement(i, 'type', e.target.value)}>
+                <option value="replaces">Reemplaza</option>
+                <option value="changes">Modifica</option>
+                <option value="optional">Opcional</option>
+              </select>
+              <button className={styles.deleteBtn} onClick={() => removeReplacement(i)}><Trash2 size={13} /></button>
+            </div>
+          ))}
+        </div>
+        <div className={styles.formRow}>
+          <label>Caracteristicas (JSON)</label>
+          <textarea className={styles.textareaFull} rows={5}
+            value={JSON.stringify(form.features, null, 2)}
+            onChange={(e) => { try { setForm((f) => ({ ...f, features: JSON.parse(e.target.value) })) } catch { } }}
+          />
+        </div>
+        <div className={styles.formRow}>
+          <label>Habilidades Anadidas (coma)</label>
+          <input className={styles.inputFull} value={(form.classSkillsAdded ?? []).join(', ')}
+            onChange={(e) => setForm((f) => ({ ...f, classSkillsAdded: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) }))} />
+        </div>
+        <div className={styles.formRow}>
+          <label>Habilidades Eliminadas (coma)</label>
+          <input className={styles.inputFull} value={(form.classSkillsRemoved ?? []).join(', ')}
+            onChange={(e) => setForm((f) => ({ ...f, classSkillsRemoved: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) }))} />
+        </div>
+        <div className={styles.formRow}>
+          <label>Override Hechizos por Dia (JSON, opcional)</label>
+          <textarea className={styles.textareaFull} rows={3}
+            value={form.spellsPerDayOverride ? JSON.stringify(form.spellsPerDayOverride, null, 2) : ''}
+            onChange={(e) => { try { setForm((f) => ({ ...f, spellsPerDayOverride: e.target.value.trim() ? JSON.parse(e.target.value) : undefined })) } catch { } }}
+          />
+        </div>
+        <div className={styles.formActions}>
+          <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
+            <Save size={15} /> {saving ? 'Guardando...' : 'Guardar'}
+          </button>
+          {status && <span className={styles.statusMsg}>{status}</span>}
+        </div>
+      </div>
     </div>
   )
 }

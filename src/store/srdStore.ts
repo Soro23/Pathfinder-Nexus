@@ -4,19 +4,24 @@ import { SKILLS } from '../data/skills'
 import { FEATS } from '../data/feats'
 import { CLASSES } from '../data/classes'
 import { RACES } from '../data/races'
+import { ARCHETYPES } from '../data/archetypes'
 import type { Skill } from '../data/skills'
 import type { Feat, FeatType } from '../data/feats'
 import type { ClassData } from '../data/classes'
 import type { Race } from '../data/races'
+import type { Archetype } from '../data/archetypes'
 
 interface SRDStore {
   skills: Skill[]
   feats: Feat[]
   classes: ClassData[]
   races: Race[]
+  archetypes: Archetype[]
   loading: boolean
   initialized: boolean
   fetchAll: () => Promise<void>
+  getArchetypesByClass: (classId: string) => Archetype[]
+  getArchetypeById: (id: string) => Archetype | undefined
 }
 
 // ── Row mappers (snake_case DB → camelCase TS) ─────────────────────────────
@@ -81,6 +86,20 @@ function mapRaceRow(r: Record<string, unknown>): Race {
   }
 }
 
+function mapArchetypeRow(r: Record<string, unknown>): Archetype {
+  return {
+    id: r.id as string,
+    classId: r.class_id as string,
+    name: r.name as string,
+    description: (r.description as string) ?? '',
+    replaces: (r.replaces as Archetype['replaces']) ?? [],
+    features: (r.features as Archetype['features']) ?? [],
+    classSkillsAdded: r.class_skills_added as string[] | undefined,
+    classSkillsRemoved: r.class_skills_removed as string[] | undefined,
+    spellsPerDayOverride: r.spells_per_day_override as Archetype['spellsPerDayOverride'],
+  }
+}
+
 // ── Store ──────────────────────────────────────────────────────────────────
 
 export const useSRDStore = create<SRDStore>()((set, get) => ({
@@ -89,19 +108,27 @@ export const useSRDStore = create<SRDStore>()((set, get) => ({
   feats: FEATS,
   classes: CLASSES,
   races: RACES,
+  archetypes: ARCHETYPES,
   loading: false,
   initialized: false,
+
+  getArchetypesByClass: (classId) =>
+    get().archetypes.filter((a) => a.classId === classId),
+
+  getArchetypeById: (id) =>
+    get().archetypes.find((a) => a.id === id),
 
   fetchAll: async () => {
     if (get().initialized) return
     set({ loading: true })
 
     try {
-      const [skillsRes, featsRes, classesRes, racesRes] = await Promise.all([
+      const [skillsRes, featsRes, classesRes, racesRes, archetypesRes] = await Promise.all([
         supabase.from('skills').select('*').order('name'),
         supabase.from('feats').select('*').order('name'),
         supabase.from('classes').select('*').order('name'),
         supabase.from('races').select('*'),
+        supabase.from('archetypes').select('*').order('name'),
       ])
 
       const updates: Partial<SRDStore> = { loading: false, initialized: true }
@@ -117,6 +144,13 @@ export const useSRDStore = create<SRDStore>()((set, get) => ({
       }
       if (racesRes.data && racesRes.data.length > 0) {
         updates.races = (racesRes.data as Record<string, unknown>[]).map(mapRaceRow)
+      }
+      if (archetypesRes.data && archetypesRes.data.length > 0) {
+        // Merge: Supabase rows override static by id
+        const dbArchetypes = (archetypesRes.data as Record<string, unknown>[]).map(mapArchetypeRow)
+        const staticById = new Map(ARCHETYPES.map((a) => [a.id, a]))
+        for (const a of dbArchetypes) staticById.set(a.id, a)
+        updates.archetypes = Array.from(staticById.values())
       }
 
       set(updates)

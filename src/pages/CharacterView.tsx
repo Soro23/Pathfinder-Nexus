@@ -10,9 +10,11 @@ import { useCharacterStore, calculateModifier, getModifierString, generateId } f
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
 import { getClassById, getMulticlassStats, SpellLevel, useSRDStore } from '../data'
 import { getBonusSpells } from '../data/bonusSpells'
+import { resolveClassSkills } from '../data/resolveArchetype'
 import { resolveModifiers } from '../engine'
 import { Card, Button } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal } from '../components/character'
+import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
 import type { LevelUpUpdates } from '../components/character'
 import styles from './CharacterView.module.css'
 
@@ -24,7 +26,7 @@ const ABILITY_ABBR: Record<string, string> = {
 }
 
 export function CharacterView() {
-  const { skills: SKILLS, feats: FEATS } = useSRDStore()
+  const { skills: SKILLS, feats: FEATS, getArchetypeById } = useSRDStore()
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const character = useCharacterStore((state) => state.getCharacter(id || ''))
@@ -446,6 +448,7 @@ export function CharacterView() {
                     <div className={styles.classLevelEditor}>
                       {character.classes.map((cc) => {
                         const cd = getClassById(cc.id)
+                        const currentArchetype = cc.archetypeId ? getArchetypeById(cc.archetypeId) : undefined
                         return (
                           <div key={cc.id} className={styles.classLevelRow}>
                             <span className={styles.classLevelName}>{cd?.name ?? cc.id}</span>
@@ -472,6 +475,33 @@ export function CharacterView() {
                                 }}
                               >+</button>
                             </div>
+                            <div className={styles.archetypeEditRow}>
+                              <ArchetypeSelector
+                                classId={cc.id}
+                                value={cc.archetypeId}
+                                onChange={(newArchId) => {
+                                  const newClasses = character.classes.map((c) =>
+                                    c.id === cc.id ? { ...c, archetypeId: newArchId } : c
+                                  )
+                                  updateCharacter(character.id, { classes: newClasses })
+                                }}
+                              />
+                              {cc.archetypeId && cd && currentArchetype && (
+                                <button
+                                  className={styles.recalcBtn}
+                                  onClick={() => {
+                                    const resolvedSkills = resolveClassSkills(cd, currentArchetype)
+                                    const updatedSkills = character.skills.filter((sk) =>
+                                      resolvedSkills.includes(sk.id) || (sk.ranks ?? 0) > 0
+                                    )
+                                    updateCharacter(character.id, { skills: updatedSkills })
+                                  }}
+                                  title="Actualiza habilidades de clase según el arquetipo"
+                                >
+                                  Recalcular
+                                </button>
+                              )}
+                            </div>
                           </div>
                         )
                       })}
@@ -496,7 +526,11 @@ export function CharacterView() {
                     )
                   )}
                   {!isEditing && activeClassData && (
-                    <ClassProgressionTable classData={activeClassData} currentLevel={activeClassEntry.level} />
+                    <ClassProgressionTable
+                      classData={activeClassData}
+                      currentLevel={activeClassEntry.level}
+                      archetype={activeClassEntry.archetypeId ? getArchetypeById(activeClassEntry.archetypeId) : undefined}
+                    />
                   )}
                 </Card>
               )

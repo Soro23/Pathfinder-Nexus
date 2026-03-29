@@ -1,22 +1,50 @@
 import { getBABForLevel, getSaveForLevel } from '../../data'
 import type { ClassData } from '../../data'
+import type { Archetype } from '../../data/archetypes'
+import { resolveClassFeatures } from '../../data/resolveArchetype'
+import type { ResolvedFeature } from '../../data/resolveArchetype'
 import styles from './ClassProgressionTable.module.css'
 
 interface ClassProgressionTableProps {
   classData: ClassData
   currentLevel: number
+  archetype?: Archetype
 }
 
-export function ClassProgressionTable({ classData, currentLevel }: ClassProgressionTableProps) {
+const STATUS_LABEL: Record<ResolvedFeature['status'], string | null> = {
+  base: null,
+  replaced: 'Reemplazada',
+  changed: 'Modificada',
+  optional: 'Opcional',
+  archetype: 'Arquetipo',
+}
+
+const STATUS_CLASS: Record<ResolvedFeature['status'], string | null> = {
+  base: null,
+  replaced: 'featureBadgeReplaced',
+  changed: 'featureBadgeChanged',
+  optional: 'featureBadgeOptional',
+  archetype: 'featureBadgeArchetype',
+}
+
+export function ClassProgressionTable({ classData, currentLevel, archetype }: ClassProgressionTableProps) {
   const isCaster = classData.magicType !== null
 
-  // Determine how many spell columns we need
-  const spellCols = classData.spellsPerDay
-    ? Math.max(...classData.spellsPerDay.map((row) => row.length))
+  const spellTable = archetype?.spellsPerDayOverride ?? classData.spellsPerDay
+
+  const spellCols = spellTable
+    ? Math.max(...spellTable.map((row) => row.length))
     : 0
+
+  const allFeatures = resolveClassFeatures(classData, archetype ?? null)
 
   return (
     <div className={styles.wrapper}>
+      {archetype && (
+        <div className={styles.archetypeBanner}>
+          Arquetipo activo: <strong>{archetype.name}</strong>
+        </div>
+      )}
       <div className={styles.scrollArea}>
         <table className={styles.table}>
           <thead>
@@ -42,8 +70,8 @@ export function ClassProgressionTable({ classData, currentLevel }: ClassProgress
               const fort = getSaveForLevel(lvl, classData.fortitudeSave)
               const ref = getSaveForLevel(lvl, classData.reflexSave)
               const will = getSaveForLevel(lvl, classData.willSave)
-              const featuresAtLevel = classData.features.filter((f) => f.level === lvl)
-              const spellRow = classData.spellsPerDay?.[idx]
+              const featuresAtLevel = allFeatures.filter((f) => f.level === lvl)
+              const spellRow = spellTable?.[idx]
               const isCurrent = lvl === currentLevel
 
               return (
@@ -60,9 +88,30 @@ export function ClassProgressionTable({ classData, currentLevel }: ClassProgress
                     </td>
                   ))}
                   <td className={styles.tdFeatures}>
-                    {featuresAtLevel.length > 0
-                      ? featuresAtLevel.map((f) => f.name).join(', ')
-                      : '—'}
+                    {featuresAtLevel.length > 0 ? (
+                      <span className={styles.featureList}>
+                        {featuresAtLevel.map((f, i) => {
+                          const badgeClass = STATUS_CLASS[f.status]
+                          const badgeLabel = STATUS_LABEL[f.status]
+                          const isReplaced = f.status === 'replaced'
+                          const isArchetype = f.status === 'archetype'
+                          return (
+                            <span
+                              key={i}
+                              className={`${styles.featureItem} ${isReplaced ? styles.featureReplaced : ''} ${isArchetype ? styles.featureArchetype : ''}`}
+                              title={f.description}
+                            >
+                              {f.name}
+                              {badgeClass && badgeLabel && (
+                                <span className={`${styles.featureBadge} ${styles[badgeClass]}`}>
+                                  {badgeLabel}
+                                </span>
+                              )}
+                            </span>
+                          )
+                        })}
+                      </span>
+                    ) : '—'}
                   </td>
                 </tr>
               )

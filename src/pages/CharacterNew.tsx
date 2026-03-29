@@ -4,6 +4,7 @@ import { ArrowLeft, ChevronRight, ChevronDown, Check, Lightbulb, Dice6 } from 'l
 import { Button, Card } from '../components/ui'
 import { useCharacterStore, generateId, calculateModifier } from '../store'
 import { getClassById } from '../data'
+import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
 import styles from './CharacterNew.module.css'
 
 // ── Race data by category ──
@@ -212,6 +213,7 @@ export function CharacterNew() {
   })
 
   const [startingGold, setStartingGold] = useState(0)
+  const [selectedArchetypeId, setSelectedArchetypeId] = useState<string | undefined>(undefined)
 
   // ── Accordion open state (exclusive - only one open at a time) ──
   const [openRaceGroup, setOpenRaceGroup] = useState<string>('Razas Principales')
@@ -305,7 +307,7 @@ export function CharacterNew() {
       id,
       name: form.name,
       race: form.race,
-      classes: [{ id: form.class, level: 1 }],
+      classes: [{ id: form.class, level: 1, archetypeId: selectedArchetypeId }],
       level: 1,
       xp: 0,
       alignment: form.alignment,
@@ -463,7 +465,7 @@ export function CharacterNew() {
                             <button
                               key={cls.value}
                               className={`${styles.classCard} ${form.class === cls.value ? styles.selected : ''}`}
-                              onClick={() => updateForm('class', cls.value)}
+                              onClick={() => { updateForm('class', cls.value); setSelectedArchetypeId(undefined) }}
                             >
                               <div className={styles.classHeader}>
                                 <span className={styles.className}>{cls.label}</span>
@@ -493,6 +495,16 @@ export function CharacterNew() {
                   ))}
                 </select>
               </div>
+
+              {form.class && (
+                <div className={styles.archetypeSection}>
+                  <ArchetypeSelector
+                    classId={form.class}
+                    value={selectedArchetypeId}
+                    onChange={setSelectedArchetypeId}
+                  />
+                </div>
+              )}
 
               <div className={styles.stepActions}>
                 <Button variant="secondary" onClick={() => setStep('race')}>

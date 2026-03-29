@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 export interface CharacterClass {
   id: string
   level: number
+  archetypeId?: string
 }
 
 export interface InventoryItem {
