@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Minus, ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Moon, RefreshCw } from 'lucide-react'
 import { Card, Select } from '../ui'
 import { SPELL_SCHOOLS, SPELL_TYPES, SpellLevel } from '../../data'
 import { useSpells } from '../../hooks/useSpells'
@@ -37,9 +37,12 @@ interface SpellbookProps {
   spellSlots: Record<SpellLevel, SpellSlot>
   abilityModifier: number
   classIds: string[]
+  isEditing?: boolean
   onToggleKnown: (spellId: string) => void
-  onUseSlot: (level: SpellLevel) => void
-  onRestoreSlot: (level: SpellLevel) => void
+  onToggleSlotPip: (level: SpellLevel, pipIndex: number) => void
+  onLongRest: () => void
+  onSyncSlots?: () => void
+  onSetSlotMax?: (level: SpellLevel, max: number) => void
 }
 
 export function Spellbook({
@@ -47,9 +50,12 @@ export function Spellbook({
   spellSlots,
   abilityModifier,
   classIds,
+  isEditing,
   onToggleKnown,
-  onUseSlot,
-  onRestoreSlot,
+  onToggleSlotPip,
+  onLongRest,
+  onSyncSlots,
+  onSetSlotMax,
 }: SpellbookProps) {
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
@@ -85,52 +91,82 @@ export function Spellbook({
   return (
     <div className={styles.container}>
       <div className={styles.slotsPanel}>
-        <h3 className={styles.sectionTitle}>Slots de Hechizos</h3>
+        <div className={styles.slotsPanelHeader}>
+          <h3 className={styles.sectionTitle}>Slots</h3>
+          <div className={styles.slotsPanelActions}>
+            {onSyncSlots && (
+              <button className={styles.slotActionBtn} onClick={onSyncSlots} title="Sincronizar slots con clase">
+                <RefreshCw size={13} />
+              </button>
+            )}
+            <button className={styles.slotRestBtn} onClick={onLongRest} title="Descanso largo — recuperar todos los slots">
+              <Moon size={13} />
+              <span>Descanso</span>
+            </button>
+          </div>
+        </div>
+
         <div className={styles.slotsGrid}>
           {levels.map((level) => {
             const slot = spellSlots[level]
             const isLocked = !slot || slot.max === 0
-            if (isLocked) {
+
+            if (isLocked && !isEditing) {
               return (
                 <div key={level} className={`${styles.slotRow} ${styles.slotRowLocked}`}>
                   <span className={styles.slotLevel}>
-                    {level === 0 ? 'Cantrip' : `Nivel ${level}`}
+                    {level === 0 ? 'Cantrip' : `Nv ${level}`}
                   </span>
                   <span className={styles.slotLockedLabel}>—</span>
                 </div>
               )
             }
+
+            const max  = slot?.max  ?? 0
+            const used = slot?.used ?? 0
+            const available = max - used
+
             return (
-              <div key={level} className={styles.slotRow}>
+              <div key={level} className={`${styles.slotRow} ${isLocked ? styles.slotRowLocked : ''}`}>
                 <span className={styles.slotLevel}>
-                  {level === 0 ? 'Cantrip' : `Nivel ${level}`}
+                  {level === 0 ? 'Cantrip' : `Nv ${level}`}
                 </span>
-                <div className={styles.slotControls}>
-                  <button
-                    className={styles.slotBtn}
-                    onClick={() => onUseSlot(level)}
-                    disabled={slot.used >= slot.max}
-                  >
-                    <Minus size={14} />
-                  </button>
-                  <span className={styles.slotCount}>
-                    {slot.max - slot.used}/{slot.max}
-                  </span>
-                  <button
-                    className={styles.slotBtn}
-                    onClick={() => onRestoreSlot(level)}
-                    disabled={slot.used <= 0}
-                  >
-                    <Plus size={14} />
-                  </button>
-                </div>
+
+                {isEditing ? (
+                  <div className={styles.slotEditRow}>
+                    <span className={styles.slotEditLabel}>Máx:</span>
+                    <input
+                      className={styles.slotMaxInput}
+                      type="number"
+                      min={0}
+                      max={9}
+                      defaultValue={max}
+                      onBlur={(e) => onSetSlotMax?.(level, Math.max(0, Math.min(9, parseInt(e.target.value) || 0)))}
+                    />
+                  </div>
+                ) : (
+                  <div className={styles.slotPipsArea}>
+                    <div className={styles.slotPips}>
+                      {Array.from({ length: max }).map((_, i) => (
+                        <button
+                          key={i}
+                          className={`${styles.slotPip} ${i < used ? styles.slotPipUsed : styles.slotPipAvail}`}
+                          onClick={() => onToggleSlotPip(level, i)}
+                          title={i < used ? 'Clic para recuperar' : 'Clic para gastar'}
+                        />
+                      ))}
+                    </div>
+                    <span className={styles.slotCount}>
+                      {available}/{max}
+                    </span>
+                  </div>
+                )}
               </div>
             )
           })}
         </div>
-        <p className={styles.slotHint}>
-          DC base: {10 + abilityModifier}+{''}
-        </p>
+
+        <p className={styles.slotHint}>DC {10 + abilityModifier} + nivel</p>
       </div>
 
       <div className={styles.spellList}>

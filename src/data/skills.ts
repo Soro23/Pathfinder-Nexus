@@ -5,6 +5,9 @@ export interface Skill {
   isClassSkill: boolean
   hasArmorCheckPenalty: boolean
   description: string
+  uses?: string[]
+  typicalDCs?: { dc: number; example: string }[]
+  notes?: string[]
 }
 
 export const SKILLS: Skill[] = [
@@ -14,7 +17,21 @@ export const SKILLS: Skill[] = [
     ability: 'dexterity',
     isClassSkill: true,
     hasArmorCheckPenalty: true,
-    description: 'Saltos, volteretas, equilibrismo y rodar para evitar ataques.',
+    description: 'Mantener el equilibrio en superficies estrechas o irregulares, moverse a través de cuadrados amenazados sin provoking ataques de oportunidad, y realizar saltos y caídas.',
+    uses: ['Cruzar superficies estrechas', 'Movimiento amenazado', 'Saltar', 'Caer de pie'],
+    typicalDCs: [
+      { dc: 5, example: 'Cruzar superficie de 1-3 pies de ancho' },
+      { dc: 10, example: 'Cruzar superficie de 7-11 pulgadas' },
+      { dc: 15, example: 'Cruzar superficie de 2-6 pulgadas' },
+      { dc: 10, example: 'Moverse a través de cuadrado amenazado' },
+      { dc: 15, example: 'Caer de pie (DC 15)' },
+    ],
+    notes: [
+      'DC aumenta +5 para moverse a velocidad completa',
+      'DC +10 CMD del oponente para moverse a través de su espacio',
+      'DC 15 para ignorar los primeros 10 pies de caída',
+      'Estás flat-footed mientras usas Acrobatics para mantener el equilibrio',
+    ],
   },
   {
     id: 'appraise',
@@ -22,7 +39,18 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Determinar el valor de objetos valiosos y detectar trampas.',
+    description: 'Determinar el valor de objetos valiosos y materiales, identificar propiedad magic y detectar materiales.',
+    uses: ['Valor de objetos', 'Identificar materiales', 'Detectar trampas'],
+    typicalDCs: [
+      { dc: 15, example: 'Identificar objeto mágico común' },
+      { dc: 20, example: 'Identificar objeto mágico poco común' },
+      { dc: 25, example: 'Identificar artefacto' },
+    ],
+    notes: [
+      'Puedes determinar si un objeto es mágico con DC 20 + CD del efecto',
+      'Un objeto vale un 10% menos si está dañado',
+      'Con 5 rangos o más, obtienes +2 a las tiradas de negociación comercial',
+    ],
   },
   {
     id: 'bluff',
@@ -30,7 +58,18 @@ export const SKILLS: Skill[] = [
     ability: 'charisma',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Mentir convincentemente, engañar, disimular y fast talk.',
+    description: 'Mentir convincentemente, engañar, disimular motivos, fast talk, y pasar información falsa.',
+    uses: ['Mentir', 'Fast talk', 'Pasar información falsa', 'Seducir'],
+    typicalDCs: [
+      { dc: 15, example: 'Engaño menor' },
+      { dc: 20, example: 'Creer mentira compleja' },
+      { dc: 25, example: 'Engañar sobre identidad' },
+    ],
+    notes: [
+      'Contra Sentir Motivaciones del objetivo',
+      'Crear una distracción para sigilo',
+      'Gastar una acción de movimiento para mejorar la siguiente tirada de Engaño',
+    ],
   },
   {
     id: 'climb',
@@ -38,7 +77,19 @@ export const SKILLS: Skill[] = [
     ability: 'strength',
     isClassSkill: true,
     hasArmorCheckPenalty: true,
-    description: 'Escalar superficies verticales y superficies inclinadas.',
+    description: 'Escalar superficies verticales, superficies inclinadas, y trepar por manos y pies.',
+    uses: ['Escalar superficies', 'Trepar con manos y pies', 'Reducir velocidad de caída'],
+    typicalDCs: [
+      { dc: 5, example: 'Escalar superficie con presas' },
+      { dc: 10, example: 'Escalar superficie lisa' },
+      { dc: 15, example: 'Escalar superficie sin presas' },
+      { dc: 20, example: 'Escalar superficie de cristal' },
+    ],
+    notes: [
+      'DC aumenta +5 con armadura pesada o carga media/pesada',
+      'Puedes trepar 1/4 de tu velocidad',
+      'Un crítico fallido te hace caer',
+    ],
   },
   {
     id: 'craft',
@@ -46,7 +97,18 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Crear objetos. Se debe especificar un tipo de crafting.',
+    description: 'Crear objetos físicos. Debes especificar un tipo de Oficio (carpintería, herrería, etc.).',
+    uses: ['Crear objetos', 'Identificar objetos por material', 'Reparar objetos'],
+    typicalDCs: [
+      { dc: 10, example: 'Crear objeto común (semana de trabajo)' },
+      { dc: 15, example: 'Crear objeto de calidad' },
+      { dc: 20, example: 'Crear objeto maestro' },
+    ],
+    notes: [
+      'Cuesta 1/3 del precio base en materiales',
+      'Puedes trabajar 8 horas por día para hacer Progress',
+      'Un crítico fallido arruina los materiales',
+    ],
   },
   {
     id: 'diplomacy',
@@ -54,7 +116,18 @@ export const SKILLS: Skill[] = [
     ability: 'charisma',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Influenciar, calmar, persuadevir y hacer buenas primeras impresiones.',
+    description: 'Influenciar, calmar, persuadir, inspirar, y hacer buenas primeras impresiones.',
+    uses: ['Cambiar actitud', 'Persuadir', 'Influenciar opiniones', 'Pedir información'],
+    typicalDCs: [
+      { dc: 0, example: 'Mejorar actitud de Indiferente a Friendly' },
+      { dc: 10, example: 'Cambiar actitud de Hostil a Friendly' },
+      { dc: 25, example: 'Obtener información de un renegado' },
+    ],
+    notes: [
+      'Un crítico exitoso hace que el objetivo sea extremadamente amigable',
+      'No puede usarse contra criaturas con Int -',
+      'Toma 1 minuto de conversación',
+    ],
   },
   {
     id: 'disable_device',
@@ -62,7 +135,20 @@ export const SKILLS: Skill[] = [
     ability: 'dexterity',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Abrir cerraduras, desactivar trampas y saboteer mecanismos.',
+    description: 'Abrir cerraduras, desactivar trampas, y sabotear mecanismos.',
+    uses: ['Abrir cerraduras', 'Desactivar trampas', 'Sabotear objetos'],
+    typicalDCs: [
+      { dc: 15, example: 'Cerradura simple' },
+      { dc: 20, example: 'Cerradura compleja' },
+      { dc: 25, example: 'Cerradura magistral' },
+      { dc: 15, example: 'Trampa simple' },
+      { dc: 20, example: 'Trampa mágica' },
+    ],
+    notes: [
+      'DC +5 si no ves el mecanismo',
+      'Un crítico fallido activa la trampa',
+      'Requiere herramientas de ladrones (-2 sin ellas)',
+    ],
   },
   {
     id: 'disguise',
@@ -70,7 +156,18 @@ export const SKILLS: Skill[] = [
     ability: 'charisma',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Crear disfraces y fingir ser otra persona.',
+    description: 'Crear disfraces, fingir ser otra persona, y cambiar tu apariencia.',
+    uses: ['Cambiar apariencia', 'Imitar persona', 'Appearing como criatura diferente'],
+    typicalDCs: [
+      { dc: 20, example: 'Disfrazarse como persona diferente del mismo tamaño' },
+      { dc: 20, example: 'Appearing como otra raza (talla similar)' },
+      { dc: +10, example: 'Imitar individuo específico' },
+    ],
+    notes: [
+      'Un asistente puede darte +2',
+      'La ropa y equipamiento no cuentan',
+      'Un observador puede hacer проверку Percepción contra tu Disfraz',
+    ],
   },
   {
     id: 'escape_artist',
@@ -78,7 +175,19 @@ export const SKILLS: Skill[] = [
     ability: 'dexterity',
     isClassSkill: true,
     hasArmorCheckPenalty: true,
-    description: 'Escapar de ataduras, cuerdas y apretones.',
+    description: 'Escapar de ataduras, sogas, grilletes, y apretones.',
+    uses: ['Escape de ataduras', 'Escapismo', ' deslizarse a través de espacios reducidos'],
+    typicalDCs: [
+      { dc: 10, example: 'Escape de sogas simples' },
+      { dc: 15, example: 'Escape de sogas complejas' },
+      { dc: 20, example: 'Escape de grilletes' },
+      { dc: 30, example: 'Escape de espacio pequeño' },
+    ],
+    notes: [
+      'DC +5 si las ataduras están bien hecho',
+      'Un crítico fallido hace que sea imposible escapar',
+      'Puedes hacer una prueba de Percepción para detectar una encerrona',
+    ],
   },
   {
     id: 'fly',
@@ -86,7 +195,19 @@ export const SKILLS: Skill[] = [
     ability: 'dexterity',
     isClassSkill: true,
     hasArmorCheckPenalty: true,
-    description: 'Maniobrar mientras se vuela.',
+    description: 'Maniobrar mientras vuela, incluyendo ascender, descender, y mantener equilibrio.',
+    uses: ['Maniobras de vuelo', 'Ascender', 'Descender', 'Volar en espacios reducidos'],
+    typicalDCs: [
+      { dc: 10, example: 'Volar a velocidad completa' },
+      { dc: 15, example: 'Volar en área abarrotada' },
+      { dc: 20, example: 'Volar con vientos turbulentos' },
+      { dc: 20, example: 'Ascender abruptamente' },
+    ],
+    notes: [
+      'Estás flat-footed mientrasetcs volando',
+      'Si caes, sufres daño de caída normalmente',
+      'Criaturas con fly como ability natural tienen +8',
+    ],
   },
   {
     id: 'handle_animal',
@@ -94,7 +215,20 @@ export const SKILLS: Skill[] = [
     ability: 'charisma',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Domesticar, calmar y comandar animales.',
+    description: 'Domesticar, calmar, comandar, y entrenar animales.',
+    uses: ['Calmar animal', 'Comandar animal mountado', 'Enseñar trucos', 'Empatizar animal'],
+    typicalDCs: [
+      { dc: 15, example: 'Calmar animal agresivo' },
+      { dc: 15, example: 'Obtener atención de animal' },
+      { dc: 20, example: 'Enseñar truco simple' },
+      { dc: 20, example: 'Comandar animal doméstico' },
+      { dc: 25, example: 'Comandar animal feroz' },
+    ],
+    notes: [
+      'DC +5 para animals salvajes',
+      'Un crítico fallido hace que el animal sea hostil',
+      'Puedes influir sobre animales con 1 rango',
+    ],
   },
   {
     id: 'heal',
@@ -102,7 +236,19 @@ export const SKILLS: Skill[] = [
     ability: 'wisdom',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Curar heridas, identificar venenos y enfermedades.',
+    description: 'Curar heridas, identificar venenos y enfermedades, y proporcionar primeros auxilios.',
+    uses: ['Primeros auxilios', 'Curar enfermedad', 'Identificar veneno', 'Tratar heridas'],
+    typicalDCs: [
+      { dc: 15, example: 'Estabilizar criatura moribunda' },
+      { dc: 15, example: 'Curar herida leve (1d8 PG)' },
+      { dc: 20, example: 'Curar herida moderada (2d8 PG)' },
+      { dc: 20, example: 'Identificar veneno' },
+    ],
+    notes: [
+      'Puedes tratar enfermedades con DC 15 + días de enfermedad',
+      'Un crítico exitoso cura el doble de PG',
+      'Puedes proporcionar primeros auxilios como acción estándar',
+    ],
   },
   {
     id: 'intimidate',
@@ -110,7 +256,18 @@ export const SKILLS: Skill[] = [
     ability: 'charisma',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Influenciar a través de amenazas y comportamiento hostil.',
+    description: 'Influenciar a través de amenazas, comportamiento hostil, y coerceción física.',
+    uses: ['Aterrorizar', 'Coercer', 'Desmoralizar', 'Forzar cooperación'],
+    typicalDCs: [
+      { dc: 15, example: 'Desmoralizar oponente' },
+      { dc: 20, example: 'Aterrorizar (CD de la criatura)' },
+      { dc: 25, example: 'Coercer a creature hostil' },
+    ],
+    notes: [
+      'Un crítico exitoso atemoriza al objetivo durante 1d4 rondas',
+      'No puede usarse contra criaturas con Int -',
+      'El objetivo debe poder verte y oírte',
+    ],
   },
   {
     id: 'knowledge_arcana',
@@ -118,7 +275,19 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de magia, spells, dragones y seres planares.',
+    description: 'Conocimiento de magia, hechizos, dragones y seres planares.',
+    uses: ['Identificar hechizo', 'Conocer dragón', 'Identificar criatura planar', 'Conocer escuela de magia'],
+    typicalDCs: [
+      { dc: 10, example: 'Información básica sobre tema conocido' },
+      { dc: 15, example: 'Información detallada' },
+      { dc: 20, example: 'Información oculta o rara' },
+      { dc: 25, example: 'Información única o secretos arcanos' },
+    ],
+    notes: [
+      'Cada habilidad de Conocimiento es una habilidad separada',
+      'Sin entrenamiento solo puedes hacer preguntas básicas',
+      'Útil para identificar criaturas mágicas y dragones',
+    ],
   },
   {
     id: 'knowledge_dungeoneering',
@@ -126,7 +295,19 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de subterráneos, monstruos y geografía.',
+    description: 'Conocimiento de subterráneos, monstruos de mazmorra, geografía subterránea, y constructor de mazmorras.',
+    uses: ['Identificar monstruo', 'Conocer конструкции de dungeon', 'Detectar truco de dungeon'],
+    typicalDCs: [
+      { dc: 10, example: 'Información básica sobre tema conocido' },
+      { dc: 15, example: 'Información detallada' },
+      { dc: 20, example: 'Información oculta o rara' },
+      { dc: 25, example: 'Información única o secretos profundos' },
+    ],
+    notes: [
+      'Cada habilidad de Conocimiento es una habilidad separada',
+      'Sin entrenamiento solo puedes hacer preguntas básicas',
+      'Un crítico exitoso proporciona información adicional',
+    ],
   },
   {
     id: 'knowledge_engineering',
@@ -134,7 +315,17 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de arquitectura, ingeniería y edificios.',
+    description: 'Conocimiento de arquitectura, ingeniería, edificios, y proyectos de construcción.',
+    uses: ['Identificar construcción', 'Conocer materiales', 'Diseñar estructura'],
+    typicalDCs: [
+      { dc: 10, example: 'Información básica' },
+      { dc: 15, example: 'Identificar edificio notable' },
+      { dc: 20, example: 'Conocer ingeniería avanzada' },
+    ],
+    notes: [
+      'Útil para evaluar solidez de estructuras',
+      'Permite identificar trampas конструкции',
+    ],
   },
   {
     id: 'knowledge_geography',
@@ -142,7 +333,16 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de tierras, mapas, clima y ríos.',
+    description: 'Conocimiento de tierras, mapas, clima, Ríos, y geografía física.',
+    uses: ['Conocer ubicación', 'Navegación', 'Clima local'],
+    typicalDCs: [
+      { dc: 10, example: 'Región conocida' },
+      { dc: 20, example: 'Región lejana o exótica' },
+    ],
+    notes: [
+      'Ayuda con navegación y supervivencia',
+      'Identificar criaturas según su hábitat',
+    ],
   },
   {
     id: 'knowledge_history',
@@ -150,7 +350,17 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de eventos históricos, personas y civilizaciones.',
+    description: 'Conocimiento de eventos históricos, personas, civilizaciones, y guerras pasadas.',
+    uses: ['Conocer evento histórico', 'Identificar artifact', 'Conocer persona histórica'],
+    typicalDCs: [
+      { dc: 10, example: 'Evento histórico común' },
+      { dc: 20, example: 'Evento histórico importante' },
+      { dc: 25, example: 'Evento oculto o antiguo' },
+    ],
+    notes: [
+      'Información sobre artefactos y reliquias',
+      'Conocer reyes, guerras, y civilizaciones',
+    ],
   },
   {
     id: 'knowledge_local',
@@ -158,7 +368,18 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de una región específica, rumores, leyendas.',
+    description: 'Conocimiento de una región específica, rumores, leyendas, y gente local.',
+    uses: ['Conocer gossip', 'Conocer criminales', 'Conocer leyendas locales'],
+    typicalDCs: [
+      { dc: 10, example: 'Información básica de la ciudad' },
+      { dc: 15, example: 'Rumores conocidos' },
+      { dc: 20, example: 'Información oculta o de gremios' },
+      { dc: 25, example: 'Secretos de facciones' },
+    ],
+    notes: [
+      'Solo cubre una ciudad o región específica',
+      'Útil para encontrar ayuda local',
+    ],
   },
   {
     id: 'knowledge_nature',
@@ -166,7 +387,17 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de animales, plantas, tierras y clima.',
+    description: 'Conocimiento de animales, plantas, tierras salvageages, clima, y ecosistemas.',
+    uses: ['Identificar animal', 'Conocer terreno', 'Predicción del clima'],
+    typicalDCs: [
+      { dc: 10, example: 'Animal o planta común' },
+      { dc: 15, example: 'Animal o planta poco común' },
+      { dc: 20, example: 'Criatura mágica o bestia' },
+    ],
+    notes: [
+      'Ayuda con supervivencia en la naturaleza',
+      'Identificar propiedades de plantas y animales',
+    ],
   },
   {
     id: 'knowledge_nobility',
@@ -174,7 +405,17 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de relaciones nobiliarias, protocolos y heraldos.',
+    description: 'Conocimiento de relaciones nobiliarias, protocolos reales, linajes, y título.',
+    uses: ['Conocer noble', 'Entender protocolo', 'Conocer genealogía'],
+    typicalDCs: [
+      { dc: 10, example: 'Noble conocido' },
+      { dc: 15, example: 'Protocolo de corte' },
+      { dc: 20, example: 'Secreto de familia noble' },
+    ],
+    notes: [
+      'Ayuda con diplomacia y trata social',
+      'Identificar divisas y escudos familiares',
+    ],
   },
   {
     id: 'knowledge_planes',
@@ -182,7 +423,18 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de planos exteriores,-inner, y seres planares.',
+    description: 'Conocimiento de planos, dimensiones alternativas, y sus habitantes.',
+    uses: ['Identificar criatura planar', 'Conocer ley y caos del plano', 'Navegar entre planos'],
+    typicalDCs: [
+      { dc: 10, example: 'Plano común' },
+      { dc: 15, example: 'Plano outer' },
+      { dc: 20, example: 'Plano interior o exótico' },
+      { dc: 25, example: 'Dimensión desconocida' },
+    ],
+    notes: [
+      'Información sobre efectos planares',
+      'Conocer住户 de otros planos',
+    ],
   },
   {
     id: 'knowledge_religion',
@@ -190,7 +442,18 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de dioses, rituales, muertos vivientes y filosofía.',
+    description: 'Conocimiento de dioses, rituales, muerto viviente, religiones, y filosofía.',
+    uses: ['Identificar criatura no-muerta', 'Conocer deidad', 'Entender ritual'],
+    typicalDCs: [
+      { dc: 10, example: 'Deidad común' },
+      { dc: 15, example: 'Ritual conocido' },
+      { dc: 20, example: 'Secreto religioso o secta' },
+      { dc: 25, example: 'Misterio antiguo' },
+    ],
+    notes: [
+      'Ayuda contra efectos de miedo',
+      'Identificar reliquias sagradas',
+    ],
   },
   {
     id: 'linguistics',
@@ -198,7 +461,18 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Conocimiento de idiomas y códigos, descifrar escritura.',
+    description: 'Conocimiento de idiomas, dialectos, y códigos. También para descifrar escritura.',
+    uses: ['Aprender idioma', 'Descifrar texto', 'Crear cifrado'],
+    typicalDCs: [
+      { dc: 15, example: 'Descifrar texto en idioma conocido' },
+      { dc: 20, example: 'Descifrar texto en idioma desconocido' },
+      { dc: 25, example: 'Descifrar código complejo' },
+    ],
+    notes: [
+      'Cada idioma requiere 1 semana de aprendizaje',
+      'Puedes identificar escritura con CD 15',
+      '3+ rangos dan +2 a todas las pruebas de idiomas',
+    ],
   },
   {
     id: 'perception',
@@ -206,7 +480,19 @@ export const SKILLS: Skill[] = [
     ability: 'wisdom',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Notar cosas, escuchar, buscar y percibir algo oculto.',
+    description: 'Notar cosas, escuchar, buscar, y percibir algo oculto o invisible.',
+    uses: ['Notar detalles', 'Escuchar', 'Buscar', 'Detectar ocultamiento'],
+    typicalDCs: [
+      { dc: 0, example: 'Notar cosa obvia' },
+      { dc: 10, example: 'Percibir criaturas escondidas' },
+      { dc: 20, example: 'Escuchar conversación en silencio' },
+      { dc: 20, example: 'Encontrartrampa oculta' },
+    ],
+    notes: [
+      'Se hace automáticamente en很多situaciones',
+      'Crítico exitoso permite详细信息',
+      'Solo puedes intentar una vez por circunstancia',
+    ],
   },
   {
     id: 'perform',
@@ -214,7 +500,18 @@ export const SKILLS: Skill[] = [
     ability: 'charisma',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Actuar, cantar, bailar, tocar instrumentos, contar historias.',
+    description: 'Actuar, cantar, bailar, tocar instrumentos, o contar historias para entretener.',
+    uses: ['Entretener audiencia', 'Demostrar habilidad', 'Ganar dinero'],
+    typicalDCs: [
+      { dc: 10, example: 'Actuación ante audiencia amigable' },
+      { dc: 15, example: 'Actuación ante audiencia neutral' },
+      { dc: 20, example: 'Actuación profesional' },
+    ],
+    notes: [
+      'Puedes ganar dinero con actuación',
+      'Un crítico exitoso duplica las propinas',
+      'Solo una habilidad de Interpretación (eliges tipo)',
+    ],
   },
   {
     id: 'profession',
@@ -222,7 +519,18 @@ export const SKILLS: Skill[] = [
     ability: 'wisdom',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Trabajo remunerado. Se debe especificar una profesión.',
+    description: 'Trabajo remunerado en un campo específico. Se debe especificar una profesión.',
+    uses: ['Ganar dinero', 'Estimar valor de servicios', 'Conocimiento profesional'],
+    typicalDCs: [
+      { dc: 10, example: 'Trabajo básico' },
+      { dc: 15, example: 'Trabajo especializado' },
+      { dc: 20, example: 'Trabajo de experto' },
+    ],
+    notes: [
+      'Puedes ganar 1/3 del precio base por semana',
+      'Un crítico exitoso duplica las ganancias',
+      'Solo una habilidad de Profesión (eliges tipo)',
+    ],
   },
   {
     id: 'ride',
@@ -230,7 +538,19 @@ export const SKILLS: Skill[] = [
     ability: 'dexterity',
     isClassSkill: true,
     hasArmorCheckPenalty: true,
-    description: 'Montar animales, dirigir monturas y realizar trucos.',
+    description: 'Montar animales, dirigirlos, y realizar trucos montados.',
+    uses: ['Montar criatura', 'Dirigir montura', 'Saltosmontado'],
+    typicalDCs: [
+      { dc: 5, example: 'Montar animal domesticado' },
+      { dc: 10, example: 'Montar animal feroz' },
+      { dc: 15, example: 'Mantener montura en combate' },
+      { dc: 15, example: 'Saltosmontado (DC del salto)' },
+    ],
+    notes: [
+      'Estás flat-footed mientras montas si no has actuado aún',
+      'Puedes hacer que tu montura actué como reacción',
+      'DC +5 para montar criatura no familiarizada',
+    ],
   },
   {
     id: 'sense_motive',
@@ -238,7 +558,18 @@ export const SKILLS: Skill[] = [
     ability: 'wisdom',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Detectar mentiras, motivaciones ocultas y engaños.',
+    description: 'Detectar mentiras, percibir motivaciones ocultas, y ver través de engaños.',
+    uses: ['Detectar engaño', 'Descubrir motivo', 'Intuir intención'],
+    typicalDCs: [
+      { dc: 15, example: 'Detectar mentira obvia' },
+      { dc: 20, example: 'Detectar mentira elaborada' },
+      { dc: 25, example: 'Descubrir motivo oculto' },
+    ],
+    notes: [
+      'Se opone a Engaño',
+      'Un crítico exitoso revela la verdad completa',
+      'Solo puedes intentar una vez por conversación',
+    ],
   },
   {
     id: 'sleight_of_hand',
@@ -246,7 +577,18 @@ export const SKILLS: Skill[] = [
     ability: 'dexterity',
     isClassSkill: true,
     hasArmorCheckPenalty: true,
-    description: 'Robar carterismo, plantar objetos y trucos de magia.',
+    description: 'Robar, plantar objetos, y realizar trucos de magia.',
+    uses: ['Robar', 'Plantar objeto', 'Ocultar objeto'],
+    typicalDCs: [
+      { dc: 20, example: 'Robar objeto pequeño (observadores)' },
+      { dc: 10, example: 'Ocultar objeto pequeño (sin observar)' },
+      { dc: 25, example: 'Robar objeto de criatura' },
+    ],
+    notes: [
+      'DC +5 si el objetivo está alerta',
+      'Un crítico fallido revela tu intento',
+      'No puedes robar armas ni objetos grandes',
+    ],
   },
   {
     id: 'spellcraft',
@@ -254,7 +596,18 @@ export const SKILLS: Skill[] = [
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Identificar spells, entender wéricas y crear items mágicos.',
+    description: 'Identificar hechizos, descifrar runoff magical, y crear objetos mágicos.',
+    uses: ['Identificar hechizo', 'Descifrar runa', 'Activar objeto'],
+    typicalDCs: [
+      { dc: 15, example: 'Identificarhechizo en curso (por nivel)' },
+      { dc: 20, example: 'Identificar propiedad de objeto mágico' },
+      { dc: 20, example: 'Descifrar runa o glifo' },
+    ],
+    notes: [
+      'DC aumenta +1 por cada nivel del hechizo',
+      'Puedes identificarhechizos como reacción',
+      'Necesitas 5+ rangos para identificarhechizos de outsiders',
+    ],
   },
   {
     id: 'stealth',
@@ -262,7 +615,20 @@ export const SKILLS: Skill[] = [
     ability: 'dexterity',
     isClassSkill: true,
     hasArmorCheckPenalty: true,
-    description: 'Ocultarse, moverse sin ser visto y passar desapercibido.',
+    description: 'Ocultarse, moverse sin ser visto y pasar desapercibido.',
+    uses: ['Ocultarse', 'Moverse sigilosamente', 'Evadir detección', 'Emboscada'],
+    typicalDCs: [
+      { dc: 10, example: 'Ocultarse en sombra densa' },
+      { dc: 15, example: 'Ocultarse en cobertura ligera' },
+      { dc: 20, example: 'Ocultarse sin cobertura ni sombra' },
+      { dc: 25, example: 'Ocultarse ante observador atento' },
+    ],
+    notes: [
+      'Debes tener cobertura o sombra para ocultarte',
+      'La distancia del observador afecta la dificultad',
+      'Un crítico fallido te revela automáticamente',
+      'Te descubren automáticamente si te mueves más de la mitad de tu velocidad',
+    ],
   },
   {
     id: 'survival',
@@ -270,7 +636,19 @@ export const SKILLS: Skill[] = [
     ability: 'wisdom',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Rastrear, encontrar provisiones, predecir clima, sobrevivir.',
+    description: 'Rastrear criaturas, encontrar provisiones, predecir clima, y sobrevivir en la naturaleza.',
+    uses: ['Rastrear criaturas', 'Encontrar comida y agua', 'Predecir clima', 'Orientación', 'Evitar peligros naturales'],
+    typicalDCs: [
+      { dc: 10, example: 'Encontrar camino en terreno conocido' },
+      { dc: 15, example: 'Rastrear criaturas (por tamaño)' },
+      { dc: 20, example: 'Predecir clima de la región' },
+      { dc: 20, example: 'Supervivir sin provisiones' },
+    ],
+    notes: [
+      'Con 5+ rangos puedes proporcionar +2 a Survival de compañeros',
+      'Puedes rastrear con DC +5 si las criaturas son magic',
+      'Con 10+ rangos puedes sobrevivir indefinidamente',
+    ],
   },
   {
     id: 'swim',
@@ -278,7 +656,20 @@ export const SKILLS: Skill[] = [
     ability: 'strength',
     isClassSkill: true,
     hasArmorCheckPenalty: true,
-    description: 'Nadar y resistir ser arrastrado por el agua.',
+    description: 'Nadar, resistir ser arrastrado por el agua, y sumergirse.',
+    uses: ['Nadar', 'Resistir corriente', 'Sumergirse', 'Aguantar respiración'],
+    typicalDCs: [
+      { dc: 10, example: 'Nadar a velocidad reducida' },
+      { dc: 15, example: 'Nadar a velocidad completa' },
+      { dc: 15, example: 'Resistir corriente moderada' },
+      { dc: 20, example: 'Nadar en aguas turbulentas' },
+    ],
+    notes: [
+      'DC +5 con armadura pesada o carga media/pesada',
+      'Un crítico fallido te hace gastar una acciónnadando',
+      'Un crítico fallido bajo el agua te hace sufrir 1d6 de daño',
+      'Puedes moverte 1/4 de tu velocidad nadando',
+    ],
   },
   {
     id: 'use_magic_device',
@@ -286,7 +677,20 @@ export const SKILLS: Skill[] = [
     ability: 'charisma',
     isClassSkill: true,
     hasArmorCheckPenalty: false,
-    description: 'Activar objetos mágicos sin ser el lanzador.',
+    description: 'Activar objetos mágicos sin ser el lanzador, usar bastones y varitas, y descifrar pergaminos.',
+    uses: ['Activar objeto mágico', 'Usar varita', 'Descifrar pergamino', 'Usar objeto de clase diferente'],
+    typicalDCs: [
+      { dc: 20, example: 'Activar objeto mágico común' },
+      { dc: 25, example: 'Activar objeto de alineamiento diferente' },
+      { dc: 25, example: 'Descifrar pergamino sin saber el hechizo' },
+      { dc: 30, example: 'Activar objeto con requerimiento de clase' },
+    ],
+    notes: [
+      'No puedes usar objetos con requerimiento de raza o alineamiento',
+      'Un crítico fallido puedebrick el objeto',
+      'Necesitas decodificar el dispositivo primero',
+      'Puedes tomar 10 incluso en combate',
+    ],
   },
 ]
 

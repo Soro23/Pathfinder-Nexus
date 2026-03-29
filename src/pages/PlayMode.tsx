@@ -2,13 +2,42 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Plus, Minus, Dices, History, Shield, Heart, Brain,
-  Swords, Flame, X, Zap, BookOpen, Activity
+  Swords, Flame, X, Zap, BookOpen, Activity, Power, Pencil, Check
 } from 'lucide-react'
-import { useCharacterStore, calculateModifier, getModifierString } from '../store'
+import { useCharacterStore, calculateModifier, getModifierString, StatusEffect, BonusTarget } from '../store'
 import { getClassById, getMulticlassStats, useSRDStore } from '../data'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card } from '../components/ui'
 import styles from './PlayMode.module.css'
+
+function getEffectBonus(effects: StatusEffect[], target: BonusTarget): number {
+  return effects
+    .filter(e => e.active !== false && e.bonusTarget === target && e.bonusValue !== undefined)
+    .reduce((sum, e) => sum + (e.bonusValue ?? 0), 0)
+}
+
+function addModifierToNotation(notation: string, extra: number): string {
+  if (extra === 0) return notation
+  const match = notation.match(/^(\d+d\d+)([+-]\d+)?$/)
+  if (!match) return notation
+  const base = match[1]
+  const existing = match[2] ? parseInt(match[2]) : 0
+  const total = existing + extra
+  if (total === 0) return base
+  return `${base}${total > 0 ? '+' : ''}${total}`
+}
+
+const BONUS_TARGET_LABELS: Record<string, string> = {
+  attack: 'Ataque',
+  damage: 'Daño',
+  ac: 'CA',
+  fort: 'Fortaleza',
+  ref: 'Reflejos',
+  will: 'Voluntad',
+  initiative: 'Iniciativa',
+  cmb: 'CMB',
+  cmd: 'CMD',
+}
 
 function rollDice(notation: string): { total: number; rolls: number[] } {
   const match = notation.match(/(\d+)d(\d+)([+-]\d+)?/)
@@ -44,6 +73,19 @@ export function PlayMode() {
   const [critEvent, setCritEvent] = useState<CritEvent | null>(null)
   const [rolling, setRolling] = useState(false)
   const [showStatusEffects, setShowStatusEffects] = useState(false)
+  const [newEffectName, setNewEffectName] = useState('')
+  const [newEffectDesc, setNewEffectDesc] = useState('')
+  const [newEffectDuration, setNewEffectDuration] = useState('')
+  const [newEffectTarget, setNewEffectTarget] = useState<BonusTarget | 'skill' | ''>('')
+  const [newEffectSkillId, setNewEffectSkillId] = useState('')
+  const [newEffectValue, setNewEffectValue] = useState<number>(0)
+  const [editingEffectId, setEditingEffectId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editDesc, setEditDesc] = useState('')
+  const [editDuration, setEditDuration] = useState('')
+  const [editTarget, setEditTarget] = useState<BonusTarget | 'skill' | ''>('')
+  const [editSkillId, setEditSkillId] = useState('')
+  const [editValue, setEditValue] = useState<number>(0)
 
   const { spells: spellMap } = useSpellsByIds(character?.spells ?? [])
 
@@ -64,9 +106,6 @@ export function PlayMode() {
   const { abilities } = character
   const classData = getClassById(character.classes[0]?.id || '')   // mantener — se usa en hasSpells, concentrationBonus, classSkillIds
   const mcStats  = getMulticlassStats(character.classes)
-  const fortSave = mcStats.fortitude + calculateModifier(abilities.constitution)
-  const refSave  = mcStats.reflex    + calculateModifier(abilities.dexterity)
-  const willSave = mcStats.will      + calculateModifier(abilities.wisdom)
   const bab      = mcStats.bab
 
   // Correct AC calculation using equipped armor
@@ -78,15 +117,29 @@ export function PlayMode() {
     calculateModifier(abilities.dexterity),
     armorMaxDex === Infinity ? 99 : armorMaxDex
   )
-  const ac = 10 + totalArmorBonus + dexForAC
 
   const strMod = calculateModifier(abilities.strength)
   const dexMod = calculateModifier(abilities.dexterity)
-  const cmb = bab + strMod
-  const cmd = 10 + bab + strMod + dexMod
+
+  const ac         = 10 + totalArmorBonus + dexForAC
+  const fortSave   = mcStats.fortitude + calculateModifier(abilities.constitution)
+  const refSave    = mcStats.reflex    + calculateModifier(abilities.dexterity)
+  const willSave   = mcStats.will      + calculateModifier(abilities.wisdom)
+  const cmb        = bab + strMod
+  const cmd        = 10 + bab + strMod + dexMod
   const initiative = dexMod
 
   const statusEffects = character.statusEffects ?? []
+
+  const effectAC         = getEffectBonus(statusEffects, 'ac')
+  const effectFort       = getEffectBonus(statusEffects, 'fort')
+  const effectRef        = getEffectBonus(statusEffects, 'ref')
+  const effectWill       = getEffectBonus(statusEffects, 'will')
+  const effectInitiative = getEffectBonus(statusEffects, 'initiative')
+  const effectCMB        = getEffectBonus(statusEffects, 'cmb')
+  const effectCMD        = getEffectBonus(statusEffects, 'cmd')
+  const effectAttack     = getEffectBonus(statusEffects, 'attack')
+  const effectDamage     = getEffectBonus(statusEffects, 'damage')
 
   function triggerRollAnimation(cb: () => void) {
     setRolling(true)
@@ -202,23 +255,216 @@ export function PlayMode() {
         <div className={styles.effectsOverlay} onClick={() => setShowStatusEffects(false)}>
           <div className={styles.effectsDrawer} onClick={(e) => e.stopPropagation()}>
             <div className={styles.effectsHeader}>
-              <h3>Efectos de Estado</h3>
+              <h3>Efectos</h3>
               <button className={styles.critClose} onClick={() => setShowStatusEffects(false)}>
                 <X size={18} />
               </button>
             </div>
+
+            {/* Add effect form */}
+            <div className={styles.effectForm}>
+              <input
+                className={styles.effectInput}
+                placeholder="Nombre del efecto"
+                value={newEffectName}
+                onChange={e => setNewEffectName(e.target.value)}
+              />
+              <input
+                className={styles.effectInput}
+                placeholder="Descripción (opcional)"
+                value={newEffectDesc}
+                onChange={e => setNewEffectDesc(e.target.value)}
+              />
+              <input
+                className={styles.effectInput}
+                placeholder="Duración (ej: 3 rondas)"
+                value={newEffectDuration}
+                onChange={e => setNewEffectDuration(e.target.value)}
+              />
+              <div className={styles.effectBonusRow}>
+                <select
+                  className={styles.effectSelect}
+                  value={newEffectTarget}
+                  onChange={e => { setNewEffectTarget(e.target.value as BonusTarget | 'skill' | ''); setNewEffectSkillId('') }}
+                >
+                  <option value="">Sin bonificador</option>
+                  <option value="attack">Ataque</option>
+                  <option value="damage">Daño</option>
+                  <option value="ac">CA</option>
+                  <option value="fort">Fortaleza</option>
+                  <option value="ref">Reflejos</option>
+                  <option value="will">Voluntad</option>
+                  <option value="initiative">Iniciativa</option>
+                  <option value="cmb">CMB</option>
+                  <option value="cmd">CMD</option>
+                  <option value="skill">Habilidad específica…</option>
+                </select>
+                {newEffectTarget === 'skill' && (
+                  <select
+                    className={styles.effectSelect}
+                    value={newEffectSkillId}
+                    onChange={e => setNewEffectSkillId(e.target.value)}
+                  >
+                    <option value="">Selecciona habilidad</option>
+                    {SKILLS.sort((a, b) => a.name.localeCompare(b.name)).map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                )}
+                {newEffectTarget && (
+                  <input
+                    className={styles.effectValueInput}
+                    type="number"
+                    placeholder="+2"
+                    value={newEffectValue === 0 ? '' : newEffectValue}
+                    onChange={e => setNewEffectValue(parseInt(e.target.value) || 0)}
+                  />
+                )}
+              </div>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  if (!newEffectName.trim()) return
+                  const resolvedTarget: BonusTarget | undefined =
+                    newEffectTarget === 'skill'
+                      ? newEffectSkillId ? (`skill:${newEffectSkillId}` as BonusTarget) : undefined
+                      : newEffectTarget || undefined
+                  const effect: StatusEffect = {
+                    id: Date.now().toString(),
+                    name: newEffectName.trim(),
+                    description: newEffectDesc.trim(),
+                    duration: newEffectDuration.trim() || undefined,
+                    bonusTarget: resolvedTarget,
+                    bonusValue: resolvedTarget !== undefined ? newEffectValue : undefined,
+                  }
+                  updateCharacter(character.id, { statusEffects: [...statusEffects, effect] })
+                  setNewEffectName('')
+                  setNewEffectDesc('')
+                  setNewEffectDuration('')
+                  setNewEffectTarget('')
+                  setNewEffectSkillId('')
+                  setNewEffectValue(0)
+                }}
+              >
+                <Plus size={14} /> Añadir efecto
+              </Button>
+            </div>
+
             {statusEffects.length === 0 ? (
-              <p className={styles.emptyHistory}>Sin efectos activos</p>
+              <p className={styles.emptyHistory}>Sin efectos</p>
             ) : (
               <ul className={styles.effectsList}>
-                {statusEffects.map((eff) => (
-                  <li key={eff.id} className={styles.effectItem}>
-                    <div className={styles.effectName}>{eff.name}</div>
-                    {eff.bonus && <div className={styles.effectBonus}>{eff.bonus}</div>}
-                    {eff.duration && <div className={styles.effectDuration}>Duración: {eff.duration}</div>}
-                    {eff.description && <div className={styles.effectDesc}>{eff.description}</div>}
-                  </li>
-                ))}
+                {statusEffects.map((eff) => {
+                  const isActive = eff.active !== false
+                  const targetLabel = eff.bonusTarget
+                    ? eff.bonusTarget.startsWith('skill:')
+                      ? `Habilidad: ${SKILLS.find(s => s.id === eff.bonusTarget!.replace('skill:', ''))?.name ?? eff.bonusTarget.replace('skill:', '')}`
+                      : BONUS_TARGET_LABELS[eff.bonusTarget] ?? eff.bonusTarget
+                    : null
+                  const isEditing = editingEffectId === eff.id
+
+                  const startEdit = () => {
+                    setEditingEffectId(eff.id)
+                    setEditName(eff.name)
+                    setEditDesc(eff.description ?? '')
+                    setEditDuration(eff.duration ?? '')
+                    if (eff.bonusTarget?.startsWith('skill:')) {
+                      setEditTarget('skill')
+                      setEditSkillId(eff.bonusTarget.replace('skill:', ''))
+                    } else {
+                      setEditTarget(eff.bonusTarget ?? '')
+                      setEditSkillId('')
+                    }
+                    setEditValue(eff.bonusValue ?? 0)
+                  }
+
+                  const saveEdit = () => {
+                    const resolvedTarget: BonusTarget | undefined =
+                      editTarget === 'skill'
+                        ? editSkillId ? (`skill:${editSkillId}` as BonusTarget) : undefined
+                        : editTarget || undefined
+                    updateCharacter(character.id, {
+                      statusEffects: statusEffects.map(e => e.id !== eff.id ? e : {
+                        ...e,
+                        name: editName.trim() || e.name,
+                        description: editDesc.trim(),
+                        duration: editDuration.trim() || undefined,
+                        bonusTarget: resolvedTarget,
+                        bonusValue: resolvedTarget !== undefined ? editValue : undefined,
+                      })
+                    })
+                    setEditingEffectId(null)
+                  }
+
+                  return (
+                    <li key={eff.id} className={`${styles.effectItem} ${!isActive ? styles.effectItemDisabled : ''}`}>
+                      {isEditing ? (
+                        <div className={styles.effectEditForm}>
+                          <input className={styles.effectInput} value={editName} onChange={e => setEditName(e.target.value)} placeholder="Nombre" />
+                          <input className={styles.effectInput} value={editDesc} onChange={e => setEditDesc(e.target.value)} placeholder="Descripción" />
+                          <input className={styles.effectInput} value={editDuration} onChange={e => setEditDuration(e.target.value)} placeholder="Duración" />
+                          <div className={styles.effectBonusRow}>
+                            <select className={styles.effectSelect} value={editTarget} onChange={e => { setEditTarget(e.target.value as BonusTarget | 'skill' | ''); setEditSkillId('') }}>
+                              <option value="">Sin bonificador</option>
+                              <option value="attack">Ataque</option>
+                              <option value="damage">Daño</option>
+                              <option value="ac">CA</option>
+                              <option value="fort">Fortaleza</option>
+                              <option value="ref">Reflejos</option>
+                              <option value="will">Voluntad</option>
+                              <option value="initiative">Iniciativa</option>
+                              <option value="cmb">CMB</option>
+                              <option value="cmd">CMD</option>
+                              <option value="skill">Habilidad específica…</option>
+                            </select>
+                            {editTarget === 'skill' && (
+                              <select className={styles.effectSelect} value={editSkillId} onChange={e => setEditSkillId(e.target.value)}>
+                                <option value="">Selecciona habilidad</option>
+                                {SKILLS.sort((a, b) => a.name.localeCompare(b.name)).map(s => (
+                                  <option key={s.id} value={s.id}>{s.name}</option>
+                                ))}
+                              </select>
+                            )}
+                            {editTarget && (
+                              <input className={styles.effectValueInput} type="number" value={editValue === 0 ? '' : editValue} onChange={e => setEditValue(parseInt(e.target.value) || 0)} placeholder="+2" />
+                            )}
+                          </div>
+                          <div className={styles.effectEditActions}>
+                            <button className={styles.effectSaveBtn} onClick={saveEdit} title="Guardar"><Check size={14} /> Guardar</button>
+                            <button className={styles.effectRemoveBtn} onClick={() => setEditingEffectId(null)} title="Cancelar"><X size={14} /></button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className={styles.effectItemHeader}>
+                            <button
+                              className={`${styles.effectToggleBtn} ${isActive ? styles.effectToggleOn : styles.effectToggleOff}`}
+                              onClick={() => updateCharacter(character.id, {
+                                statusEffects: statusEffects.map(e => e.id === eff.id ? { ...e, active: !isActive } : e)
+                              })}
+                              title={isActive ? 'Desactivar' : 'Activar'}
+                            >
+                              <Power size={13} />
+                            </button>
+                            <span className={styles.effectName}>{eff.name}</span>
+                            <div className={styles.effectItemActions}>
+                              <button className={styles.effectEditBtn} onClick={startEdit} title="Editar"><Pencil size={13} /></button>
+                              <button className={styles.effectRemoveBtn} onClick={() => updateCharacter(character.id, { statusEffects: statusEffects.filter(e => e.id !== eff.id) })} title="Eliminar"><X size={14} /></button>
+                            </div>
+                          </div>
+                          {targetLabel && eff.bonusValue !== undefined && (
+                            <div className={`${styles.effectBonus} ${eff.bonusValue >= 0 ? styles.effectBonusPos : styles.effectBonusNeg}`}>
+                              {eff.bonusValue >= 0 ? `+${eff.bonusValue}` : eff.bonusValue} a {targetLabel}
+                            </div>
+                          )}
+                          {eff.duration && <div className={styles.effectDuration}>Duración: {eff.duration}</div>}
+                          {eff.description && <div className={styles.effectDesc}>{eff.description}</div>}
+                        </>
+                      )}
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </div>
@@ -305,26 +551,23 @@ export function PlayMode() {
             <div className={styles.tabContent}>
               {/* Combat Stats Bar */}
               <div className={styles.combatStats}>
-                <div className={styles.statPill}>
-                  <span className={styles.statPillLabel}>CA</span>
-                  <span className={styles.statPillValue}>{ac}</span>
-                </div>
-                <div className={styles.statPill}>
-                  <span className={styles.statPillLabel}>INI</span>
-                  <span className={styles.statPillValue}>{initiative >= 0 ? `+${initiative}` : initiative}</span>
-                </div>
-                <div className={styles.statPill}>
-                  <span className={styles.statPillLabel}>CMB</span>
-                  <span className={styles.statPillValue}>{cmb >= 0 ? `+${cmb}` : cmb}</span>
-                </div>
-                <div className={styles.statPill}>
-                  <span className={styles.statPillLabel}>CMD</span>
-                  <span className={styles.statPillValue}>{cmd}</span>
-                </div>
-                <div className={styles.statPill}>
-                  <span className={styles.statPillLabel}>BAB</span>
-                  <span className={styles.statPillValue}>+{bab}</span>
-                </div>
+                {([
+                  { label: 'CA',  value: ac + effectAC,           bonus: effectAC,         fmt: (v: number) => `${v}` },
+                  { label: 'INI', value: initiative + effectInitiative, bonus: effectInitiative, fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
+                  { label: 'CMB', value: cmb + effectCMB,         bonus: effectCMB,         fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
+                  { label: 'CMD', value: cmd + effectCMD,         bonus: effectCMD,         fmt: (v: number) => `${v}` },
+                  { label: 'BAB', value: bab,                     bonus: 0,                 fmt: (v: number) => `+${v}` },
+                ] as { label: string; value: number; bonus: number; fmt: (v: number) => string }[]).map(({ label, value, bonus, fmt }) => (
+                  <div key={label} className={styles.statPill}>
+                    <span className={styles.statPillLabel}>{label}</span>
+                    <span className={styles.statPillValue}>{fmt(value)}</span>
+                    {bonus !== 0 && (
+                      <span className={bonus > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
+                        {bonus > 0 ? `+${bonus}` : bonus}
+                      </span>
+                    )}
+                  </div>
+                ))}
               </div>
 
               {/* Weapons */}
@@ -332,44 +575,52 @@ export function PlayMode() {
                 <h3 className={styles.sectionTitle}><Shield size={18} />Ataques</h3>
                 <div className={styles.weaponList}>
                   {character.weapons && character.weapons.length > 0 ? (
-                    character.weapons.map((weapon) => (
-                      <div key={weapon.id} className={styles.weaponRow}>
-                        <div className={styles.weaponInfo}>
-                          <span className={styles.weaponName}>{weapon.name}</span>
-                          <span className={styles.weaponCrit}>×{weapon.critical || '20/×2'}</span>
+                    character.weapons.map((weapon) => {
+                      const atkTotal = bab + weapon.attackBonus + effectAttack
+                      const dmgNotation = addModifierToNotation(weapon.damage, effectDamage)
+                      return (
+                        <div key={weapon.id} className={styles.weaponRow}>
+                          <div className={styles.weaponInfo}>
+                            <span className={styles.weaponName}>{weapon.name}</span>
+                            <span className={styles.weaponCrit}>×{weapon.critical || '20/×2'}</span>
+                          </div>
+                          <div className={styles.weaponBtns}>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => handleQuickRoll(
+                                `1d20+${atkTotal}`,
+                                `${weapon.name} (Ataque)`,
+                                true
+                              )}
+                            >
+                              Atacar {atkTotal >= 0 ? `+${atkTotal}` : atkTotal}
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => handleQuickRoll(dmgNotation, `${weapon.name} (Daño)`)}
+                            >
+                              Daño {dmgNotation}
+                            </Button>
+                          </div>
                         </div>
-                        <div className={styles.weaponBtns}>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => handleQuickRoll(
-                              `1d20+${bab + weapon.attackBonus}`,
-                              `${weapon.name} (Ataque)`,
-                              true
-                            )}
-                          >
-                            Atacar {bab + weapon.attackBonus >= 0 ? `+${bab + weapon.attackBonus}` : bab + weapon.attackBonus}
-                          </Button>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => handleQuickRoll(weapon.damage, `${weapon.name} (Daño)`)}
-                          >
-                            Daño {weapon.damage}
-                          </Button>
-                        </div>
-                      </div>
-                    ))
+                      )
+                    })
                   ) : (
                     <div className={styles.quickRolls}>
-                      <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${bab + strMod}`, `Melee (+${bab + strMod})`, true)}>
-                        Melee +{bab + strMod}
+                      <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${bab + strMod + effectAttack}`, `Melee (+${bab + strMod + effectAttack})`, true)}>
+                        Melee +{bab + strMod + effectAttack}
                       </Button>
-                      <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${bab + dexMod}`, `Ranged (+${bab + dexMod})`, true)}>
-                        Ranged +{bab + dexMod}
+                      <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${bab + dexMod + effectAttack}`, `Ranged (+${bab + dexMod + effectAttack})`, true)}>
+                        Ranged +{bab + dexMod + effectAttack}
                       </Button>
-                      <Button variant="danger" onClick={() => handleQuickRoll(`1d6+${strMod}`, 'Daño Melee')}>Daño Melee</Button>
-                      <Button variant="danger" onClick={() => handleQuickRoll(`1d8+${dexMod}`, 'Daño Ranged')}>Daño Ranged</Button>
+                      <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d6+${strMod}`, effectDamage), 'Daño Melee')}>
+                        Daño Melee {addModifierToNotation(`1d6+${strMod}`, effectDamage)}
+                      </Button>
+                      <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d8+${dexMod}`, effectDamage), 'Daño Ranged')}>
+                        Daño Ranged {addModifierToNotation(`1d8+${dexMod}`, effectDamage)}
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -379,15 +630,23 @@ export function PlayMode() {
               <Card padding="md">
                 <h3 className={styles.sectionTitle}><Heart size={18} />Tiros de Salvación</h3>
                 <div className={styles.savesRow}>
-                  <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${fortSave}`, `Fortaleza (+${fortSave})`)}>
-                    Fortaleza {fortSave >= 0 ? `+${fortSave}` : fortSave}
-                  </Button>
-                  <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${refSave}`, `Reflejos (+${refSave})`)}>
-                    Reflejos {refSave >= 0 ? `+${refSave}` : refSave}
-                  </Button>
-                  <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${willSave}`, `Voluntad (+${willSave})`)}>
-                    Voluntad {willSave >= 0 ? `+${willSave}` : willSave}
-                  </Button>
+                  {([
+                    { label: 'Fortaleza', base: fortSave, eff: effectFort },
+                    { label: 'Reflejos',  base: refSave,  eff: effectRef  },
+                    { label: 'Voluntad',  base: willSave, eff: effectWill },
+                  ] as { label: string; base: number; eff: number }[]).map(({ label, base, eff }) => {
+                    const total = base + eff
+                    return (
+                      <Button key={label} variant="secondary" onClick={() => handleQuickRoll(`1d20+${total}`, `${label} (+${total})`)}>
+                        {label} {total >= 0 ? `+${total}` : total}
+                        {eff !== 0 && (
+                          <span className={eff > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
+                            {eff > 0 ? `+${eff}` : eff}
+                          </span>
+                        )}
+                      </Button>
+                    )
+                  })}
                 </div>
               </Card>
             </div>
@@ -409,7 +668,8 @@ export function PlayMode() {
                         const miscTotal = (skillRank.miscBonuses ?? []).reduce((s, b) => s + b.value, 0)
                         const isClassSkill = classSkillIds.includes(skillRank.id)
                         const classBonus = isClassSkill && skillRank.ranks > 0 ? 3 : 0
-                        const total = skillRank.ranks + abilityMod + miscTotal + classBonus
+                        const skillEffectBonus = getEffectBonus(statusEffects, `skill:${skillRank.id}` as BonusTarget)
+                        const total = skillRank.ranks + abilityMod + miscTotal + classBonus + skillEffectBonus
                         return (
                           <button
                             key={skillRank.id}
@@ -421,7 +681,14 @@ export function PlayMode() {
                               {isClassSkill && <span className={styles.classSkillDot}>●</span>}
                             </span>
                             <span className={styles.skillAbility}>{abilityAbbr[skillDef.ability]}</span>
-                            <span className={styles.skillBonus}>{total >= 0 ? `+${total}` : total}</span>
+                            <span className={styles.skillBonus}>
+                              {total >= 0 ? `+${total}` : total}
+                              {skillEffectBonus !== 0 && (
+                                <span className={skillEffectBonus > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
+                                  {skillEffectBonus > 0 ? `+${skillEffectBonus}` : skillEffectBonus}
+                                </span>
+                              )}
+                            </span>
                           </button>
                         )
                       })}

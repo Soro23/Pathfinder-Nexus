@@ -9,6 +9,9 @@ export interface Feat {
   normal?: string
   special?: string
   effects?: Modifier[]
+  uses?: string[]
+  notes?: string[]
+  source?: string
 }
 
 export const FEATS: Feat[] = [
@@ -20,6 +23,8 @@ export const FEATS: Feat[] = [
     effects: [
       { id: 'ac_awareness_bonus', source: 'Feat: Acrobacias Increíbles', type: 'untyped', target: 'skill:acrobatics', value: 3, rankCondition: { skillId: 'acrobatics', minRanks: 10, bonusValue: 6 } },
     ],
+    uses: ['Mejorar pruebas de equilibrio', 'Saltos más altos', 'Caer de pie'],
+    notes: ['El bonus aumenta a +6 con 10+ rangos', 'Sin entrenamiento, solo puedes usar Acrobatics para mantener el equilibrio'],
   },
   {
     id: 'agile_maneuvers',
@@ -27,6 +32,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     benefit: 'Añades tu bonificador de Destreza en lugar de tu bonificador de Fuerza a tu bonificador de Ataque Base y al bonificador por tamaño para determinar tu Bonificador de Maniobra en Combate (BMC).',
     normal: 'Añades tu bonificador de Fuerza a tu bonificador de Ataque Base y al bonificador por tamaño para determinar tu Bonificador de Maniobra en Combate.',
+    uses: ['Derribar enemigos', 'Desarmar', 'Embestir', 'Agarre'],
+    notes: ['Ideal para personajes con alta Destreza', 'No afecta daño de maniobra como Rotura'],
   },
   {
     id: 'athletic',
@@ -37,6 +44,8 @@ export const FEATS: Feat[] = [
       { id: 'athletic_climb', source: 'Feat: Atlético', type: 'untyped', target: 'skill:climb', value: 2, rankCondition: { skillId: 'climb', minRanks: 10, bonusValue: 4 } },
       { id: 'athletic_swim', source: 'Feat: Atlético', type: 'untyped', target: 'skill:swim', value: 2, rankCondition: { skillId: 'swim', minRanks: 10, bonusValue: 4 } },
     ],
+    uses: ['Escalar superficies verticales', 'Nadar contra corriente', 'Reducir daño de caída'],
+    notes: ['Bonus aumenta a +4 con 10+ rangos', 'Esencial para exploradores y druidas'],
   },
   {
     id: 'blind_fight',
@@ -44,6 +53,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     benefit: 'En combate cuerpo a cuerpo, cada vez que fallas por ocultamiento, puedes relanzar tu tirada de porcentaje de fallo una vez para ver si en realidad impactas. Un atacante invisible no obtiene ventajas relacionadas con impactarte en combate cuerpo a cuerpo: no pierdes tu bonificador de Destreza a la CA y el atacante no obtiene el habitual +2 por ser invisible. No necesitas realizar pruebas de Acrobacias para moverte a velocidad total mientras estás cegado.',
     normal: 'Los modificadores normales de tirada de ataque para atacantes invisibles que intentan impactarte se aplican y pierdes tu bonificador de Destreza a la CA.',
+    uses: ['Combate contra enemigos invisibles', 'Combate en oscuridad', 'Moverse sin penalización cuando cegado'],
+    notes: ['Esencial para PvP contra wizards', 'No ayuda contra adversarios看不到但感觉得到'],
   },
   {
     id: 'combat_expertise',
@@ -51,6 +62,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Inteligencia 13',
     benefit: 'Puedes elegir sufrir una penalización de −1 a las tiradas de ataque cuerpo a cuerpo y a las pruebas de maniobra para ganar un bonificador de esquiva de +1 a tu CA. Cuando tu bonificador de Ataque Base alcanza +4 y cada +4 a partir de ahí, la penalización aumenta en −1 y el bonificador de esquiva aumenta en +1. Solo puedes usar esta dote cuando declaras que estás realizando un ataque o un ataque completo con un arma de combate cuerpo a cuerpo. Los efectos duran hasta tu siguiente turno.',
+    uses: ['Defensa en combate', 'Mejorar pruebas de maniobra', 'Tanking'],
+    notes: ['Prerrequisito para muchas dotes de combate', 'Escala con tu BAB', 'Máximo -5 ataque / +5 CA'],
   },
   {
     id: 'craft_magic_arms_armor',
@@ -58,6 +71,35 @@ export const FEATS: Feat[] = [
     type: 'item_creation',
     prerequisite: 'Nivel de lanzador 5',
     benefit: 'Puedes crear armas, armaduras y escudos mágicos. Mejorar un arma, una armadura o un escudo lleva 1 día por cada 1.000 po en el precio de sus características mágicas. Para mejorar un arma, armadura o escudo, debes gastar materias primas que cuesten la mitad del precio total. El objeto debe ser un objeto maestro que tú proporciones.',
+    uses: ['Crear armas mágicas', 'Crear armaduras mágicas', 'Crear escudos mágicos'],
+    notes: ['Cuesta 1/3 del precio total en materials', 'Objeto maestro requerido', 'PNs pueden ayudarte'],
+  },
+  {
+    id: 'craft_rod',
+    name: 'Elaborar Bastón',
+    type: 'item_creation',
+    prerequisite: 'Nivel de lanzador 9',
+    benefit: 'Puedes crear bastones mágicos. Elaborar un bastón lleva 1 día por cada 1.000 po en su precio base. Para elaborar un bastón, debes gastar materias primas que cuesten la mitad de su precio base.',
+    uses: ['Crear bastones mágicos'],
+    notes: ['Cuesta 1/2 del precio base', 'Requiere conocer los hechizos del bastón'],
+  },
+  {
+    id: 'craft_staff',
+    name: 'Crear Bastones',
+    type: 'item_creation',
+    prerequisite: 'Nivel de lanzador 11',
+    benefit: 'Puedes crear cualquier bastón cuyos prerrequisitos cumplas. Elaborar un bastón lleva 1 día por cada 1.000 po en su precio base. Para elaborar un bastón, debes gastar materias primas que cuesten la mitad de su precio base. Un bastón recién creado tiene 10 cargas.',
+    uses: ['Crear bastones con múltiples hechizos'],
+    notes: ['Más flexible que Elaborar Bastón', 'Cuesta 1/2 del precio base'],
+  },
+  {
+    id: 'craft_wondrous',
+    name: 'Crear Objetos Maravillosos',
+    type: 'item_creation',
+    prerequisite: 'Nivel de lanzador 3',
+    benefit: 'Puedes crear una amplia variedad de objetos maravillosos. Elaborar un objeto maravilloso lleva 1 día por cada 1.000 po de su precio. Para crear un objeto maravilloso, debes gastar materias primas que cuesten la mitad de su precio base.',
+    uses: ['Crear objetos maravillasos', 'Crear Items mundanos mejorados'],
+    notes: ['La dote de creación más versátil', 'Cuesta 1/2 del precio base'],
   },
   {
     id: 'craft_rod',
@@ -89,6 +131,8 @@ export const FEATS: Feat[] = [
       { id: 'deceitful_bluff', source: 'Feat: Engañoso', type: 'untyped', target: 'skill:bluff', value: 2, rankCondition: { skillId: 'bluff', minRanks: 10, bonusValue: 4 } },
       { id: 'deceitful_disguise', source: 'Feat: Engañoso', type: 'untyped', target: 'skill:disguise', value: 2, rankCondition: { skillId: 'disguise', minRanks: 10, bonusValue: 4 } },
     ],
+    uses: ['Mentir convincentemente', 'Crear disfraces efectivos', 'Infiltración'],
+    notes: ['Bonus aumenta a +4 con 10+ rangos', 'Esencial para rogues y bards'],
   },
   {
     id: 'deflect_arrows',
@@ -96,14 +140,18 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Destreza 13, Golpe sin Arma Mejorado',
     benefit: 'Debes tener al menos una mano libre (sin sostener nada) para usar esta dote. Una vez por turno, cuando normalmente serías impactado por un ataque de un arma a distancia, puedes desviarlo para no recibir daño. Debes ser consciente del ataque y no estar desprevenido. Intentar desviar un ataque a distancia no cuenta como acción.',
+    uses: ['Desviar ataques a distancia', 'Reducir daño de proyectiles'],
+    notes: ['Una vez por turno', 'Requiere mano libre', 'Monjes pueden mejorar con Desviar Mejorado'],
   },
   {
     id: 'diehard',
     name: 'Resistente',
     type: 'general',
     prerequisite: 'Resistencia',
-    benefit: 'Cuando tu total de puntos de golpe está por debajo de 0 pero no estás muerto, te estabilizas automáticamente. No necesitas hacer una prueba de Constitución cada turno para evitar perder puntos de golpe adicionales. Puedes elegir actuar como si estuvieras discapacitado en lugar de moribundo. Cuando usas esta dote, estás tambaleante. Puedes realizar una acción de movimiento sin herirte más, pero si realizas cualquier acción estándar, sufres 1 punto de daño al completarla.',
+    benefit: 'Cuando tu total de puntos de golpe está por debajo de 0 pero no estás muerto, te estabilizas automáticamente. No necesitas hacer una prueba de Constitución cada turno para evitar perder puntos de golpe adicionales. Puedes elegir actuar como si estuvieras incapacitado en lugar de moribundo. Cuando usas esta dote, estás tambaleante. Puedes realizar una acción de movimiento sin herirte más, pero si realizas cualquier acción estándar, sufres 1 punto de daño al completarla.',
     normal: 'Un personaje sin esta dote que es reducido a puntos de golpe negativos está inconsciente y moribundo.',
+    uses: ['Seguir luchando bajo 0 PG', 'Actuar cuando moribundo', 'Estabilización automática'],
+    notes: ['Prerrequisito: Resistencia', 'Tambaleante al actuar bajo 0', 'Esencial para tanques'],
   },
   {
     id: 'dodge',
@@ -114,25 +162,33 @@ export const FEATS: Feat[] = [
     effects: [
       { id: 'dodge_ac', source: 'Feat: Esquivar', type: 'dodge', target: 'ac_dodge', value: 1 },
     ],
+    uses: ['Bonificador a CA', 'Defensa pasiva'],
+    notes: ['Bonificador de esquiva (acumula)', 'Se pierde si pierdes bonificador DES', 'Prerrequisito para Movilidad'],
   },
   {
     id: 'empower_spell',
     name: 'Potenciar Hechizo',
     type: 'metamagic',
     benefit: 'Todos los efectos variables y numéricos de un hechizo potenciado aumentan en un 50%, incluyendo los bonificadores a esos dados. Las tiradas de salvación y las tiradas enfrentadas no se ven afectadas, ni tampoco los hechizos sin variables aleatorias. Un hechizo potenciado ocupa una ranura de hechizo dos niveles más alta que el nivel real del hechizo.',
+    uses: ['Aumentar daño variable', 'Potenciar hechizos de área', 'Mayor efectividad en hechizos de daño'],
+    notes: ['+2 niveles de ranura', 'No afecta tiradas de salvación', 'Mejor con hechizos de daño'],
   },
   {
     id: 'endurance',
     name: 'Resistencia',
     type: 'general',
-    benefit: 'Obtienes un bonificador de +4 a las siguientes pruebas y salvaciones: pruebas de Nadar para resistir el daño no letal por agotamiento; pruebas de Constitución para seguir corriendo; pruebas de Constitución para evitar el daño no letal de una marcha forzada; pruebas de Constitución para aguantar la respiración; pruebas de Constitución para evitar el daño no letal por hambre o sed; tiradas de Fortaleza para evitar el daño no letal por entornos muy calientes o fríos; y tiradas de Fortaleza para resistir el daño por sofocación. Puedes dormir con armadura ligera o media sin quedar fatigado.',
+    benefit: 'Obtienes un bonificador de +4 a las siguientes pruebas y salvaciones: pruebas de Nadar para resistir el daño no letal por agotamiento; pruebas de Constitución para seguir corriendo; pruebas de Constitución para evitar el daño no letal de una marcha forzada; pruebas de Constitución para aguantar la respiración; pruebas de Constitución para evitar el daño no lethal por hambre o sed; tiradas de Fortaleza para evitar el daño no lethal por entornos muy calientes o fríos; y tiradas de Fortaleza para resistir el daño por sofocación. Puedes dormir con armadura ligera o media sin quedar fatigado.',
     normal: 'Un personaje sin esta dote que duerme con armadura media o más pesada queda fatigado al día siguiente.',
+    uses: ['Dormir con armadura', 'Marcha forzada', 'Entornos extremos', 'Aguantar respiración'],
+    notes: ['+4 a múltiples pruebas de CON', 'Prerrequisito para Resistente', 'Esencial para exploradores'],
   },
   {
     id: 'enlarge_spell',
     name: 'Agrandar Hechizo',
     type: 'metamagic',
     benefit: 'Puedes alterar un hechizo con un alcance de corto, medio o largo para aumentar su alcance en un 100%. Un hechizo agrandado ocupa una ranura de hechizo un nivel más alta que el nivel real del hechizo.',
+    uses: ['Aumentar alcance de hechizos', 'Hit-and-run con hechizos', 'Mantener distancia'],
+    notes: ['+1 nivel de ranura', 'Solo afecta alcances corto/medio/largo', 'No afecta hechizos de toque'],
   },
   {
     id: 'esf_aim',
@@ -145,7 +201,9 @@ export const FEATS: Feat[] = [
     id: 'extend_spell',
     name: 'Extender Hechizo',
     type: 'metamagic',
-    benefit: 'Un hechizo extendido dura el doble de lo normal. Un hechizo con duración de concentración, instantáneo o permanente no se ve afectado por esta dote. Un hechizo extendido ocupa una ranura de hechizo un nivel más alta que el nivel real del hechizo.',
+    benefit: 'Un hechizo extendido dura el doble de lo normal. Un hechizo con duración de concentración, instantáneo o permanente no se ve afectado. Un hechizo extendido ocupa una ranura de hechizo un nivel más alta que el nivel real del hechizo.',
+    uses: ['Extender duración de hechizos', 'Buffs más largos', 'Hechizos de exploración'],
+    notes: ['+1 nivel de ranura', 'No afecta duración de concentración', 'Ideal para buffos'],
   },
   {
     id: 'extra_channel',
@@ -178,6 +236,8 @@ export const FEATS: Feat[] = [
     effects: [
       { id: 'great_fortitude_fort', source: 'Feat: Gran Fortaleza', type: 'untyped', target: 'save_fort', value: 2 },
     ],
+    uses: ['TS de Fortaleza +2', 'Resistencia a venenos', 'Supervivencia'],
+    notes: ['+2 a TS de Fortaleza', 'Combina con Resistencia', 'Esencial para guerreros'],
   },
   {
     id: 'greater_disarm',
@@ -201,6 +261,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Enfoque de Hechizo',
     benefit: 'Añade +1 a la Clase de Dificultad de todas las tiradas de salvación contra hechizos de la escuela de magia que selecciones. Este bonificador se acumula con el de Enfoque de Hechizo.',
+    uses: ['CD de hechizos +2 total', 'Especialización maxima', 'Hechizos muy difíciles'],
+    notes: ['+2 a CD total (1+1)', 'Requiere Enfoque de Hechizo', 'Acumula con Enfoque de Hechizo'],
   },
   {
     id: 'greater_spell_penetration',
@@ -208,6 +270,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Penetración de Hechizo',
     benefit: 'Obtienes un bonificador de +2 a las pruebas de nivel de lanzador para superar la resistencia a la magia de una criatura. Este bonificador se acumula con el de Penetración de Hechizo.',
+    uses: ['Superar RM +4 total', 'Vs. bosses mágicos', 'Penetración maxima'],
+    notes: ['+4 a pruebas total (2+2)', 'Requiere Penetración de Hechizo', 'Contra dragones y违天龙'],
   },
   {
     id: 'greater_two_weapon',
@@ -215,6 +279,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Destreza 19, Combate con Dos Armas Mejorado, Combates con Dos Armas, BAB +11',
     benefit: 'Obtienes un tercer ataque con tu arma secundaria, aunque con una penalización de −10.',
+    uses: ['Tercer ataque con mano secundaria', 'Cuatro ataques por turno', 'Máximo DPS dual'],
+    notes: ['-10 al tercer ataque secundario', 'Requiere DES 19', 'Total de 4 ataques'],
   },
   {
     id: 'greater_vital_strike',
@@ -222,18 +288,24 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Golpe Vital Mejorado, Golpe Vital, BAB +16',
     benefit: 'Cuando usas la acción de ataque, puedes realizar un ataque con tu bonificador de ataque base más alto que causa daño adicional. Lanza los dados de daño del arma cuatro veces y suma los resultados antes de añadir bonificadores de Fuerza, habilidades del arma, daño de precisión y otros bonificadores de daño. Estos dados de daño adicionales no se multiplican en un golpe crítico, pero se suman al total.',
+    uses: ['Máximo daño concentrado', 'One-shot a enemigos', 'Daño masivo'],
+    notes: ['Lanza dados de daño 4x', 'Requiere Vital Strike Mejorado', 'Daño devastador'],
   },
   {
     id: 'heighten_spell',
     name: 'Elevar Hechizo',
     type: 'metamagic',
     benefit: 'Un hechizo elevado tiene un nivel de hechizo más alto de lo normal (hasta un máximo de nivel 9). A diferencia de otras dotes de metamagia, Elevar Hechizo aumenta realmente el nivel efectivo del hechizo que modifica. Todos los efectos dependientes del nivel del hechizo se calculan según el nivel elevado.',
+    uses: ['Subir nivel de hechizo', 'Efectos más fuertes', 'CD más alto'],
+    notes: ['Aumenta nivel efectivo', 'Muy caro', 'Usado para superar CDs'],
   },
   {
     id: 'improved_arcana',
     name: 'Arcana Mejorada',
     type: 'general',
     benefit: 'Obtienes un bonificador de +2 a las pruebas de Conocimiento Arcano.',
+    uses: ['Identificar hechizos', 'Conocimiento arcanico', 'Identificar criaturas mágicas'],
+    notes: ['+2 a Conocimiento Arcano', 'Útil para wizards', 'Información sobre magia'],
   },
   {
     id: 'improved_bull_rush',
@@ -242,6 +314,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'Fuerza 13, Ataque Poderoso, BAB +1',
     benefit: 'No provocas un ataque de oportunidad cuando realizas una maniobra de embestida. Además, recibes un bonificador de +2 a las pruebas para empujar a un enemigo. También recibes un bonificador de +2 a tu Defensa de Maniobra en Combate cuando un oponente intenta empujarte.',
     normal: 'Provocas un ataque de oportunidad cuando realizas una maniobra de embestida.',
+    uses: ['Embestir sin AO', 'Empujar enemigos', 'Control de posición'],
+    notes: ['+2 a pruebas de embestida', 'No provocas AO', 'Combina con Embestida Superior'],
   },
   {
     id: 'improved_combat_style',
@@ -257,6 +331,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'INT 13, Pericia en Combate',
     benefit: 'No provocas un ataque de oportunidad cuando realizas una maniobra de desarme. Además, recibes un bonificador de +2 a las pruebas para desarmar a un enemigo. También recibes un bonificador de +2 a tu Defensa de Maniobra en Combate cuando un oponente intenta desarmarte.',
     normal: 'Provocas un ataque de oportunidad cuando realizas una maniobra de desarme.',
+    uses: ['Desarmar sin AO', 'Quitar armas', 'Combate pacifista'],
+    notes: ['+2 a pruebas de desarme', 'No provocas AO', 'Combina con Desarme Superior'],
   },
   {
     id: 'improved_feint',
@@ -273,6 +349,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'Destreza 13, Golpe sin Arma Mejorado',
     benefit: 'No provocas un ataque de oportunidad cuando realizas una maniobra de agarre. Además, recibes un bonificador de +2 a las pruebas para agarrar a un enemigo. También recibes un bonificador de +2 a tu Defensa de Maniobra en Combate cuando un oponente intenta agarrarte.',
     normal: 'Provocas un ataque de oportunidad cuando realizas una maniobra de agarre.',
+    uses: ['Agarre sin AO', 'Sujetar enemigos', 'Controlling opponents'],
+    notes: ['+2 a pruebas de agarre', 'No provocas AO', 'Esencial para monjes'],
   },
   {
     id: 'improved_initiative',
@@ -282,6 +360,8 @@ export const FEATS: Feat[] = [
     effects: [
       { id: 'improved_initiative_init', source: 'Feat: Iniciativa Mejorada', type: 'untyped', target: 'initiative', value: 4 },
     ],
+    uses: ['Iniciativa +4', 'Actuar primero', 'Control del combate'],
+    notes: ['+4 a Iniciativa', 'Esencial para todos', 'Primera acción puede ser decisiva'],
   },
   {
     id: 'improved_iron_lung',
@@ -304,6 +384,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'INT 13, Pericia en Combate',
     benefit: 'No provocas un ataque de oportunidad cuando realizas una maniobra de derribo. Además, recibes un bonificador de +2 a las pruebas para derribar a un enemigo. También recibes un bonificador de +2 a tu Defensa de Maniobra en Combate cuando un oponente intenta derribarte.',
     normal: 'Provocas un ataque de oportunidad cuando realizas una maniobra de derribo.',
+    uses: ['Derribar sin AO', 'Tumbar enemigos', 'Control de movilidad'],
+    notes: ['+2 a pruebas de derribo', 'No provocas AO', 'Combina con Derribo Superior'],
   },
   {
     id: 'improved_two_weapon',
@@ -312,13 +394,17 @@ export const FEATS: Feat[] = [
     prerequisite: 'Destreza 17, Combates con Dos Armas, BAB +6',
     benefit: 'Además del único ataque adicional estándar que obtienes con tu arma secundaria, obtienes un segundo ataque con ella, aunque con una penalización de −5.',
     normal: 'Sin esta dote, solo puedes obtener un único ataque adicional con tu arma secundaria.',
+    uses: ['Segundo ataque con mano secundaria', 'Tres ataques por turno', 'DPS dua'],
+    notes: ['-5 al segundo ataque secundario', 'Requiere DES 17', 'Tercer ataque total'],
   },
   {
     id: 'improved_unarmed_strike',
     name: 'Golpe sin Arma Mejorado',
     type: 'combat',
-    benefit: 'Se te considera armado incluso cuando atacas desarmado: no provocas ataques de oportunidad cuando atacas a enemigos desarmado. Tus ataques sin arma pueden causar daño letal o no letal, a tu elección.',
-    normal: 'Sin esta dote, se te considera desarmado cuando atacas con un golpe sin arma y solo puedes causar daño no letal.',
+    benefit: 'Se te considera armado incluso cuando atacas desarmado: no provocas ataques de oportunidad cuando atacas a enemigos desarmado. Tus ataques sin arma pueden causar daño letal o no lethal, a tu elección.',
+    normal: 'Sin esta dote, se te considera desarmado cuando atacas con un golpe sin arma y solo puedes causar daño no lethal.',
+    uses: ['Ataques desarmados letales', 'No provocar AO', 'Prerrequisito para monje'],
+    notes: ['Considerado armado', 'Daño lethal o no lethal', 'Prerrequisito para muchas dotes'],
   },
   {
     id: 'intimidating_prowess',
@@ -338,6 +424,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Nivel de personaje 7',
     benefit: 'Esta dote te permite atraer un compañero leal y un número de subordinados devotos que te ayudan. Un compañero es generalmente un PNJ con niveles de clase, mientras que los seguidores son típicamente PNJ de nivel más bajo.',
+    uses: ['Reclutar compañero', 'Seguidores', 'Facción propia'],
+    notes: ['Requiere nivel 7', 'PNJ leal con niveles', 'Mejora con carisma'],
   },
   {
     id: 'light_ armor_proficiency',
@@ -351,6 +439,8 @@ export const FEATS: Feat[] = [
     name: 'Maximizar Hechizo',
     type: 'metamagic',
     benefit: 'Todos los efectos variables y numéricos de un hechizo modificado por esta dote se maximizan. Las tiradas de salvación y las tiradas enfrentadas no se ven afectadas, ni tampoco los hechizos sin variables aleatorias. Un hechizo maximizado ocupa una ranura de hechizo tres niveles más alta que el nivel real del hechizo.',
+    uses: ['Daño máximo garantizado', 'Maximizar hechizos de daño', 'Efectos predecibles'],
+    notes: ['+3 niveles de ranura', 'Daño máximo pero sin variabilidad', 'Combina con Potenciar'],
   },
   {
     id: 'medium_armor_proficiency',
@@ -366,6 +456,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Destreza 13, Esquivar',
     benefit: 'Obtienes un bonificador de esquiva de +4 a la CA contra ataques de oportunidad causados al moverte desde o dentro de un área amenazada.',
+    uses: ['Movimiento seguro', 'Evitar AO', 'Hit-and-run'],
+    notes: ['+4 a CA contra AO por movimiento', 'Prerrequisito para Ataque de Primavera', 'Esencial para arqueros y magos'],
   },
   {
     id: 'mounted_archery',
@@ -411,6 +503,8 @@ export const FEATS: Feat[] = [
       { id: 'persuasive_diplomacy', source: 'Feat: Persuasivo', type: 'untyped', target: 'skill:diplomacy', value: 2, rankCondition: { skillId: 'diplomacy', minRanks: 10, bonusValue: 4 } },
       { id: 'persuasive_intimidate', source: 'Feat: Persuasivo', type: 'untyped', target: 'skill:intimidate', value: 2, rankCondition: { skillId: 'intimidate', minRanks: 10, bonusValue: 4 } },
     ],
+    uses: ['Diplomacia', 'Intimidar', 'Interacción social'],
+    notes: ['+2 a Diplomacia e Intimidar', 'Aumenta a +4 con 10+ rangos', 'Esencial para bardos y PJ sociales'],
   },
   {
     id: 'point_blank_master',
@@ -424,6 +518,8 @@ export const FEATS: Feat[] = [
     name: 'Punto en Blanco',
     type: 'combat',
     benefit: 'Obtienes un bonificador de +1 a las tiradas de ataque y daño con armas a distancia a alcances de hasta 30 pies.',
+    uses: ['Bonificador a ataque y daño cercano', 'Arqueros', 'Thrown weapons'],
+    notes: ['+1 ataque y daño hasta 30 pies', 'Prerrequisito para muchas dotes de arco', 'Esencial para arqueros'],
   },
   {
     id: 'precise_shot',
@@ -431,6 +527,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Punto en Blanco',
     benefit: 'Puedes disparar o lanzar armas a distancia a un oponente implicado en combate cuerpo a cuerpo sin sufrir la penalización estándar de −4 en tu tirada de ataque.',
+    uses: ['Disparar en combate melee', 'Arqueros en refriega', 'Evitar penalización'],
+    notes: ['Elimina -4 por disparar en melee', 'Prerrequisito para Disparo Preciso Mejorado', 'Esencial para arqueros'],
   },
   {
     id: 'quick_draw',
@@ -445,6 +543,8 @@ export const FEATS: Feat[] = [
     name: 'Hechizo Rápido',
     type: 'metamagic',
     benefit: 'Lanzar un hechizo rápido es una acción rápida. Puedes realizar otra acción, incluso lanzar otro hechizo, en el mismo turno en que lanzas un hechizo rápido. Un hechizo rápido ocupa una ranura de hechizo cuatro niveles más alta que el nivel real del hechizo.',
+    uses: ['Lanzar hechizo como acción rápida', 'Combinar hechizos', 'Hechizo extra por turno'],
+    notes: ['+4 niveles de ranura', 'Muy costoso', 'Solo un hechizo rápido por turno'],
   },
   {
     id: 'rapid_reload',
@@ -459,6 +559,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Destreza 13, Punto en Blanco',
     benefit: 'Cuando realizas un ataque completo con un arma a distancia, puedes disparar una vez adicional este turno con tu bonificador más alto. Todas tus tiradas de ataque sufren una penalización de −2 cuando usas Disparo Rápido.',
+    uses: ['Disparo adicional', 'Más ataques por turno', 'DPS de arco'],
+    notes: ['-2 a todos los ataques', 'Un disparo extra por turno', 'Combina con Disparo Múltiple'],
   },
   {
     id: 'ride_by_attack',
@@ -497,6 +599,8 @@ export const FEATS: Feat[] = [
       { id: 'self_sufficient_heal', source: 'Feat: Autosuficiente', type: 'untyped', target: 'skill:heal', value: 2, rankCondition: { skillId: 'heal', minRanks: 10, bonusValue: 4 } },
       { id: 'self_sufficient_survival', source: 'Feat: Autosuficiente', type: 'untyped', target: 'skill:survival', value: 2, rankCondition: { skillId: 'survival', minRanks: 10, bonusValue: 4 } },
     ],
+    uses: ['Curar', 'Supervivencia', 'Exploración en solitario'],
+    notes: ['+2 a Curar y Supervivencia', 'Aumenta a +4 con 10+ rangos', 'Esencial para rangers'],
   },
   {
     id: 'shield_proficiency',
@@ -519,6 +623,8 @@ export const FEATS: Feat[] = [
     type: 'metamagic',
     benefit: 'Un hechizo silencioso puede lanzarse sin componentes verbales. Los hechizos sin componentes verbales no se ven afectados. Un hechizo silencioso ocupa una ranura de hechizo un nivel más alta que el nivel real del hechizo.',
     special: 'Los hechizos de bardo no pueden mejorarse con esta dote.',
+    uses: ['Lanzar sin hablar', 'Infiltración', 'Zonas de silencio'],
+    notes: ['+1 nivel de ranura', 'Bardos no pueden usarlo', 'Combina con Estático'],
   },
   {
     id: 'simple_melee_weapon_proficiency',
@@ -531,6 +637,8 @@ export const FEATS: Feat[] = [
     name: 'Enfoque de Habilidad',
     type: 'general',
     benefit: 'Obtienes un bonificador de +3 a todas las pruebas de la habilidad elegida. Si tienes 10 o más rangos en esa habilidad, este bonificador aumenta a +6.',
+    uses: ['+3 a habilidad específica', 'Especialización en habilidad', 'Expertos'],
+    notes: ['+3 a la habilidad elegida', 'Aumenta a +6 con 10+ rangos', 'Se puede tomar múltiples veces'],
   },
   {
     id: 'spell_mastery',
@@ -545,12 +653,16 @@ export const FEATS: Feat[] = [
     name: 'Enfoque de Hechizo',
     type: 'general',
     benefit: 'Añade +1 a la Clase de Dificultad de todas las tiradas de salvación contra hechizos de la escuela de magia que selecciones.',
+    uses: ['CD de hechizos +1', 'Especialización en escuela', 'Hechizos más difíciles de resistir'],
+    notes: ['+1 a CD de escuela elegida', 'Se acumula con Enfoque Superior', 'Elige una escuela'],
   },
   {
     id: 'spell_penetration',
     name: 'Penetración de Hechizo',
     type: 'general',
     benefit: 'Obtienes un bonificador de +2 a las pruebas de nivel de lanzador para superar la resistencia a la magia de una criatura.',
+    uses: ['Superar RM', 'Vs. criaturas mágicas', 'Efectividad de hechizos'],
+    notes: ['+2 a pruebas de nivel de lanzador', 'Combina con Penetración Superior', 'Esencial para magos'],
   },
   {
     id: 'spring_attack',
@@ -559,6 +671,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'Destreza 13, Esquivar, Movilidad, BAB +4',
     benefit: 'Como acción de turno completo, puedes moverte hasta tu velocidad y realizar un único ataque cuerpo a cuerpo sin provocar ataques de oportunidad del objetivo de tu ataque. Puedes moverte tanto antes como después del ataque, pero debes moverte al menos 10 pies antes del ataque.',
     normal: 'No puedes moverte antes y después de un ataque.',
+    uses: ['Movimiento y ataque sin AO', 'Ataques móviles', 'Flanquear y retirarse'],
+    notes: ['Un solo ataque por acción', 'Requiere 10 pies de movimiento', 'Prerrequisito para Torbellino'],
   },
   {
     id: 'stall_defense',
@@ -575,12 +689,16 @@ export const FEATS: Feat[] = [
       { id: 'stealthy_stealth', source: 'Feat: Sigiloso', type: 'untyped', target: 'skill:stealth', value: 2, rankCondition: { skillId: 'stealth', minRanks: 10, bonusValue: 4 } },
       { id: 'stealthy_escape_artist', source: 'Feat: Sigiloso', type: 'untyped', target: 'skill:escape_artist', value: 2, rankCondition: { skillId: 'escape_artist', minRanks: 10, bonusValue: 4 } },
     ],
+    uses: ['Sigilo', 'Escapismo', 'Infiltración'],
+    notes: ['+2 a Sigilo y Escapismo', 'Aumenta a +4 con 10+ rangos', 'Esencial para rogues'],
   },
   {
     id: 'still_spell',
     name: 'Hechizo Estático',
     type: 'metamagic',
     benefit: 'Un hechizo estático puede lanzarse sin componentes somáticos. Los hechizos sin componentes somáticos no se ven afectados. Un hechizo estático ocupa una ranura de hechizo un nivel más alta que el nivel real del hechizo.',
+    uses: ['Lanzar sin gesticular', 'Manos ocupadas', 'Encadenar hechizos'],
+    notes: ['+1 nivel de ranura', 'Útil para monjes', 'Combina con Silencioso'],
   },
   {
     id: 'strike_back',
@@ -612,6 +730,8 @@ export const FEATS: Feat[] = [
     effects: [
       { id: 'toughness_hp', source: 'Feat: Dureza', type: 'untyped', target: 'hp', value: 3 },
     ],
+    uses: ['PG adicionales', 'Supervivencia', 'Tanking'],
+    notes: ['+3 PG iniciales, +1 por DD más allá de 3', 'Esencial para todos los personajes', 'Acumula con otros bonificadores'],
   },
   {
     id: 'tower_shield_proficiency',
@@ -646,8 +766,10 @@ export const FEATS: Feat[] = [
     name: 'Combates con Dos Armas',
     type: 'combat',
     prerequisite: 'Destreza 15',
-    benefit: 'Las penalizaciones a las tiradas de ataque por luchar con dos armas se reducen. La penalización de tu mano principal se reduce en 2 y la de tu mano secundaria se reduce en 6.',
+    benefit: 'Las penalizaciones a las tiradas de ataque por luchar con dos armas se reducen. La penalización de tu mano principal se reduce en 2 y la mano secundaria se reduce en 6.',
     normal: 'Si empuñas una segunda arma en tu mano secundaria, puedes obtener un ataque adicional por turno con esa arma. Al luchar así, sufres una penalización de −6 con tu ataque principal y una de −10 con la mano secundaria. Si tu arma secundaria es ligera, las penalizaciones se reducen en 2 cada una.',
+    uses: ['Combate con dos armas', 'Más ataques por turno', 'Daño sostenido'],
+    notes: ['Reduce penalizaciones (-6/-10 a -4/-6)', 'Prerrequisito para dotes mejores', 'Requiere alta Destreza'],
   },
   {
     id: 'ultimate_disarm',
@@ -669,6 +791,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     benefit: 'Con un arma ligera, espada élfica curva, estoque, látigo o cadena con pinchos fabricada para una criatura de tu categoría de tamaño, puedes usar tu modificador de Destreza en lugar de tu modificador de Fuerza en las tiradas de ataque.',
     special: 'Las armas naturales se consideran armas ligeras.',
+    uses: ['Usar Destreza para ataques', 'Armas ligeras optimizadas', 'Rogues y monjes'],
+    notes: ['No afecta daño, solo ataque', 'Combina con Maniobras Ágiles', 'Ideal para rogues'],
   },
   {
     id: 'weapon_focus',
@@ -676,6 +800,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Competencia con el arma elegida, BAB +1',
     benefit: 'Obtienes un bonificador de +1 a todas las tiradas de ataque que realices con el arma elegida.',
+    uses: ['Bonificador de ataque con arma específica', 'Especialización progresiva'],
+    notes: ['+1 a ataques', 'Prerrequisito para Especialización', 'Se puede tomar múltiples veces'],
   },
   {
     id: 'weapon_specialization',
@@ -689,6 +815,8 @@ export const FEATS: Feat[] = [
     name: 'Expandir Hechizo',
     type: 'metamagic',
     benefit: 'Puedes alterar un hechizo con forma de explosión, emanación o expansión para aumentar su área. Todas las medidas numéricas del área del hechizo aumentan en un 100%. Un hechizo ampliado ocupa una ranura de hechizo tres niveles más alta que el nivel real del hechizo.',
+    uses: ['Aumentar área de efecto', 'AOE masivo', 'Cubrir más enemigos'],
+    notes: ['+3 niveles de ranura', 'Solo afecta áreas de explosión/emanación', 'Muy costoso pero efectivo'],
   },
   {
     id: 'windy_presence',
@@ -704,6 +832,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'FUE 13, BAB +1',
     benefit: 'Puedes elegir sufrir una penalización de −1 a todas las tiradas de ataque cuerpo a cuerpo y pruebas de maniobra para ganar un bonificador de +2 a todas las tiradas de daño cuerpo a cuerpo. Este bonificador de daño aumenta en un 50% si usas un arma a dos manos. Cuando tu BAB alcanza +4 y cada 4 puntos más, la penalización aumenta en −1 y el bonificador de daño aumenta en +2.',
+    uses: ['Daño adicional en melee', 'Combate con dos armas', 'Embestida mejorada'],
+    notes: ['+50% daño con dos manos', 'Escala con BAB', 'No funciona con armas a distancia'],
   },
   {
     id: 'cleave',
@@ -711,6 +841,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'FUE 13, Ataque Poderoso, BAB +1',
     benefit: 'Como acción estándar, puedes realizar un único ataque con tu bonificador de ataque base completo contra un enemigo dentro de tu alcance. Si impactas, causas daño normalmente y puedes realizar un ataque adicional contra un enemigo adyacente al primero y también dentro de tu alcance. Solo puedes realizar un ataque adicional por turno con esta dote. Cuando usas esta dote, sufres −2 a tu CA hasta tu siguiente turno.',
+    uses: ['Ataques adicionales contra múltiples enemigos', 'Limpiar mobs', 'Control de área'],
+    notes: ['-2 a CA hasta siguiente turno', 'Prerrequisito para Gran Cuchillada', 'Un ataque extra por turno'],
   },
   {
     id: 'furious_focus',
@@ -718,6 +850,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'FUE 13, Ataque Poderoso, BAB +1',
     benefit: 'Al usar Ataque Poderoso con un ataque completo, ignora la penalización al primer ataque del asalto.',
+    uses: ['Ignorar penalización de Ataque Poderoso', 'Primer ataque más preciso', 'Ataque completo optimizado'],
+    notes: ['Solo afecta el primer ataque', 'Combina bien con Vital Strike', 'Esencial para barbarians'],
   },
   {
     id: 'vital_strike',
@@ -725,6 +859,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'BAB +6',
     benefit: 'Cuando usas la acción de ataque, puedes realizar un ataque con tu bonificador de ataque base más alto que causa daño adicional. Lanza los dados de daño del arma dos veces y suma los resultados antes de añadir bonificadores.',
+    uses: ['Daño concentrado en un golpe', 'Combate móvil', 'Golpes poderosos'],
+    notes: ['Lanza dados de daño 2x', 'No se multiplica en crítico', 'Mejora con Vital Strike Mejorado y Superior'],
   },
   {
     id: 'improved_vital_strike',
@@ -732,6 +868,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Golpe Vital, BAB +11',
     benefit: 'Cuando usas la acción de ataque, puedes realizar un ataque con tu bonificador de ataque base más alto que causa daño adicional. Lanza los dados de daño del arma tres veces y suma los resultados antes de añadir bonificadores.',
+    uses: ['Mayor daño concentrado', 'Golpes devastadores', 'Combate contra bosses'],
+    notes: ['Lanza dados de daño 3x', 'Prerrequisito: Golpe Vital', 'No se multiplica en crítico'],
   },
   {
     id: 'lunge',
@@ -739,6 +877,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'BAB +6',
     benefit: 'Puedes aumentar el alcance de tus ataques cuerpo a cuerpo en 5 pies hasta el final de tu turno tomando una penalización de −2 a tu CA hasta tu siguiente turno. Debes decidir usar esta habilidad antes de que se realice cualquier ataque.',
+    uses: ['Alargar alcance', 'Atacar desde distancia', 'Mantener distancia'],
+    notes: ['+5 pies de alcance', '-2 a CA hasta siguiente turno', 'Mejor con armas de alcance'],
   },
   {
     id: 'step_up',
@@ -746,6 +886,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'BAB +1',
     benefit: 'Cuando un enemigo adyacente intenta dar un paso de 5 pies alejándose de ti, también puedes dar un paso de 5 pies como acción inmediata siempre que acabes adyacente al enemigo que provocó esta habilidad.',
+    uses: ['Mantener contacto con enemigos', 'Evitar que huyan', 'Combate cuerpo a cuerpo'],
+    notes: ['Acción inmediata, no provoke AO', 'Debes terminar adyacente', 'Combina bien con Ataque de Primavera'],
   },
   {
     id: 'whirlwind_attack',
@@ -753,6 +895,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'DES 13, INT 13, Pericia en Combate, Esquivar, Movilidad, Ataque de Primavera, BAB +4',
     benefit: 'Cuando usas la acción de ataque completo, puedes renunciar a tus ataques habituales y en su lugar realizar un ataque cuerpo a cuerpo con tu bonificador de ataque base más alto contra cada oponente dentro de tu alcance.',
+    uses: ['Ataque a múltiples enemigos', 'Limpiar mobs', 'Combate contra múltiples oponentes'],
+    notes: ['Requiere 5 prerrequisitos', 'Un solo ataque por enemigo', 'Esencial para monks y clerics guerreros'],
   },
   {
     id: 'improved_overrun',
@@ -761,6 +905,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'FUE 13, Ataque Poderoso, BAB +1',
     benefit: 'No provocas un ataque de oportunidad cuando realizas una maniobra de arrollar. Además, recibes un bonificador de +2 a las pruebas para arrollar a un enemigo. También recibes un bonificador de +2 a tu Defensa de Maniobra en Combate cuando un oponente intenta arrollarte. Los objetivos de tu intento de arrollar no pueden elegir evitarte.',
     normal: 'Provocas un ataque de oportunidad cuando realizas una maniobra de arrollar.',
+    uses: ['Empujar enemigos sin AO', 'Control de posición', 'Combate de carga'],
+    notes: ['No provoca AO', '+2 a pruebas de arrollar', '+2 a CMD vs arrollar', 'Prerrequisito: Embestida Superior'],
   },
   {
     id: 'shield_focus',
@@ -768,6 +914,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Competencia con Escudos, BAB +1',
     benefit: 'Aumenta el bonificador a la CA concedido por cualquier escudo que estés usando en 1.',
+    uses: ['Mayor CA con escudo', 'Defensa tank', 'Combate con escudo'],
+    notes: ['+1 adicional a CA de escudo', 'Prerrequisito para Golpe de Escudo', 'Se acumula con otros bonificadores'],
   },
   {
     id: 'shield_slam',
@@ -775,13 +923,17 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Golpe con Escudo Mejorado, Competencia con Escudos, Combates con Dos Armas, BAB +6',
     benefit: 'Cualquier oponente golpeado por tu ataque con escudo también recibe un intento de embestida gratuito, sustituyendo tu tirada de ataque por la prueba de maniobra. Esta embestida no provoca un ataque de oportunidad.',
+    uses: ['Embestida con escudo', 'Control de posición', 'Daño + maniobra'],
+    notes: ['Embestida gratuita al golpear', 'No provoca AO', 'Requiere Golpe con Escudo Mejorado'],
   },
   {
     id: 'manyshot',
     name: 'Disparo Múltiple',
     type: 'combat',
-    prerequisite: 'DES 17, Punto en Blanco, Disparo Rápido, BAB +6',
+    prerequisite: 'Destreza 17, Punto en Blanco, Disparo Rápido, BAB +6',
     benefit: 'Cuando realizas un ataque completo con un arco, tu primer ataque dispara dos flechas. Si el ataque impacta, ambas flechas impactan. Aplica el daño de precisión y el daño de golpe crítico solo una vez para este ataque.',
+    uses: ['Dos flechas en un ataque', 'Daño masivo', 'Combate de arco'],
+    notes: ['Ambas flechan deben impactar', 'Daño de precisión solo una vez', 'Requiere Disparo Rápido'],
   },
   {
     id: 'greater_weapon_focus',
@@ -789,6 +941,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Competencia con el arma elegida, Enfoque con Armas, guerrero nivel 8',
     benefit: 'Obtienes un bonificador de +1 adicional a las tiradas de ataque con el arma elegida. Este bonificador se acumula con otros bonificadores, incluido el de Enfoque con Armas.',
+    uses: ['Mayor precisión con arma', 'Especialización progresiva', 'Combate con arma específica'],
+    notes: ['+1 adicional a ataque', 'Requiere guerrero nivel 8', 'Se acumula con Enfoque con Armas'],
   },
   {
     id: 'greater_weapon_spec',
@@ -796,6 +950,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Competencia con el arma elegida, Enfoque con Armas Superior, Enfoque con Armas, Especialización con Armas, guerrero nivel 12',
     benefit: 'Obtienes un bonificador de +2 adicional al daño con el arma elegida. Este bonificador se acumula con otros bonificadores, incluido el de Especialización con Armas.',
+    uses: ['Mayor daño con arma', 'Especialización máxima', 'Combate cuerpo a cuerpo'],
+    notes: ['+2 adicional a daño', 'Requiere guerrero nivel 12', 'Se acumula con Especialización con Armas'],
   },
   {
     id: 'combat_reflexes',
@@ -803,6 +959,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     benefit: 'Puedes realizar un número de ataques de oportunidad adicionales por turno igual a tu bonificador de Destreza. Con esta dote, también puedes realizar ataques de oportunidad mientras estás desprevenido.',
     normal: 'Un personaje sin esta dote solo puede realizar un ataque de oportunidad por turno y no puede realizarlos mientras está desprevenido.',
+    uses: ['Múltiples AO por turno', 'AO mientras desprevenido', 'Defensa reactiva'],
+    notes: ['+1 AO por cada punto de DES', 'AO mientras desprevenido', 'Prerrequisito común'],
   },
   {
     id: 'stand_still',
@@ -810,6 +968,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Reflejos de Combate',
     benefit: 'Cuando un enemigo provoca un ataque de oportunidad al moverse a través de tus casillas adyacentes, puedes realizar una prueba de maniobra como tu ataque de oportunidad. Si tienes éxito, el enemigo no puede moverse el resto de su turno.',
+    uses: ['Detener enemigos que huyen', 'Control de movimiento', 'Control de posición'],
+    notes: ['Parar movimiento con AO', 'Prueba de maniobra vs CMD', 'Requiere Reflejos de Combate'],
   },
   {
     id: 'greater_bull_rush',
@@ -817,7 +977,9 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Embestida Mejorada, Ataque Poderoso, FUE 13, BAB +6',
     benefit: 'Recibes un bonificador de +2 adicional a las pruebas para empujar a un enemigo. Este bonificador se acumula con el de Embestida Mejorada. Cuando empujas a un oponente, su movimiento provoca ataques de oportunidad de todos tus aliados (pero no de ti).',
-    normal: 'Las criaturas movidas por embestida no provocan ataques de oportunidad.',
+    normal: 'Las criaturas movidas por embestida no provoca ataques de oportunidad.',
+    uses: ['Embestida poderosa', 'Provocar AO aliados', 'Control de posición avanzado'],
+    notes: ['+2 adicional a embestir', 'Provoca AO de aliados', 'Prerreq: Embestida Mejorada + BAB +6'],
   },
   {
     id: 'greater_trip',
@@ -825,7 +987,9 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Derribo Mejorado, Pericia en Combate, INT 13, BAB +6',
     benefit: 'Recibes un bonificador de +2 adicional a las pruebas para derribar a un enemigo. Este bonificador se acumula con el de Derribo Mejorado. Cuando derribas con éxito a un oponente, ese oponente provoca ataques de oportunidad.',
-    normal: 'Las criaturas no provocan ataques de oportunidad al ser derribadas.',
+    normal: 'Las criaturas no provocar ataques de oportunidad al ser derribadas.',
+    uses: ['Derribo con AO', 'Control de movimiento', 'Combate con armas de alcance'],
+    notes: ['+2 adicional a derribar', 'Derribado provoca AO', 'Prerreq: Derribo Mejorado + BAB +6'],
   },
 
   // ── Teamwork feats ──
@@ -835,6 +999,58 @@ export const FEATS: Feat[] = [
     type: 'teamwork',
     prerequisite: 'BAB +4',
     benefit: 'Cuando flanqueas con un aliado que tiene esta dote, el bonus de flanqueo aumenta a +4.',
+    uses: ['Flanqueo más efectivo', 'Mayor amenaza', 'Daño garantizado'],
+    notes: ['+4 bonus de flanqueo', 'Requiere aliado con la dote', 'BAB +4 prerrequisito'],
+  },
+  {
+    id: 'precise_strike',
+    name: 'Golpe Preciso',
+    type: 'teamwork',
+    prerequisite: 'DES 13, BAB +1',
+    benefit: 'Cuando flanqueas con un aliado que tiene esta dote, inflict 1d6 de daño de precisión adicional.',
+    uses: ['Daño de precisión extra', 'Combate con flanqueo', 'Rogues'],
+    notes: ['+1d6 daño de precisión', 'Requiere aliado con la dote', 'No se multiplica en crítico'],
+  },
+  {
+    id: 'coordinated_defense',
+    name: 'Defensa Coordinada',
+    type: 'teamwork',
+    benefit: 'Cuando estás adyacente a un aliado con esta dote, +2 a CMD.',
+    uses: ['Mayor CMD', 'Defensa en pareja', 'Tanking'],
+    notes: ['+2 a CMD adyacente', 'Sin prerrequisitos', 'Combina con otros feats de equipo'],
+  },
+  {
+    id: 'shake_it_off',
+    name: 'Sacudirse',
+    type: 'teamwork',
+    benefit: 'Cuando estás adyacente a un aliado con esta dote, +1 a TS contra condiciones de estado.',
+    uses: ['Resistencia a estados', 'Supervivencia en grupo', 'Soportar efectos'],
+    notes: ['+1 a TS contra condiciones', 'Adyacente a aliado', 'Sin prerrequisitos'],
+  },
+  {
+    id: 'duck_and_cover',
+    name: 'Cubierta',
+    type: 'teamwork',
+    benefit: 'Si estás adyacente a un aliado con esta dote, puedes usar su bonificador a CA como cobertura.',
+    uses: ['Cubierta de aliado', 'Mayor CA', 'Reducir daño a distancia'],
+    notes: ['Usa bonificador CA de aliado', 'Cubre penalización', 'Sin prerrequisitos'],
+  },
+  {
+    id: 'escape_route',
+    name: 'Vía de Escape',
+    type: 'teamwork',
+    benefit: 'No provocas AO al moverse a través de espacios ocupados por aliados con esta dote.',
+    uses: ['Movimiento sin AO', 'Moverse entre aliados', 'Evasión'],
+    notes: ['No provoca AO con aliados', 'Facilita posicionamiento', 'Sin prerrequisitos'],
+  },
+  {
+    id: 'pack_attack',
+    name: 'Ataque en Manada',
+    type: 'teamwork',
+    prerequisite: 'BAB +1',
+    benefit: 'Cuando tú y un aliado con esta dote atacáis al mismo objetivo, ignoráis la CA de escudo.',
+    uses: ['Ignorar CA de escudo', 'Daño más consistente', 'Contra tankes'],
+    notes: ['Ignora CA de escudo', 'Requiere aliado con la dote', 'BAB +1 prerrequisito'],
   },
   {
     id: 'precise_strike',
@@ -882,6 +1098,8 @@ export const FEATS: Feat[] = [
     type: 'critical',
     prerequisite: 'Enfoque en Críticos, BAB +11',
     benefit: 'Cuando consigues un golpe crítico con un arma cortante o perforante, tu oponente sufre 2d6 puntos de daño de sangrado cada turno en su turno. El daño de sangrado puede detenerse con una prueba de CD 15 de Curar o mediante curación mágica.',
+    uses: ['Daño continuo', 'Daño residual', 'Combate con armas cortantes/perforantes'],
+    notes: ['2d6 daño de sangrado', 'Requiere Crítico Mejorado', 'BAB +11 prerrequisito'],
   },
   {
     id: 'blinding_critical',
@@ -889,6 +1107,8 @@ export const FEATS: Feat[] = [
     type: 'critical',
     prerequisite: 'Enfoque en Críticos, BAB +15',
     benefit: 'Cuando consigues un golpe crítico, tu oponente queda cegado permanentemente. Una tirada de Fortaleza exitosa reduce esto a deslumbrado durante 1d4 turno. La CD de esta tirada de Fortaleza es igual a 10 + tu BAB.',
+    uses: ['Cegar enemigos', 'Desventaja masiva', 'Combate definitivo'],
+    notes: ['Ceguera permanente', 'Fortaleza reduce a deslumbrado', 'BAB +15 prerrequisito - alto'],
   },
   {
     id: 'sickening_critical',
@@ -896,6 +1116,8 @@ export const FEATS: Feat[] = [
     type: 'critical',
     prerequisite: 'Enfoque en Críticos, BAB +11',
     benefit: 'Cuando consigues un golpe crítico, tu oponente queda indispuesto durante 1 minuto. Los efectos de esta dote no se acumulan. Los impactos adicionales en su lugar añaden a la duración del efecto.',
+    uses: ['Estado nauseabundo', 'Reducir efectividad', 'Combate de agotamiento'],
+    notes: ['Indispuesto 1 minuto', 'No se acumula', 'BAB +11 prerrequisito'],
   },
   {
     id: 'staggering_critical',
@@ -903,6 +1125,8 @@ export const FEATS: Feat[] = [
     type: 'critical',
     prerequisite: 'Enfoque en Críticos, BAB +13',
     benefit: 'Cuando consigues un golpe crítico, tu oponente queda tambaleante durante 1d4+1 turno. Una tirada de Fortaleza exitosa reduce la duración a 1 turno. La CD es igual a 10 + tu BAB.',
+    uses: ['Estado tambaleante', 'Interrumpir acciones', 'Control de enemigo'],
+    notes: ['Tambaleante 1d4+1 turnos', 'Fortaleza reduce a 1 turno', 'BAB +13 prerrequisito'],
   },
   {
     id: 'stunning_critical',
@@ -910,6 +1134,8 @@ export const FEATS: Feat[] = [
     type: 'critical',
     prerequisite: 'Enfoque en Críticos, Crítico Tambaleante, BAB +17',
     benefit: 'Cuando consigues un golpe crítico, tu oponente queda aturdido durante 1d4 turno. Una tirada de Fortaleza exitosa reduce esto a tambaleante durante 1d4 turno. La CD es igual a 10 + tu BAB.',
+    uses: ['Aturdir enemigos', 'Combate decisive', 'Interrumpir acciones poderosas'],
+    notes: ['Aturdido 1d4 turnos', 'Requiere Crítico Tambaleante', 'BAB +17 prerrequisito - muy alto'],
   },
 
   // ── Style feats ──
@@ -919,6 +1145,8 @@ export const FEATS: Feat[] = [
     type: 'style',
     prerequisite: 'Golpe sin Arma Mejorado, Monje 1 o BAB +2',
     benefit: 'Mientras uses este estilo, reduces la penalización de defensa a −2 y ganas +2 a CA.',
+    uses: ['Mayor CA defensiva', 'Reducir penalización de defensa', 'Combate defensivo monk'],
+    notes: ['-2 penalización defensa', '+2 a CA', 'Prerreq: Golpe sin Arma Mejorado'],
   },
   {
     id: 'crane_wing',
@@ -926,6 +1154,8 @@ export const FEATS: Feat[] = [
     type: 'style',
     prerequisite: 'Estilo Grulla, Monje 5 o BAB +5',
     benefit: 'Una vez por turno mientras uses Estilo Grulla, desvías un ataque cuerpo a cuerpo.',
+    uses: ['Desviar ataques', 'Defensa reactiva', 'Evitar daño'],
+    notes: ['Desviar 1 ataque por turno', 'Requiere Estilo Grulla', 'Monje 5 o BAB +5'],
   },
   {
     id: 'dragon_style',
@@ -933,6 +1163,8 @@ export const FEATS: Feat[] = [
     type: 'style',
     prerequisite: 'FUE 15, Golpe sin Arma Mejorado, Monje 1 o BAB +3',
     benefit: '+2 a TS contra efectos de sueño/parálisis/mareo. Añade FUE ×1.5 al primer golpe del asalto.',
+    uses: ['Resistencia a efectos', 'Mayor daño primer golpe', 'Combate ofensivo monk'],
+    notes: ['+2 TS vs sueño/parálisis/mareo', 'FUE x1.5 al primer golpe', 'FUE 15 prerrequisito'],
   },
   {
     id: 'scorpion_style',
@@ -940,6 +1172,8 @@ export const FEATS: Feat[] = [
     type: 'style',
     prerequisite: 'Golpe sin Arma Mejorado',
     benefit: 'Para usar esta dote, debes realizar un único ataque sin arma como acción estándar. Si este ataque impacta, causas daño normalmente y la velocidad base en tierra del objetivo se reduce a 5 pies durante un número de turnos igual a tu modificador de Sabiduría, a menos que realice una tirada de Fortaleza (CD 10 + 1/2 tu nivel de personaje + tu modificador de Sabiduría).',
+    uses: ['Reducir velocidad', 'Control de movilidad', 'Combate slowing'],
+    notes: ['Velocidad a 5 pies', 'Duración: modificador de SAB', 'Fortaleza CD 10 + 1/2 nivel + SAB'],
   },
   {
     id: 'gorgon_fist',
@@ -947,6 +1181,8 @@ export const FEATS: Feat[] = [
     type: 'style',
     prerequisite: 'Golpe sin Arma Mejorado, Estilo Escorpión, Monje 6 o BAB +6',
     benefit: 'Como acción estándar, realiza un único ataque cuerpo a cuerpo sin arma contra un enemigo cuya velocidad esté reducida. Si el ataque impacta, causas daño normalmente y el objetivo queda tambaleante hasta el final de tu siguiente turno a menos que realice una tirada de Fortaleza (CD 10 + 1/2 tu nivel de personaje + tu modificador de Sabiduría).',
+    uses: ['Tambalear enemigos lentos', 'Control de enemigos', 'Combo con Estilo Escorpión'],
+    notes: ['Tambaleante si velocidad reducida', 'Requiere Estilo Escorpión', 'Monje 6 o BAB +6'],
   },
 
   // ── General feats ──
@@ -955,6 +1191,8 @@ export const FEATS: Feat[] = [
     name: 'Alerta',
     type: 'general',
     benefit: 'Obtienes un bonificador de +2 a las pruebas de Percepción y Sentido de los Motivos. Si tienes 10 o más rangos en una de estas habilidades, el bonificador aumenta a +4 para esa habilidad.',
+    uses: ['Detectar enemigos', 'Notar emboscadas', 'Descubrir secretos'],
+    notes: ['+2 a Percepción y Sentido de Motivos', '+4 con 10+ rangos', 'Sin prerrequisitos'],
     effects: [
       { id: 'alertness_perception', source: 'Feat: Alertness', type: 'untyped', target: 'skill:perception', value: 2, rankCondition: { skillId: 'perception', minRanks: 10, bonusValue: 4 } },
       { id: 'alertness_sense_motive', source: 'Feat: Alertness', type: 'untyped', target: 'skill:sense_motive', value: 2, rankCondition: { skillId: 'sense_motive', minRanks: 10, bonusValue: 4 } },
@@ -965,6 +1203,8 @@ export const FEATS: Feat[] = [
     name: 'Afinidad Animal',
     type: 'general',
     benefit: 'Obtienes un bonificador de +2 a todas las pruebas de Manejo de Animales y Monta. Si tienes 10 o más rangos en una de estas habilidades, el bonificador aumenta a +4 para esa habilidad.',
+    uses: ['Manejar animales', 'Monta', 'Druidas y rattis'],
+    notes: ['+2 a Manejo de Animales y Monta', '+4 con 10+ rangos', 'Sin prerrequisitos'],
     effects: [
       { id: 'animal_affinity_ride', source: 'Feat: Afinidad Animal', type: 'untyped', target: 'skill:ride', value: 2, rankCondition: { skillId: 'ride', minRanks: 10, bonusValue: 4 } },
       { id: 'animal_affinity_handle', source: 'Feat: Afinidad Animal', type: 'untyped', target: 'skill:handle_animal', value: 2, rankCondition: { skillId: 'handle_animal', minRanks: 10, bonusValue: 4 } },
@@ -976,6 +1216,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Competencia con Armaduras Ligeras, nivel de lanzador 3',
     benefit: 'Como acción rápida, reduce la posibilidad de fallo arcano debido a la armadura que llevas en un 10% para cualquier hechizo que lances este turno.',
+    uses: ['Reducir fallo arcano', 'Combate con armadura', 'Gishes'],
+    notes: ['-10% fallo arcano', 'Acción rápida', 'Nivel de lanzador 3 prerrequisito'],
   },
   {
     id: 'arcane_strike',
@@ -983,12 +1225,16 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Capacidad de lanzar hechizos arcanos',
     benefit: 'Como acción rápida, puedes imbuir tus armas con una fracción de tu poder. Durante 1 turno, tus armas causan +1 de daño adicional y son tratadas como mágicas para el propósito de superar la reducción de daño. Por cada cinco niveles de lanzador que poseas, este bonificador aumenta en +1, hasta un máximo de +5 en el nivel 20.',
+    uses: ['Armas视为 mágicas', 'Daño adicional', 'Superar RD'],
+    notes: ['+1 a +5 daño', 'Tratado como mágico', 'Lanzador arcano requerido'],
   },
   {
     id: 'combat_casting',
     name: 'Lanzamiento en Combate',
     type: 'general',
     benefit: 'Obtienes un bonificador de +4 a las pruebas de Concentración para lanzar un hechizo o usar una habilidad similar a un hechizo cuando se lanza a la defensiva o mientras está agarrado.',
+    uses: ['Lanzar a la defensiva', 'Lanzar mientras agarra', 'Combate con hechizos'],
+    notes: ['+4 a Concentración defensiva', 'Esencial para lanzadores', 'Sin prerrequisitos'],
   },
   {
     id: 'extra_ki',
@@ -997,6 +1243,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'Reserva de ki',
     benefit: 'Tu reserva de ki aumenta en 2.',
     special: 'Puedes tomar Extra Ki varias veces. Sus efectos se acumulan.',
+    uses: ['Más usos de ki', 'Más habilidades de monje', 'Combate sostenido'],
+    notes: ['+2 ki por día', 'Se acumula', 'Requiere reserva de ki'],
   },
   {
     id: 'extra_rage',
@@ -1005,6 +1253,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'Capacidad de entrar en furia de clase',
     benefit: 'Puedes entrar en furia durante 6 turnos adicionales por día.',
     special: 'Puedes tomar Extra Furia varias veces. Sus efectos se acumulan.',
+    uses: ['Más turnos de furia', 'Combate extendido', 'Mayor daño sostenido'],
+    notes: ['+6 turnos de furia por día', 'Se acumula', 'Requiere capacidad de furia'],
   },
   {
     id: 'extra_performance',
@@ -1013,6 +1263,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'Capacidad de actuación de bardo',
     benefit: 'Puedes usar la actuación de bardo durante 6 turnos adicionales por día.',
     special: 'Puedes tomar Extra Actuación varias veces. Sus efectos se acumulan.',
+    uses: ['Más turnos de actuación', 'Soporte extendido', 'Utilidad social'],
+    notes: ['+6 turnos de actuación por día', 'Se acumula', 'Requiere capacidad de bardo'],
   },
   {
     id: 'improved_great_fortitude',
@@ -1020,6 +1272,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Gran Fortaleza',
     benefit: 'Una vez por día, puedes relanzar una tirada de Fortaleza. Debes decidir usar esta habilidad antes de revelar los resultados. Debes aceptar el segundo resultado, aunque sea peor.',
+    uses: ['Relanzar TS de Fortaleza', 'Salvación contra venenos', 'Efectos de Fortaleza'],
+    notes: ['1 uso por día', 'Requiere Gran Fortaleza', 'Toma el segundo resultado'],
   },
   {
     id: 'improved_iron_will',
@@ -1027,6 +1281,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Voluntad de Acero',
     benefit: 'Una vez por día, puedes relanzar una tirada de Voluntad. Debes decidir usar esta habilidad antes de revelar los resultados. Debes aceptar el segundo resultado, aunque sea peor.',
+    uses: ['Relanzar TS de Voluntad', 'Salvación contra efectos mentales', ' control'],
+    notes: ['1 uso por día', 'Requiere Voluntad de Acero', 'Toma el segundo resultado'],
   },
   {
     id: 'improved_lightning_reflexes',
@@ -1034,12 +1290,16 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Reflejos de Rayo',
     benefit: 'Una vez por día, puedes relanzar una tirada de Reflejos. Debes decidir usar esta habilidad antes de revelar los resultados. Debes aceptar el segundo resultado, aunque sea peor.',
+    uses: ['Relanzar TS de Reflejos', 'Salvación contra efectos de área', 'Evadir peligros'],
+    notes: ['1 uso por día', 'Requiere Reflejos de Rayo', 'Toma el segundo resultado'],
   },
   {
     id: 'iron_will',
     name: 'Voluntad de Acero',
     type: 'general',
     benefit: 'Obtienes un bonificador de +2 a todas las tiradas de Voluntad.',
+    uses: ['Resistencia mental', 'TS de Voluntad', 'Contra hechizos de control'],
+    notes: ['+2 a TS de Voluntad', 'Sin prerrequisitos', 'Prerrequisito para dotes de mejora'],
     effects: [
       { id: 'iron_will_will', source: 'Feat: Voluntad de Acero', type: 'untyped', target: 'save_will', value: 2 },
     ],
@@ -1049,6 +1309,8 @@ export const FEATS: Feat[] = [
     name: 'Reflejos de Rayo',
     type: 'general',
     benefit: 'Obtienes un bonificador de +2 a todas las tiradas de Reflejos.',
+    uses: ['Evadir efectos', 'TS de Reflejos', 'Combate contra magos'],
+    notes: ['+2 a TS de Reflejos', 'Sin prerrequisitos', 'Prerrequisito para dotes de mejora'],
     effects: [
       { id: 'lightning_reflexes_ref', source: 'Feat: Reflejos de Rayo', type: 'untyped', target: 'save_ref', value: 2 },
     ],
@@ -1058,6 +1320,8 @@ export const FEATS: Feat[] = [
     name: 'Aptitud Mágica',
     type: 'general',
     benefit: 'Obtienes un bonificador de +2 a todas las pruebas de Conocimiento Arcano y Uso de Objeto Mágico. Si tienes 10 o más rangos en una de estas habilidades, el bonificador aumenta a +4 para esa habilidad.',
+    uses: ['Identificar objetos', 'Usaritems mágicos', 'Conocimientoarcano'],
+    notes: ['+2 a Conocimiento Arcano y UMD', '+4 con 10+ rangos', 'Sin prerrequisitos'],
     effects: [
       { id: 'magical_aptitude_arcana', source: 'Feat: Aptitud Mágica', type: 'untyped', target: 'skill:knowledge_arcana', value: 2, rankCondition: { skillId: 'knowledge_arcana', minRanks: 10, bonusValue: 4 } },
       { id: 'magical_aptitude_spellcraft', source: 'Feat: Aptitud Mágica', type: 'untyped', target: 'skill:spellcraft', value: 2, rankCondition: { skillId: 'spellcraft', minRanks: 10, bonusValue: 4 } },
@@ -1069,6 +1333,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     benefit: 'Mientras llevas armadura ligera o ninguna armadura, tu velocidad base aumenta en 5 pies. Pierdes los beneficios de esta dote si llevas una carga media o pesada.',
     special: 'Puedes tomar esta dote varias veces. Los efectos se acumulan.',
+    uses: ['Movimiento más rápido', 'Alcance adicional', 'Hit-and-run'],
+    notes: ['+5 pies de velocidad', 'Se acumula', 'No funciona con armadura pesada'],
     effects: [
       { id: 'fleet_speed', source: 'Feat: Veloz', type: 'untyped', target: 'speed', value: 5 },
     ],
@@ -1079,6 +1345,8 @@ export const FEATS: Feat[] = [
     type: 'item_creation',
     prerequisite: 'Nivel de lanzador 3',
     benefit: 'Puedes crear una poción de cualquier hechizo de nivel 3 o inferior que conozcas y que afecte a una o más criaturas u objetos. Elaborar una poción lleva 2 horas si su precio base es 250 po o menos; de lo contrario, lleva 1 día por cada 1.000 po de su precio base.',
+    uses: ['Crear pociones', 'Objetos consumibles', 'Utilidad y comercio'],
+    notes: ['Hechizos nivel 3 o inferior', 'Nivel de lanzador 3', 'Crea objetos usables por otros'],
   },
   {
     id: 'craft_wand',
@@ -1086,6 +1354,8 @@ export const FEATS: Feat[] = [
     type: 'item_creation',
     prerequisite: 'Nivel de lanzador 5',
     benefit: 'Puedes crear una varita de cualquier hechizo de nivel 4 o inferior que conozcas. Elaborar una varita lleva 1 día por cada 1.000 po de su precio base. Una varita recién creada tiene 50 cargas.',
+    uses: ['Crear varitas', 'Hechizos reutilizables', 'Utilidad y comercio'],
+    notes: ['Hechizos nivel 4 o inferior', 'Nivel de lanzador 5', '50 cargas por varita'],
   },
   {
     id: 'forge_ring',
@@ -1093,6 +1363,8 @@ export const FEATS: Feat[] = [
     type: 'item_creation',
     prerequisite: 'Nivel de lanzador 7',
     benefit: 'Puedes crear anillos mágicos. Elaborar un anillo lleva 1 día por cada 1.000 po de su precio base. Para elaborar un anillo, debes gastar materias primas que cuesten la mitad del precio base.',
+    uses: ['Crear anillos', 'Objetos permanentes', 'Artefactos'],
+    notes: ['Requiere nivel de lanzador 7', 'Más complejo que pociones/varitas', 'Inversión significativa'],
   },
   {
     id: 'improved_critical',
@@ -1100,6 +1372,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'Competencia con el arma, BAB +8',
     benefit: 'Cuando usas el arma que seleccionaste, tu rango de amenaza se dobla.',
+    uses: ['Mayor chance de crítico', 'Daño masivo', 'Combate ofensivo'],
+    notes: ['Dobla rango de amenaza', 'BAB +8 prerrequisito', 'Se aplica a un arma específica'],
     special: 'Puedes tomar Crítico Mejorado varias veces. Los efectos no se acumulan. Cada vez que tomas la dote, se aplica a un nuevo tipo de arma. Este efecto no se acumula con ningún otro efecto que expanda el rango de amenaza de un arma.',
   },
 
@@ -1109,6 +1383,8 @@ export const FEATS: Feat[] = [
     name: 'Acrobático',
     type: 'general',
     benefit: 'Obtienes un bonificador de +2 a todas las pruebas de Acrobacias y Volar. Si tienes 10 o más rangos en una de estas habilidades, el bonificador aumenta a +4 para esa habilidad.',
+    uses: ['Movilidad acrobática', 'Volar', 'Evadir peligros'],
+    notes: ['+2 a Acrobacias y Volar', '+4 con 10+ rangos', 'Sin prerrequisitos'],
     effects: [
       { id: 'acrobatic_acrobatics', source: 'Feat: Acrobático', type: 'untyped', target: 'skill:acrobatics', value: 2, rankCondition: { skillId: 'acrobatics', minRanks: 10, bonusValue: 4 } },
       { id: 'acrobatic_fly', source: 'Feat: Acrobático', type: 'untyped', target: 'skill:fly', value: 2, rankCondition: { skillId: 'fly', minRanks: 10, bonusValue: 4 } },
@@ -1120,6 +1396,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'DES 13',
     benefit: 'Cuando te mueves, puedes moverte a través de 5 pies de terreno difícil por turno como si fuera terreno normal. Esta dote te permite dar un paso de 5 pies hacia terreno difícil.',
+    uses: ['Moverse por terreno difícil', 'Paso a terreno difícil', 'Movilidad en mazmorras'],
+    notes: ['5 pies de terreno difícil', 'DES 13 prerrequisito', 'Combina con Pasos Acrobáticos'],
   },
   {
     id: 'acrobatic_steps',
@@ -1127,24 +1405,32 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Destreza 15, Movimientos Ágiles',
     benefit: 'Cuando te mueves, puedes moverte a través de hasta 15 pies de terreno difícil por turno como si fuera terreno normal. Los efectos de esta dote se acumulan con los de Movimientos Ágiles (permitiéndote moverte normalmente a través de un total de 20 pies de terreno difícil por turno).',
+    uses: ['Movimiento por terreno difícil', 'Mayor movilidad', 'Exploración'],
+    notes: ['15 pies adicionales', 'Se acumula con Movimientos Ágiles', 'DES 15 y Movimientos Ágiles prerrequisitos'],
   },
   {
     id: 'careful_speaker',
     name: 'Orador Cuidadoso',
     type: 'general',
     benefit: '+2 a Diplomacia y Sentido de los Motivos.',
+    uses: ['Interacción social', 'Negociación', 'Detectar mentiras'],
+    notes: ['+2 a Diplomacia y Sentido de Motivos', 'Sin prerrequisitos', 'Bardos y nobles'],
   },
   {
     id: 'cosmopolitan',
     name: 'Cosmopolita',
     type: 'general',
     benefit: 'Dos habilidades de tu elección se convierten en habilidades de clase para ti.',
+    uses: ['Habilidades adicionales', 'Flexibilidad', 'Clases sin habilidades de clase'],
+    notes: ['2 habilidades de clase extra', 'Útil para clases limitadas', 'Sin prerrequisitos'],
   },
   {
     id: 'deft_hands',
     name: 'Manos Hábiles',
     type: 'general',
     benefit: 'Obtienes un bonificador de +2 a las pruebas de Desactivar Dispositivo y Prestidigitación. Si tienes 10 o más rangos en una de estas habilidades, el bonificador aumenta a +4 para esa habilidad.',
+    uses: ['Desactivar trampas', 'Trucos de manos', 'Robo'],
+    notes: ['+2 a Desactivar Dispositivo y Prestidigitación', '+4 con 10+ rangos', 'Sin prerrequisitos'],
     effects: [
       { id: 'deft_hands_sleight', source: 'Feat: Manos Hábiles', type: 'untyped', target: 'skill:sleight_of_hand', value: 2, rankCondition: { skillId: 'sleight_of_hand', minRanks: 10, bonusValue: 4 } },
       { id: 'deft_hands_disable', source: 'Feat: Manos Hábiles', type: 'untyped', target: 'skill:disable_device', value: 2, rankCondition: { skillId: 'disable_device', minRanks: 10, bonusValue: 4 } },
@@ -1155,12 +1441,16 @@ export const FEATS: Feat[] = [
     name: 'Diligente',
     type: 'general',
     benefit: '+2 a Falsificar y Conocimiento (profesión).',
+    uses: ['Falsificación', 'Profesión', 'Negocios'],
+    notes: ['+2 a Falsificar y Profesión', 'Sin prerrequisitos', 'Infiltrados y comerciantes'],
   },
   {
     id: 'investigator',
     name: 'Investigador',
     type: 'general',
     benefit: '+2 a Percepción y Reunir Información.',
+    uses: ['Detectar cosas', 'Investigar', 'Buscar información'],
+    notes: ['+2 a Percepción y Reunir Información', 'Sin prerrequisitos', 'Detectives y periodistas'],
     effects: [
       { id: 'investigator_perception', source: 'Feat: Investigador', type: 'untyped', target: 'skill:perception', value: 2 },
     ],
@@ -1170,6 +1460,8 @@ export const FEATS: Feat[] = [
     name: 'Negociador',
     type: 'general',
     benefit: '+2 a Diplomacia y Sentido de los Motivos.',
+    uses: ['Negociación', 'Diplomacia', 'Detectar intenciones'],
+    notes: ['+2 a Diplomacia y Sentido de Motivos', 'Sin prerrequisitos', 'Diplomáticos y comerciantes'],
     effects: [
       { id: 'negotiator_diplomacy', source: 'Feat: Negociador', type: 'untyped', target: 'skill:diplomacy', value: 2 },
       { id: 'negotiator_sense_motive', source: 'Feat: Negociador', type: 'untyped', target: 'skill:sense_motive', value: 2 },
@@ -1180,18 +1472,24 @@ export const FEATS: Feat[] = [
     name: 'Dedos Ágiles',
     type: 'general',
     benefit: '+2 a Prestidigitación y Desactivar Dispositivo.',
+    uses: ['Habilidad con manos', 'Desactivar trampas', 'Robo'],
+    notes: ['+2 a Prestidigitación y Desactivar', 'Sin prerrequisitos', 'Rogues y ladrones'],
   },
   {
     id: 'scholar',
     name: 'Erudito',
     type: 'general',
     benefit: '+2 a dos habilidades de Conocimiento de tu elección.',
+    uses: ['Conocimiento especializado', 'Experticia', 'Investigación'],
+    notes: ['+2 a dos Conocimientos', 'Elige al tomar la dote', 'Bibliotecarios y sabios'],
   },
   {
     id: 'silver_tongued',
     name: 'Lengua de Plata',
     type: 'general',
     benefit: '+2 a Diplomacia y Engañar.',
+    uses: ['Persuasión', 'Engaño', 'Manipulación social'],
+    notes: ['+2 a Diplomacia y Engañar', 'Sin prerrequisitos', 'Bardos y fulls'],
     effects: [
       { id: 'silver_tongued_diplomacy', source: 'Feat: Lengua de Plata', type: 'untyped', target: 'skill:diplomacy', value: 2 },
       { id: 'silver_tongued_bluff', source: 'Feat: Lengua de Plata', type: 'untyped', target: 'skill:bluff', value: 2 },
@@ -1202,6 +1500,8 @@ export const FEATS: Feat[] = [
     name: 'Enfoque de Habilidad (Percepción)',
     type: 'general',
     benefit: '+3 a Percepción. Si tienes 10 o más rangos, +6.',
+    uses: ['Detectar cosas', 'Observación', 'Busqueda'],
+    notes: ['+3 a Percepción', '+6 con 10+ rangos', 'Sin prerrequisitos'],
     effects: [
       { id: 'skill_focus_perception_bonus', source: 'Feat: Enfoque de Habilidad (Percepción)', type: 'untyped', target: 'skill:perception', value: 3, rankCondition: { skillId: 'perception', minRanks: 10, bonusValue: 6 } },
     ],
@@ -1211,6 +1511,8 @@ export const FEATS: Feat[] = [
     name: 'Enfoque de Habilidad (Sigilo)',
     type: 'general',
     benefit: '+3 a Sigilo. Si tienes 10 o más rangos, +6.',
+    uses: ['Ocultarse', 'Infiltración', 'Sigilo'],
+    notes: ['+3 a Sigilo', '+6 con 10+ rangos', 'Sin prerrequisitos'],
     effects: [
       { id: 'skill_focus_stealth_bonus', source: 'Feat: Enfoque de Habilidad (Sigilo)', type: 'untyped', target: 'skill:stealth', value: 3, rankCondition: { skillId: 'stealth', minRanks: 10, bonusValue: 6 } },
     ],
@@ -1220,6 +1522,8 @@ export const FEATS: Feat[] = [
     name: 'Enfoque de Habilidad (Conocimiento Arcano)',
     type: 'general',
     benefit: '+3 a Conocimiento Arcano. Si tienes 10 o más rangos, +6.',
+    uses: ['Conocimiento mágico', 'Identificar hechizos', 'Arcanismo'],
+    notes: ['+3 a Conocimiento Arcano', '+6 con 10+ rangos', 'Sin prerrequisitos'],
     effects: [
       { id: 'skill_focus_spellcraft_bonus', source: 'Feat: Enfoque de Habilidad (Conocimiento Arcano)', type: 'untyped', target: 'skill:spellcraft', value: 3, rankCondition: { skillId: 'spellcraft', minRanks: 10, bonusValue: 6 } },
     ],
@@ -1232,6 +1536,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Capacidad de canalizar energía',
     benefit: 'Antes de realizar una tirada de ataque cuerpo a cuerpo, puedes gastar un uso de tu capacidad de canalizar energía como acción rápida. Si canalizas energía positiva e impactas a una criatura no muerta, esa criatura sufre daño adicional igual al daño causado por tu capacidad de canalizar energía positiva. Si canalizas energía negativa e impactas a una criatura viva, esa criatura sufre daño adicional igual al daño causado por tu capacidad de canalizar energía negativa.',
+    uses: ['Daño adicional melee', 'Combate divino', 'Gishes clericales'],
+    notes: ['Daño de canal en ataque', 'Acción rápida', 'Requiere capacidad de canalizar'],
   },
   {
     id: 'selective_channeling',
@@ -1240,6 +1546,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'CAR 13, Capacidad de canalizar energía',
     benefit: 'Cuando canalizas energía, puedes elegir un número de objetivos en el área hasta tu modificador de Carisma. Estos objetivos no se ven afectados por tu energía canalizada.',
     normal: 'Todos los objetivos en una explosión de 30 pies se ven afectados cuando canalizas energía. Solo puedes elegir si tú mismo eres afectado o no.',
+    uses: ['Evitar afectar aliados', 'Daño selectivo', 'Soporte táctico'],
+    notes: ['Excluir objetivos', 'CAR 13 prerrequisito', 'Usa modificador de CAR'],
   },
   {
     id: 'improved_channel',
@@ -1247,6 +1555,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Capacidad de canalizar energía',
     benefit: 'Añade 2 a la CD de las tiradas de salvación para resistir los efectos de tu capacidad de canalizar energía.',
+    uses: ['CD más alta', 'Más efectividad', 'Daño/curación superior'],
+    notes: ['+2 a CD de canalización', 'Requiere capacidad de canalizar', 'Mejora clericales'],
   },
 
   // ── Spell feats ──
@@ -1256,6 +1566,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'INT 13, Enfoque de Hechizo',
     benefit: 'Añade +2 al nivel de lanzador al lanzar un hechizo elegido.',
+    uses: ['Nivel de lanzador +2', 'Hechizo más fuerte', 'Especialización mágica'],
+    notes: ['+2 nivel de lanzador a un hechizo', 'INT 13 y Enfoque de Hechizo', 'Elige un hechizo'],
   },
   {
     id: 'augment_summoning',
@@ -1263,54 +1575,72 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: 'Enfoque de Hechizo (conjuración)',
     benefit: 'Cada criatura que convocas con cualquier hechizo de convocación gana un bonificador de mejora de +4 a Fuerza y Constitución durante la duración del hechizo que la convocó.',
+    uses: ['Invocados más fuertes', 'Más PG y daño', 'Conjuradores'],
+    notes: ['+4 a FUE y CON de invocaciones', 'Requiere Enfoque de Hechizo (Conjuración)', 'Duración del hechizo'],
   },
   {
     id: 'spell_focus_evocation',
     name: 'Enfoque de Hechizo (Evocación)',
     type: 'general',
     benefit: '+1 al CD de hechizos de Evocación.',
+    uses: ['Hechizos de daño más difíciles', 'Especialización en daño', 'Magos ofensivos'],
+    notes: ['+1 CD a Evocación', 'Sin prerrequisitos', 'Combina con Dominio de Hechizo'],
   },
   {
     id: 'spell_focus_necromancy',
     name: 'Enfoque de Hechizo (Nigromancia)',
     type: 'general',
     benefit: '+1 al CD de hechizos de Nigromancia.',
+    uses: ['Hechizos de nigromancia más difíciles', 'Control de muertos', 'Magos nigromantes'],
+    notes: ['+1 CD a Nigromancia', 'Sin prerrequisitos', 'Combina con Dominio de Hechizo'],
   },
   {
     id: 'spell_focus_enchantment',
     name: 'Enfoque de Hechizo (Encantamiento)',
     type: 'general',
     benefit: '+1 al CD de hechizos de Encantamiento.',
+    uses: ['Hechizos de enchantamiento más difíciles', 'Control mental', 'Bardos y enchanters'],
+    notes: ['+1 CD a Encantamiento', 'Sin prerrequisitos', 'Combina con Dominio de Hechizo'],
   },
   {
     id: 'spell_focus_illusion',
     name: 'Enfoque de Hechizo (Ilusión)',
     type: 'general',
     benefit: '+1 al CD de hechizos de Ilusión.',
+    uses: ['Hechizos de ilusión más difíciles', 'Engaño', 'Magos de ilusión'],
+    notes: ['+1 CD a Ilusión', 'Sin prerrequisitos', 'Combina con Dominio de Hechizo'],
   },
   {
     id: 'spell_focus_conjuration',
     name: 'Enfoque de Hechizo (Conjuración)',
     type: 'general',
     benefit: '+1 al CD de hechizos de Conjuración.',
+    uses: ['Hechizos de conjuración más difíciles', 'Convocación', 'Conjuradores'],
+    notes: ['+1 CD a Conjuración', 'Sin prerrequisitos', 'Combina con Dominio de Hechizo'],
   },
   {
     id: 'spell_focus_abjuration',
     name: 'Enfoque de Hechizo (Abjuración)',
     type: 'general',
     benefit: '+1 al CD de hechizos de Abjuración.',
+    uses: ['Hechizos de abjuración más difíciles', 'Defensa', 'Magos defensivos'],
+    notes: ['+1 CD a Abjuración', 'Sin prerrequisitos', 'Combina con Dominio de Hechizo'],
   },
   {
     id: 'spell_focus_transmutation',
     name: 'Enfoque de Hechizo (Transmutación)',
     type: 'general',
     benefit: '+1 al CD de hechizos de Transmutación.',
+    uses: ['Hechizos de transmutación más difíciles', 'Cambio', 'Transmutadores'],
+    notes: ['+1 CD a Transmutación', 'Sin prerrequisitos', 'Combina con Dominio de Hechizo'],
   },
   {
     id: 'spell_focus_divination',
     name: 'Enfoque de Hechizo (Adivinación)',
     type: 'general',
     benefit: '+1 al CD de hechizos de Adivinación.',
+    uses: ['Hechizos de adivinación más difíciles', 'Videncia', 'Magos de adivinación'],
+    notes: ['+1 CD a Adivinación', 'Sin prerrequisitos', 'Combina con Dominio de Hechizo'],
   },
 
   // ── Combat feats (new) ──
@@ -1321,6 +1651,8 @@ export const FEATS: Feat[] = [
     prerequisite: 'BAB +1',
     benefit: 'Realizas tiradas de ataque con el arma normalmente (sin la penalización por falta de competencia).',
     normal: 'Un personaje que usa un arma con la que no es competente sufre una penalización de −4 a las tiradas de ataque.',
+    uses: ['Usar armas exóticas', 'Armas especiales', 'Combate con armas únicas'],
+    notes: ['Elimina penalización -4', 'BAB +1 prerrequisito', 'Se puede tomar múltiples veces'],
     special: 'Puedes tomar Competencia con Arma Exótica varias veces. Cada vez que la tomas, se aplica a un nuevo tipo de arma exótica.',
   },
   {
@@ -1329,6 +1661,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'DES 13, BAB +1',
     benefit: 'Puedes elegir sufrir una penalización de −1 a todas las tiradas de ataque a distancia para ganar un bonificador de +2 a todas las tiradas de daño a distancia. Cuando tu BAB alcanza +4 y cada 4 puntos más, la penalización aumenta en −1 y el bonificador de daño aumenta en +2.',
+    uses: ['Mayor daño a distancia', 'Arqueros', 'Daño de proyectiles'],
+    notes: ['-1 ataque por +2 daño', 'Escala con BAB', 'DES 13 prerrequisito'],
   },
   {
     id: 'snap_shot',
@@ -1336,6 +1670,8 @@ export const FEATS: Feat[] = [
     type: 'combat',
     prerequisite: 'DES 13, Punto en Blanco, Disparo Certero, BAB +9',
     benefit: 'Tratas las armas a distancia como armas que amenazan tu área para el propósito de los ataques de oportunidad.',
+    uses: ['AO con armas a distancia', 'Defensa a distancia', 'Combate mixto'],
+    notes: ['Amenaza con armas a distancia', 'Requiere BAB +9', 'Combina con Disparo Certero'],
   },
 
   // ── General feats (new) ──
@@ -1345,6 +1681,8 @@ export const FEATS: Feat[] = [
     type: 'general',
     prerequisite: '5 rangos en la habilidad',
     benefit: 'Al superar el DC de una habilidad por 5+, obtienes un efecto adicional especial.',
+    uses: ['Efectos especiales', 'Habilidades expertas', 'Utility especializada'],
+    notes: ['Superar DC por 5+ para efecto', '5 rangos prerrequisito', 'Expertos de habilidad'],
   },
 ]
 

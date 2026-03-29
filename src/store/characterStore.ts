@@ -81,12 +81,26 @@ export interface JournalEntry {
   discoveredPlaces: { name: string; description: string }[]
 }
 
+export type BonusTarget =
+  | 'attack'
+  | 'damage'
+  | 'ac'
+  | 'fort'
+  | 'ref'
+  | 'will'
+  | 'initiative'
+  | 'cmb'
+  | 'cmd'
+  | `skill:${string}`
+
 export interface StatusEffect {
   id: string
   name: string
   description: string
-  bonus?: string
+  bonusTarget?: BonusTarget
+  bonusValue?: number
   duration?: string
+  active?: boolean  // undefined/true = active, false = disabled
 }
 
 export interface Character {

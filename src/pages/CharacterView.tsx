@@ -4,11 +4,12 @@ import {
   ArrowLeft, Play, Edit2, Trash2,
   Sword, Shield, Scroll, Package, Star,
   Heart, Eye, PlusCircle, X, PawPrint, BookOpen, Download,
-  Zap, TrendingUp
+  Zap, TrendingUp, Power, Pencil, Check
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
-import type { StatusEffect, JournalEntry } from '../store'
+import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
 import { getClassById, getMulticlassStats, SpellLevel, useSRDStore } from '../data'
+import { getBonusSpells } from '../data/bonusSpells'
 import { resolveModifiers } from '../engine'
 import { Card, Button } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal } from '../components/character'
@@ -35,7 +36,18 @@ export function CharacterView() {
   const [showLevelUp, setShowLevelUp] = useState(false)
   const [newEffectName, setNewEffectName] = useState('')
   const [newEffectDesc, setNewEffectDesc] = useState('')
+  const [newEffectDuration, setNewEffectDuration] = useState('')
+  const [newEffectTarget, setNewEffectTarget] = useState<BonusTarget | 'skill' | ''>('')
+  const [newEffectSkillId, setNewEffectSkillId] = useState('')
+  const [newEffectValue, setNewEffectValue] = useState<number>(0)
   const [showEffectForm, setShowEffectForm] = useState(false)
+  const [editingEffectId, setEditingEffectId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editDesc, setEditDesc] = useState('')
+  const [editDuration, setEditDuration] = useState('')
+  const [editTarget, setEditTarget] = useState<BonusTarget | 'skill' | ''>('')
+  const [editSkillId, setEditSkillId] = useState('')
+  const [editValue, setEditValue] = useState<number>(0)
   const [expandedJournalEntry, setExpandedJournalEntry] = useState<string | null>(null)
   const [showJournalModal, setShowJournalModal] = useState(false)
   const [newJournalContent, setNewJournalContent] = useState('')
@@ -126,14 +138,25 @@ export function CharacterView() {
 
   const addStatusEffect = () => {
     if (!newEffectName.trim()) return
+    const resolvedTarget: BonusTarget | undefined =
+      newEffectTarget === 'skill'
+        ? newEffectSkillId ? (`skill:${newEffectSkillId}` as BonusTarget) : undefined
+        : newEffectTarget || undefined
     const effect: StatusEffect = {
       id: generateId(),
       name: newEffectName.trim(),
       description: newEffectDesc.trim(),
+      duration: newEffectDuration.trim() || undefined,
+      bonusTarget: resolvedTarget,
+      bonusValue: resolvedTarget !== undefined ? newEffectValue : undefined,
     }
     updateCharacter(character.id, { statusEffects: [...(character.statusEffects ?? []), effect] })
     setNewEffectName('')
     setNewEffectDesc('')
+    setNewEffectDuration('')
+    setNewEffectTarget('')
+    setNewEffectSkillId('')
+    setNewEffectValue(0)
     setShowEffectForm(false)
   }
 
@@ -220,21 +243,50 @@ export function CharacterView() {
             <Heart size={28} className={styles.hpIcon} />
             <div>
               <div className={styles.hpValues}>
-                <span className={styles.hpCurrent}>{character.hp.current}</span>
-                <span className={styles.hpSeparator}>/</span>
-                <span className={styles.hpMax}>{character.hp.max}</span>
+                {isEditing ? (
+                  <>
+                    <input
+                      className={styles.hpEditInput}
+                      type="number"
+                      min={0}
+                      max={character.hp.max}
+                      defaultValue={character.hp.current}
+                      onBlur={(e) => updateCharacter(character.id, { hp: { ...character.hp, current: Math.max(0, Math.min(character.hp.max, parseInt(e.target.value) || 0)) } })}
+                    />
+                    <span className={styles.hpSeparator}>/</span>
+                    <input
+                      className={styles.hpEditInput}
+                      type="number"
+                      min={1}
+                      defaultValue={character.hp.max}
+                      onBlur={(e) => {
+                        const newMax = Math.max(1, parseInt(e.target.value) || 1)
+                        updateCharacter(character.id, { hp: { ...character.hp, max: newMax, current: Math.min(character.hp.current, newMax) } })
+                      }}
+                    />
+                    <span className={styles.hpEditHint}>PV actual / máximo</span>
+                  </>
+                ) : (
+                  <>
+                    <span className={styles.hpCurrent}>{character.hp.current}</span>
+                    <span className={styles.hpSeparator}>/</span>
+                    <span className={styles.hpMax}>{character.hp.max}</span>
+                  </>
+                )}
               </div>
               {/* HP Bar */}
               <div className={styles.hpBar}>
                 <div className={styles.hpBarFill} style={{ width: `${hpPercent}%` }} />
               </div>
             </div>
-            <div className={styles.hpControls}>
-              <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.max(0, character.hp.current - 1) } })}>−1</button>
-              <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.max(0, character.hp.current - 5) } })}>−5</button>
-              <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.min(character.hp.max, character.hp.current + 1) } })}>+1</button>
-              <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.min(character.hp.max, character.hp.current + 5) } })}>+5</button>
-            </div>
+            {!isEditing && (
+              <div className={styles.hpControls}>
+                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.max(0, character.hp.current - 1) } })}>−1</button>
+                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.max(0, character.hp.current - 5) } })}>−5</button>
+                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.min(character.hp.max, character.hp.current + 1) } })}>+1</button>
+                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.min(character.hp.max, character.hp.current + 5) } })}>+5</button>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -317,7 +369,21 @@ export function CharacterView() {
                   return (
                     <div key={attr} className={styles.abilityBlock}>
                       <span className={styles.abilityAbbr}>{ABILITY_ABBR[attr]}</span>
-                      <span className={styles.abilityScore}>{value}</span>
+                      {isEditing ? (
+                        <input
+                          className={styles.abilityEditInput}
+                          type="number"
+                          min={1}
+                          max={30}
+                          defaultValue={value}
+                          onBlur={(e) => {
+                            const v = Math.max(1, Math.min(30, parseInt(e.target.value) || 1))
+                            updateCharacter(character.id, { abilities: { ...character.abilities, [attr]: v } })
+                          }}
+                        />
+                      ) : (
+                        <span className={styles.abilityScore}>{value}</span>
+                      )}
                       <span className={`${styles.abilityMod} ${mod >= 0 ? styles.positive : styles.negative}`}>
                         {getModifierString(value)}
                       </span>
@@ -376,24 +442,60 @@ export function CharacterView() {
               return (
                 <Card padding="md" className={styles.colSpan2}>
                   <h3 className={styles.sectionTitle}>Progresión de Clase</h3>
-                  {character.classes.length > 1 && (
-                    <div className={styles.tabs}>
+                  {isEditing ? (
+                    <div className={styles.classLevelEditor}>
                       {character.classes.map((cc) => {
                         const cd = getClassById(cc.id)
                         return (
-                          <button
-                            key={cc.id}
-                            className={`${styles.tab} ${progressionTab === cc.id ? styles.activeTab : ''}`}
-                            onClick={() => setProgressionTab(cc.id)}
-                          >
-                            {cd?.name ?? cc.id}
-                            <span style={{ opacity: 0.6, fontSize: '0.85em' }}> Nv {cc.level}</span>
-                          </button>
+                          <div key={cc.id} className={styles.classLevelRow}>
+                            <span className={styles.classLevelName}>{cd?.name ?? cc.id}</span>
+                            <div className={styles.classLevelControls}>
+                              <button
+                                className={styles.classLevelBtn}
+                                onClick={() => {
+                                  if (cc.level <= 1 && character.classes.length === 1) return
+                                  const newClasses = cc.level <= 1
+                                    ? character.classes.filter((c) => c.id !== cc.id)
+                                    : character.classes.map((c) => c.id === cc.id ? { ...c, level: c.level - 1 } : c)
+                                  const newTotal = newClasses.reduce((s, c) => s + c.level, 0)
+                                  updateCharacter(character.id, { classes: newClasses, level: newTotal })
+                                }}
+                                disabled={cc.level <= 1 && character.classes.length === 1}
+                              >−</button>
+                              <span className={styles.classLevelValue}>{cc.level}</span>
+                              <button
+                                className={styles.classLevelBtn}
+                                onClick={() => {
+                                  const newClasses = character.classes.map((c) => c.id === cc.id ? { ...c, level: c.level + 1 } : c)
+                                  const newTotal = newClasses.reduce((s, c) => s + c.level, 0)
+                                  updateCharacter(character.id, { classes: newClasses, level: newTotal })
+                                }}
+                              >+</button>
+                            </div>
+                          </div>
                         )
                       })}
                     </div>
+                  ) : (
+                    character.classes.length > 1 && (
+                      <div className={styles.tabs}>
+                        {character.classes.map((cc) => {
+                          const cd = getClassById(cc.id)
+                          return (
+                            <button
+                              key={cc.id}
+                              className={`${styles.tab} ${progressionTab === cc.id ? styles.activeTab : ''}`}
+                              onClick={() => setProgressionTab(cc.id)}
+                            >
+                              {cd?.name ?? cc.id}
+                              <span style={{ opacity: 0.6, fontSize: '0.85em' }}> Nv {cc.level}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )
                   )}
-                  {activeClassData && (
+                  {!isEditing && activeClassData && (
                     <ClassProgressionTable classData={activeClassData} currentLevel={activeClassEntry.level} />
                   )}
                 </Card>
@@ -403,7 +505,7 @@ export function CharacterView() {
             {/* Status Effects */}
             <Card padding="md" className={styles.alignStart}>
               <div className={styles.sectionHeaderRow}>
-                <h3 className={styles.sectionTitle}>Efectos Activos</h3>
+                <h3 className={styles.sectionTitle}>Efectos</h3>
                 <button
                   className={styles.addEffectBtn}
                   onClick={() => setShowEffectForm(!showEffectForm)}
@@ -422,32 +524,190 @@ export function CharacterView() {
                   />
                   <input
                     className={styles.effectInput}
-                    placeholder="Descripción (ej: +1 a ataques)"
+                    placeholder="Descripción (opcional)"
                     value={newEffectDesc}
                     onChange={(e) => setNewEffectDesc(e.target.value)}
                   />
+                  <input
+                    className={styles.effectInput}
+                    placeholder="Duración (ej: 3 rondas)"
+                    value={newEffectDuration}
+                    onChange={(e) => setNewEffectDuration(e.target.value)}
+                  />
+                  <div className={styles.effectBonusRow}>
+                    <select
+                      className={styles.effectSelect}
+                      value={newEffectTarget}
+                      onChange={(e) => { setNewEffectTarget(e.target.value as BonusTarget | 'skill' | ''); setNewEffectSkillId('') }}
+                    >
+                      <option value="">Sin bonificador</option>
+                      <option value="attack">Ataque</option>
+                      <option value="damage">Daño</option>
+                      <option value="ac">CA</option>
+                      <option value="fort">Fortaleza</option>
+                      <option value="ref">Reflejos</option>
+                      <option value="will">Voluntad</option>
+                      <option value="initiative">Iniciativa</option>
+                      <option value="cmb">CMB</option>
+                      <option value="cmd">CMD</option>
+                      <option value="skill">Habilidad específica…</option>
+                    </select>
+                    {newEffectTarget === 'skill' && (
+                      <select
+                        className={styles.effectSelect}
+                        value={newEffectSkillId}
+                        onChange={(e) => setNewEffectSkillId(e.target.value)}
+                      >
+                        <option value="">Selecciona habilidad</option>
+                        {[...SKILLS].sort((a, b) => a.name.localeCompare(b.name)).map((s) => (
+                          <option key={s.id} value={s.id}>{s.name}</option>
+                        ))}
+                      </select>
+                    )}
+                    {newEffectTarget && (
+                      <input
+                        className={styles.effectValueInput}
+                        type="number"
+                        placeholder="+2"
+                        value={newEffectValue === 0 ? '' : newEffectValue}
+                        onChange={(e) => setNewEffectValue(parseInt(e.target.value) || 0)}
+                      />
+                    )}
+                  </div>
                   <div className={styles.effectFormActions}>
                     <Button variant="primary" size="sm" onClick={addStatusEffect}>Añadir</Button>
                     <Button variant="secondary" size="sm" onClick={() => setShowEffectForm(false)}>Cancelar</Button>
                   </div>
                 </div>
               )}
-              <div className={styles.effectsChips}>
-                {(character.statusEffects ?? []).length === 0 && !showEffectForm && (
-                  <p className={styles.emptyEffects}>Sin efectos activos</p>
-                )}
-                {(character.statusEffects ?? []).map((effect) => (
-                  <span key={effect.id} className={styles.effectChip}>
-                    <span className={styles.effectName}>{effect.name}</span>
-                    {effect.description && (
-                      <span className={styles.effectDesc}>{effect.description}</span>
-                    )}
-                    <button className={styles.effectRemove} onClick={() => removeStatusEffect(effect.id)}>
-                      <X size={12} />
-                    </button>
-                  </span>
-                ))}
-              </div>
+              {(character.statusEffects ?? []).length === 0 && !showEffectForm && (
+                <p className={styles.emptyEffects}>Sin efectos</p>
+              )}
+              {(character.statusEffects ?? []).length > 0 && (
+                <ul className={styles.effectsList}>
+                  {(character.statusEffects ?? []).map((effect) => {
+                    const BONUS_LABELS: Record<string, string> = {
+                      attack: 'Ataque', damage: 'Daño', ac: 'CA',
+                      fort: 'Fortaleza', ref: 'Reflejos', will: 'Voluntad',
+                      initiative: 'Iniciativa', cmb: 'CMB', cmd: 'CMD',
+                    }
+                    const targetLabel = effect.bonusTarget
+                      ? effect.bonusTarget.startsWith('skill:')
+                        ? SKILLS.find((s) => s.id === effect.bonusTarget!.replace('skill:', ''))?.name ?? effect.bonusTarget.replace('skill:', '')
+                        : BONUS_LABELS[effect.bonusTarget] ?? effect.bonusTarget
+                      : null
+                    const isActive = effect.active !== false
+                    const isEditing = editingEffectId === effect.id
+
+                    const startEdit = () => {
+                      setEditingEffectId(effect.id)
+                      setEditName(effect.name)
+                      setEditDesc(effect.description ?? '')
+                      setEditDuration(effect.duration ?? '')
+                      if (effect.bonusTarget?.startsWith('skill:')) {
+                        setEditTarget('skill')
+                        setEditSkillId(effect.bonusTarget.replace('skill:', ''))
+                      } else {
+                        setEditTarget(effect.bonusTarget ?? '')
+                        setEditSkillId('')
+                      }
+                      setEditValue(effect.bonusValue ?? 0)
+                    }
+
+                    const saveEdit = () => {
+                      const resolvedTarget: BonusTarget | undefined =
+                        editTarget === 'skill'
+                          ? editSkillId ? (`skill:${editSkillId}` as BonusTarget) : undefined
+                          : editTarget || undefined
+                      updateCharacter(character.id, {
+                        statusEffects: (character.statusEffects ?? []).map((e) =>
+                          e.id !== effect.id ? e : {
+                            ...e,
+                            name: editName.trim() || e.name,
+                            description: editDesc.trim(),
+                            duration: editDuration.trim() || undefined,
+                            bonusTarget: resolvedTarget,
+                            bonusValue: resolvedTarget !== undefined ? editValue : undefined,
+                          }
+                        )
+                      })
+                      setEditingEffectId(null)
+                    }
+
+                    return (
+                      <li key={effect.id} className={`${styles.effectItem} ${!isActive ? styles.effectItemDisabled : ''}`}>
+                        {isEditing ? (
+                          <div className={styles.effectEditInline}>
+                            <input className={styles.effectInput} value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Nombre" />
+                            <input className={styles.effectInput} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} placeholder="Descripción" />
+                            <input className={styles.effectInput} value={editDuration} onChange={(e) => setEditDuration(e.target.value)} placeholder="Duración" />
+                            <div className={styles.effectBonusRow}>
+                              <select className={styles.effectSelect} value={editTarget} onChange={(e) => { setEditTarget(e.target.value as BonusTarget | 'skill' | ''); setEditSkillId('') }}>
+                                <option value="">Sin bonificador</option>
+                                <option value="attack">Ataque</option>
+                                <option value="damage">Daño</option>
+                                <option value="ac">CA</option>
+                                <option value="fort">Fortaleza</option>
+                                <option value="ref">Reflejos</option>
+                                <option value="will">Voluntad</option>
+                                <option value="initiative">Iniciativa</option>
+                                <option value="cmb">CMB</option>
+                                <option value="cmd">CMD</option>
+                                <option value="skill">Habilidad específica…</option>
+                              </select>
+                              {editTarget === 'skill' && (
+                                <select className={styles.effectSelect} value={editSkillId} onChange={(e) => setEditSkillId(e.target.value)}>
+                                  <option value="">Selecciona habilidad</option>
+                                  {[...SKILLS].sort((a, b) => a.name.localeCompare(b.name)).map((s) => (
+                                    <option key={s.id} value={s.id}>{s.name}</option>
+                                  ))}
+                                </select>
+                              )}
+                              {editTarget && (
+                                <input className={styles.effectValueInput} type="number" value={editValue === 0 ? '' : editValue} onChange={(e) => setEditValue(parseInt(e.target.value) || 0)} placeholder="+2" />
+                              )}
+                            </div>
+                            <div className={styles.effectEditActions}>
+                              <Button variant="primary" size="sm" onClick={saveEdit}><Check size={13} /> Guardar</Button>
+                              <Button variant="secondary" size="sm" onClick={() => setEditingEffectId(null)}>Cancelar</Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className={styles.effectItemRow}>
+                              <button
+                                className={`${styles.effectToggleBtn} ${isActive ? styles.effectToggleOn : styles.effectToggleOff}`}
+                                onClick={() => updateCharacter(character.id, {
+                                  statusEffects: (character.statusEffects ?? []).map((e) =>
+                                    e.id === effect.id ? { ...e, active: !isActive } : e
+                                  )
+                                })}
+                                title={isActive ? 'Desactivar' : 'Activar'}
+                              >
+                                <Power size={13} />
+                              </button>
+                              <div className={styles.effectItemBody}>
+                                <span className={styles.effectName}>{effect.name}</span>
+                                {targetLabel && effect.bonusValue !== undefined && (
+                                  <span className={effect.bonusValue >= 0 ? styles.effectBonusPos : styles.effectBonusNeg}>
+                                    {effect.bonusValue >= 0 ? `+${effect.bonusValue}` : effect.bonusValue} {targetLabel}
+                                  </span>
+                                )}
+                                {effect.duration && <span className={styles.effectDuration}>{effect.duration}</span>}
+                                {effect.description && <span className={styles.effectDesc}>{effect.description}</span>}
+                              </div>
+                              <div className={styles.effectItemActions}>
+                                <button className={styles.effectEditBtn} onClick={startEdit} title="Editar"><Pencil size={13} /></button>
+                                <button className={styles.effectRemove} onClick={() => removeStatusEffect(effect.id)} title="Eliminar"><X size={13} /></button>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
             </Card>
           </div>
         )}
@@ -597,19 +857,52 @@ export function CharacterView() {
                   : [...character.spells, spellId]
                 updateCharacter(character.id, { spells: newSpells })
               }}
-              onUseSlot={(level: SpellLevel) => {
-                const slots = { ...character.spellSlots }
-                if (slots[level] && slots[level].used < slots[level].max) {
-                  slots[level] = { ...slots[level], used: slots[level].used + 1 }
-                  updateCharacter(character.id, { spellSlots: slots })
-                }
+              isEditing={isEditing}
+              onToggleSlotPip={(level: SpellLevel, pipIndex: number) => {
+                const slots = { ...(character.spellSlots ?? {}) }
+                const slot = slots[level] ?? { max: 0, used: 0 }
+                const newUsed = pipIndex < slot.used
+                  ? slot.used - 1
+                  : Math.min(slot.used + 1, slot.max)
+                updateCharacter(character.id, { spellSlots: { ...slots, [level]: { ...slot, used: newUsed } } })
               }}
-              onRestoreSlot={(level: SpellLevel) => {
-                const slots = { ...character.spellSlots }
-                if (slots[level] && slots[level].used > 0) {
-                  slots[level] = { ...slots[level], used: slots[level].used - 1 }
-                  updateCharacter(character.id, { spellSlots: slots })
-                }
+              onLongRest={() => {
+                const slots = { ...(character.spellSlots ?? {}) }
+                Object.keys(slots).forEach((k) => {
+                  slots[Number(k)] = { ...slots[Number(k)], used: 0 }
+                })
+                updateCharacter(character.id, { spellSlots: slots })
+              }}
+              onSyncSlots={() => {
+                const casterClass = character.classes.find((c) => {
+                  const cd = getClassById(c.id)
+                  return cd?.spellsPerDay !== undefined
+                })
+                if (!casterClass) return
+                const cd = getClassById(casterClass.id)
+                if (!cd?.spellsPerDay || !cd.casterAbility) return
+                const row = cd.spellsPerDay[casterClass.level - 1] ?? []
+                const casterScore = character.abilities[cd.casterAbility]
+                const bonusPerLevel = getBonusSpells(casterScore)
+                const current = { ...(character.spellSlots ?? {}) }
+                const newSlots: Record<number, { max: number; used: number }> = {}
+                row.forEach((slotsForLevel, spellLevel) => {
+                  if (slotsForLevel !== undefined && slotsForLevel > 0) {
+                    const bonus = bonusPerLevel[spellLevel] ?? 0
+                    const total = slotsForLevel + bonus
+                    const prev = current[spellLevel]
+                    newSlots[spellLevel] = {
+                      max: total,
+                      used: prev ? Math.min(prev.used, total) : 0,
+                    }
+                  }
+                })
+                updateCharacter(character.id, { spellSlots: newSlots })
+              }}
+              onSetSlotMax={(level: SpellLevel, max: number) => {
+                const slots = { ...(character.spellSlots ?? {}) }
+                slots[level] = { max, used: Math.min(slots[level]?.used ?? 0, max) }
+                updateCharacter(character.id, { spellSlots: slots })
               }}
             />
           </Card>
