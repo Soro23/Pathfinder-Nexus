@@ -16,7 +16,11 @@ import { CampaignView } from './pages/CampaignView'
 import { CampaignImport } from './pages/CampaignImport'
 import { PartyView } from './pages/PartyView'
 import { Admin } from './pages/Admin'
+import { Tools } from './pages/Tools'
 import { Homebrew } from './pages/Homebrew'
+import { Tables } from './pages/Tables'
+import { Skills } from './pages/Skills'
+import { Feats } from './pages/Feats'
 
 function App() {
   return (
@@ -39,12 +43,16 @@ function App() {
               <Route path="characters/:id" element={<CharacterView />} />
               <Route path="characters/:id/play" element={<PlayMode />} />
               <Route path="rules" element={<Rules />} />
+              <Route path="tables" element={<Tables />} />
+              <Route path="skills" element={<Skills />} />
+              <Route path="feats" element={<Feats />} />
               <Route path="campaigns" element={<CampaignList />} />
               <Route path="campaigns/new" element={<CampaignNew />} />
               <Route path="campaigns/import" element={<CampaignImport />} />
               <Route path="campaigns/:id" element={<CampaignView />} />
               <Route path="homebrew" element={<Homebrew />} />
               <Route path="admin" element={<Admin />} />
+              <Route path="tools" element={<Tools />} />
             </Route>
           </Route>
         </Routes>

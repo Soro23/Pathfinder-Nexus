@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { PlusCircle, Heart, Shield, BookOpen, Sparkles, Backpack, Upload, Wand2, X, ImagePlus } from 'lucide-react'
+import { PlusCircle, Heart, Shield, BookOpen, Sparkles, Backpack, Upload, Wand2, X, ImagePlus, ChevronDown } from 'lucide-react'
 import { useCharacterStore, calculateModifier } from '../store'
 import type { Character } from '../store'
 import { getClassById } from '../data'
@@ -16,6 +16,7 @@ export function Dashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
   const [showTemplates, setShowTemplates] = useState(false)
+  const [isImportOpen, setIsImportOpen] = useState(false)
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -90,18 +91,34 @@ export function Dashboard() {
             style={{ display: 'none' }}
             onChange={handleImport}
           />
-          <Button variant="secondary" size="md" onClick={() => navigate('/characters/import')} title="Importar personaje desde imagen">
-            <ImagePlus size={16} />
-            Importar Imagen
-          </Button>
-          <Button variant="secondary" size="md" onClick={() => fileInputRef.current?.click()} title="Importar personaje desde JSON">
-            <Upload size={16} />
-            Importar JSON
-          </Button>
-          <Button variant="secondary" size="md" onClick={() => setShowTemplates(true)}>
-            <Wand2 size={16} />
-            Plantillas
-          </Button>
+          <div className={styles.importDropdown}>
+            <Button 
+              variant="secondary" 
+              size="md" 
+              onClick={() => setIsImportOpen(!isImportOpen)}
+              className={styles.importDropdownTrigger}
+            >
+              <Upload size={16} />
+              Importar
+              <ChevronDown size={14} className={isImportOpen ? styles.chevronUp : ''} />
+            </Button>
+            {isImportOpen && (
+              <div className={styles.importDropdownMenu}>
+                <button onClick={() => { navigate('/characters/import'); setIsImportOpen(false) }}>
+                  <ImagePlus size={16} />
+                  Importar Imagen
+                </button>
+                <button onClick={() => { fileInputRef.current?.click(); setIsImportOpen(false) }}>
+                  <Upload size={16} />
+                  Importar JSON
+                </button>
+                <button onClick={() => { setShowTemplates(true); setIsImportOpen(false) }}>
+                  <Wand2 size={16} />
+                  Plantillas
+                </button>
+              </div>
+            )}
+          </div>
           <Link to="/characters/new">
             <Button variant="primary" size="md">
               <PlusCircle size={18} />

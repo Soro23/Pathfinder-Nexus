@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users, Wand2 } from 'lucide-react'
+import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users, Wand2, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Spell } from '../data/spells'
 import { SPELL_SCHOOLS } from '../data/spells'
 import { useCustomSpellsStore } from '../store/customSpellsStore'
@@ -87,6 +87,25 @@ type ImportStatus = 'idle' | 'loading' | 'done' | 'error'
 
 export function Admin() {
   const [activeTab, setActiveTab] = useState<TabId>('spells')
+  const [showLeftArrow, setShowLeftArrow] = useState(false)
+  const [showRightArrow, setShowRightArrow] = useState(true)
+  const tabNavRef = useRef<HTMLDivElement>(null)
+
+  const updateArrows = () => {
+    if (!tabNavRef.current) return
+    const { scrollLeft, scrollWidth, clientWidth } = tabNavRef.current
+    setShowLeftArrow(scrollLeft > 0)
+    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10)
+  }
+
+  const scrollTabs = (direction: 'left' | 'right') => {
+    if (!tabNavRef.current) return
+    const scrollAmount = tabNavRef.current.clientWidth * 0.7
+    tabNavRef.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
+    })
+  }
 
   return (
     <div className={styles.page}>
@@ -95,38 +114,50 @@ export function Admin() {
         <p className={styles.subtitle}>Gestiona y amplía la biblioteca de hechizos de la aplicación.</p>
       </header>
 
-      <nav className={styles.tabNav}>
-        <button
-          className={`${styles.tabBtn} ${activeTab === 'spells' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('spells')}
-        >
-          <Wand2 size={16} /> Conjuros
-        </button>
-        <button
-          className={`${styles.tabBtn} ${activeTab === 'skills' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('skills')}
-        >
-          <BookOpen size={16} /> Skills
-        </button>
-        <button
-          className={`${styles.tabBtn} ${activeTab === 'feats' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('feats')}
-        >
-          <Star size={16} /> Feats
-        </button>
-        <button
-          className={`${styles.tabBtn} ${activeTab === 'classes' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('classes')}
-        >
-          <Sword size={16} /> Clases
-        </button>
-        <button
-          className={`${styles.tabBtn} ${activeTab === 'races' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('races')}
-        >
-          <Users size={16} /> Razas
-        </button>
-      </nav>
+      <div className={styles.tabNavWrapper}>
+        {showLeftArrow && (
+          <button className={`${styles.tabArrow} ${styles.left}`} onClick={() => scrollTabs('left')}>
+            <ChevronLeft size={20} />
+          </button>
+        )}
+        <nav className={styles.tabNav} ref={tabNavRef} onScroll={updateArrows}>
+          <button
+            className={`${styles.tabBtn} ${activeTab === 'spells' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('spells')}
+          >
+            <Wand2 size={16} /> Conjuros
+          </button>
+          <button
+            className={`${styles.tabBtn} ${activeTab === 'skills' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('skills')}
+          >
+            <BookOpen size={16} /> Skills
+          </button>
+          <button
+            className={`${styles.tabBtn} ${activeTab === 'feats' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('feats')}
+          >
+            <Star size={16} /> Feats
+          </button>
+          <button
+            className={`${styles.tabBtn} ${activeTab === 'classes' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('classes')}
+          >
+            <Sword size={16} /> Clases
+          </button>
+          <button
+            className={`${styles.tabBtn} ${activeTab === 'races' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('races')}
+          >
+            <Users size={16} /> Razas
+          </button>
+        </nav>
+        {showRightArrow && (
+          <button className={`${styles.tabArrow} ${styles.right}`} onClick={() => scrollTabs('right')}>
+            <ChevronRight size={20} />
+          </button>
+        )}
+      </div>
 
       <div className={styles.tabContent}>
         {activeTab === 'spells' && <SpellsEditor />}

@@ -38,6 +38,52 @@
   flex-shrink: 0;
 }
 
+.importDropdown {
+  position: relative;
+}
+
+.importDropdownTrigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.chevronUp {
+  transform: rotate(180deg);
+}
+
+.importDropdownMenu {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  background: var(--color-surface-container);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  min-width: 180px;
+  z-index: 50;
+  overflow: hidden;
+}
+
+.importDropdownMenu button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--color-on-surface);
+  font-size: var(--text-body-md);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.importDropdownMenu button:hover {
+  background: var(--color-surface-container-high);
+}
+
 /* ── Character Grid ── */
 .grid {
   display: grid;
@@ -417,6 +463,16 @@
   .headerActions {
     width: 100%;
     justify-content: flex-end;
+  }
+
+  .importDropdownMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 50vh;
+    overflow-y: auto;
   }
 
   .grid {

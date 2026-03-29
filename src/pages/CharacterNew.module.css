@@ -716,6 +716,10 @@
   background: var(--color-bg-elevated);
 }
 
+.accordionHeaderOpen {
+  background: var(--color-surface-container);
+}
+
 .accordionHasSelected {
   border-left: 3px solid var(--color-primary);
   padding-left: calc(var(--space-4) - 3px);

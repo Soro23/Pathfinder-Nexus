@@ -213,14 +213,14 @@ export function CharacterNew() {
 
   const [startingGold, setStartingGold] = useState(0)
 
-  // ── Accordion open state ──
-  const [openRaceGroups, setOpenRaceGroups] = useState<Set<string>>(new Set(['Razas Principales']))
-  const [openClassGroups, setOpenClassGroups] = useState<Set<string>>(new Set(['Clases Principales']))
+  // ── Accordion open state (exclusive - only one open at a time) ──
+  const [openRaceGroup, setOpenRaceGroup] = useState<string>('Razas Principales')
+  const [openClassGroup, setOpenClassGroup] = useState<string>('Clases Principales')
 
   const toggleRaceGroup = (label: string) =>
-    setOpenRaceGroups((prev) => { const s = new Set(prev); s.has(label) ? s.delete(label) : s.add(label); return s })
+    setOpenRaceGroup((prev) => prev === label ? '' : label)
   const toggleClassGroup = (label: string) =>
-    setOpenClassGroups((prev) => { const s = new Set(prev); s.has(label) ? s.delete(label) : s.add(label); return s })
+    setOpenClassGroup((prev) => prev === label ? '' : label)
 
   // ── Ability method state ──
   const [abilityMethod, setAbilityMethod] = useState<AbilityMethod>('free')
@@ -388,12 +388,12 @@ export function CharacterNew() {
 
               <div className={styles.accordionList}>
                 {RACE_GROUPS.map((group) => {
-                  const isOpen = openRaceGroups.has(group.label)
+                  const isOpen = openRaceGroup === group.label
                   const groupHasSelected = group.races.some((r) => r.value === form.race)
                   return (
                     <div key={group.label} className={styles.accordionGroup}>
                       <button
-                        className={`${styles.accordionHeader} ${groupHasSelected ? styles.accordionHasSelected : ''}`}
+                        className={`${styles.accordionHeader} ${isOpen ? styles.accordionHeaderOpen : ''} ${groupHasSelected ? styles.accordionHasSelected : ''}`}
                         onClick={() => toggleRaceGroup(group.label)}
                       >
                         <span className={styles.accordionLabel}>{group.label}</span>
@@ -445,12 +445,12 @@ export function CharacterNew() {
 
               <div className={styles.accordionList}>
                 {CLASS_GROUPS.map((group) => {
-                  const isOpen = openClassGroups.has(group.label)
+                  const isOpen = openClassGroup === group.label
                   const groupHasSelected = group.classes.some((c) => c.value === form.class)
                   return (
                     <div key={group.label} className={styles.accordionGroup}>
                       <button
-                        className={`${styles.accordionHeader} ${groupHasSelected ? styles.accordionHasSelected : ''}`}
+                        className={`${styles.accordionHeader} ${isOpen ? styles.accordionHeaderOpen : ''} ${groupHasSelected ? styles.accordionHasSelected : ''}`}
                         onClick={() => toggleClassGroup(group.label)}
                       >
                         <span className={styles.accordionLabel}>{group.label}</span>

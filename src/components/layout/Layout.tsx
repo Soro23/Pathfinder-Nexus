@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import {
-  Users, Map, BookOpen, LayoutList, Shield, Globe, Star, Zap,
+  Users, Map, BookOpen, LayoutList, Shield, Globe, Zap,
   Sparkles, Backpack, Gem, PawPrint, Settings, Sun, Moon, LogOut, Sword, Wand2,
 } from 'lucide-react'
 import { useSRDStore } from '../../store/srdStore'
@@ -10,11 +10,8 @@ import { useTheme } from '../../hooks/useTheme'
 import styles from './Layout.module.css'
 
 const compendiumSoon = [
-  { icon: LayoutList, label: 'Tablas' },
   { icon: Shield,     label: 'Clases' },
   { icon: Globe,      label: 'Razas' },
-  { icon: Star,       label: 'Dotes' },
-  { icon: Zap,        label: 'Habilidades' },
   { icon: Sparkles,   label: 'Conjuros' },
   { icon: Backpack,   label: 'Equipación' },
   { icon: Gem,        label: 'Objetos Mágicos' },
@@ -24,7 +21,8 @@ const compendiumSoon = [
 const bottomNavItems = [
   { path: '/',          icon: Users,     label: 'Personajes', exact: true },
   { path: '/campaigns', icon: Map,       label: 'Campañas',   exact: false },
-  { path: '/rules',     icon: BookOpen,  label: 'Reglas',     exact: false },
+  { path: '/rules',     icon: BookOpen,  label: 'Compendio',  exact: false },
+  { path: '/tools',     icon: Settings,  label: 'Herramientas', exact: false },
 ]
 
 export function Layout() {
@@ -102,6 +100,27 @@ export function Layout() {
           >
             <Wand2 size={18} />
             <span>Homebrew</span>
+          </Link>
+          <Link
+            to="/tables"
+            className={`${styles.navItem} ${isActive('/tables', false) ? styles.active : ''}`}
+          >
+            <LayoutList size={18} />
+            <span>Tablas</span>
+          </Link>
+          <Link
+            to="/skills"
+            className={`${styles.navItem} ${isActive('/skills', false) ? styles.active : ''}`}
+          >
+            <Zap size={18} />
+            <span>Habilidades</span>
+          </Link>
+          <Link
+            to="/feats"
+            className={`${styles.navItem} ${isActive('/feats', false) ? styles.active : ''}`}
+          >
+            <Sword size={18} />
+            <span>Dotes</span>
           </Link>
           {compendiumSoon.map(({ icon: Icon, label }) => (
             <span key={label} className={`${styles.navItem} ${styles.disabled}`}>
