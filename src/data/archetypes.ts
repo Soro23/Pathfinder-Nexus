@@ -497,56 +497,295 @@ export const ARCHETYPES: Archetype[] = [
   },
 
   // ─── WIZARD ───────────────────────────────────────────────────────────────
+  // ─── WIZARD ───────────────────────────────────────────────────────────────
+  // Escuelas de especialización (arcane schools) — cambian poderes de escuela
   {
-    id: 'exploiter-wizard',
+    id: 'wizard-abjurer',
     classId: 'wizard',
-    name: 'Exploiter Wizard',
-    description: 'Mago que intercambia la especialización de escuela por explotaciones arcanas.',
+    name: 'Especialista Abjurador',
+    description: 'Mago especializado en conjuros de Abjuración. Obtiene poderes de resistencia y protección mágica. Escuelas prohibidas recomendadas: Evocación, Ilusión.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Resistencia Protectora', level: 1, description: 'Obtienes un bonus de resistencia a las salvaciones igual a 1/3 de tu nivel (mín. 1).' },
+      { name: 'Campo de Energía', level: 1, description: 'Como acción estándar, 3 + mod. INT veces al día, creas una barrera de 1d6+1/2 nivel de PV temporales.' },
+      { name: 'Supresión de Conjuro', level: 6, description: 'Puedes suprimir un conjuro o efecto mágico activo como dispel magic, 1/día por cada 6 niveles.' },
+    ],
+  },
+  {
+    id: 'wizard-conjurer',
+    classId: 'wizard',
+    name: 'Especialista Conjurador',
+    description: 'Mago especializado en conjuros de Conjuración. Convoca aliados con mayor potencia. Escuelas prohibidas recomendadas: Evocación, Ilusión.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Teletransporte a Corta Distancia', level: 1, description: 'Como acción libre 3 + mod. INT veces al día, te teletransportas hasta 5 pies × 1/2 nivel (mín. 5 pies).' },
+      { name: 'Convocación Potenciada', level: 8, description: 'Las criaturas que convocas con conjuros de invocación ganan beneficios adicionales.' },
+    ],
+  },
+  {
+    id: 'wizard-diviner',
+    classId: 'wizard',
+    name: 'Especialista Adivino',
+    description: 'Mago especializado en adivinación y predicción del futuro. Escuelas prohibidas recomendadas: Ilusión, Nigromancia.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Augure', level: 1, description: 'Una vez al día por cada 4 niveles de mago, lanzas un conjuro de adivinación a nivel de conjurador +2.' },
+      { name: 'Visión del Futuro', level: 1, description: 'Tiras dos dados de iniciativa al inicio del combate y eliges cuál usar. 3 + mod. INT veces al día.' },
+      { name: 'Ojo del Adivino', level: 8, description: 'Puedes usar clairvoyance/clairaudience a voluntad sobre lugares que hayas visitado antes.' },
+    ],
+  },
+  {
+    id: 'wizard-enchanter',
+    classId: 'wizard',
+    name: 'Especialista Encantador',
+    description: 'Mago especializado en conjuros de Encantamiento. Manipula mentes y emociones. Escuelas prohibidas recomendadas: Evocación, Nigromancia.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Mirada Hipnótica', level: 1, description: 'Como acción estándar, un enemigo en 30 pies queda atontado 1 ronda (Will niega). 3 + mod. INT veces al día.' },
+      { name: 'Sugestión Arcana', level: 8, description: 'Cuando falla la TS de un encantamiento tuyo, el objetivo queda desorientado 1 ronda en cambio.' },
+    ],
+  },
+  {
+    id: 'wizard-evoker',
+    classId: 'wizard',
+    name: 'Especialista Evocador',
+    description: 'Mago especializado en conjuros de Evocación. Daño mágico potenciado. Escuelas prohibidas recomendadas: Encantamiento, Conjuración.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Chispa Intensa', level: 1, description: '3 + mod. INT veces al día, tiras un rayo de energía de 1d6 + 1/2 nivel de daño contra un objetivo en 30 pies.' },
+      { name: 'Evocación Potenciada', level: 8, description: 'Añades mod. INT de daño adicional a cualquier conjuro de evocación que cause daño (una vez por conjuro).' },
+    ],
+  },
+  {
+    id: 'wizard-illusionist',
+    classId: 'wizard',
+    name: 'Especialista Ilusionista',
+    description: 'Mago especializado en conjuros de Ilusión. Manipula la percepción y crea engaños. Escuelas prohibidas recomendadas: Nigromancia, Conjuración.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Doble Cegador', level: 1, description: '3 + mod. INT veces al día, creas un doble ilusorio al lado de un enemigo que lo deja cegado 1 ronda (Will niega).' },
+      { name: 'Velo Persistente', level: 8, description: 'Las ilusiones que creas duran el doble y su CD de salvación aumenta en 1.' },
+    ],
+  },
+  {
+    id: 'wizard-necromancer',
+    classId: 'wizard',
+    name: 'Especialista Nigromante',
+    description: 'Mago especializado en conjuros de Nigromancia. Domina la muerte y los no-muertos. Escuelas prohibidas recomendadas: Encantamiento, Ilusión.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Toque Putrefacto', level: 1, description: '3 + mod. INT veces al día, toque que causa 1d6 + 1/2 nivel de daño a criaturas vivas o sana igual a no-muertos.' },
+      { name: 'Animación Rápida', level: 8, description: 'Puedes crear no-muertos con animate dead sin material component y uno más por día.' },
+    ],
+  },
+  {
+    id: 'wizard-transmuter',
+    classId: 'wizard',
+    name: 'Especialista Transmutador',
+    description: 'Mago especializado en conjuros de Transmutación. Altera la realidad física. Escuelas prohibidas recomendadas: Abjuración, Conjuración.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Magia de Transformación', level: 1, description: 'Elige una característica física; 3 + mod. INT veces al día ganas +2 a esa estadística durante 1 ronda/nivel.' },
+      { name: 'Cambio de Forma Físico', level: 8, description: 'Cuando lanzas un conjuro de transmutación de forma, añades +2 a FUE o DES durante la duración.' },
+    ],
+  },
+
+  // Escuelas elementales (Ultimate Magic)
+  {
+    id: 'wizard-air-elementalist',
+    classId: 'wizard',
+    name: 'Elementalista del Aire',
+    description: 'Mago especializado en magia del elemento Aire. Puede incluir agua como escuela secundaria.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Ráfaga de Viento', level: 1, description: '3 + mod. INT veces al día, puedes empujar una criatura en 30 pies (Fort o la mueves 5 pies por nivel).' },
+      { name: 'Celeridad del Viento', level: 6, description: 'Aumentas tu velocidad de movimiento en 10 pies. A nivel 10, puedes volar con velocidad de vuelo media.' },
+    ],
+  },
+  {
+    id: 'wizard-earth-elementalist',
+    classId: 'wizard',
+    name: 'Elementalista de la Tierra',
+    description: 'Mago especializado en magia del elemento Tierra. Puede incluir ácido como escuela secundaria.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Golpe de Piedra', level: 1, description: '3 + mod. INT veces al día, golpe que causa 1d6 + 1/2 nivel de daño contundente y puede aturdir 1 ronda.' },
+      { name: 'Piel de Piedra', level: 6, description: 'Obtienes RD 1/— que aumenta en 1 por cada 4 niveles de mago.' },
+    ],
+  },
+  {
+    id: 'wizard-fire-elementalist',
+    classId: 'wizard',
+    name: 'Elementalista del Fuego',
+    description: 'Mago especializado en magia del elemento Fuego. Puede incluir rayo como escuela secundaria.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Rayo de Fuego', level: 1, description: '3 + mod. INT veces al día, rayo de 1d6 + 1/2 nivel de daño de fuego en 30 pies. Puede causar fuego persistente.' },
+      { name: 'Elemental del Fuego', level: 6, description: 'Ganas inmunidad al fuego y tu daño con conjuros de fuego ignora la resistencia al fuego de 5 o menos.' },
+    ],
+  },
+  {
+    id: 'wizard-water-elementalist',
+    classId: 'wizard',
+    name: 'Elementalista del Agua',
+    description: 'Mago especializado en magia del elemento Agua. Puede incluir hielo como escuela secundaria.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Chorro de Agua', level: 1, description: '3 + mod. INT veces al día, chorro de agua que causa 1d6 + 1/2 nivel y puede derribar al objetivo (Fort niega).' },
+      { name: 'Forma Acuosa', level: 6, description: 'Puedes breathe water, nadas con velocidad 30 pies, y ganas RD 5/slashing cuando estás bajo el agua.' },
+    ],
+  },
+
+  // Arquetipos de arquetipo puro (Ultimate Magic / APG)
+  {
+    id: 'arcane-bomber',
+    classId: 'wizard',
+    name: 'Arcane Bomber',
+    description: 'Mago que canaliza su magia en bombas de energía arcana lanzables, a expensas de poderes de escuela.',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'replaces' },
+      { featureName: 'Escritura de Conjuros', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Bomba Arcana', level: 1, description: 'Crea y lanza bombas de energía arcana como alquimista de nivel igual al tuyo. Daño 1d6 + mod. INT por 1/2 nivel.' },
+      { name: 'Explosión Potenciada', level: 8, description: 'Puedes elegir el tipo de energía de la bomba (fuego, frío, electricidad o ácido) al crearla.' },
+    ],
+  },
+  {
+    id: 'scrollmaster',
+    classId: 'wizard',
+    name: 'Scrollmaster',
+    description: 'Mago especializado en el uso ofensivo y defensivo de pergaminos mágicos como arma y escudo.',
+    replaces: [
+      { featureName: 'Vínculo Arcano', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Escudo de Pergamino', level: 1, description: 'Usas un pergamino como escudo mágico que añade su nivel de hechizo a tu CA como bonificación de escudo.' },
+      { name: 'Leer Rápido', level: 1, description: 'Activas pergaminos como acción de movimiento en lugar de estándar.' },
+      { name: 'Pergamino Blindado', level: 4, description: 'Cuando te impacta un conjuro o ataque mágico, puedes gastar un pergamino para reducir el daño a la mitad.' },
+    ],
+  },
+  {
+    id: 'shadow-caller',
+    classId: 'wizard',
+    name: 'Shadow Caller',
+    description: 'Mago que invoca criaturas del Plano de las Sombras en lugar de criaturas normales.',
     replaces: [
       { featureName: 'Escuela de Especialización', atLevel: 1, type: 'replaces' },
     ],
     features: [
-      { name: 'Explotación Arcana', level: 1, description: 'Obtienes explotaciones arcanas del arcanista en lugar de poderes de escuela.' },
-      { name: 'Reserva Arcana', level: 1, description: 'Tienes una reserva de puntos arcanos igual a tu nivel + mod. INT.' },
+      { name: 'Invocación de Sombras', level: 1, description: 'Cuando invocas criaturas, puedes elegir traerlas del Plano de las Sombras. Son más fuertes pero tienen vulnerabilidad a la luz.' },
+      { name: 'Fusión con la Sombra', level: 1, description: '3 + mod. INT veces al día, te vuelves translúcido durante 1 ronda, ganando ocultamiento (20% de fallo).' },
+      { name: 'Toque de Oscuridad', level: 6, description: 'Tu toque apaga fuentes de luz no mágicas y puede causar ceguera temporal (Fort niega, 1 ronda/nivel).' },
+    ],
+  },
+  {
+    id: 'spellslinger',
+    classId: 'wizard',
+    name: 'Spellslinger',
+    description: 'Mago que combina el uso de armas de fuego con la magia arcana, canalizando conjuros a través del cañón.',
+    replaces: [
+      { featureName: 'Vínculo Arcano', atLevel: 1, type: 'replaces' },
+      { featureName: 'Escritura de Conjuros', atLevel: 1, type: 'changes' },
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Pistola Arcana', level: 1, description: 'Obtienes competencia con armas de fuego y una pistola de inicio. Puedes canalizar conjuros de toque a través de ella para dispararlos a distancia.' },
+      { name: 'Hechizo Bala', level: 1, description: 'Los conjuros lanzados a través de la pistola arcana añaden el daño del arma al efecto del conjuro.' },
+      { name: 'Recarga Mágica', level: 4, description: 'Puedes recargar tu pistola arcana como acción libre 3 + mod. INT veces al día sin usar munición física.' },
+    ],
+  },
+  {
+    id: 'exploiter-wizard',
+    classId: 'wizard',
+    name: 'Exploiter Wizard',
+    description: 'Mago que intercambia la especialización de escuela y el vínculo arcano por explotaciones arcanas del Arcanista. (Advanced Class Guide)',
+    replaces: [
+      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'replaces' },
+      { featureName: 'Vínculo Arcano', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Reserva Arcana', level: 1, description: 'Tienes puntos de reserva arcana = 3 + mod. INT. Se recuperan al preparar conjuros.' },
+      { name: 'Explotación Arcana', level: 1, description: 'Aprendes explotaciones arcanas del Arcanista. Inicias con una y obtienes otra a nivel 3 y cada 2 niveles después.' },
     ],
   },
   {
     id: 'spell-sage',
     classId: 'wizard',
     name: 'Spell Sage',
-    description: 'Mago generalista que puede lanzar cualquier hechizo de cualquier escuela con potencia máxima.',
+    description: 'Erudito arcano que puede identificar y replicar hechizos de cualquier lista de conjuros.',
     replaces: [
       { featureName: 'Escuela de Especialización', atLevel: 1, type: 'replaces' },
     ],
     features: [
-      { name: 'Conocimiento Completo', level: 1, description: 'No tienes escuelas prohibidas y tratas todos los conjuros como de tu escuela.' },
-      { name: 'Hechizo Potenciado', level: 2, description: 'Una vez por día puedes lanzar un hechizo con nivel de conjurador +2.' },
+      { name: 'Conocimiento Universal', level: 1, description: 'No tienes escuelas prohibidas. Puedes preparar cualquier hechizo de cualquier lista de clase arcana que conozcas.' },
+      { name: 'Sabiduría Arcana', level: 2, description: '1/día por cada 6 niveles, lanzas un hechizo como si tu nivel de conjurador fuera 2 más alto.' },
+      { name: 'Consejo de los Libros', level: 6, description: 'Añades la mitad de tu nivel a checks de Conocimiento sobre magia y puedes "recordar" conjuros ya lanzados como si tuvieras el talento Lore Master.' },
     ],
   },
   {
-    id: 'bonded-wizard',
+    id: 'pact-wizard',
     classId: 'wizard',
-    name: 'Bonded Wizard',
-    description: 'Mago cuyo vínculo con su objeto arcano o familiar es extremadamente profundo.',
+    name: 'Pact Wizard',
+    description: 'Mago que ha sellado un pacto con un espíritu u outsider a cambio de poder arcano adicional. (Horror Adventures)',
+    replaces: [
+      { featureName: 'Vínculo Arcano', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Pacto Arcano', level: 1, description: 'Forjas un pacto con un tipo de criatura extraplanar. Obtienes resistencias y poderes relacionados con ese tipo.' },
+      { name: 'Llamada del Pacto', level: 1, description: '1/día puedes invocar a tu patrono pactado como una invocación de monstruos de nivel equivalente a la mitad de tu nivel de mago.' },
+      { name: 'Favores del Patrono', level: 4, description: 'Tu patrono te concede uno de sus poderes innatos que puedes usar 1/día.' },
+    ],
+  },
+  {
+    id: 'thassilonian-specialist',
+    classId: 'wizard',
+    name: 'Thassilonian Specialist',
+    description: 'Mago de las antiguas tradiciones Thassilonianas: domina una única escuela con maestría absoluta pero tiene dos escuelas prohibidas. (Rise of the Runelords)',
     replaces: [
       { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
     ],
     features: [
-      { name: 'Vínculo Arcano Profundo', level: 1, description: 'Tu objeto vinculado o familiar gana poderes adicionales cada 5 niveles.' },
-      { name: 'Recuperación Vinculada', level: 5, description: 'Puedes usar el vínculo para recuperar un conjuro lanzado ese día.' },
+      { name: 'Especialización Extrema', level: 1, description: 'Ganas un espacio de conjuro extra de tu escuela especializada por cada nivel de conjuro que puedas lanzar (en lugar del habitual espacio de la escuela).' },
+      { name: 'Dominio de Pecado', level: 1, description: 'Tu especialización está asociada a uno de los siete pecados capitales Thassilonianos; ganas poderes temáticos únicos relacionados con él.' },
     ],
   },
   {
-    id: 'diviner',
+    id: 'siege-mage',
     classId: 'wizard',
-    name: 'Diviner',
-    description: 'Mago especializado en adivinación y predicción del futuro.',
+    name: 'Siege Mage',
+    description: 'Mago entrenado en magia militar a gran escala: mejora motores de asedio y lanza conjuros de área masiva. (Ultimate Combat)',
     replaces: [
-      { featureName: 'Escuela de Especialización', atLevel: 1, type: 'changes' },
+      { featureName: 'Escritura de Conjuros', atLevel: 1, type: 'changes' },
     ],
     features: [
-      { name: 'Augure', level: 1, description: 'Lanzas conjuros de adivinación a nivel +2 efectivo.' },
-      { name: 'Visión Futura', level: 1, description: 'Una vez por día puedes relanzar un dado de iniciativa.' },
+      { name: 'Operario de Asedio', level: 1, description: 'Puedes controlar un motor de asedio como acción estándar y añadir mod. INT a su ataque o daño.' },
+      { name: 'Conjuro de Artillería', level: 5, description: 'Puedes lanzar conjuros de evocación de área a través de un motor de asedio; el área del conjuro se centra en el punto de impacto y se duplica.' },
+      { name: 'Escudo Arcano Defensivo', level: 10, description: 'Puedes crear una cúpula de fuerza mágica que protege un área de 30 pies de diámetro de ataques de asedio durante 1 hora/día.' },
     ],
   },
 ]
