@@ -330,51 +330,40 @@
     font-size: 0.9rem;
   }
 
-  /* Table: horizontal scroll with sticky first column */
+  /* Tables: fit container, no horizontal scroll */
   .tableWrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border) transparent;
+    overflow-x: hidden;
   }
 
   .refTable {
-    font-size: 0.76rem;
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.72rem;
   }
 
   .refTable thead th {
-    font-size: 0.66rem;
-    padding: var(--space-1) var(--space-2);
-    white-space: nowrap;
+    font-size: 0.62rem;
+    padding: var(--space-1) var(--space-1);
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.3;
   }
 
   .refTable td {
-    padding: var(--space-1) var(--space-2);
+    padding: var(--space-1) var(--space-1);
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
-  /* Sticky first column — label always visible while scrolling */
   .tdLabel {
-    position: sticky;
-    left: 0;
-    z-index: 2;
-    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
+    word-break: break-word;
+    white-space: normal;
   }
 
-  .refTable thead th:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 3;
-    background: var(--color-bg-secondary);
-    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Match alternating row backgrounds for sticky cells */
-  .refTable tbody tr:nth-child(odd) .tdLabel {
-    background: var(--color-bg-primary);
-  }
-
-  .refTable tbody tr:nth-child(even) .tdLabel {
-    background: var(--color-bg-secondary);
+  /* Hide high-level spell columns on mobile */
+  .mobileHide {
+    display: none;
   }
 
   /* Tighter section spacing */

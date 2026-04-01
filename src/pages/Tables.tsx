@@ -541,10 +541,10 @@ export function Tables() {
               <table className={styles.refTable}>
                 <thead>
                   <tr>
-                    <th>Puntuación</th>
+                    <th>Punt.</th>
                     <th>Mod.</th>
                     {SPELL_LEVELS_BONUS.map(sl => (
-                      <th key={sl}>{sl === 0 ? 'Nv 0' : `Nv ${sl}`}</th>
+                      <th key={sl} className={sl >= 5 ? styles.mobileHide : ''}>{sl === 0 ? 'Nv 0' : `Nv ${sl}`}</th>
                     ))}
                   </tr>
                 </thead>
@@ -555,13 +555,13 @@ export function Tables() {
                       <td className={styles.tdMod}>{fmtMod(row.modifier)}</td>
                       {!row.canCast ? (
                         <td colSpan={10} className={styles.cantCastLabel}>
-                          No puede lanzar conjuros vinculados a este atributo
+                          No puede lanzar conjuros de este atributo
                         </td>
                       ) : (
                         SPELL_LEVELS_BONUS.map(sl => {
                           const val = row.bonus[sl]
                           return (
-                            <td key={sl}>
+                            <td key={sl} className={sl >= 5 ? styles.mobileHide : ''}>
                               {!val ? <span className={styles.cellNone}>—</span>
                                     : <span className={styles.cellBonus}>{val}</span>}
                             </td>
@@ -585,8 +585,8 @@ export function Tables() {
               <table className={styles.refTable}>
                 <thead>
                   <tr>
-                    <th>Mod. atributo</th>
-                    {SPELL_LEVELS_DC.map(sl => <th key={sl}>Nv {sl}</th>)}
+                    <th>Mod.</th>
+                    {SPELL_LEVELS_DC.map(sl => <th key={sl} className={sl >= 6 ? styles.mobileHide : ''}>Nv {sl}</th>)}
                   </tr>
                 </thead>
                 <tbody>
@@ -594,7 +594,7 @@ export function Tables() {
                     <tr key={mod}>
                       <td className={styles.tdMod}>{fmtMod(mod)}</td>
                       {SPELL_LEVELS_DC.map(sl => (
-                        <td key={sl}><span className={styles.cellBonus}>{10 + sl + mod}</span></td>
+                        <td key={sl} className={sl >= 6 ? styles.mobileHide : ''}><span className={styles.cellBonus}>{10 + sl + mod}</span></td>
                       ))}
                     </tr>
                   ))}
