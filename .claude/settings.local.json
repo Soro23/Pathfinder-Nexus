@@ -23,7 +23,11 @@
       "Bash(find /c/Users/aitol/Documents/Code/ClaudeWorkspace/Pathfinder-Nexus/src -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.css \\\\\\))",
       "Bash(echo \"EXIT: $?\")",
       "WebFetch(domain:www.d20pfsrd.com)",
-      "Bash(python scripts/append_archetypes.py)"
+      "Bash(python scripts/append_archetypes.py)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git *)",
+      "mcp__claude_ai_Vercel__deploy_to_vercel"
     ]
   }
 }

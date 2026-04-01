@@ -135,6 +135,8 @@ export interface Character {
   companion?: AnimalCompanion
   statusEffects?: StatusEffect[]
   journalEntries?: JournalEntry[]
+  preparedSpells?: string[]
+  classFeatureUses?: Record<string, number>
   createdAt: string
   updatedAt: string
 }
