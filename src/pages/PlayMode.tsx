@@ -192,7 +192,8 @@ export function PlayMode() {
 
   // Concentration bonus
   const casterAbility = classData?.casterAbility
-  const concentrationBonus = character.level + (casterAbility ? calculateModifier(abilities[casterAbility]) : 0)
+  const casterAbilityMod = casterAbility ? calculateModifier(abilities[casterAbility]) : 0
+  const concentrationBonus = character.level + casterAbilityMod
 
   // Ability abbreviations
   const abilityAbbr: Record<string, string> = {
@@ -763,7 +764,7 @@ export function PlayMode() {
                             <div key={spellId} className={styles.spellRow}>
                               <div className={styles.spellInfo}>
                                 <span className={styles.spellName}>{spell.name}</span>
-                                <span className={styles.spellMeta}>Nv {spell.level} · {spell.school}</span>
+                                <span className={styles.spellMeta}>Nv {spell.level} · {spell.school}{spell.level > 0 ? ` · DC ${10 + spell.level + casterAbilityMod}` : ''}</span>
                               </div>
                               <Button
                                 variant="secondary"

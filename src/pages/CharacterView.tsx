@@ -20,6 +20,28 @@ import styles from './CharacterView.module.css'
 
 type Tab = 'combat' | 'skills' | 'feats' | 'weapons' | 'inventory' | 'spells' | 'notes' | 'companion'
 
+function computeSyncedSlots(
+  classes: Array<{ id: string; level: number }>,
+  abilities: Record<string, number>,
+  currentSlots: Record<number, { max: number; used: number }>
+): Record<number, { max: number; used: number }> | null {
+  const casterClass = classes.find((c) => getClassById(c.id)?.spellsPerDay !== undefined)
+  if (!casterClass) return null
+  const cd = getClassById(casterClass.id)
+  if (!cd?.spellsPerDay || !cd.casterAbility) return null
+  const row = cd.spellsPerDay[casterClass.level - 1] ?? []
+  const bonusPerLevel = getBonusSpells(abilities[cd.casterAbility])
+  const newSlots: Record<number, { max: number; used: number }> = {}
+  row.forEach((base, spellLevel) => {
+    if (base !== undefined && base > 0) {
+      const total = base + (bonusPerLevel[spellLevel] ?? 0)
+      const prev = currentSlots[spellLevel]
+      newSlots[spellLevel] = { max: total, used: prev ? Math.min(prev.used, total) : 0 }
+    }
+  })
+  return Object.keys(newSlots).length > 0 ? newSlots : null
+}
+
 const ABILITY_ABBR: Record<string, string> = {
   strength: 'FUE', dexterity: 'DES', constitution: 'CON',
   intelligence: 'INT', wisdom: 'SAB', charisma: 'CAR',
@@ -341,6 +363,11 @@ export function CharacterView() {
           character={character}
           onClose={() => setShowLevelUp(false)}
           onConfirm={(updates: LevelUpUpdates) => {
+            const syncedSlots = computeSyncedSlots(
+              updates.newClassLevels,
+              character.abilities,
+              character.spellSlots ?? {}
+            )
             updateCharacter(character.id, {
               level: updates.newLevel,
               classes: updates.newClassLevels,
@@ -349,6 +376,7 @@ export function CharacterView() {
                 max: character.hp.max + updates.hpGained,
                 current: character.hp.current + updates.hpGained,
               },
+              ...(syncedSlots && { spellSlots: syncedSlots }),
             })
             setShowLevelUp(false)
           }}
@@ -908,30 +936,12 @@ export function CharacterView() {
                 updateCharacter(character.id, { spellSlots: slots })
               }}
               onSyncSlots={() => {
-                const casterClass = character.classes.find((c) => {
-                  const cd = getClassById(c.id)
-                  return cd?.spellsPerDay !== undefined
-                })
-                if (!casterClass) return
-                const cd = getClassById(casterClass.id)
-                if (!cd?.spellsPerDay || !cd.casterAbility) return
-                const row = cd.spellsPerDay[casterClass.level - 1] ?? []
-                const casterScore = character.abilities[cd.casterAbility]
-                const bonusPerLevel = getBonusSpells(casterScore)
-                const current = { ...(character.spellSlots ?? {}) }
-                const newSlots: Record<number, { max: number; used: number }> = {}
-                row.forEach((slotsForLevel, spellLevel) => {
-                  if (slotsForLevel !== undefined && slotsForLevel > 0) {
-                    const bonus = bonusPerLevel[spellLevel] ?? 0
-                    const total = slotsForLevel + bonus
-                    const prev = current[spellLevel]
-                    newSlots[spellLevel] = {
-                      max: total,
-                      used: prev ? Math.min(prev.used, total) : 0,
-                    }
-                  }
-                })
-                updateCharacter(character.id, { spellSlots: newSlots })
+                const syncedSlots = computeSyncedSlots(
+                  character.classes,
+                  character.abilities,
+                  character.spellSlots ?? {}
+                )
+                if (syncedSlots) updateCharacter(character.id, { spellSlots: syncedSlots })
               }}
               onSetSlotMax={(level: SpellLevel, max: number) => {
                 const slots = { ...(character.spellSlots ?? {}) }

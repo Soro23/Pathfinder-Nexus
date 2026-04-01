@@ -156,6 +156,15 @@
   outline: none;
 }
 
+.slotDC {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--color-accent-gold);
+  opacity: 0.8;
+  min-width: 36px;
+  text-align: right;
+}
+
 .slotHint {
   margin-top: var(--space-3);
   font-size: 0.72rem;

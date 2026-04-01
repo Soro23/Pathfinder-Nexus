@@ -159,6 +159,9 @@ export function Spellbook({
                     <span className={styles.slotCount}>
                       {available}/{max}
                     </span>
+                    {level >= 1 && (
+                      <span className={styles.slotDC} title="CD del conjuro">DC {10 + abilityModifier + level}</span>
+                    )}
                   </div>
                 )}
               </div>
@@ -166,7 +169,7 @@ export function Spellbook({
           })}
         </div>
 
-        <p className={styles.slotHint}>DC {10 + abilityModifier} + nivel</p>
+        <p className={styles.slotHint}>Mod. lanzamiento: {abilityModifier >= 0 ? '+' : ''}{abilityModifier}</p>
       </div>
 
       <div className={styles.spellList}>
