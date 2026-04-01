@@ -1,13 +1,21 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import {
   Users, Map, BookOpen, LayoutList, Shield, Globe, Zap,
-  Sparkles, Backpack, Gem, PawPrint, Settings, Sun, Moon, LogOut, Sword, Wand2,
+  Sparkles, Backpack, Gem, PawPrint, Settings, Sun, Moon, LogOut, Sword, Wand2, X,
 } from 'lucide-react'
 import { useSRDStore } from '../../store/srdStore'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../hooks/useTheme'
 import styles from './Layout.module.css'
+
+const compendiumLinks = [
+  { path: '/rules',    icon: BookOpen,   label: 'Reglas Rápidas' },
+  { path: '/homebrew', icon: Wand2,      label: 'Homebrew' },
+  { path: '/tables',   icon: LayoutList, label: 'Tablas' },
+  { path: '/skills',   icon: Zap,        label: 'Habilidades' },
+  { path: '/feats',    icon: Sword,      label: 'Dotes' },
+]
 
 const compendiumSoon = [
   { icon: Shield,     label: 'Clases' },
@@ -21,7 +29,6 @@ const compendiumSoon = [
 const bottomNavItems = [
   { path: '/',          icon: Users,     label: 'Personajes', exact: true },
   { path: '/campaigns', icon: Map,       label: 'Campañas',   exact: false },
-  { path: '/rules',     icon: BookOpen,  label: 'Compendio',  exact: false },
   { path: '/tools',     icon: Settings,  label: 'Herramientas', exact: false },
 ]
 
@@ -30,15 +37,51 @@ export function Layout() {
   const { signOut } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
   const fetchAll = useSRDStore((s) => s.fetchAll)
+  const [compendiumOpen, setCompendiumOpen] = useState(false)
   useEffect(() => { fetchAll() }, [fetchAll])
+  useEffect(() => { setCompendiumOpen(false) }, [location.pathname])
 
   function isActive(path: string, exact: boolean) {
     if (exact) return location.pathname === path
     return location.pathname.startsWith(path)
   }
 
+  const isCompendiumActive = compendiumLinks.some(({ path }) => location.pathname.startsWith(path))
+
   return (
     <div className={styles.layout}>
+      {/* ── Mobile Compendium Sheet ── */}
+      {compendiumOpen && (
+        <div className={styles.compendiumOverlay} onClick={() => setCompendiumOpen(false)}>
+          <div className={styles.compendiumSheet} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.compendiumSheetHeader}>
+              <span>Compendio</span>
+              <button className={styles.compendiumCloseBtn} onClick={() => setCompendiumOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            {compendiumLinks.map(({ path, icon: Icon, label }) => (
+              <Link
+                key={path}
+                to={path}
+                className={`${styles.compendiumSheetItem} ${isActive(path, false) ? styles.compendiumSheetItemActive : ''}`}
+              >
+                <Icon size={20} />
+                <span>{label}</span>
+              </Link>
+            ))}
+            <div className={styles.compendiumSheetDivider} />
+            {compendiumSoon.map(({ icon: Icon, label }) => (
+              <span key={label} className={`${styles.compendiumSheetItem} ${styles.disabled}`}>
+                <Icon size={20} />
+                <span>{label}</span>
+                <span className={styles.badge}>Pronto</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── Mobile Bottom Nav ── */}
       <nav className={styles.bottomNav}>
         {bottomNavItems.map(({ path, icon: Icon, label, exact }) => (
@@ -51,6 +94,13 @@ export function Layout() {
             <span>{label}</span>
           </Link>
         ))}
+        <button
+          className={`${styles.bottomNavItem} ${isCompendiumActive || compendiumOpen ? styles.bottomNavActive : ''}`}
+          onClick={() => setCompendiumOpen((v) => !v)}
+        >
+          <BookOpen size={22} />
+          <span>Compendio</span>
+        </button>
       </nav>
 
       {/* ── Sidebar ── */}

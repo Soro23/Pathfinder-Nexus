@@ -269,6 +269,85 @@
   /* shown only in mobile breakpoint */
 }
 
+/* ── Mobile Compendium Sheet ── */
+.compendiumOverlay {
+  display: none;
+}
+
+.compendiumSheet {
+  position: fixed;
+  bottom: 64px;
+  left: 0;
+  right: 0;
+  background: var(--color-surface-container-low);
+  border-top: 1px solid var(--color-surface-container-high);
+  z-index: 200;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: var(--space-2) var(--space-2) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+}
+
+.compendiumSheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--text-title-sm);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.compendiumCloseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.compendiumSheetItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3);
+  color: var(--color-on-surface-variant);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-body-md);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.compendiumSheetItem:not(.disabled):hover {
+  background: var(--color-surface-container);
+  color: var(--color-on-surface);
+}
+
+.compendiumSheetItemActive {
+  background: var(--color-surface-container-high);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.compendiumSheetItem.disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.compendiumSheetDivider {
+  height: 1px;
+  background: var(--color-surface-container-high);
+  margin: var(--space-2) var(--space-3);
+}
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .main {
@@ -296,6 +375,14 @@
   /* Hide desktop sidebar completely on mobile */
   .sidebar {
     display: none;
+  }
+
+  .compendiumOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 199;
   }
 
   .main {
