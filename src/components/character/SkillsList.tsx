@@ -74,7 +74,7 @@ export function SkillsList({
 
   const updateRank = (skillId: string, delta: number) => {
     const currentRank = getRanksForSkill(skillId)
-    const maxRanks = level + 3
+    const maxRanks = level
     const newRank = Math.max(0, Math.min(maxRanks, currentRank + delta))
     const cost = newRank - currentRank
 
@@ -218,7 +218,7 @@ export function SkillsList({
                   <button
                     className={styles.rankBtn}
                     onClick={() => updateRank(skill.id, 1)}
-                    disabled={skillPointsAvailable <= 0 || skill.ranks >= level + 3}
+                    disabled={skillPointsAvailable <= 0 || skill.ranks >= level}
                   >
                     +
                   </button>
