@@ -408,5 +408,245 @@ export const FEATS_ES: Record<string, {
     name: "Sangre Angélica",
     prerequisite: "CON 13, aasimar.",
     benefit: "Obtienes un bono de +2 a las tiradas de ahorro contra efectos con el descriptor maligno y a las pruebas de Constitución para estabilizar cuando eres reducido a puntos de golpe negativos (pero no muerto). Además, cada vez que recibes daño de sangrado o drenaje de sangre, cada criatura no muerta o criatura con el subtipo maligno que esté actualmente adyacente a ti también toma 1 punto de daño."
+  },
+  "animal-ally": {
+    name: "Aliado Animal",
+    benefit: "Obtienes un compañero animal como si fueras un druida de tu nivel de personaje –3 de la siguiente lista: tejón, ave, camello, gato (pequeño), rata dira, perro, caballo, poni, serpiente (víbora) o lobo. Si más adelante obtienes un compañero animal a través de otra fuente (como el dominio Animal, vínculo divino, vínculo de cazador o clase de naturaleza), el nivel de druida efectivo otorgado por esta dote se acumula con el otorgado por otras fuentes."
+  },
+  "animal-call": {
+    name: "Llamada Animal",
+    prerequisite: "Engaño 1 rango, Conocimiento (naturaleza) 1 rango.",
+    benefit: "Elige uno de los terrenos favoritos del ranger. Puedes usar tu habilidad de Engaño para imitar las llamadas de animales nativos de ese terreno. Criaturas con rangos en Conocimiento (naturaleza) pueden usar esa habilidad en lugar de Sentir Motivaciones para detectar tu imitación y darte cuenta de que el sonido es falso.",
+    special: "Puedes tomar esta dote múltiples veces. Cada vez que lo haces, selecciona un terreno favorito adicional al que se aplica esta dote."
+  },
+  "animal-disguise": {
+    name: "Disfraces Animal",
+    prerequisite: "Disfraza 6 rangos, Conocimiento (naturaleza) 6 rangos.",
+    benefit: "Puedes usar Disfraza para disfrazarte como un animal de tu categoría de tamaño. Debes tener un pelaje apropiado y cualquier otra parte de animal necesaria para completar el disfraz. También obtienes un bono de +2 a las pruebas de Disfraza cuando te disfrazas como animal. Criaturas con rangos en Conocimiento (naturaleza) pueden usar esa habilidad en lugar de Sentir Motivaciones para detectar este tipo de disfraz."
+  },
+  "animal-ferocity": {
+    name: "Ferocidad Animal*",
+    prerequisite: "Bono de ataque base +3, habilidad racial ferocidad.",
+    benefit: "Cuando tus puntos de golpe se reducen por debajo de 0, puedes hacer ataques, pero recibes una penalización de -5 a cada tirada de ataque."
+  },
+  "animal-soul": {
+    name: "Alma Animal",
+    prerequisite: "Característica de clase compañero de animal o montura.",
+    benefit: "Puedes elegir no permitir que hechizos y efectos te afecten si no serían capaces de afectar tanto tu tipo de criatura original como el tipo de criatura animal."
+  },
+  "ankle-biter": {
+    name: "Mordedor de Tobillo*",
+    prerequisite: "Goblin, Escapismo 1 rango.",
+    benefit: "Si eres el objetivo de una maniobra de combate, puedes, como acción inmediata, intentar morder a tu oponente además de cualquier ataque de oportunidad u otras consecuencias que tu oponente pueda incurrir por atacarte. Este ataque natural de mordida adicional no provoca un ataque de oportunidad en sí mismo y causa daño base apropiado para una criatura de tu tamaño actual (generalmente 1d4 para criaturas Pequeñas). Si estás agarrotado o inmovilizado, puedes continuar haciendo este ataque de mordida adicional cada ronda como acción rápida en tu turno. Obtienes un bono a cualquier intento de romper el agarre igual al daño que causaste con tu mordida esa ronda.",
+    special: "No puedes hacer este ataque de mordida cuando eres el agresor, incluyendo si logras revertir un agarre o hacer cualquier otro ataque de oportunidad."
+  },
+  "antagonize": {
+    name: "Antagonizar",
+    benefit: "Puedes hacer pruebas de Diplomacia e Intimidar para hacer que las criaturas respondan con hostilidad. No importa qué habilidad uses, antagonizar a una criatura toma una acción estándar que no provoca ataques de oportunidad, y tiene una CD igual a 10 + los Dados de Golpe del objetivo + el modificador de Sabiduría del objetivo. No puedes hacer esta prueba contra una criatura que no te entiende o tiene un puntuación de Inteligencia de 3 o menor. Antes de hacer estas pruebas, puedes hacer una prueba de Sentir Motivaciones (CD 20) como acción rápida para obtener un bono de perspicacia a estas pruebas de Diplomacia o Intimidar igual a tu modificador de Carisma hasta el final de tu próximo turno. Los beneficios que ganas por esta prueba dependen de la habilidad que uses. Esto es un efecto que afecta la mente. Diplomacia: Desconcertas a tu enemigo. Durante el próximo minuto, el objetivo recibe una penalización de -2 a todas las tiradas de ataque feitas contra criaturas que no seas tú y tiene un 10% de probabilidad de fallo de hechizos en todos los hechizos que no te tengan como objetivo o que te tengan dentro de su área de efecto. Intimidar: La criatura entra en rage. En su próximo turno, el objetivo debe intentar hacer un ataque cuerpo a cuerpo contra ti, hacer un ataque a distancia contra ti, lanzarte un hechizo o incluirte en el área de un hechizo. El efecto termina si se evita que la criatura te ataque o intentar hacerlo le haría daño. Si no puede atacarte en su turno, puedes hacer la prueba de nuevo como acción inmediata para extender el efecto por 1 ronda (pero no puedes extenderlo después de eso). El efecto termina tan pronto como la criatura te ataca. Una vez que has usado esta habilidad contra una criatura, no puedes objetivola de nuevo durante 1 día."
+  },
+  "anticipate-dodge": {
+    name: "Anticipar Esquiva*",
+    benefit: "Sabes automáticamente si una criatura que puedes ver tiene un bono de esquiva a su CA. Obtienes hasta un bono de +2 a las tiradas de ataque contra un objetivo que tiene un bono de esquiva. Este bono no puede exceder el bono de esquiva de la criatura que atacas."
+  },
+  "aphotic-explorer": {
+    name: "Explorador Afótico",
+    benefit: "Mientras estés en oscuridad o luz tenue, puedes tomar una acción rápida para obtener resistencia al frío 5 durante 1 ronda. Si tienes 11 o más Dados de Golpe, obtienes resistencia al frío 10 en su lugar."
+  },
+  "apocalyptic-spell": {
+    name: "Hechizo Apocalíptico",
+    benefit: "Puedes alterar un hechizo con un área de efecto y una duración de instantánea para convertirlo en un hechizo apocalíptico. Cuando lanzas el hechizo, el área afectada por el efecto instantáneo del hechizo se ve arruinada y devastada en apariencia. Todas las superficies en el área se tratan como terreno difícil, y las pruebas de Trepar, Volar y Nadar intentadas en el área reciben una penalización igual al nivel del hechizo original. El terreno difícil y las penalizaciones de habilidad duran un número de rondas igual al nivel del hechizo original. Un hechizo apocalíptico obtiene el descriptor maligno. Un hechizo apocalíptico usa un espacio de hechizo 1 nivel más alto que el nivel normal del hechizo. Los hechizos con el descriptor bueno no pueden ser hechizos apocalípticos."
+  },
+  "apotheosis": {
+    name: "Apoteosis",
+    prerequisite: "Debes haber tenido contacto directo con una deidad o ser similar a un dios, o haber sido resucitado de entre los muertos por voluntad personal de una deidad o ser similar a un dios.",
+    benefit: "Obtienes un bono de +2 a las pruebas de Constitución para estabilizar mientras mueres. En cualquier momento en que tú o un aliado que adore al dios que te contactó lancen augurio o un efecto similar, tu probabilidad de recibir una respuesta significativa aumenta en 5% (hasta un máximo de 95%)."
+  },
+  "aquadynamic-focus": {
+    name: "Enfoque Acuadinámico*",
+    benefit: "No recibes penalizaciones adicionales a las tiradas de ataque y daño por luchar bajo el agua con armas cuerpo a cuerpo contundente y cortantes para las que hayas tomado la dote Enfoque de Arma.",
+    normal: "Al usar armas cuerpo a cuerpo contundente y cortantes bajo el agua, recibes una penalización de -2 a las tiradas de ataque y causas la mitad del daño."
+  },
+  "aquadynamic-shot": {
+    name: "Disparo Acuadinámico*",
+    benefit: "Tus ataques de proyectil reciben una penalización de -1 por cada 5 pies de agua entre tú y el objetivo. Aún no puedes usar armas arrojadizas efectivamente bajo el agua excepto en circunstancias especiales.",
+    normal: "Los ataques de proyectil bajo el agua reciben una penalización de -2 por cada 5 pies de agua entre el disparar y el objetivo."
+  },
+  "aquatic-adaption": {
+    name: "Adaptación Acuática",
+    prerequisite: "Contener el aliento.",
+    benefit: "Puedes respirar agua tan bien como aire."
+  },
+  "aquatic-advantage": {
+    name: "Ventaja Acuática",
+    benefit: "Una criatura que carece de velocidad de nado provoca un ataque de oportunidad de ti cuando te ataca bajo el agua. No obtienes un ataque de oportunidad si el atacante está bajo los efectos de libertad de movimiento."
+  },
+  "aquatic-ancestry": {
+    name: "Ascendencia Acuática",
+    prerequisite: "Undine.",
+    benefit: "Obtienes un bono de +2 a las pruebas de Diplomacia realizadas bajo el agua. Además, puedes usar tu modificador de Carisma en lugar de tu modificador de Constitución para determinar cuánto tiempo puedes contener el aliento."
+  },
+  "arachnid-companion": {
+    name: "Compañero Arácnido",
+    benefit: "Obtienes un compañero animal araña como si fueras un druida de tu nivel de personaje –3. Este compañero animal es un araña gigante con un tamaño basado en tu nivel (ver abajo). Si más adelante obtienes un compañero animal a través de otra fuente, el nivel de druida efectivo otorgado por esta dote se acumula con otras fuentes."
+  },
+  "arcane-aptitude": {
+    name: "Aptitud Arcana",
+    benefit: "Obtienes un bono de +2 a las pruebas de Oficio Mago y Spellcraft. Si tienes 10 o más rangos en una de estas habilidades, el bono aumenta a +4 para esa habilidad."
+  },
+  "arcane-armor-mastery": {
+    name: "Maestría de Armadura Arcana",
+    prerequisite: "Con 15, Competencia con armaduras, lanzar hechizos arcanos.",
+    benefit: "Reduce la probabilidad de fallo de hechizos de armadura para armaduras que usas en un 10%."
+  },
+  "arcane-armor-training": {
+    name: "Entrenamiento de Armadura Arcana",
+    prerequisite: "Competencia con armadura, lanzar hechizos arcanos.",
+    benefit: "No sufres penalización de probabilidad de fallo de hechizos por usar armadura ligera."
+  },
+  "arcane-battle-mastery": {
+    name: "Maestría de Batalla Arcana",
+    prerequisite: "Nivel de lanzador arcano 3°.",
+    benefit: "Cuando lanzas un hechizo que tiene un componente de toque de combate, puedes hacer un ataque de toque cuerpo a cuerpo como parte del lanzamiento del hechizo. El hechizo se lanza contra la CA del objetivo en lugar de contra CA sin armadura, pero puedes añadir tu bono de ataque base a la tirada."
+  },
+  "arcane-defender": {
+    name: "Defensor Arcano",
+    prerequisite: "Característica de clase aura, nivel de lanzador 3°.",
+    benefit: "Obtienes una defensa natural de +2, o tu defensa natural existente aumenta en +2."
+  },
+  "arcane-denial": {
+    name: "Negación Arcana",
+    prerequisite: "Inteligencia 13.",
+    benefit: "Obtienes un intento de interrumpir hechizo por día. Usas tu bono de ataque de toque para realizar el ataque de interrupción. Este beneficio se renueva cada día al despertar."
+  },
+  "arcane-draftsmanship": {
+    name: "Elaboración Arcana",
+    prerequisite: "UML 1 rango.",
+    benefit: "Puedes elaborar pergaminos de cualquier hechizo arcano que conoces. Crear un pergamino toma 1 hora por nivel de hechizo y requiere materiales valorados en 25 po por nivel de hechizo."
+  },
+  "arcane-expert": {
+    name: "Experto Arcano",
+    benefit: "Obtienes un bono de +2 a las pruebas de Spellcraft. Si tienes 10 o más rangos, el bono aumenta a +4."
+  },
+  "arcane-flare": {
+    name: "Destello Arcano",
+    prerequisite: "Capacidad para lanzar al menos un hechizo arcano.",
+    benefit: "Como reacción, cuando una criatura a menos de 30 pies lanza un hechizo arcano, puedes hacer que esa criatura sea el objetivo de un efecto menor. El lanzador debe tener éxito en una tirada de ahorro de Voluntad (CD 10 + tu modificador de Carisma) o quedar estremecido durante 1 ronda."
+  },
+  "arcane-focus": {
+    name: "Enfoque Arcano",
+    benefit: "Obtienes un bono de +2 a las pruebas de Spellcraft. Si tienes 10 o más rangos, el bono aumenta a +4."
+  },
+  "arcane-heritage": {
+    name: "Herencia Arcana",
+    prerequisite: "Al menos un hechizo arcano de nivel 0 en tu libro de hechizos.",
+    benefit: "Elige una escuela de magia. Obtienes +2 a las pruebas de nivel de lanzador para superar la resistencia a hechizos de criaturas de esa escuela y +2 a las tiradas de ataque de toque a distancia con hechizos de esa escuela."
+  },
+  "arcane-master": {
+    name: "Maestro Arcano",
+    prerequisite: "Nivel de lanzador arcano 10°, escuela de magia seleccionada con Herencia Arcana.",
+    benefit: "Elige un hechizo de la escuela seleccionada con Herencia Arcana que puedas lanzar. Puedes lanzar ese hechizo una vez al día como habilidad similar a hechizo de nivel igual a la mitad de tu nivel de lanzador (redondeando hacia arriba)."
+  },
+  "arcane-mastery": {
+    name: "Dominio Arcano",
+    prerequisite: "Nivel de lanzador 7°.",
+    benefit: "Selecciona una escuela de magia de tu libro de hechizos. Puedes preparar un hechizo adicional de esa escuela cada día."
+  },
+  "arcane-penetrator": {
+    name: "Penetrador Arcano",
+    prerequisite: "Nivel de lanzador arcano 5°.",
+    benefit: "Obtienes un bono de +2 a las pruebas de nivel de lanzador para superar la resistencia a hechizos."
+  },
+  "arcane-schooling": {
+    name: "Escuela Arcana",
+    benefit: "Obtienes un bono de +2 a las pruebas de Conocimiento (arcano) y Spellcraft. Si tienes 10 o más rangos en una de estas habilidades, el bono aumenta a +4 para esa habilidad."
+  },
+  "arcane-sentry": {
+    name: "Centinela Arcano",
+    prerequisite: "Sab 13.",
+    benefit: "Obtienes resistencia a hechizos 5 contra efectos de escuela de adivinación."
+  },
+  "arcane-strike": {
+    name: "Golpe Arcano",
+    benefit: "Como acción rápida, puedes invertir un uso de poder místico para dar a tu próximo ataque cuerpo a cuerpo en el mismo turno un bono de +1d6 a la tirada de daño. Este bono de daño no se multiplica en un golpe crítico, pero se añade al daño total del crítico."
+  },
+  "arcane-talent": {
+    name: "Talento Arcano",
+    benefit: "Selecciona un hechizo arcano de nivel 0 de tu lista de hechizos. Ese hechizo se convierte en un hechizo favorito. Puedes lanzar ese hechizo favorito un número de veces ilimitado."
+  },
+  "arcane-throw": {
+    name: "Arrojar Arcano",
+    benefit: "Puedes convertir cualquier objeto que sostengas en un proyectil y dispararlo como un ataque de toque a distancia con un alcance de 30 pies. El objeto causa 1d6 puntos de daño por cada 10 pies de alcance que tendría si fuera arrojado (generalmente 1d6 para objetos pequeños). No puedes usar esta capacidad con objetos que no podrían ser arrojados (como armaduras o escudos grandes)."
+  },
+  "archaeologist-luck": {
+    name: "Suerte del Arqueólogo",
+    benefit: "Obtienes un talento de arqueólogo de la lista de talentos de inquisidor. Debes satisfacer los requisitos del talento como si fuera un talento de inquisidor."
+  },
+  "armor-expertise": {
+    name: "Experiencia con Armaduras",
+    benefit: "Reduce la penalización de armadura a las pruebas de sigilo en 3."
+  },
+  "armor-master": {
+    name: "Maestro de Armaduras",
+    prerequisite: "Competencia con armadura, entrenamiento con armadura.",
+    benefit: "Obtienes un talento de entrenamiento de armadura avanzado de la lista de talentos de entrenamiento de armadura avanzada de guerrero."
+  },
+  "armor-proficiency": {
+    name: "Competencia con Armaduras",
+    benefit: "Obtienes competencia con armaduras ligeras, medianas y pesadas."
+  },
+  "armor-training": {
+    name: "Entrenamiento de Armadura",
+    prerequisite: "Nivel de guerrero 1°.",
+    benefit: "Selecciona un talento de entrenamiento de armadura de la lista de talentos de entrenamiento de armadura de guerrero."
+  },
+  "artful-panic": {
+    name: "Pánico Artístico",
+    benefit: "Cuando usas un talento de pandilla o una habilidad de clase que causa que un enemigo se vuelva estremecido o mareado, el efecto dura 1 ronda adicional."
+  },
+  "aspect-of-the-beast": {
+    name: "Aspecto de la Bestia",
+    prerequisite: "Característica de clase de forma de野",
+    benefit: "Selecciona una forma alternativa de tu característica de clase de forma. Puedes adoptar esa forma alternativa un número de veces al día igual a 1 + tu modificador de Sabiduría."
+  },
+  "assault-launcher": {
+    name: "Lanzador de Asalto",
+    prerequisite: "Nivel de lanzador 5°, capacidad de lanzar hechizos con el descriptor de fuerza.",
+    benefit: "Cuando lanzas un hechizo con el descriptor de fuerza, puedes Designar un punto dentro del alcance del hechizo como el nuevo punto de origen para el efecto del hechizo. El área del efecto del hechizo se origina desde ese punto en su lugar."
+  },
+  "assimilate": {
+    name: "Asimilar",
+    prerequisite: "Con 13, habilidad para lanzar hechizos de adivinación.",
+    benefit: "Cuando una criatura que puedas ver falla una tirada de ahorro contra uno de tus hechizos de adivinación, puedes obtener información adicional sobre esa criatura. El tipo de información depende de qué tan bien falló la criatura la tirada de ahorro. Falla por 5 o menos: obtienes una categoría de información (a tu elección) de la lista de abajo. Falla por 6-10: obtienes dos categorías de información. Falla por 11-15: obtienes tres categorías. Falla por 16 o más: obtienes todas las categorías de información. Categorías de información: nombre de la criatura, alineación, ND, DV, puntos de golpe actuales, resistencias, inmunidades, debilidades, habilidades especiales, hechizos activos, o equipo."
+  },
+  "astral-reorientation": {
+    name: "Reorientación Astral",
+    benefit: "Una vez por día, como acción inmediata, puedes elegir cambiar tu alineación por un paso en cualquier dirección. Este cambio dura 24 horas."
+  },
+  "athletic": {
+    name: "Atlético",
+    benefit: "Obtienes un bono de +2 a todas las pruebas de Acrobacia y Natación. Si tienes 10 o más rangos en una de estas habilidades, el bono aumenta a +4 para esa habilidad."
+  },
+  "augment-explosive": {
+    name: "Amplificar Explosivo",
+    benefit: "Cuando usas el talento descobridor Explosivo, el radio de explosión aumenta en 5 pies y el daño máximo aumenta en 2d6."
+  },
+  "aura-of-the-unremarkable": {
+    name: "Aurea de lo Insípido",
+    prerequisite: "Carisma 13.",
+    benefit: "Tienes un aura que hace que sea más difícil notar tu presencia. Los seres no alineados no pueden usar Sentir Motivaciones o percepción pasiva para notar tu presencia a menos que quieras que lo hagan."
+  },
+  "auto-animation": {
+    name: "Auto-Animación",
+    prerequisite: "Nivel de lanzador 7°, característica de clase animador de objetos.",
+    benefit: "Cuando lanzas animate objects, puedes elegir un número de objetos adicionales igual a tu modificador de Sabiduría."
+  },
+  "averting-gaze": {
+    name: "Mirada Evitadora",
+    benefit: "Obtienes un bono de +2 a las tiradas de ahorro contra efectos de mirada."
+  },
+  "awakened-mind": {
+    name: "Mente Despertada",
+    prerequisite: "Capacidad de lanzar hechizos telépaticamente pero no telepatía innata.",
+    benefit: "Obtienes telepatía con un alcance de 30 pies."
   }
 }
