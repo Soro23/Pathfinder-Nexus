@@ -644,9 +644,20 @@ export const FEATS_ES: Record<string, {
     name: "Mirada Evitadora",
     benefit: "Obtienes un bono de +2 a las tiradas de ahorro contra efectos de mirada."
   },
-  "awakened-mind": {
-    name: "Mente Despertada",
-    prerequisite: "Capacidad de lanzar hechizos telépaticamente pero no telepatía innata.",
-    benefit: "Obtienes telepatía con un alcance de 30 pies."
+  "aquatic-combatant": {
+    name: "Combatiente Acuático*",
+    prerequisite: "Natación 1 rango.",
+    benefit: "Obtienes un bono de +2 a las pruebas de Natación y no sufres las penalizaciones habituales a las tiradas de ataque cuerpo a cuerpo realizadas bajo el agua. Tus ataques cuerpo a cuerpo cortantes y ataques sin armas contundente causan daño completo bajo el agua.",
+    normal: "Cuando estás bajo el agua, la mayoría de tus ataques cuerpo a cuerpo reciben una penalización de -2 y causan solo la mitad del daño."
+  },
+  "aquatic-spell": {
+    name: "Hechizo Acuático",
+    benefit: "Un hechizo acuático funciona normalmente bajo el agua y no requiere prueba de nivel de lanzador para lanzar, incluso si tiene el descriptor de fuego. Además, el hechizo puede lanzarse desde la superficie hacia el agua y seguir siendo efectivo. Un hechizo acuático usa un espacio de hechizo 1 nivel más alto que el nivel real del hechizo."
+  },
+  "aquatic-squires": {
+    name: "Escuderos Acuáticos",
+    prerequisite: "Tritón",
+    benefit: "La duración de tu habilidad similar a hechizo invitación de aliado de la naturaleza II es 1 minuto por nivel.",
+    normal: "Invocación de aliado de la naturaleza II tiene una duración de 1 ronda por nivel."
   }
 }
