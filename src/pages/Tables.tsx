@@ -375,13 +375,22 @@ export function Tables() {
   return (
     <div className={styles.pageLayout}>
 
-      {/* ── Mobile sticky category chips ── */}
+      {/* ── Mobile category dropdown ── */}
       <div className={styles.mobileCatBar}>
-        {CATEGORIES.map(cat => (
-          <button key={cat.id} className={styles.mobileCatChip} onClick={() => scrollTo(cat.id)}>
-            {cat.label}
-          </button>
-        ))}
+        <select
+          className={styles.mobileCatSelect}
+          defaultValue=""
+          onChange={e => { scrollTo(e.target.value); (e.target as HTMLSelectElement).value = '' }}
+        >
+          <option value="" disabled>Ir a categoría…</option>
+          {CATEGORIES.map(cat => (
+            <optgroup key={cat.id} label={cat.label}>
+              {cat.sections.map(sec => (
+                <option key={sec.id} value={sec.id}>{sec.label}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
       </div>
 
       {/* ── Left category nav (desktop) ── */}
