@@ -788,4 +788,736 @@ export const ARCHETYPES: Archetype[] = [
       { name: 'Escudo Arcano Defensivo', level: 10, description: 'Puedes crear una cúpula de fuerza mágica que protege un área de 30 pies de diámetro de ataques de asedio durante 1 hora/día.' },
     ],
   },
+
+  // ─── BARBARIAN (adicionales) ──────────────────────────────────────────────
+  {
+    id: 'superstitious-barbarian',
+    classId: 'barbarian',
+    name: 'Superstitious',
+    description: 'Bárbaro con desconfianza innata hacia la magia. Gana resistencia a conjuros durante la furia.',
+    replaces: [
+      { featureName: 'Furia Improved', atLevel: 2, type: 'changes' },
+    ],
+    features: [
+      { name: 'Mente de Acero', level: 2, description: 'Durante la furia, añades tu bonificador de moral a todas las salvaciones contra conjuros y efectos sobrenaturales.' },
+      { name: 'Resistencia Mágica', level: 5, description: 'Ganas resistencia a conjuros = 10 + nivel mientras estás en furia.' },
+    ],
+  },
+  {
+    id: 'titan-mauler',
+    classId: 'barbarian',
+    name: 'Titan Mauler',
+    description: 'Bárbaro especializado en empuñar armas enormes diseñadas para criaturas de mayor tamaño.',
+    replaces: [
+      { featureName: 'Furia Mayor', atLevel: 4, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Arma Enorme', level: 2, description: 'Puedes empuñar armas de una categoría de tamaño mayor con una penalización de solo −2 al ataque.' },
+      { name: 'Golpe Aplastante', level: 4, description: 'Con armas de gran tamaño, el daño de crítico se multiplica por uno adicional.' },
+    ],
+  },
+  {
+    id: 'wild-rager',
+    classId: 'barbarian',
+    name: 'Wild Rager',
+    description: 'Bárbaro cuya furia es tan incontrolable que puede atacar a aliados, pero gana potencia extrema.',
+    replaces: [
+      { featureName: 'Furia Tireless', atLevel: 5, type: 'changes' },
+    ],
+    features: [
+      { name: 'Furia Incontrolable', level: 1, description: 'Durante la furia, si matas a un enemigo, debes superar una salvación de Voluntad o atacar al aliado más cercano.' },
+      { name: 'Potencia Salvaje', level: 1, description: 'Mientras estás en furia, añades el doble de tu bonificador de moral al daño cuerpo a cuerpo.' },
+    ],
+  },
+  {
+    id: 'mooncursed-barbarian',
+    classId: 'barbarian',
+    name: 'Mooncursed',
+    description: 'Bárbaro maldito que adopta rasgos animales durante la furia dependiendo de la fase lunar.',
+    replaces: [
+      { featureName: 'Furia Greater', atLevel: 3, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Maldición Lunar', level: 3, description: 'Al entrar en furia, adoptas rasgos físicos de un animal (garras, colmillos, visión nocturna) según la fase de la luna.' },
+      { name: 'Transformación Salvaje', level: 6, description: 'A partir del nivel 6, la transformación lunar durante la furia se vuelve más pronunciada: ganas ataques naturales adicionales.' },
+    ],
+  },
+  {
+    id: 'elemental-kin',
+    classId: 'barbarian',
+    name: 'Elemental Kin',
+    description: 'Bárbaro con sangre elemental en sus venas que canaliza ese poder durante la furia.',
+    replaces: [
+      { featureName: 'Furia Improved', atLevel: 2, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Alma Elemental', level: 1, description: 'Elige un elemento (fuego, frío, electricidad o ácido). Ganas resistencia 5 a ese elemento.' },
+      { name: 'Furia Elemental', level: 2, description: 'Durante la furia, tus ataques cuerpo a cuerpo causan 1d6 de daño elemental adicional del tipo elegido.' },
+    ],
+  },
+
+  // ─── BARD (adicionales) ───────────────────────────────────────────────────
+  {
+    id: 'archaeologist',
+    classId: 'bard',
+    name: 'Archaeologist',
+    description: 'Explorador de ruinas y reliquias que usa la suerte en lugar de la música. No necesita bardic performance.',
+    replaces: [
+      { featureName: 'Inspiración de Canción', atLevel: 1, type: 'replaces' },
+      { featureName: 'Inspiración Valiente', atLevel: 1, type: 'replaces' },
+      { featureName: 'Inspiración Maestro', atLevel: 5, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Suerte del Arqueólogo', level: 2, description: 'Ganas un bonificador de suerte de +1 a ataque, salvaciones, habilidades y daño igual a 1 + 1/4 de nivel, durante rounds = nivel + mod. CAR.' },
+      { name: 'Sentido de Trampa', level: 1, description: 'Añades la mitad de tu nivel como bonificación a Percepción para detectar trampas.' },
+      { name: 'Evasión', level: 4, description: 'Ganas Evasión como el ladrón.' },
+    ],
+    classSkillsAdded: ['disable_device', 'knowledge_dungeoneering'],
+  },
+  {
+    id: 'detective-bard',
+    classId: 'bard',
+    name: 'Detective',
+    description: 'Bardo especializado en resolución de misterios e interrogación, usando la música para revelar mentiras.',
+    replaces: [
+      { featureName: 'Inspiración Valiente', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Ojo Investigador', level: 1, description: 'Añades mod. INT (además de CAR) a las tiradas de Sentir Motivaciones y Diplomacia para recopilar información.' },
+      { name: 'Serenata de la Verdad', level: 2, description: 'Mantienes una bardic performance que fuerza a los que la escuchan a superar Vol o no pueden mentir durante su duración.' },
+    ],
+    classSkillsAdded: ['knowledge_local', 'linguistics'],
+  },
+  {
+    id: 'magician-bard',
+    classId: 'bard',
+    name: 'Magician',
+    description: 'Bardo que se especializa en ilusiones y trucos de manos, combinando actuación con magia real.',
+    replaces: [
+      { featureName: 'Conocimiento Bardo', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Prestidigitación Arcana', level: 1, description: 'Usas Actuación (prestidigitación) en lugar de Engaño para tus tiradas de ilusión. Añades nivel a las DCs de ilusiones.' },
+      { name: 'Truco de Distracción', level: 3, description: 'Como acción estándar, creas una distracción que otorga bonificación flanking a un aliado hasta el inicio de tu siguiente turno.' },
+    ],
+  },
+  {
+    id: 'savage-skald',
+    classId: 'bard',
+    name: 'Savage Skald',
+    description: 'Bardo guerrero que usa cantos de guerra tribales para impulsar a sus aliados al combate.',
+    replaces: [
+      { featureName: 'Inspiración de Canción', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Canto de Guerra', level: 1, description: 'Tu inspire courage también permite a los aliados hacer un ataque adicional a menor BAB durante 1 ronda cuando matan a un enemigo.' },
+      { name: 'Furia Inspirada', level: 3, description: 'Los aliados afectados por tu inspire courage pueden entrar en un estado de berserker menor (+2 FUE, −1 CA) durante la duración.' },
+    ],
+  },
+  {
+    id: 'thundercaller',
+    classId: 'bard',
+    name: 'Thundercaller',
+    description: 'Bardo cuya voz es un arma literal: canaliza truenos y relámpagos a través de su canto.',
+    replaces: [
+      { featureName: 'Inspiración Maestro', atLevel: 5, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Grito del Trueno', level: 1, description: '1/día por cada 4 niveles, sueltas un grito en cono de 30 pies que causa 1d6/2 niveles de daño sónico y aturde 1 ronda (Fort ½ y niega aturdimiento).' },
+      { name: 'Voz de la Tormenta', level: 5, description: 'Tu bardic performance de inspire courage añade daño eléctrico igual a la bonificación que ya otorga.' },
+    ],
+  },
+
+  // ─── CLERIC (adicionales) ─────────────────────────────────────────────────
+  {
+    id: 'cloistered-cleric',
+    classId: 'cleric',
+    name: 'Cloistered Cleric',
+    description: 'Clérigo erudito de biblioteca que sacrifica combate por mayor versatilidad mágica y conocimiento.',
+    replaces: [
+      { featureName: 'Canalizar Energía', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Conocimiento Profundo', level: 1, description: 'Añades la mitad de tu nivel a todos los checks de Conocimiento y los tratas como entrenados.' },
+      { name: 'Dominio Adicional', level: 1, description: 'Eliges tres dominios en lugar de dos, aunque solo puedes preparar conjuros de dos de ellos cada día.' },
+      { name: 'Lore Divino', level: 6, description: 'Puedes identificar conjuros y efectos mágicos como si usaras identify automáticamente.' },
+    ],
+    classSkillsAdded: ['knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_nature', 'knowledge_planes'],
+  },
+  {
+    id: 'crusader-cleric',
+    classId: 'cleric',
+    name: 'Crusader',
+    description: 'Clérigo guerrero que lidera a sus tropas desde el frente, sacrificando preparación de conjuros por potencia marcial.',
+    replaces: [
+      { featureName: 'Dominio', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Inspiración de Batalla', level: 1, description: 'Como bardic performance, inspiras a tus aliados otorgando bonificador de moral +1 al ataque cuando los ves luchar.' },
+      { name: 'Maestría Marcial', level: 1, description: 'Ganas Golpe Poderoso o Combate con Dos Armas como talento adicional de combate, aunque no cumplas los requisitos.' },
+    ],
+  },
+  {
+    id: 'divine-strategist',
+    classId: 'cleric',
+    name: 'Divine Strategist',
+    description: 'Clérigo táctico que coordina el campo de batalla con precisión divina.',
+    replaces: [
+      { featureName: 'Canalizar Energía', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Bendición Táctica', level: 1, description: 'Como acción estándar, otorgas a tus aliados en 30 pies la capacidad de moverse su velocidad adicional 1 vez antes de su próxima acción.' },
+      { name: 'Maniobra Sagrada', level: 4, description: 'Puedes gastar usos de Canalizar Energía para que todos tus aliados en 30 pies hagan ataques de oportunidad contra un enemigo que designes.' },
+    ],
+  },
+  {
+    id: 'merciful-healer',
+    classId: 'cleric',
+    name: 'Merciful Healer',
+    description: 'Clérigo dedicado exclusivamente a la sanación, con poderes de curación muy potenciados.',
+    replaces: [
+      { featureName: 'Dominio', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Sanación Compasiva', level: 1, description: 'Cuando canal positive energy para curar, añades mod. SAB adicional a los PV curados.' },
+      { name: 'Toque Misericordioso', level: 2, description: 'Con Manos Puestas de paladin (equivalente), eliminas condiciones negativas además de curar PV.' },
+      { name: 'Curación Masiva', level: 6, description: 'Tus conjuros de curación curan el máximo posible cuando los lanzas sobre criaturas que están a 0 PV o menos.' },
+    ],
+  },
+  {
+    id: 'separatist-cleric',
+    classId: 'cleric',
+    name: 'Separatist',
+    description: 'Clérigo que sigue sus propias convicciones en lugar de las de su deidad, eligiendo un dominio fuera de los permitidos.',
+    replaces: [
+      { featureName: 'Dominio', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Dominio Prohibido', level: 1, description: 'Puedes elegir un dominio que tu deidad normalmente no ofrece. Los conjuros de ese dominio cuestan un espacio adicional.' },
+      { name: 'Fe Independiente', level: 3, description: 'Eres menos vulnerable a efectos que perjudican a seguidores de una deidad específica.' },
+    ],
+  },
+  {
+    id: 'evangelist-cleric',
+    classId: 'cleric',
+    name: 'Evangelist',
+    description: 'Clérigo predicador que convierte y lidera masas, combinando poderes de bardo con los del clérigo.',
+    replaces: [
+      { featureName: 'Canalizar Energía', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Sermón Divino', level: 1, description: 'Como bardic performance de bardo de nivel igual al tuyo, usas Actuación para inspire courage/competence.' },
+      { name: 'Palabra de Dios', level: 5, description: 'Tu sermón puede afectar a no-creyentes como hold person (Vol niega) mientras mantienes la performance.' },
+    ],
+  },
+
+  // ─── DRUID (adicionales) ──────────────────────────────────────────────────
+  {
+    id: 'urban-druid',
+    classId: 'druid',
+    name: 'Urban Druid',
+    description: 'Druida de la jungla de piedra que protege ecosistemas urbanos y la naturaleza que sobrevive en las ciudades.',
+    replaces: [
+      { featureName: 'Compañero Animal', atLevel: 1, type: 'changes' },
+      { featureName: ' forma Salvaje', atLevel: 4, type: 'changes' },
+    ],
+    features: [
+      { name: 'Empatía Urbana', level: 1, description: 'Añades mod. CAR a checks de Diplomacia e Intimidar. Tus conjuros de naturaleza también afectan a criaturas urbanas.' },
+      { name: 'Forma Urbana', level: 4, description: 'Puedes transformarte en un humanoide común además de en animales, manteniendo tus poderes de druida.' },
+    ],
+    classSkillsAdded: ['diplomacy', 'knowledge_local'],
+    classSkillsRemoved: ['knowledge_nature', 'survival'],
+  },
+  {
+    id: 'world-walker-druid',
+    classId: 'druid',
+    name: 'World Walker',
+    description: 'Druida nómada que protege múltiples terrenos y viaja constantemente, adaptándose a cualquier entorno.',
+    replaces: [
+      { featureName: 'Compañero Animal', atLevel: 1, type: 'optional' },
+    ],
+    features: [
+      { name: 'Terrenos Múltiples', level: 1, description: 'Obtienes Terreno Favorito del explorador (como el talento de clase del ranger) a nivel 1 y cada 4 niveles después.' },
+      { name: 'Adaptación Rápida', level: 3, description: 'Cambias tu terreno favorito activo como acción gratuita una vez al día.' },
+    ],
+  },
+  {
+    id: 'aquatic-druid',
+    classId: 'druid',
+    name: 'Aquatic Druid',
+    description: 'Druida guardián de océanos, ríos y costas, con poderes especiales bajo el agua.',
+    replaces: [
+      { featureName: ' forma Salvaje', atLevel: 4, type: 'changes' },
+    ],
+    features: [
+      { name: 'Respiración Acuática', level: 1, description: 'Puedes respirar bajo el agua indefinidamente y nadas con velocidad 30 pies.' },
+      { name: 'Forma Acuática', level: 4, description: 'Puedes transformarte en criaturas acuáticas (peces, pulpos, tiburones) además de animales terrestres.' },
+      { name: 'Llamada del Mar', level: 6, description: '1/día convocas una tormenta de agua dulce o marina de 60 pies de radio que dificulta la visión y el movimiento.' },
+    ],
+  },
+  {
+    id: 'arctic-druid',
+    classId: 'druid',
+    name: 'Arctic Druid',
+    description: 'Druida de tundras y glaciares que domina el frío extremo y la supervivencia en entornos helados.',
+    replaces: [
+      { featureName: 'Compañero Animal', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Resistencia al Frío', level: 1, description: 'Ganas inmunidad a los efectos de clima frío y resistencia al frío 5, que aumenta a 10 a nivel 5 e inmunidad a nivel 10.' },
+      { name: 'Forma Ártica', level: 4, description: 'Puedes transformarte en animales del ártico (osos polares, lobos árticos, focas) ganando sus immunidades al frío.' },
+    ],
+  },
+  {
+    id: 'jungle-druid',
+    classId: 'druid',
+    name: 'Jungle Druid',
+    description: 'Druida de selvas tropicales y junglas densas, experto en venenos y criaturas exóticas.',
+    replaces: [
+      { featureName: 'Naturaleza Absoluta', atLevel: 5, type: 'changes' },
+    ],
+    features: [
+      { name: 'Inmunidad a Veneno', level: 5, description: 'Ganas inmunidad a venenos no-mágicos. Los venenos que aplicas tienen CD +2.' },
+      { name: 'Maestro de la Jungla', level: 1, description: 'Moverse a través de vegetación natural difícil no te cuesta movimiento adicional y no dejas rastros.' },
+    ],
+    classSkillsAdded: ['knowledge_nature', 'stealth'],
+  },
+  {
+    id: 'verdant-gnome-druid',
+    classId: 'druid',
+    name: 'Verdant Gnome',
+    description: 'Druida gnomo con vínculo especial con las plantas. Puede hablar con plantas y animarlas.',
+    replaces: [
+      { featureName: 'Compañero Animal', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Empatía con Plantas', level: 1, description: 'Puedes comunicarte con plantas como si usaras speak with plants constantemente. Las plantas amigables te ayudan activamente.' },
+      { name: 'Animación Vegetal', level: 4, description: '1/día animas una planta de tamaño Mediano o menor como si usara liveoak. A nivel 8 puedes animar plantas Grandes.' },
+    ],
+  },
+
+  // ─── FIGHTER (adicionales) ────────────────────────────────────────────────
+  {
+    id: 'mobile-fighter',
+    classId: 'fighter',
+    name: 'Mobile Fighter',
+    description: 'Guerrero que usa la movilidad y el movimiento dinámico como arma táctica principal.',
+    replaces: [
+      { featureName: 'Armadura Pesada', atLevel: 3, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Paso Ágil', level: 3, description: 'Puedes moverte hasta tu velocidad completa como acción de movimiento incluso después de un ataque estándar.' },
+      { name: 'Carga Mejorada', level: 5, description: 'No provacas ataques de oportunidad al cargar y puedes girar hasta 90° durante la carga.' },
+    ],
+  },
+  {
+    id: 'phalanx-soldier',
+    classId: 'fighter',
+    name: 'Phalanx Soldier',
+    description: 'Guerrero especializado en combate en formación cerrada con escudo y lanza.',
+    replaces: [
+      { featureName: 'Destreza', atLevel: 2, type: 'changes' },
+    ],
+    features: [
+      { name: 'Formación de Falange', level: 1, description: 'Cuando luchas junto a un aliado con escudo, ambos ganáis +2 a CA y podéis usar armas de alcance en espacio adyacente.' },
+      { name: 'Muro de Escudos', level: 3, description: 'Si tú y un aliado lleváis escudos y estáis adyacentes, la bonificación de escudo de ambos aumenta en 2.' },
+    ],
+  },
+  {
+    id: 'gladiator-fighter',
+    classId: 'fighter',
+    name: 'Gladiator',
+    description: 'Guerrero entrenado en arenas y espectáculos de combate que usa la intimidación como arma.',
+    replaces: [
+      { featureName: 'Destreza', atLevel: 2, type: 'changes' },
+    ],
+    features: [
+      { name: 'Intimidación de Arena', level: 2, description: 'Al derrotar a un oponente, puedes intimidar a todos los enemigos en 30 pies como acción libre.' },
+      { name: 'Actuación de Combate', level: 1, description: 'Tratas Actuación como habilidad de clase y puedes añadir mod. CAR a las maniobras de combate para aturdir.' },
+    ],
+    classSkillsAdded: ['perform'],
+  },
+  {
+    id: 'dragoon-fighter',
+    classId: 'fighter',
+    name: 'Dragoon',
+    description: 'Guerrero especializado en combate montado y el uso de lanzas desde la silla.',
+    replaces: [
+      { featureName: 'Armadura Pesada', atLevel: 3, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Lanza de Caballería', level: 1, description: 'Con lanza montada, el multiplicador de daño de cargar aumenta a ×4 y no sufres la penalización de −4 al ataque al no ser caballero.' },
+      { name: 'Acometida Aérea', level: 5, description: 'Puedes hacer una carga desde montura voladora con penalización de solo −1 al ataque y daño doble.' },
+    ],
+    classSkillsAdded: ['ride'],
+  },
+  {
+    id: 'tower-shield-specialist',
+    classId: 'fighter',
+    name: 'Tower Shield Specialist',
+    description: 'Guerrero que convierte el escudo de torre en una fortaleza ambulante.',
+    replaces: [
+      { featureName: 'Armadura Pesada', atLevel: 3, type: 'changes' },
+    ],
+    features: [
+      { name: 'Defensa de Torre', level: 1, description: 'Reduces la penalización de ataque por usar escudo de torre en 2 (a −4 en lugar de −2 adicional).' },
+      { name: 'Escudo Inexpugnable', level: 3, description: 'Puedes usar el escudo de torre para obtener cobertura total como acción de movimiento en lugar de estándar.' },
+    ],
+  },
+  {
+    id: 'unbreakable-fighter',
+    classId: 'fighter',
+    name: 'Unbreakable',
+    description: 'Guerrero cuya resistencia física es legendaria: absorbe golpes que matarían a otros.',
+    replaces: [
+      { featureName: 'Destreza', atLevel: 2, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Aguante de Hierro', level: 2, description: 'Ganas Aguante y Dormir en Armadura como talentos sin requisitos. Cada nivel impar reduces el daño no-letal en 1.' },
+      { name: 'Resistencia al Dolor', level: 4, description: 'Cuando llegas a 0 PV, haces una tirada de Fortaleza (CD 15). Si la superas, sigues combatiendo con el estado fatigado en lugar de caer.' },
+    ],
+  },
+
+  // ─── MONK (adicionales) ───────────────────────────────────────────────────
+  {
+    id: 'flowing-monk',
+    classId: 'monk',
+    name: 'Flowing Monk',
+    description: 'Monje que usa el flujo del combate enemigo contra ellos mismos, redirigiendo ataques y ataques.',
+    replaces: [
+      { featureName: 'Golpe Aturdidor', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Redirección', level: 1, description: 'Cuando un enemigo falla un ataque cuerpo a cuerpo contra ti, puedes gastar 1 punto ki para que el ataque se redirija contra otro objetivo adyacente.' },
+      { name: 'Flujo Perfecto', level: 3, description: 'Una vez por ronda, cuando esquivas un ataque, puedes hacer un ataque de oportunidad contra el atacante como acción libre.' },
+    ],
+  },
+  {
+    id: 'hungry-ghost-monk',
+    classId: 'monk',
+    name: 'Hungry Ghost Monk',
+    description: 'Monje que drena la fuerza vital de sus enemigos para potenciar su propia ki.',
+    replaces: [
+      { featureName: 'Armadura Natural', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Drenaje de Ki', level: 1, description: 'Cuando golpeas con un ataque desarmado, recuperas 1 punto ki si el objetivo falla una salvación de Fortaleza.' },
+      { name: 'Terrifying Strike', level: 4, description: 'Al gastar 1 punto ki, un golpe causa que el objetivo quede asustado durante 1d4 rondas (Vol niega).' },
+    ],
+  },
+  {
+    id: 'weapon-adept-monk',
+    classId: 'monk',
+    name: 'Weapon Adept',
+    description: 'Monje que integra el uso de armas tradicionales monásticas en su disciplina de ki.',
+    replaces: [
+      { featureName: 'Golpe sin Arma', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Arma Perfecta', level: 1, description: 'Elige un arma de monje. Ganas Enfoque en Arma sin requisitos y la tratas como golpe desarmado para tus poderes de monje.' },
+      { name: 'Ki del Arma', level: 3, description: 'Puedes gastar puntos ki para añadir propiedades mágicas (impactante, exacta, etc.) a tu arma perfecta durante 1 minuto.' },
+    ],
+  },
+  {
+    id: 'sohei',
+    classId: 'monk',
+    name: 'Sohei',
+    description: 'Guerrero-monje montado que combina disciplina marcial con el combate a caballo.',
+    replaces: [
+      { featureName: 'Armadura Natural', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Monta Ki', level: 1, description: 'Puedes usar tus poderes de ki mientras estás montado y el bonificador de AC no armada se aplica contra ataques mientras montas.' },
+      { name: 'Carga Ki', level: 3, description: 'Cuando cargas montado y gastas 1 punto ki, el multiplicador de daño de carga aumenta en 1 y no provocas ataques de oportunidad.' },
+    ],
+    classSkillsAdded: ['ride'],
+  },
+  {
+    id: 'ki-mystic',
+    classId: 'monk',
+    name: 'Ki Mystic',
+    description: 'Monje que desarrolla poderes psíquicos y de adivinación a través de la meditación profunda.',
+    replaces: [
+      { featureName: 'Golpe Aturdidor', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Visión Ki', level: 1, description: 'Gastas 1 punto ki para ver a través de ilusiones, detectar la alineación de criaturas en 30 pies o ver en oscuridad mágica durante 1 minuto.' },
+      { name: 'Meditación Profunda', level: 5, description: 'Si meditas 1 hora, puedes lanzar augury o, a nivel 10, divination como poder sobrenatural.' },
+    ],
+  },
+
+  // ─── PALADIN (adicionales) ────────────────────────────────────────────────
+  {
+    id: 'holy-tactician',
+    classId: 'paladin',
+    name: 'Holy Tactician',
+    description: 'Paladín que lidera a sus aliados con maestría táctica en lugar de auras y bendiciones personales.',
+    replaces: [
+      { featureName: 'Detectar Maldad', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Trabajo en Equipo Divino', level: 1, description: 'Concedes talentos de trabajo en equipo a tus aliados en 30 pies que duren 3 + mod. CAR rondas, 1/día por cada 5 niveles.' },
+      { name: 'Estratega Sagrado', level: 4, description: 'Cuando usas Trabajo en Equipo Divino, también añades un bonificador de competencia de +2 a las tiradas de ataque de los aliados afectados.' },
+    ],
+  },
+  {
+    id: 'shining-knight',
+    classId: 'paladin',
+    name: 'Shining Knight',
+    description: 'Paladín con énfasis en el combate montado y la caballería sagrada.',
+    replaces: [
+      { featureName: 'Aura de Bien', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Montura Sagrada Mejorada', level: 1, description: 'Tu Montura Divina es más poderosa: sus PV adicionales, bonificadores y poderes especiales mejoran como si tuvieras 4 niveles más.' },
+      { name: 'Carga Celestial', level: 3, description: 'Tu montura y tú podéis cargar como si fuerais una sola criatura. La CA no se reduce durante la carga.' },
+    ],
+  },
+  {
+    id: 'undead-scourge',
+    classId: 'paladin',
+    name: 'Undead Scourge',
+    description: 'Paladín especializado en la destrucción de no-muertos, con poderes especiales contra ellos.',
+    replaces: [
+      { featureName: 'Manos Puestas', atLevel: 2, type: 'changes' },
+    ],
+    features: [
+      { name: 'Golpe Destructor', level: 2, description: 'Tus ataques contra no-muertos causan daño máximo automáticamente y los afectas como si llevaras una espada del bien.' },
+      { name: 'Aura de Purificación', level: 4, description: 'Los no-muertos en 10 pies sufren −2 a todas las tiradas y los efectos que controlan no-muertos en el aura fallan automáticamente.' },
+    ],
+  },
+  {
+    id: 'warrior-of-holy-light',
+    classId: 'paladin',
+    name: 'Warrior of the Holy Light',
+    description: 'Paladín que no sigue a ninguna deidad específica sino a la causa del bien absoluto, con poderes de luz.',
+    replaces: [
+      { featureName: 'Dominio', atLevel: 1, type: 'replaces' },
+      { featureName: 'Detectar Maldad', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Poder de la Luz', level: 1, description: 'Emites luz brillante en 20 pies y luz tenue en 40 pies. Los no-muertos y seres malvados en la luz brillante reciben −2 a todas las tiradas.' },
+      { name: 'Golpe de Luz Sagrada', level: 4, description: 'Gastas 2 usos de Manos Puestas para causar daño de luz sagrada = 1d6/4 niveles en explosión de 10 pies (Ref ½).' },
+    ],
+  },
+
+  // ─── RANGER (adicionales) ─────────────────────────────────────────────────
+  {
+    id: 'falconer',
+    classId: 'ranger',
+    name: 'Falconer',
+    description: 'Explorador que usa aves de presa como compañeros de caza, coordinando ataques con ellas.',
+    replaces: [
+      { featureName: 'Compañero Animal', atLevel: 4, type: 'changes' },
+    ],
+    features: [
+      { name: 'Halcón Compañero', level: 1, description: 'Obtienes un ave de presa como compañero a nivel 1 (en lugar de nivel 4). El halcón puede señalar objetivos que flanquean contigo.' },
+      { name: 'Picado Coordinado', level: 4, description: 'Cuando tu halcón ataca un objetivo, tus ataques de proyectil contra ese objetivo ganan +2 al ataque y daño hasta el inicio de tu siguiente turno.' },
+    ],
+  },
+  {
+    id: 'infiltrator-ranger',
+    classId: 'ranger',
+    name: 'Infiltrator',
+    description: 'Explorador espía que adopta las costumbres de sus enemigos favoritos para infiltrarse entre ellos.',
+    replaces: [
+      { featureName: 'Enemigo Favorito', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Adaptación al Enemigo', level: 1, description: 'Por cada tipo de Enemigo Favorito, aprendes un rasgo cultural o físico de esa especie que te permite pasar por uno de ellos con Disfraz.' },
+      { name: 'Infiltración Perfecta', level: 5, description: 'Mientras te haces pasar por una criatura de tu tipo de Enemigo Favorito, ganas una de sus habilidades raciales a elección.' },
+    ],
+  },
+  {
+    id: 'trapper-ranger',
+    classId: 'ranger',
+    name: 'Trapper',
+    description: 'Explorador especializado en trampas mecánicas y mágicas, creando zonas de peligro en el campo de batalla.',
+    replaces: [
+      { featureName: 'Compañero Animal', atLevel: 4, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Colocar Trampa', level: 2, description: 'Fabricas y colocas trampas mecánicas como un ladrón de nivel igual al tuyo. Añades mod. SAB en lugar de INT a las DCs.' },
+      { name: 'Trampa Mágica', level: 4, description: 'Puedes crear trampas con efectos de conjuro de ranger (duración concentrada). El conjuro se activa cuando una criatura detona la trampa.' },
+    ],
+    classSkillsAdded: ['disable_device'],
+  },
+  {
+    id: 'warden-ranger',
+    classId: 'ranger',
+    name: 'Warden',
+    description: 'Explorador guardián de un territorio específico con poderes especiales dentro de él.',
+    replaces: [
+      { featureName: 'Enemigo Favorito', atLevel: 1, type: 'changes' },
+      { featureName: 'Terreno Favorito', atLevel: 3, type: 'changes' },
+    ],
+    features: [
+      { name: 'Señor del Territorio', level: 3, description: 'En tu Terreno Favorito principal, eres consciente de todas las criaturas en 1 milla y no puedes sorprenderte.' },
+      { name: 'Vínculo con la Tierra', level: 5, description: 'Puedes lanzar conjuros de terreno (hallucinatory terrain, move earth) como poderes sobrenaturales 1/día en tu territorio.' },
+    ],
+  },
+  {
+    id: 'wild-hunter',
+    classId: 'ranger',
+    name: 'Wild Hunter',
+    description: 'Explorador que abandona la magia por capacidades físicas mejoradas, pareciéndose más a un bárbaro.',
+    replaces: [
+      { featureName: 'Compañero Animal', atLevel: 4, type: 'optional' },
+    ],
+    features: [
+      { name: 'Furia de Caza', level: 4, description: 'Puedes entrar en un estado de furia menor (+2 FUE, +2 CON, −2 CA) durante 3 + mod. CON rondas, como bárbaro pero sin poderes de furia.' },
+      { name: 'Instinto Primario', level: 6, description: 'Ganas scent (olfato) permanente y +4 a Percepción basada en olfato. No puedes sorprenderte mientras estés consciente.' },
+    ],
+  },
+
+  // ─── ROGUE (adicionales) ──────────────────────────────────────────────────
+  {
+    id: 'knife-master',
+    classId: 'rogue',
+    name: 'Knife Master',
+    description: 'Pícaro especializado en cuchillos y dagas que maximiza el daño con armas de filo pequeñas.',
+    replaces: [
+      { featureName: 'Trampa Sense', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Maestría del Cuchillo', level: 1, description: 'Con dagas y cuchillos tu ataque furtivo usa d8 en lugar de d6. Con otras armas ligeras usas d4.' },
+      { name: 'Velocidad del Cuchillo', level: 3, description: 'Puedes sacar una daga oculta como acción libre y lanzarla como parte del mismo ataque.' },
+    ],
+  },
+  {
+    id: 'pirate-rogue',
+    classId: 'rogue',
+    name: 'Pirate',
+    description: 'Pícaro marino especializado en combate naval y abordajes, con habilidades de intimidación.',
+    replaces: [
+      { featureName: 'Trampa Sense', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Pies de Pirata', level: 1, description: 'Nunca sufres penalización de movimiento en cubiertas inestables o mojadas. Añades nivel a tiradas de Acrobacias en barcos.' },
+      { name: 'Abordaje', level: 3, description: 'Cuando balanceas con una cuerda o saltas a otra embarcación, puedes hacer un ataque de aturdimiento gratis al aterrizar.' },
+    ],
+    classSkillsAdded: ['swim', 'profession'],
+  },
+  {
+    id: 'poisoner-rogue',
+    classId: 'rogue',
+    name: 'Poisoner',
+    description: 'Pícaro especializado en venenos que puede crearlos y aplicarlos con rapidez excepcional.',
+    replaces: [
+      { featureName: 'Talentos de Pícaro', atLevel: 10, type: 'changes' },
+    ],
+    features: [
+      { name: 'Aplicación Rápida', level: 2, description: 'Puedes aplicar veneno a un arma como acción de movimiento sin arriesgarte a envenenarte (inmunidad a venenos propios a nivel 4).' },
+      { name: 'Síntesis de Veneno', level: 1, description: 'Fabricas venenos a la mitad del precio y con Alquimia en lugar de comprarlos. Tu nivel cuenta como grados de Craft (alchemy).' },
+      { name: 'Veneno Potenciado', level: 4, description: 'La CD de los venenos que aplicas aumenta en 2 y los venenos de inicio rápido tienen una segunda tirada de salvación.' },
+    ],
+  },
+  {
+    id: 'spy-rogue',
+    classId: 'rogue',
+    name: 'Spy',
+    description: 'Pícaro maestro del engaño e infiltración en organizaciones enemigas.',
+    replaces: [
+      { featureName: 'Trampa Sense', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Arte del Disfraz', level: 1, description: 'Siempre tienes un disfraz preparado en tu mente; reduce el tiempo de disfrazarse a 1d3 minutos. Añades nivel a Disfraz.' },
+      { name: 'Identidad Falsa', level: 3, description: 'Mantienes hasta dos identidades falsas con documentación preparada. Cambiar entre ellas es instantáneo si llevas los objetos.' },
+      { name: 'Extracción de Información', level: 5, description: 'Cuando interrogas a alguien durante 10 minutos, puedes hacer una tirada de Sentir Motivaciones con +5. Si la superas, obtienes una verdad que no quería revelar.' },
+    ],
+  },
+  {
+    id: 'charlatan-rogue',
+    classId: 'rogue',
+    name: 'Charlatan',
+    description: 'Pícaro estafador y manipulador social que usa el engaño como arma principal.',
+    replaces: [
+      { featureName: 'Ataque Furtivo', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Maestro del Engaño', level: 1, description: 'Añades nivel completo a Engaño y Actuación. Cuando engañas con éxito a un objetivo, sufre −2 a su siguiente salvación contra tus efectos.' },
+      { name: 'Cara de Poker', level: 3, description: 'Eres inmune a detect thoughts y lie detection. Puedes engañar a detectores mágicos de mentiras con una tirada de Engaño contra CD 25.' },
+    ],
+  },
+  {
+    id: 'phantom-thief',
+    classId: 'rogue',
+    name: 'Phantom Thief',
+    description: 'Pícaro ladrón de alto nivel especializado en robar objetos irremplazables con elegancia y precisión.',
+    replaces: [
+      { featureName: 'Talentos de Pícaro', atLevel: 10, type: 'changes' },
+    ],
+    features: [
+      { name: 'Dedos Fantasma', level: 1, description: 'Añades nivel a Juego de Manos y puedes intentar Robar como acción de movimiento sin penalización.' },
+      { name: 'Robo Perfecto', level: 4, description: 'Puedes intentar robar objetos mágicos atados o malditos. Si lo consigues, el objeto no detecta el robo hasta que el dueño lo compruebe activamente.' },
+    ],
+  },
+
+  // ─── SORCERER (adicionales) ───────────────────────────────────────────────
+  {
+    id: 'wildblooded',
+    classId: 'sorcerer',
+    name: 'Wildblooded',
+    description: 'Hechicero con una versión mutada de su linaje de sangre que cambia algunos poderes por alternativas únicas.',
+    replaces: [
+      { featureName: 'Linaje de Sangre', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Linaje Mutado', level: 1, description: 'Tu linaje tiene una mutación: un poder de linaje cambia por una versión alternativa más inusual pero igualmente potente.' },
+      { name: 'Sangre Salvaje', level: 3, description: 'Una vez al día puedes "activar" tu mutación salvaje para doblar la eficacia de un poder de linaje durante 1 ronda.' },
+    ],
+  },
+  {
+    id: 'sylvan-sorcerer',
+    classId: 'sorcerer',
+    name: 'Sylvan Sorcerer',
+    description: 'Hechicero con sangre feérica que obtiene un compañero animal en lugar de familiar.',
+    replaces: [
+      { featureName: 'Hechizos', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Compañero Animal Feérico', level: 1, description: 'Obtienes un compañero animal como druida de nivel = nivel de hechicero − 2. Puede ser un animal inusualmente inteligente.' },
+      { name: 'Magia del Bosque', level: 3, description: 'Añades conjuros de druida de nivel 1 a tu lista de conjuros conocidos. A nivel 7 añades conjuros de nivel 2.' },
+    ],
+    classSkillsAdded: ['knowledge_nature', 'survival'],
+  },
+  {
+    id: 'empyreal-sorcerer',
+    classId: 'sorcerer',
+    name: 'Empyreal Sorcerer',
+    description: 'Hechicero con sangre celestial que usa Sabiduría en lugar de Carisma para sus conjuros.',
+    replaces: [
+      { featureName: 'Linaje de Sangre', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Magia Divina Innata', level: 1, description: 'Usas SAB en lugar de CAR para la CD de salvación y conjuros por día adicionales. Tu linaje es celestial.' },
+      { name: 'Resistencia Celestial', level: 3, description: 'Ganas resistencia al fuego y ácido 5, y resistencia a la electricidad y frío 5. A nivel 9 aumentan a 10.' },
+    ],
+  },
+  {
+    id: 'mongrel-mage',
+    classId: 'sorcerer',
+    name: 'Mongrel Mage',
+    description: 'Hechicero sin linaje definido que puede acceder a poderes de múltiples linajes pero de forma menos potente.',
+    replaces: [
+      { featureName: 'Linaje de Sangre', atLevel: 1, type: 'changes' },
+    ],
+    features: [
+      { name: 'Sangre Mezclada', level: 1, description: 'Seleccionas dos linajes. Obtienes los poderes de nivel 1 de ambos, pero los poderes de mayor nivel vienen solo del linaje primario.' },
+      { name: 'Versatilidad Arcana', level: 5, description: '1/día puedes lanzar un conjuro usando la bonificación de un linaje secundario aunque no sea tu linaje activo.' },
+    ],
+  },
+  {
+    id: 'razmiran-priest',
+    classId: 'sorcerer',
+    name: 'Razmiran Priest',
+    description: 'Hechicero que finge ser un sacerdote divino, ocultando su magia arcana como milagros religiosos.',
+    replaces: [
+      { featureName: 'Linaje de Sangre', atLevel: 1, type: 'replaces' },
+    ],
+    features: [
+      { name: 'Milagro Falso', level: 1, description: 'Lanzas conjuros arcanos como si fueran divinos. Los espectadores deben superar Percepción CD 20 para notar que no es magia divina real.' },
+      { name: 'Máscara del Sacerdote', level: 3, description: 'Añades cure light wounds y bless a tu lista de conjuros conocidos como conjuros arcanos. Ganas +4 a Engaño para mantener tu disfraz religioso.' },
+    ],
+  },
 ]
