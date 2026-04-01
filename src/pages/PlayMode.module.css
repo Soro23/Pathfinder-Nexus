@@ -1040,3 +1040,336 @@
     font-size: 1rem;
   }
 }
+
+/* ── Class Features ── */
+.featureList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.featureRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.featureRowActive {
+  border-color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.06);
+}
+
+.featureInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.featureName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.featureActiveTag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.15);
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+}
+
+.featureMeta {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.featureActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.featureUses {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-accent-gold);
+  min-width: 32px;
+  text-align: right;
+}
+
+/* ── Encounter Tracker ── */
+.roundBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.roundLabel {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  flex: 1;
+}
+
+.roundLabel strong {
+  color: var(--color-accent-gold);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+}
+
+.combatantList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.combatantRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  transition: border-color 0.15s;
+}
+
+.combatantActive {
+  border-color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.06);
+}
+
+.combatantDead {
+  opacity: 0.45;
+}
+
+.combatantTurnIndicator {
+  width: 16px;
+  font-size: 0.75rem;
+  color: var(--color-accent-gold);
+  flex-shrink: 0;
+}
+
+.combatantInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.combatantName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.combatantMeta {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+.combatantHp {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.combatantHpValue {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  min-width: 52px;
+  text-align: center;
+  color: var(--color-text-primary);
+}
+
+.addEnemyForm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.enemyInput {
+  flex: 1;
+  min-width: 120px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+}
+
+.enemyInput:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+.enemyLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.enemyInputSmall {
+  width: 52px;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.enemyInputSmall:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+/* ── Dice Panel Floating ── */
+.dicePanelFloating {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  width: 280px;
+  background: var(--color-surface-container);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+  z-index: 100;
+  animation: slideInUp 0.2s ease-out;
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.dicePanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.dicePanelTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--color-accent-gold);
+  font-family: var(--font-display);
+}
+
+.dicePanelClose {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dicePanelClose:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-container-high);
+}
+
+.dicePanelContent {
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dicePanelInput {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dicePanelInput .diceInputField {
+  flex: 1;
+  padding: var(--space-2);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.dicePanelInput .diceInputField:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+.dicePanelPresets {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-1);
+}
+
+.dicePanelPresetBtn {
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dicePanelPresetBtn:hover {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+}
+
+.dicePanelResult {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+}
+
+.dicePanelResultNumber {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+}
+
+.dicePanelRollsDetail {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}

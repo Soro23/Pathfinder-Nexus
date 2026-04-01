@@ -57,7 +57,18 @@ function rollDice(notation: string): { total: number; rolls: number[] } {
 }
 
 type CritEvent = { type: 'crit' | 'fumble'; name: string; roll: number }
-type TabId = 'combat' | 'skills' | 'spells' | 'dice'
+type TabId = 'combat' | 'skills' | 'spells' | 'dice' | 'encounter'
+
+interface Combatant {
+  id: string
+  name: string
+  initiative: number
+  hp: { current: number; max: number }
+  ac: number
+  isPlayer: boolean
+}
+
+const PREPARED_CASTERS = ['wizard', 'cleric', 'druid', 'paladin', 'ranger']
 
 export function PlayMode() {
   const { skills: SKILLS, classes: CLASSES_DATA } = useSRDStore()
@@ -72,6 +83,7 @@ export function PlayMode() {
   const [history, setHistory] = useState<{ notation: string; result: number; isCrit?: boolean; isFumble?: boolean }[]>([])
   const [critEvent, setCritEvent] = useState<CritEvent | null>(null)
   const [rolling, setRolling] = useState(false)
+  const [dicePanelOpen, setDicePanelOpen] = useState(false)
   const [showStatusEffects, setShowStatusEffects] = useState(false)
   const [newEffectName, setNewEffectName] = useState('')
   const [newEffectDesc, setNewEffectDesc] = useState('')
@@ -87,7 +99,21 @@ export function PlayMode() {
   const [editSkillId, setEditSkillId] = useState('')
   const [editValue, setEditValue] = useState<number>(0)
 
+  // ── Encounter tracker state ──
+  const [combatants, setCombatants] = useState<Combatant[]>([])
+  const [activeTurn, setActiveTurn] = useState(0)
+  const [round, setRound] = useState(1)
+  const [encounterStarted, setEncounterStarted] = useState(false)
+  const [newEnemyName, setNewEnemyName] = useState('')
+  const [newEnemyInit, setNewEnemyInit] = useState(0)
+  const [newEnemyHp, setNewEnemyHp] = useState(10)
+  const [newEnemyAc, setNewEnemyAc] = useState(10)
+
+  // ── Rage state ──
+  const [raging, setRaging] = useState(false)
+
   const { spells: spellMap } = useSpellsByIds(character?.spells ?? [])
+  const { spells: preparedSpellMap } = useSpellsByIds(character?.preparedSpells ?? [])
 
   if (!character) {
     return (
@@ -202,6 +228,100 @@ export function PlayMode() {
   }
 
   const classSkillIds = classData?.classSkills ?? CLASSES_DATA.find(c => c.id === character.classes[0]?.id)?.classSkills ?? []
+
+  // ── Class feature helpers ──
+  const conMod = calculateModifier(abilities.constitution)
+  const wisMod = calculateModifier(abilities.wisdom)
+  const chaMod = calculateModifier(abilities.charisma)
+  const classByType = (id: string) => character.classes.find(c => c.id === id)
+
+  const barbarianClass = classByType('barbarian')
+  const clericClass    = classByType('cleric')
+  const rogueClass     = classByType('rogue')
+  const paladinClass   = classByType('paladin')
+  const monkClass      = classByType('monk')
+
+  const rageMaxUses   = barbarianClass ? 4 + conMod + 2 * (barbarianClass.level - 1) : 0
+  const channelMaxUses = clericClass   ? Math.max(1, 3 + chaMod) : 0
+  const layMaxUses    = paladinClass   ? Math.max(1, Math.floor(paladinClass.level / 2) + chaMod) : 0
+  const stunMaxUses   = monkClass      ? monkClass.level + wisMod : 0
+  const sneakDice     = rogueClass     ? Math.ceil(rogueClass.level / 2) : 0
+
+  const featureUses = character.classFeatureUses ?? {}
+  const rageUses    = featureUses['rage']    ?? rageMaxUses
+  const channelUses = featureUses['channel'] ?? channelMaxUses
+  const layUses     = featureUses['lay']     ?? layMaxUses
+  const stunUses    = featureUses['stun']    ?? stunMaxUses
+
+  const useFeature = (key: string, max: number) => {
+    const current = featureUses[key] ?? max
+    if (current <= 0) return
+    updateCharacter(character.id, { classFeatureUses: { ...featureUses, [key]: current - 1 } })
+  }
+
+  // ── Encounter helpers ──
+  const startEncounter = () => {
+    const playerCombatant: Combatant = {
+      id: character.id,
+      name: character.name,
+      initiative: initiative + effectInitiative + Math.floor(Math.random() * 20) + 1,
+      hp: { current: character.hp.current, max: character.hp.max },
+      ac: ac + effectAC,
+      isPlayer: true,
+    }
+    setCombatants([playerCombatant])
+    setActiveTurn(0)
+    setRound(1)
+    setEncounterStarted(true)
+  }
+
+  const addEnemy = () => {
+    if (!newEnemyName.trim()) return
+    const enemy: Combatant = {
+      id: `enemy-${Date.now()}`,
+      name: newEnemyName.trim(),
+      initiative: newEnemyInit,
+      hp: { current: newEnemyHp, max: newEnemyHp },
+      ac: newEnemyAc,
+      isPlayer: false,
+    }
+    setCombatants(prev => [...prev, enemy].sort((a, b) => b.initiative - a.initiative))
+    setNewEnemyName('')
+    setNewEnemyInit(0)
+    setNewEnemyHp(10)
+    setNewEnemyAc(10)
+  }
+
+  const sortedCombatants = [...combatants].sort((a, b) => b.initiative - a.initiative)
+
+  const nextTurn = () => {
+    const next = activeTurn + 1
+    if (next >= sortedCombatants.length) {
+      setActiveTurn(0)
+      setRound(r => r + 1)
+    } else {
+      setActiveTurn(next)
+    }
+  }
+
+  const adjustCombatantHp = (id: string, delta: number) => {
+    setCombatants(prev => prev.map(c =>
+      c.id === id
+        ? { ...c, hp: { ...c.hp, current: Math.max(0, Math.min(c.hp.max, c.hp.current + delta)) } }
+        : c
+    ))
+  }
+
+  const endEncounter = () => {
+    setCombatants([])
+    setActiveTurn(0)
+    setRound(1)
+    setEncounterStarted(false)
+  }
+
+  const isPreparedCaster = character.classes.some(c => PREPARED_CASTERS.includes(c.id))
+  const activeSpellMap = isPreparedCaster ? preparedSpellMap : spellMap
+  const activeSpellIds = isPreparedCaster ? (character.preparedSpells ?? []) : (character.spells ?? [])
 
   return (
     <div className={styles.container}>
@@ -489,6 +609,12 @@ export function PlayMode() {
               <span className={styles.statusBadge}>{statusEffects.length}</span>
             )}
           </button>
+          <button
+            className={`${styles.statusBtn} ${dicePanelOpen ? styles.statusBtnActive : ''}`}
+            onClick={() => setDicePanelOpen(!dicePanelOpen)}
+          >
+            <Dices size={16} />
+          </button>
         </div>
       </header>
 
@@ -544,6 +670,12 @@ export function PlayMode() {
               onClick={() => setActiveTab('dice')}
             >
               <Dices size={16} /> DADOS
+            </button>
+            <button
+              className={`${styles.tabBtn} ${activeTab === 'encounter' ? styles.tabBtnActive : ''}`}
+              onClick={() => setActiveTab('encounter')}
+            >
+              <Swords size={16} /> ENCUENTRO
             </button>
           </nav>
 
@@ -650,6 +782,118 @@ export function PlayMode() {
                   })}
                 </div>
               </Card>
+
+              {/* Class Features */}
+              {(barbarianClass || clericClass || rogueClass || paladinClass || monkClass) && (
+                <Card padding="md">
+                  <h3 className={styles.sectionTitle}><Zap size={18} />Poderes de Clase</h3>
+                  <div className={styles.featureList}>
+
+                    {/* Barbarian Rage */}
+                    {barbarianClass && (
+                      <div className={`${styles.featureRow} ${raging ? styles.featureRowActive : ''}`}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Rabia {raging && <span className={styles.featureActiveTag}>ACTIVA</span>}</span>
+                          <span className={styles.featureMeta}>+4 FUE/CON, +2 Voluntad, −2 CA</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{rageUses}/{rageMaxUses}</span>
+                          <Button
+                            variant={raging ? 'danger' : 'secondary'}
+                            size="sm"
+                            onClick={() => {
+                              if (!raging && rageUses > 0) { useFeature('rage', rageMaxUses); setRaging(true) }
+                              else { setRaging(false) }
+                            }}
+                            disabled={!raging && rageUses <= 0}
+                          >
+                            {raging ? 'Fin Rabia' : 'Rabia'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Cleric Channel Energy */}
+                    {clericClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Canalizar Energía</span>
+                          <span className={styles.featureMeta}>{Math.ceil(clericClass.level / 2)}d6 — CD {10 + Math.floor(clericClass.level / 2) + chaMod}</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{channelUses}/{channelMaxUses}</span>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => { useFeature('channel', channelMaxUses); handleQuickRoll(`${Math.ceil(clericClass.level / 2)}d6`, 'Canalizar Energía') }}
+                            disabled={channelUses <= 0}
+                          >
+                            Canalizar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Rogue Sneak Attack (passive) */}
+                    {rogueClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Ataque Furtivo</span>
+                          <span className={styles.featureMeta}>+{sneakDice}d6 daño (flanqueo / negado DES)</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <Button variant="danger" size="sm" onClick={() => handleQuickRoll(`${sneakDice}d6`, 'Ataque Furtivo (daño extra)')}>
+                            Tirar {sneakDice}d6
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Paladin Lay on Hands */}
+                    {paladinClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Imponer Manos</span>
+                          <span className={styles.featureMeta}>{Math.floor(paladinClass.level / 2)}d6 curación</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{layUses}/{layMaxUses}</span>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => { useFeature('lay', layMaxUses); handleQuickRoll(`${Math.max(1, Math.floor(paladinClass.level / 2))}d6`, 'Imponer Manos') }}
+                            disabled={layUses <= 0}
+                          >
+                            Curar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Monk Stunning Fist */}
+                    {monkClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Puño Aturdidor</span>
+                          <span className={styles.featureMeta}>CD {10 + Math.floor(monkClass.level / 2) + wisMod} Fortaleza</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{stunUses}/{stunMaxUses}</span>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => useFeature('stun', stunMaxUses)}
+                            disabled={stunUses <= 0}
+                          >
+                            Usar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                  </div>
+                </Card>
+              )}
             </div>
           )}
 
@@ -754,14 +998,16 @@ export function PlayMode() {
 
                   {/* Spell List */}
                   <Card padding="md">
-                    <h3 className={styles.sectionTitle}><BookOpen size={18} />Conjuros Preparados</h3>
-                    {character.spells && character.spells.length > 0 ? (
+                    <h3 className={styles.sectionTitle}>
+                      <BookOpen size={18} />{isPreparedCaster ? 'Conjuros Preparados Hoy' : 'Conjuros Conocidos'}
+                    </h3>
+                    {activeSpellIds.length > 0 ? (
                       <div className={styles.spellList}>
-                        {character.spells.map((spellId) => {
-                          const spell = spellMap[spellId]
+                        {activeSpellIds.map((spellId, idx) => {
+                          const spell = activeSpellMap[spellId]
                           if (!spell) return null
                           return (
-                            <div key={spellId} className={styles.spellRow}>
+                            <div key={`${spellId}-${idx}`} className={styles.spellRow}>
                               <div className={styles.spellInfo}>
                                 <span className={styles.spellName}>{spell.name}</span>
                                 <span className={styles.spellMeta}>Nv {spell.level} · {spell.school}{spell.level > 0 ? ` · DC ${10 + spell.level + casterAbilityMod}` : ''}</span>
@@ -774,14 +1020,14 @@ export function PlayMode() {
                                   `Concentración — ${spell.name}`
                                 )}
                               >
-                                Concentración +{concentrationBonus}
+                                Conc. +{concentrationBonus}
                               </Button>
                             </div>
                           )
                         })}
                       </div>
                     ) : (
-                      <p className={styles.emptyHistory}>Sin conjuros asignados</p>
+                      <p className={styles.emptyHistory}>{isPreparedCaster ? 'Sin conjuros preparados hoy. Prepáralos en la ficha de personaje.' : 'Sin conjuros asignados'}</p>
                     )}
                   </Card>
                 </>
@@ -833,6 +1079,82 @@ export function PlayMode() {
               )}
             </div>
           )}
+
+          {/* ─── TAB: ENCUENTRO ─── */}
+          {activeTab === 'encounter' && (
+            <div className={styles.tabContent}>
+              {!encounterStarted ? (
+                <Card padding="md">
+                  <h3 className={styles.sectionTitle}><Swords size={18} />Nuevo Encuentro</h3>
+                  <p className={styles.emptyHistory}>Inicia el rastreador para este combate. El personaje se añade automáticamente.</p>
+                  <div style={{ marginTop: 'var(--space-3)' }}>
+                    <Button variant="primary" onClick={startEncounter}>Iniciar Encuentro</Button>
+                  </div>
+                </Card>
+              ) : (
+                <>
+                  {/* Round counter */}
+                  <Card padding="sm">
+                    <div className={styles.roundBar}>
+                      <span className={styles.roundLabel}>Ronda <strong>{round}</strong></span>
+                      <Button variant="primary" size="sm" onClick={nextTurn}>Siguiente Turno →</Button>
+                      <Button variant="ghost" size="sm" onClick={endEncounter}>Fin Encuentro</Button>
+                    </div>
+                  </Card>
+
+                  {/* Combatants list */}
+                  <Card padding="md">
+                    <h3 className={styles.sectionTitle}>Orden de Combate</h3>
+                    <div className={styles.combatantList}>
+                      {sortedCombatants.map((c, idx) => (
+                        <div
+                          key={c.id}
+                          className={`${styles.combatantRow} ${idx === activeTurn ? styles.combatantActive : ''} ${c.hp.current === 0 ? styles.combatantDead : ''}`}
+                        >
+                          <div className={styles.combatantTurnIndicator}>{idx === activeTurn ? '▶' : ''}</div>
+                          <div className={styles.combatantInfo}>
+                            <span className={styles.combatantName}>{c.name}{c.isPlayer ? ' ★' : ''}</span>
+                            <span className={styles.combatantMeta}>INI {c.initiative} · CA {c.ac}</span>
+                          </div>
+                          <div className={styles.combatantHp}>
+                            <Button variant="danger" size="sm" onClick={() => adjustCombatantHp(c.id, -1)}>−</Button>
+                            <span className={`${styles.combatantHpValue} ${c.hp.current <= c.hp.max * 0.25 ? styles.critical : ''}`}>
+                              {c.hp.current}/{c.hp.max}
+                            </span>
+                            <Button variant="primary" size="sm" onClick={() => adjustCombatantHp(c.id, 1)}>+</Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  {/* Add enemy form */}
+                  <Card padding="md">
+                    <h3 className={styles.sectionTitle}>Añadir Enemigo</h3>
+                    <div className={styles.addEnemyForm}>
+                      <input
+                        className={styles.enemyInput}
+                        placeholder="Nombre"
+                        value={newEnemyName}
+                        onChange={e => setNewEnemyName(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && addEnemy()}
+                      />
+                      <label className={styles.enemyLabel}>INI
+                        <input className={styles.enemyInputSmall} type="number" value={newEnemyInit} onChange={e => setNewEnemyInit(parseInt(e.target.value) || 0)} />
+                      </label>
+                      <label className={styles.enemyLabel}>PV
+                        <input className={styles.enemyInputSmall} type="number" min={1} value={newEnemyHp} onChange={e => setNewEnemyHp(Math.max(1, parseInt(e.target.value) || 1))} />
+                      </label>
+                      <label className={styles.enemyLabel}>CA
+                        <input className={styles.enemyInputSmall} type="number" min={0} value={newEnemyAc} onChange={e => setNewEnemyAc(parseInt(e.target.value) || 0)} />
+                      </label>
+                      <Button variant="secondary" size="sm" onClick={addEnemy}>Añadir</Button>
+                    </div>
+                  </Card>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* ── Side Panel (desktop only) ── */}
@@ -880,6 +1202,52 @@ export function PlayMode() {
             </div>
           </Card>
         </aside>
+
+        {/* ── Dice Panel Floating ── */}
+        {dicePanelOpen && (
+          <div className={styles.dicePanelFloating}>
+            <div className={styles.dicePanelHeader}>
+              <span className={styles.dicePanelTitle}><Dices size={16} /> Dados</span>
+              <button className={styles.dicePanelClose} onClick={() => setDicePanelOpen(false)}>
+                <X size={16} />
+              </button>
+            </div>
+            <div className={styles.dicePanelContent}>
+              <div className={styles.dicePanelInput}>
+                <input
+                  type="text"
+                  value={diceNotation}
+                  onChange={(e) => setDiceNotation(e.target.value)}
+                  placeholder="1d20+5"
+                  className={styles.diceInputField}
+                  onKeyDown={(e) => e.key === 'Enter' && handleRoll()}
+                />
+                <Button variant="primary" size="sm" onClick={handleRoll} className={rolling ? styles.btnShaking : ''}>
+                  Tirar
+                </Button>
+              </div>
+              <div className={styles.dicePanelPresets}>
+                {['1d4', '1d6', '1d8', '1d10', '1d12', '1d20', '2d6', '2d10', '1d100'].map((d) => (
+                  <button
+                    key={d}
+                    className={styles.dicePanelPresetBtn}
+                    onClick={() => { setDiceNotation(d); handleQuickRoll(d, d) }}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+              {rollResult !== null && (
+                <div className={styles.dicePanelResult}>
+                  <span className={styles.dicePanelResultNumber}>{rollResult.total}</span>
+                  {rollResult.rolls.length > 1 && (
+                    <span className={styles.dicePanelRollsDetail}>[{rollResult.rolls.join(' + ')}]</span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
