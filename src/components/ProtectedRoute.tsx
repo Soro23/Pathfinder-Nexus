@@ -10,11 +10,13 @@ export function ProtectedRoute() {
   const fetchCampaigns = useCampaignStore((s) => s.fetchCampaigns)
 
   useEffect(() => {
-    if (session) {
+    if (import.meta.env.DEV || session) {
       fetchCharacters()
       fetchCampaigns()
     }
   }, [session, fetchCharacters, fetchCampaigns])
+
+  if (import.meta.env.DEV) return <Outlet />
 
   if (loading) {
     return (

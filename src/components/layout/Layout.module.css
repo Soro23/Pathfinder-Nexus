@@ -389,6 +389,9 @@
     padding: var(--space-4);
     padding-bottom: calc(var(--space-4) + 64px);
     /* leave room for bottom nav */
+    overflow-y: visible;
+    /* overflow-y: auto on .main breaks position:sticky in descendants;
+       on mobile the body scrolls, so this is safe to remove */
   }
 
   /* Show mobile bottom nav */

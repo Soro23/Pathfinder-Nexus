@@ -1,6 +1,7 @@
-import { LayoutList } from 'lucide-react'
+import { LayoutList, ChevronDown } from 'lucide-react'
 import { BONUS_SPELL_TABLE } from '../data/bonusSpells'
 import styles from './Tables.module.css'
+import mobile from '../styles/compendiumMobile.module.css'
 
 // ── Static data ──────────────────────────────────────────────────────────────
 
@@ -373,24 +374,28 @@ export function Tables() {
   }
 
   return (
-    <div className={styles.pageLayout}>
+    <div className={`${styles.pageLayout} ${mobile.pageLayout}`}>
 
       {/* ── Mobile category dropdown ── */}
-      <div className={styles.mobileCatBar}>
-        <select
-          className={styles.mobileCatSelect}
-          defaultValue=""
-          onChange={e => { scrollTo(e.target.value); (e.target as HTMLSelectElement).value = '' }}
-        >
-          <option value="" disabled>Ir a categoría…</option>
-          {CATEGORIES.map(cat => (
-            <optgroup key={cat.id} label={cat.label}>
-              {cat.sections.map(sec => (
-                <option key={sec.id} value={sec.id}>{sec.label}</option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
+      <div className={mobile.mobileCatBar}>
+        <div className={mobile.mobileCatSelectWrap}>
+          <LayoutList size={15} className={mobile.mobileCatIcon} />
+          <select
+            className={mobile.mobileCatSelect}
+            defaultValue=""
+            onChange={e => { scrollTo(e.target.value); (e.target as HTMLSelectElement).value = '' }}
+          >
+            <option value="" disabled>Ir a sección…</option>
+            {CATEGORIES.map(cat => (
+              <optgroup key={cat.id} label={cat.label}>
+                {cat.sections.map(sec => (
+                  <option key={sec.id} value={sec.id}>{sec.label}</option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          <ChevronDown size={15} className={mobile.mobileCatChevron} />
+        </div>
       </div>
 
       {/* ── Left category nav (desktop) ── */}

@@ -19,10 +19,10 @@ export interface Feat {
 export const FEATS: Feat[] = [
   {
     id: 'aberrant-tumor',
-    name: 'Aberrant Tumor',
+    name: 'Tumor Aberrante',
     type: ['general'],
-    prerequisite: 'Aberrant bloodline.',
-    benefit: 'You gain a tumor familiar, as the tumor familiar alchemist discovery ( Pathfinder RPG Ultimate Magic 17), with an effective alchemist level equal to the level of the class that grants your aberrant bloodline for determining the tumor familiar’s abilities. If multiple classes grant you the aberrant bloodline, those class levels stack for determining your effective alchemist level.',
+    prerequisite: 'Linaje aberrante.',
+    benefit: 'Obtienes un familiar tumor, como el descubrimiento de químico tumor familiar (Pathfinder RPG Ultimate Magic 17), con un nivel de químico efectivo igual al nivel de la clase que otorga tu linaje aberrante para determinar las habilidades del tumor familiar. Si múltiples clases te otorgan el linaje aberrante, esos niveles de clase se apilan para determinar tu nivel de químico efectivo.',
     source: 'Advanced Class Guide pg. 136',
   },
   {

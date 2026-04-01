@@ -8,7 +8,7 @@
 }
 
 /* ── Left nav ── */
-.featNav {
+.monsterNav {
   width: 200px;
   flex-shrink: 0;
   position: sticky;
@@ -19,14 +19,14 @@
 }
 
 @media (min-width: 901px) {
-  .featNav {
+  .monsterNav {
     position: fixed;
     top: var(--space-8);
     z-index: 100;
   }
 }
 
-.featNavInner {
+.monsterNavInner {
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -75,7 +75,7 @@
   background: rgba(212, 164, 76, 0.1);
 }
 
-.featCount {
+.monsterCount {
   margin-left: auto;
   font-size: 0.65rem;
   color: var(--color-text-secondary);
@@ -121,9 +121,18 @@
   margin-bottom: var(--space-4);
 }
 
+.searchIcon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+}
+
 .searchInput {
   width: 100%;
   padding: var(--space-3) var(--space-4);
+  padding-left: var(--space-8);
   padding-right: var(--space-8);
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
@@ -165,177 +174,197 @@
   margin-bottom: var(--space-4);
 }
 
-/* ── Feat cards ── */
-.featsGrid {
+/* ── Monster cards ── */
+.monstersGrid {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-.featCard {
+.monsterCard {
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-4);
 }
 
-.featHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-3);
+.monsterHeader {
   margin-bottom: var(--space-3);
 }
 
-.featName {
+.monsterNameRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.monsterName {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: var(--color-text-primary);
 }
 
-.featType {
+.crBadge {
   display: inline-flex;
-  padding: 2px var(--space-2);
+  padding: 4px var(--space-2);
   border-radius: var(--radius-sm);
-  font-size: 0.65rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
   flex-shrink: 0;
 }
 
-.featType.combat {
-  background: rgba(231, 76, 60, 0.15);
-  color: #e74c3c;
-}
-
-.featType.general {
-  background: rgba(52, 152, 219, 0.15);
-  color: #3498db;
-}
-
-.featType.metamagic {
-  background: rgba(155, 89, 182, 0.15);
-  color: #9b59b6;
-}
-
-.featType.item_creation {
-  background: rgba(46, 204, 113, 0.15);
-  color: #2ecc71;
-}
-
-.featType.teamwork {
-  background: rgba(52, 73, 94, 0.15);
-  color: #95a5a6;
-}
-
-.featType.critical {
-  background: rgba(230, 126, 34, 0.15);
-  color: #e67e22;
-}
-
-.featType.style {
-  background: rgba(241, 196, 15, 0.15);
-  color: #f1c40f;
-}
-
-.featType.race {
-  background: rgba(211, 84, 0, 0.15);
-  color: #d35400;
-}
-
-.featType.story {
-  background: rgba(142, 68, 173, 0.15);
-  color: #8e44ad;
-}
-
-.featTypes {
+.monsterTypes {
   display: flex;
+  align-items: center;
+  gap: var(--space-2);
   flex-wrap: wrap;
-  gap: 4px;
 }
 
-.featPrereq {
-  font-size: 0.8rem;
-  color: #e67e22;
-  margin-bottom: var(--space-2);
-  padding: var(--space-2);
-  background: rgba(230, 126, 34, 0.1);
-  border-radius: var(--radius-sm);
+.monsterType {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
 }
 
-.featBenefit {
-  font-size: 0.875rem;
-  color: var(--color-text-primary);
-  line-height: 1.6;
-  margin-bottom: var(--space-2);
-}
-
-.featNormal {
+.monsterSubtype {
   font-size: 0.8rem;
   color: var(--color-text-secondary);
   font-style: italic;
-  margin-bottom: var(--space-2);
 }
 
-.featSpecial {
+.monsterAlignment {
   font-size: 0.8rem;
-  color: #9b59b6;
-  margin-bottom: var(--space-2);
-}
-
-.featSection {
-  margin-top: var(--space-3);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--color-border);
-}
-
-.featSectionTitle {
-  font-size: 0.75rem;
-  font-weight: 600;
   color: var(--color-accent-gold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding: var(--space-2);
+  background: rgba(212, 164, 76, 0.1);
+  border-radius: var(--radius-sm);
+  display: inline-block;
 }
 
-.usesList {
+/* Stat block */
+.statBlock {
   display: flex;
-  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+}
+
+.statRow {
+  display: flex;
   gap: var(--space-2);
 }
 
-.useItem {
-  display: inline-block;
-  padding: 4px var(--space-2);
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
+.statLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.statValue {
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
   color: var(--color-text-primary);
 }
 
-.notesList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.notesList li {
-  font-size: 0.8rem;
+.statNote {
+  font-size: 0.7rem;
   color: var(--color-text-secondary);
-  padding: var(--space-1) 0;
-  padding-left: var(--space-3);
-  position: relative;
 }
 
-.notesList li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
+/* Ability scores */
+.abilityScores {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.ability {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-2);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+}
+
+.ability span:first-child {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 2px;
+}
+
+.ability span:last-child {
+  font-size: 0.9rem;
+  font-family: var(--font-mono);
+  color: var(--color-text-primary);
+}
+
+/* Monster details */
+.monsterDetails {
+  display: flex;
+  gap: var(--space-6);
+  margin-bottom: var(--space-3);
+}
+
+.detailRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.detailLabel {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.detailValue {
+  font-size: 0.8rem;
+  color: var(--color-text-primary);
+}
+
+/* Sections */
+.monsterSection {
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px dashed var(--color-border);
+}
+
+.sectionLabel {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
   color: var(--color-accent-gold);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
 }
 
-.featSource {
+.sectionValue {
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.monsterDescription {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  line-height: 1.6;
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-accent-gold);
+}
+
+.monsterSource {
   font-size: 0.7rem;
   color: var(--color-text-secondary);
   font-style: italic;
@@ -356,13 +385,13 @@
     flex-direction: column;
   }
 
-  .featNav {
+  .monsterNav {
     width: 100%;
     position: static;
     max-height: none;
   }
 
-  .featNavInner {
+  .monsterNavInner {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
@@ -381,13 +410,21 @@
     padding: 4px 8px;
   }
 
-  .featHeader {
-    flex-direction: column;
+  .statBlock {
+    flex-wrap: wrap;
+  }
+
+  .abilityScores {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .monsterDetails {
+    flex-wrap: wrap;
   }
 }
 
 @media (max-width: 640px) {
-  .featNav {
+  .monsterNav {
     display: none;
   }
 

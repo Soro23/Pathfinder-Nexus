@@ -83,3 +83,21 @@
   color: var(--color-text-secondary);
   line-height: 1.5;
 }
+
+@media (max-width: 640px) {
+  .header {
+    margin-bottom: var(--space-4);
+  }
+
+  .header h1 {
+    font-size: 1.3rem;
+  }
+
+  .formulaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .conditionList {
+    grid-template-columns: 1fr;
+  }
+}

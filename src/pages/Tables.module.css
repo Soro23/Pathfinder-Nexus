@@ -251,23 +251,6 @@
   opacity: 0.45;
 }
 
-/* ── Mobile category dropdown ── */
-.mobileCatBar {
-  display: none;
-}
-
-.mobileCatSelect {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text-primary);
-  font-family: var(--font-body);
-  font-size: 0.88rem;
-  cursor: pointer;
-  appearance: auto;
-}
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
@@ -295,16 +278,6 @@
 @media (max-width: 640px) {
   .tableNav {
     display: none;
-  }
-
-  .mobileCatBar {
-    display: block;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: var(--color-bg-primary);
-    padding: var(--space-3) 0;
-    margin-bottom: var(--space-5);
   }
 
   /* Page header compact */

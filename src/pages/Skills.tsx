@@ -1,6 +1,7 @@
-import { Zap } from 'lucide-react'
+import { Zap, ChevronDown } from 'lucide-react'
 import { SKILLS } from '../data/skills'
 import styles from './Skills.module.css'
+import mobile from '../styles/compendiumMobile.module.css'
 
 function fmtAbility(ability: string): string {
   const map: Record<string, string> = {
@@ -21,7 +22,26 @@ export function Skills() {
   }
 
   return (
-    <div className={styles.pageLayout}>
+    <div className={`${styles.pageLayout} ${mobile.pageLayout}`}>
+
+      {/* ── Mobile sticky nav ── */}
+      <div className={mobile.mobileCatBar}>
+        <div className={mobile.mobileCatSelectWrap}>
+          <Zap size={15} className={mobile.mobileCatIcon} />
+          <select
+            className={mobile.mobileCatSelect}
+            defaultValue=""
+            onChange={e => { scrollTo(e.target.value); (e.target as HTMLSelectElement).value = '' }}
+          >
+            <option value="" disabled>Ir a habilidad…</option>
+            {SKILLS.map(skill => (
+              <option key={skill.id} value={skill.id}>{skill.name}</option>
+            ))}
+          </select>
+          <ChevronDown size={15} className={mobile.mobileCatChevron} />
+        </div>
+      </div>
+
       {/* ── Left skill nav ── */}
       <nav className={styles.skillNav}>
         <div className={styles.skillNavInner}>

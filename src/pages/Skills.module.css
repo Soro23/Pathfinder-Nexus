@@ -240,6 +240,7 @@
   color: var(--color-accent-gold);
 }
 
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .pageLayout {
@@ -277,5 +278,19 @@
 
   .skillMeta {
     align-self: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .skillNav {
+    display: none;
+  }
+
+  .header {
+    margin-bottom: var(--space-4);
+  }
+
+  .header h1 {
+    font-size: 1.3rem;
   }
 }

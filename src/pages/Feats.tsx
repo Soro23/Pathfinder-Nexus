@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Sword, Shield, Sparkles, Wand2, Users, Target, Zap, BookOpen, Scroll } from 'lucide-react'
+import { Sword, Shield, Sparkles, Wand2, Users, Target, Zap, BookOpen, Scroll, ChevronDown } from 'lucide-react'
 import { FEATS, type FeatType } from '../data/feats'
 import styles from './Feats.module.css'
+import mobile from '../styles/compendiumMobile.module.css'
 
 const CATEGORIES: { id: FeatType; label: string; icon: React.ReactNode }[] = [
   { id: 'combat', label: 'Combate', icon: <Sword size={14} /> },
@@ -40,7 +41,26 @@ export function Feats() {
   })
 
   return (
-    <div className={styles.pageLayout}>
+    <div className={`${styles.pageLayout} ${mobile.pageLayout}`}>
+
+      {/* ── Mobile sticky nav ── */}
+      <div className={mobile.mobileCatBar}>
+        <div className={mobile.mobileCatSelectWrap}>
+          <Sword size={15} className={mobile.mobileCatIcon} />
+          <select
+            className={mobile.mobileCatSelect}
+            value={activeCategory}
+            onChange={e => setActiveCategory(e.target.value as FeatType | 'all')}
+          >
+            <option value="all">Todas las dotes</option>
+            {CATEGORIES.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.label}</option>
+            ))}
+          </select>
+          <ChevronDown size={15} className={mobile.mobileCatChevron} />
+        </div>
+      </div>
+
       {/* ── Left nav ── */}
       <nav className={styles.featNav}>
         <div className={styles.featNavInner}>

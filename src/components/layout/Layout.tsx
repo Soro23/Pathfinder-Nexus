@@ -15,6 +15,7 @@ const compendiumLinks = [
   { path: '/tables',   icon: LayoutList, label: 'Tablas' },
   { path: '/skills',   icon: Zap,        label: 'Habilidades' },
   { path: '/feats',    icon: Sword,      label: 'Dotes' },
+  { path: '/bestiary', icon: PawPrint,   label: 'Bestiario' },
 ]
 
 const compendiumSoon = [
@@ -23,13 +24,11 @@ const compendiumSoon = [
   { icon: Sparkles,   label: 'Conjuros' },
   { icon: Backpack,   label: 'Equipación' },
   { icon: Gem,        label: 'Objetos Mágicos' },
-  { icon: PawPrint,   label: 'Bestiario' },
 ]
 
 const bottomNavItems = [
-  { path: '/',          icon: Users,     label: 'Personajes', exact: true },
-  { path: '/campaigns', icon: Map,       label: 'Campañas',   exact: false },
-  { path: '/tools',     icon: Settings,  label: 'Herramientas', exact: false },
+  { path: '/',          icon: Users,  label: 'Personajes', exact: true },
+  { path: '/campaigns', icon: Map,    label: 'Campañas',   exact: false },
 ]
 
 export function Layout() {
@@ -101,6 +100,13 @@ export function Layout() {
           <BookOpen size={22} />
           <span>Compendio</span>
         </button>
+        <Link
+          to="/tools"
+          className={`${styles.bottomNavItem} ${isActive('/tools', false) ? styles.bottomNavActive : ''}`}
+        >
+          <Settings size={22} />
+          <span>Herramientas</span>
+        </Link>
       </nav>
 
       {/* ── Sidebar ── */}
@@ -171,6 +177,13 @@ export function Layout() {
           >
             <Sword size={18} />
             <span>Dotes</span>
+          </Link>
+          <Link
+            to="/bestiary"
+            className={`${styles.navItem} ${isActive('/bestiary', false) ? styles.active : ''}`}
+          >
+            <PawPrint size={18} />
+            <span>Bestiario</span>
           </Link>
           {compendiumSoon.map(({ icon: Icon, label }) => (
             <span key={label} className={`${styles.navItem} ${styles.disabled}`}>
