@@ -251,6 +251,11 @@
   opacity: 0.45;
 }
 
+/* ── Mobile category chip bar ── */
+.mobileCatBar {
+  display: none;
+}
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .pageLayout {
@@ -271,5 +276,116 @@
 
   .navGroup {
     margin-bottom: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Hide sidebar nav, show chip bar instead */
+  .tableNav {
+    display: none;
+  }
+
+  /* Sticky horizontal category chips */
+  .mobileCatBar {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--color-bg-primary);
+    padding: var(--space-3) 0 var(--space-2);
+    margin-bottom: var(--space-4);
+    /* fade hint on right edge */
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+
+  .mobileCatBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobileCatChip {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-accent-gold);
+    background: transparent;
+    color: var(--color-accent-gold);
+    font-family: var(--font-display);
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .mobileCatChip:active {
+    background: rgba(212, 164, 76, 0.15);
+  }
+
+  /* Page header compact */
+  .header {
+    margin-bottom: var(--space-5);
+  }
+
+  .header h1 {
+    font-size: 1.3rem;
+  }
+
+  .subtitle {
+    font-size: 0.78rem;
+  }
+
+  /* Category & section titles smaller */
+  .categoryTitle {
+    font-size: 1.1rem;
+    margin-bottom: var(--space-4);
+  }
+
+  .sectionTitle {
+    font-size: 0.9rem;
+  }
+
+  /* Table scroll with shadow hint */
+  .tableWrapper {
+    position: relative;
+  }
+
+  .tableWrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 32px;
+    pointer-events: none;
+    background: linear-gradient(to right, transparent, var(--color-bg-primary) 90%);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+
+  /* Slightly smaller table font */
+  .refTable {
+    font-size: 0.76rem;
+  }
+
+  .refTable thead th {
+    font-size: 0.66rem;
+    padding: var(--space-2) var(--space-2);
+  }
+
+  .refTable td {
+    padding: var(--space-2) var(--space-2);
+  }
+
+  /* Tighter section spacing */
+  .category {
+    margin-bottom: var(--space-8);
+  }
+
+  .section {
+    margin-bottom: var(--space-6);
   }
 }

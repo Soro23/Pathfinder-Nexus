@@ -375,7 +375,16 @@ export function Tables() {
   return (
     <div className={styles.pageLayout}>
 
-      {/* ── Left category nav ── */}
+      {/* ── Mobile sticky category chips ── */}
+      <div className={styles.mobileCatBar}>
+        {CATEGORIES.map(cat => (
+          <button key={cat.id} className={styles.mobileCatChip} onClick={() => scrollTo(cat.id)}>
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Left category nav (desktop) ── */}
       <nav className={styles.tableNav}>
         <div className={styles.tableNavInner}>
           <p className={styles.navTitle}>Categorías</p>
