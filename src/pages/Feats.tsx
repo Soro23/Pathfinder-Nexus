@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Sword, Shield, Sparkles, Wand2, Users, Target, Zap, BookOpen, Scroll, ChevronDown } from 'lucide-react'
-import { FEATS, type FeatType } from '../data/feats'
+import { useSRDStore } from '../store/srdStore'
+import type { FeatType } from '../data/feats'
 import styles from './Feats.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
@@ -29,10 +30,15 @@ const TYPE_LABELS: Record<FeatType, string> = {
 }
 
 export function Feats() {
+  const { feats, fetchAll, initialized } = useSRDStore()
   const [activeCategory, setActiveCategory] = useState<FeatType | 'all'>('all')
   const [search, setSearch] = useState('')
 
-  const filteredFeats = FEATS.filter((feat) => {
+  useEffect(() => {
+    if (!initialized) fetchAll()
+  }, [fetchAll, initialized])
+
+  const filteredFeats = feats.filter((feat) => {
     const matchesCategory = activeCategory === 'all' || feat.type.includes(activeCategory)
     const matchesSearch = search === '' || 
       feat.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -81,7 +87,7 @@ export function Feats() {
                 {cat.icon}
                 <span>{cat.label}</span>
                 <span className={styles.featCount}>
-                  {FEATS.filter((f) => f.type.includes(cat.id)).length}
+                  {feats.filter((f) => f.type.includes(cat.id)).length}
                 </span>
               </button>
             ))}
@@ -97,7 +103,7 @@ export function Feats() {
           </div>
           <div>
             <h1>Dotes</h1>
-            <p className={styles.subtitle}>Todas las dotes del sistema Pathfinder ({FEATS.length})</p>
+            <p className={styles.subtitle}>Todas las dotes del sistema Pathfinder ({feats.length})</p>
           </div>
         </header>
 
