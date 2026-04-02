@@ -141,29 +141,25 @@ export const CLASSES: ClassData[] = [
     skillPointsPerLevel: 4,
     classSkills: ['climb', 'craft', 'fly', 'handle_animal', 'heal', 'knowledge_geography', 'knowledge_nature', 'perception', 'profession', 'ride', 'spellcraft', 'survival', 'swim'],
     features: [
-      { name: 'Vínculo con Naturaleza', level: 1, description: 'Elige compañero animal o dominio de naturaleza.' },
+      { name: 'Vínculo Natural', level: 1, description: 'Elige compañero animal o dominio de naturaleza.' },
+      { name: 'Sentido Natural', level: 1, description: '+1 a Supervivencia y Percepción.' },
+      { name: 'Orisons', level: 1, description: 'Puedes preparar hechizos de nivel 0.' },
       { name: 'Empatía Salvaje', level: 1, description: 'Puedes mejorar actitud de animales como Diplomacia.' },
-      { name: 'Lenguaje del Bosque', level: 2, description: 'Puedes hablar con plantas y animales.' },
-      { name: 'Resistencia a Veneno +4', level: 2, description: '+4 a TS contra venenos.' },
-      { name: 'Movimiento en la Maleza', level: 2, description: 'Sin penalización por terreno difícil natural.' },
-      { name: 'Rastrear +1', level: 2, description: '+1 a Supervivencia para rastrear.' },
-      { name: 'Resistencia a Veneno +6', level: 6, description: '+6 a TS contra venenos.' },
-      { name: 'Rastrear +2', level: 4, description: '+2 a Supervivencia para rastrear.' },
-      { name: 'Forma Salvaje Menor', level: 4, description: 'Puedes transformarte en animal de talla P o M.' },
-      { name: 'Resistencia a Veneno +8', level: 10, description: '+8 a TS contra venenos.' },
-      { name: 'Rastrear +3', level: 6, description: '+3 a Supervivencia para rastrear.' },
-      { name: 'Forma Salvaje', level: 6, description: 'Puedes transformarte en animal de talla M o G.' },
-      { name: 'Rastrear +4', level: 8, description: '+4 a Supervivencia para rastrear.' },
-      { name: 'Inmunidad a Venenos', level: 9, description: 'Inmune a venenos naturales.' },
-      { name: 'Rastrear +5', level: 10, description: '+5 a Supervivencia para rastrear.' },
-      { name: 'Forma Salvaje Mayor', level: 10, description: 'Puedes transformarte en animal de talla G.' },
-      { name: 'A Thousand Faces', level: 13, description: 'Puedes cambiar tu apariencia voluntariamente.' },
-      { name: 'Rastrear +6', level: 12, description: '+6 a Supervivencia para rastrear.' },
-      { name: 'No Envejece', level: 15, description: 'Ya no sufres penalizaciones por envejecimiento.' },
-      { name: 'Rastrear +7', level: 14, description: '+7 a Supervivencia para rastrear.' },
-      { name: 'Rastrear +8', level: 16, description: '+8 a Supervivencia para rastrear.' },
-      { name: 'Rastrear +9', level: 18, description: '+9 a Supervivencia para rastrear.' },
-      { name: 'Rastrear +10', level: 20, description: '+10 a Supervivencia para rastrear.' },
+      { name: 'Paso por el Bosque', level: 2, description: 'Ignoras penalización por terreno difícil natural.' },
+      { name: 'Paso sin Pista', level: 3, description: 'No puedes ser rastreado en exteriores.' },
+      { name: 'Resiste el Atractivo de la Naturaleza', level: 4, description: '+4 a TS contra efectos de naturaleza.' },
+      { name: 'Forma Salvaje (1/día)', level: 4, description: 'Puedes transformarte en animal 1 vez por día.' },
+      { name: 'Forma Salvaje (2/día)', level: 6, description: 'Puedes transformarte en animal 2 veces por día.' },
+      { name: 'Forma Salvaje (3/día)', level: 8, description: 'Puedes transformarte en animal 3 veces por día.' },
+      { name: 'Inmunidad al Veneno', level: 9, description: 'Inmune a venenos naturales.' },
+      { name: 'Forma Salvaje (4/día)', level: 10, description: 'Puedes transformarte en animal 4 veces por día.' },
+      { name: 'Forma Salvaje (5/día)', level: 12, description: 'Puedes transformarte en animal 5 veces por día.' },
+      { name: 'Mil Caras', level: 13, description: 'Puedes cambiar tu apariencia voluntariamente.' },
+      { name: 'Forma Salvaje (6/día)', level: 14, description: 'Puedes transformarte en animal 6 veces por día.' },
+      { name: 'Cuerpo Atemporal', level: 15, description: 'Ya no sufres penalizaciones por envejecimiento.' },
+      { name: 'Forma Salvaje (7/día)', level: 16, description: 'Puedes transformarte en animal 7 veces por día.' },
+      { name: 'Forma Salvaje (8/día)', level: 18, description: 'Puedes transformarte en animal 8 veces por día.' },
+      { name: 'Forma Salvaje (a Voluntad)', level: 20, description: 'Puedes transformarte en animal sin límite.' },
     ],
     alignment: ['Neutral'],
     description: 'Protectors de la naturaleza con magia primitiva.',
@@ -182,26 +178,33 @@ export const CLASSES: ClassData[] = [
     skillPointsPerLevel: 2,
     classSkills: ['climb', 'craft', 'handle_animal', 'intimidate', 'knowledge_dungeoneering', 'knowledge_engineering', 'profession', 'ride', 'survival', 'swim'],
     features: [
-      { name: 'Competencia con Armas y Armaduras', level: 1, description: 'Competente con todas las armas marciales, escudos y armaduras.' },
-      { name: 'Talento de Combate', level: 1, description: 'Ganas un talento de combate.' },
+      { name: 'Hazaña de Combate', level: 1, description: 'Ganas una hazaña de combate.' },
+      { name: 'Hazaña de Combate Adicional', level: 1, description: 'Ganas una segunda hazaña de combate.' },
+      { name: 'Hazaña Extra', level: 2, description: 'Ganas una Hazaña de Combate adicional.' },
       { name: 'Valentía +1', level: 2, description: '+1 a TS contra efectos de miedo.' },
-      { name: 'Entrenamiento de Armadura', level: 3, description: 'Reduces penalización de armadura en 1 y aumentas máx DES en 1.' },
-      { name: 'Talento de Combate', level: 4, description: 'Ganas un talento de combate.' },
-      { name: 'Entrenamiento de Arma', level: 5, description: '+1 ataque y daño con grupo de armas elegido.' },
+      { name: 'Entrenamiento de Armadura 1', level: 3, description: 'Reduce penalización de armadura y aumenta máx DES.' },
+      { name: 'Hazaña de Combate', level: 4, description: 'Ganas una hazaña de combate.' },
+      { name: 'Entrenamiento con Armas 1', level: 5, description: '+1 a ataque y daño con grupo de armas.' },
+      { name: 'Hazaña Extra', level: 6, description: 'Ganas una Hazaña de Combate adicional.' },
       { name: 'Valentía +2', level: 6, description: '+2 a TS contra efectos de miedo.' },
-      { name: 'Talento de Combate', level: 6, description: 'Ganas un talento de combate.' },
-      { name: 'Entrenamiento de Armadura', level: 7, description: 'Reduces penalización de armadura en 2 y aumentas máx DES en 2.' },
-      { name: 'Entrenamiento de Arma +2', level: 9, description: '+2 ataque y daño con grupo de armas elegido.' },
+      { name: 'Entrenamiento de Armadura 2', level: 7, description: 'Reduce penalización de armadura y aumenta máx DES.' },
+      { name: 'Hazaña de Combate', level: 8, description: 'Ganas una hazaña de combate.' },
+      { name: 'Entrenamiento con Armas 2', level: 9, description: '+2 a ataque y daño con grupo de armas.' },
+      { name: 'Hazaña Extra', level: 10, description: 'Ganas una Hazaña de Combate adicional.' },
       { name: 'Valentía +3', level: 10, description: '+3 a TS contra efectos de miedo.' },
-      { name: 'Talento de Combate', level: 10, description: 'Ganas un talento de combate.' },
-      { name: 'Entrenamiento de Armadura', level: 11, description: 'Reduces penalización de armadura en 3 y aumentas máx DES en 3.' },
-      { name: 'Entrenamiento de Arma +3', level: 13, description: '+3 ataque y daño con grupo de armas elegido.' },
+      { name: 'Entrenamiento de Armadura 3', level: 11, description: 'Reduce penalización de armadura y aumenta máx DES.' },
+      { name: 'Hazaña de Combate', level: 12, description: 'Ganas una hazaña de combate.' },
+      { name: 'Entrenamiento con Armas 3', level: 13, description: '+3 a ataque y daño con grupo de armas.' },
+      { name: 'Hazaña Extra', level: 14, description: 'Ganas una Hazaña de Combate adicional.' },
       { name: 'Valentía +4', level: 14, description: '+4 a TS contra efectos de miedo.' },
-      { name: 'Talento de Combate', level: 14, description: 'Ganas un talento de combate.' },
-      { name: 'Entrenamiento de Armadura', level: 15, description: 'Reduces penalización de armadura en 4 y aumentas máx DES en 4.' },
-      { name: 'Entrenamiento de Arma +4', level: 17, description: '+4 ataque y daño con grupo de armas elegido.' },
-      { name: 'Talento de Combate', level: 18, description: 'Ganas un talento de combate.' },
-      { name: 'Maestría de Arma', level: 20, description: 'Confirma críticos automáticamente con arma elegida y +2 al multiplicador de crítico.' },
+      { name: 'Entrenamiento de Armadura 4', level: 15, description: 'Reduce penalización de armadura y aumenta máx DES.' },
+      { name: 'Hazaña de Combate', level: 16, description: 'Ganas una hazaña de combate.' },
+      { name: 'Entrenamiento con Armas 4', level: 17, description: '+4 a ataque y daño con grupo de armas.' },
+      { name: 'Hazaña Extra', level: 18, description: 'Ganas una Hazaña de Combate adicional.' },
+      { name: 'Valentía +5', level: 18, description: '+5 a TS contra efectos de miedo.' },
+      { name: 'Dominio de la Armadura', level: 19, description: 'Sin penalización por armadura.' },
+      { name: 'Obra Extra', level: 20, description: 'Ganas una acción adicional por día.' },
+      { name: 'Dominio de Armas', level: 20, description: '+2 al multiplicador de crítico y confirma automáticamente.' },
     ],
     alignment: ['Cualquiera'],
     description: 'Maestros del combate armado.',
@@ -220,29 +223,49 @@ export const CLASSES: ClassData[] = [
     skillPointsPerLevel: 4,
     classSkills: ['acrobatics', 'climb', 'craft', 'escape_artist', 'intimidate', 'knowledge_history', 'knowledge_religion', 'perception', 'perform', 'profession', 'ride', 'sense_motive', 'stealth', 'swim'],
     features: [
-      { name: 'Golpe sin Arma', level: 1, description: 'Daño desarmado como monje; no provoca AoO. Daño 1d10.' },
-      { name: 'Golpe Aturdidor', level: 1, description: 'Gasta 1 uso para aturdir o fatigar. Usos = nivel + mod SAB.' },
-      { name: 'Bonificador de Armadura Natural +1', level: 1, description: '+1 CA cuando no se viste armadura.' },
-      { name: 'Evasión', level: 2, description: 'Con éxito en Reflejos, no sufres daño (falla = daño medio).' },
-      { name: 'Movimiento Rápido', level: 3, description: '+10 pies a velocidad base en tierra.' },
-      { name: 'Bonificador de Armadura Natural +2', level: 4, description: '+2 CA cuando no se viste armadura.' },
-      { name: 'Ki Pool', level: 4, description: 'Reserva de ki = nivel/2 + mod SAB. Gasta para ataques extra, velocidad o habilidades.' },
-      { name: 'Caída Lenta 20 pies', level: 4, description: 'Reduce la caída libre hasta 20 pies.' },
-      { name: 'Pureza de Cuerpo', level: 5, description: 'Inmune a enfermedades.' },
-      { name: 'Golpe Integral', level: 7, description: 'Tus golpes se consideran mágicos para superar reducción de daño.' },
-      { name: 'Serenidad', level: 7, description: '+2 a TS contra hechizos de encantamiento y efectos de miedo.' },
-      { name: 'Bonificador de Armadura Natural +3', level: 8, description: '+3 CA cuando no se viste armadura.' },
-      { name: 'Caída Lenta 30 pies', level: 8, description: 'Reduce la caída libre hasta 30 pies.' },
-      { name: 'Movimiento Rápido +20 pies', level: 11, description: '+20 pies a velocidad base en tierra.' },
-      { name: 'Bonificador de Armadura Natural +4', level: 12, description: '+4 CA cuando no se viste armadura.' },
-      { name: 'Caída Lenta 40 pies', level: 12, description: 'Reduce la caída libre hasta 40 pies.' },
-      { name: 'Cuerpo Inmortal', level: 15, description: 'Ya no envejeces y no puedes morir por vejez.' },
-      { name: 'Bonificador de Armadura Natural +5', level: 16, description: '+5 CA cuando no se viste armadura.' },
-      { name: 'Caída Lenta 50 pies', level: 16, description: 'Reduce la caída libre hasta 50 pies.' },
-      { name: 'Golpe Vacío', level: 19, description: 'Tus ataques desarmados ignoran efectos de invisibilidad.' },
-      { name: 'Bonificador de Armadura Natural +6', level: 20, description: '+6 CA cuando no se viste armadura.' },
-      { name: 'Caída Lenta 60 pies', level: 20, description: 'Reduce la caída libre hasta 60 pies.' },
-      { name: 'Ser Perfecto', level: 20, description: 'Inmune a enfermedades, venenos, hechizos y efectos de envejecimiento.' },
+      { name: 'Hazaña Extra', level: 1, description: 'Ganas una hazaña de monje.' },
+      { name: 'Ráfaga de Golpes', level: 1, description: 'Puedes hacer ataques adicionales en un turno.' },
+      { name: 'Puño Impresionante', level: 1, description: 'Tu entrenamiento te permite golpear mejor.' },
+      { name: 'Golpe Desarmado', level: 1, description: 'Daño desarmado 1d6, no provoca AoO.' },
+      { name: 'Obra Extra', level: 2, description: 'Ganas una acción adicional por día.' },
+      { name: 'Evasión', level: 2, description: 'Con éxito en Reflejos, no sufres daño.' },
+      { name: 'Movimiento Rápido', level: 3, description: '+10 pies a velocidad base.' },
+      { name: 'Entrenamiento de Maniobras', level: 3, description: '+1 a CMB y CMD.' },
+      { name: 'Mente Quieta', level: 3, description: '+2 a TS contra efectos de mente.' },
+      { name: 'Ki Piscina (Mágica)', level: 4, description: 'Reserva de ki = nivel + mod SAB.' },
+      { name: 'Bonificador de Armadura Natural +1', level: 4, description: '+1 CA sin armadura.' },
+      { name: 'Caída Lenta 20 pies', level: 4, description: 'Reduce la caída 20 pies.' },
+      { name: 'Salto de Altura', level: 5, description: 'Puedes saltar más alto.' },
+      { name: 'Pureza del Cuerpo', level: 5, description: 'Inmune a enfermedades.' },
+      { name: 'Obra Extra', level: 6, description: 'Ganas una acción adicional por día.' },
+      { name: 'Caída Lenta 30 pies', level: 6, description: 'Reduce la caída 30 pies.' },
+      { name: 'Ki Piscina (Hierro Frío/Plata)', level: 7, description: 'Ki puede ignorar daño.' },
+      { name: 'Totalidad del Cuerpo', level: 7, description: '+2 a TS contra hechizos.' },
+      { name: 'Bonificador de Armadura Natural +2', level: 8, description: '+2 CA sin armadura.' },
+      { name: 'Caída Lenta 40 pies', level: 8, description: 'Reduce la caída 40 pies.' },
+      { name: 'Evasión Mejorada', level: 9, description: 'Evasión funciona incluso contra efectos de área.' },
+      { name: 'Hazaña Extra', level: 10, description: 'Ganas una acción adicional por día.' },
+      { name: 'Ki Piscina (Legal)', level: 10, description: 'Ki puede otorgar efectos legales.' },
+      { name: 'Caída Lenta 50 pies', level: 10, description: 'Reduce la caída 50 pies.' },
+      { name: 'Cuerpo de Diamante', level: 11, description: 'Resistencia a damage físico.' },
+      { name: 'Paso Abundante', level: 12, description: 'Puedes moverte a través de criaturas.' },
+      { name: 'Bonificador de Armadura Natural +3', level: 12, description: '+3 CA sin armadura.' },
+      { name: 'Caída Lenta 60 pies', level: 12, description: 'Reduce la caída 60 pies.' },
+      { name: 'Alma de Diamante', level: 13, description: 'Resistencia a energía.' },
+      { name: 'Obra Extra', level: 14, description: 'Ganas una acción adicional por día.' },
+      { name: 'Caída Lenta 70 pies', level: 14, description: 'Reduce la caída 70 pies.' },
+      { name: 'Palma Temblorosa', level: 15, description: 'Golpe que stunnea.' },
+      { name: 'Ki Piscina (Adamantina)', level: 16, description: 'Ki imparable.' },
+      { name: 'Bonificador de Armadura Natural +4', level: 16, description: '+4 CA sin armadura.' },
+      { name: 'Caída Lenta 80 pies', level: 16, description: 'Reduce la caída 80 pies.' },
+      { name: 'Cuerpo Atemporal', level: 17, description: 'No envejeces.' },
+      { name: 'Lengua del Sol y la Luna', level: 17, description: 'Puedes entender todos los idiomas.' },
+      { name: 'Obra Extra', level: 18, description: 'Ganas una acción adicional por día.' },
+      { name: 'Caída Lenta 90 pies', level: 18, description: 'Reduce la caída 90 pies.' },
+      { name: 'Cuerpo Vacío', level: 19, description: 'Golpes ignoran invisibilidad.' },
+      { name: 'Yo Perfecto', level: 20, description: 'Inmune a venenos, enfermedades y envejecimiento.' },
+      { name: 'Bonificador de Armadura Natural +5', level: 20, description: '+5 CA sin armadura.' },
+      { name: 'Caída Lenta a Cualquier Distancia', level: 20, description: 'Inmune a daño por caída.' },
     ],
     alignment: ['Legal Neutral', 'Legal Bueno', 'Neutral', 'Caótico Bueno'],
     description: 'Artes marciales con poderes místicos.',
@@ -462,17 +485,38 @@ export const CLASSES: ClassData[] = [
     classSkills: ['appraise', 'craft', 'disable_device', 'fly', 'heal', 'knowledge_arcana', 'knowledge_nature', 'perception', 'profession', 'sleight_of_hand', 'spellcraft', 'survival', 'use_magic_device'],
     features: [
       { name: 'Alquimia', level: 1, description: 'Puedes crear pociones, extractos y bombas.' },
-      { name: 'Bombas', level: 1, description: 'Creas bombas explosivas que inflijen daño de fuego.' },
+      { name: 'Bomba 1d6', level: 1, description: 'Creas bombas explosivas que inflijen daño de fuego.' },
+      { name: 'Preparar Poción', level: 1, description: 'Puedes preparar pociones.' },
       { name: 'Mutágeno', level: 1, description: 'Bebes una mezcla que mejora tu físico a costa de tu mente.' },
-      { name: 'Descubrimientos', level: 2, description: 'Aprendes descubrimientos alquímicos especiales.' },
-      { name: 'Veneno Resistente +2', level: 2, description: '+2 a TS contra venenos.' },
-      { name: 'Lanzador Rápido', level: 4, description: 'Puedes lanzar bombas como acción rápida.' },
-      { name: 'Veneno Resistente +4', level: 5, description: '+4 a TS contra venenos.' },
-      { name: 'Veneno Resistente +6', level: 8, description: '+6 a TS contra venenos.' },
-      { name: 'Gran Mutágeno', level: 14, description: 'Tu mutágeno mejora dos atributos físicos.' },
-      { name: 'Gran Gran Mutágeno', level: 16, description: 'Tu mutágeno mejora tres atributos físicos.' },
-      { name: 'Instilación Instantánea', level: 18, description: 'Puedes crear extractos como acción rápida.' },
-      { name: 'Forma Milagrosa', level: 20, description: 'Tu cuerpo se vuelve completamente resistente a ciertos daños.' },
+      { name: 'Tirar Cualquier Cosa', level: 1, description: 'Puedes lanzar objetos a distancia.' },
+      { name: 'Descubrimiento', level: 2, description: 'Aprendes un descubrimiento alquímico especial.' },
+      { name: 'Resistencia al Veneno +2', level: 2, description: '+2 a TS contra venenos.' },
+      { name: 'Uso de Veneno', level: 2, description: 'Puedes usar venenos.' },
+      { name: 'Bomba 2d6', level: 3, description: 'Tus bombas inflict 2d6 daño.' },
+      { name: 'Alquimia Rápida', level: 3, description: 'Puedes crear extractos más rápido.' },
+      { name: 'Descubrimiento', level: 4, description: 'Aprendes un descubrimiento alquímico.' },
+      { name: 'Bomba 3d6', level: 5, description: 'Tus bombas inflict 3d6 daño.' },
+      { name: 'Resistencia al Veneno +4', level: 5, description: '+4 a TS contra venenos.' },
+      { name: 'Descubrimiento', level: 6, description: 'Aprendes un descubrimiento alquímico.' },
+      { name: 'Envenenamiento Rápido', level: 6, description: 'Puedes aplicar veneno rápidamente.' },
+      { name: 'Bomba 4d6', level: 7, description: 'Tus bombas inflict 4d6 daño.' },
+      { name: 'Descubrimiento', level: 8, description: 'Aprendes un descubrimiento alquímico.' },
+      { name: 'Resistencia al Veneno +6', level: 8, description: '+6 a TS contra venenos.' },
+      { name: 'Bomba 5d6', level: 9, description: 'Tus bombas inflict 5d6 daño.' },
+      { name: 'Descubrimiento', level: 10, description: 'Aprendes un descubrimiento alquímico.' },
+      { name: 'Inmunidad al Veneno', level: 10, description: 'Eres inmune a venenos.' },
+      { name: 'Bomba 6d6', level: 11, description: 'Tus bombas inflict 6d6 daño.' },
+      { name: 'Descubrimiento', level: 12, description: 'Aprendes un descubrimiento alquímico.' },
+      { name: 'Bomba 7d6', level: 13, description: 'Tus bombas inflict 7d6 daño.' },
+      { name: 'Descubrimiento', level: 14, description: 'Aprendes un descubrimiento alquímico.' },
+      { name: 'Mutágeno Persistente', level: 14, description: 'Tu mutágeno dura más tiempo.' },
+      { name: 'Bomba 8d6', level: 15, description: 'Tus bombas inflict 8d6 daño.' },
+      { name: 'Descubrimiento', level: 16, description: 'Aprendes un descubrimiento alquímico.' },
+      { name: 'Bomba 9d6', level: 17, description: 'Tus bombas inflict 9d6 daño.' },
+      { name: 'Descubrimiento', level: 18, description: 'Aprendes un descubrimiento alquímico.' },
+      { name: 'Alquimia Instantánea', level: 18, description: 'Puedes crear extractos como acción rápida.' },
+      { name: 'Bomba 10d6', level: 19, description: 'Tus bombas inflict 10d6 daño.' },
+      { name: 'Gran Descubrimiento', level: 20, description: 'Ganas un descubrimiento mayor.' },
     ],
     alignment: ['Cualquiera'],
     description: 'Maestros de la alquimia que crean pociones, bombas y mutágenos.',
@@ -514,45 +558,52 @@ export const CLASSES: ClassData[] = [
     classSkills: ['craft', 'diplomacy', 'heal', 'knowledge_history', 'knowledge_planes', 'knowledge_religion', 'profession', 'sense_motive', 'spellcraft'],
     features: [
       { name: 'Misterio', level: 1, description: 'Eliges un misterio divino que define tus poderes.' },
+      { name: 'Maldición del Oráculo', level: 1, description: 'Tu vínculo con los dioses viene con una debilidad permanente.' },
+      { name: 'Orisons', level: 1, description: 'Puedes preparar hechizos de nivel 0.' },
       { name: 'Revelación', level: 1, description: 'Ganas una revelación del misterio elegido.' },
-      { name: 'Maldición de Oráculo', level: 1, description: 'Tu vínculo con los dioses viene con una debilidad permanente.' },
-      { name: 'Revelación Adicional', level: 3, description: 'Ganas otra revelación del misterio.' },
-      { name: 'Revelación Adicional', level: 5, description: 'Ganas otra revelación del misterio.' },
-      { name: 'Revelation Mejorada', level: 7, description: 'Algunas revelaciones se potencian.' },
-      { name: 'Revelación Adicional', level: 9, description: 'Ganas otra revelación del misterio.' },
-      { name: 'Gran Revelación', level: 11, description: 'Accedes a las revelaciones más poderosas de tu misterio.' },
-      { name: 'Revelación Adicional', level: 13, description: 'Ganas otra revelación del misterio.' },
-      { name: 'Revelación Adicional', level: 15, description: 'Ganas otra revelación del misterio.' },
-      { name: 'Revelación Adicional', level: 17, description: 'Ganas otra revelación del misterio.' },
+      { name: 'Hechizo Misterioso', level: 2, description: 'Ganas un hechizo del misterio.' },
+      { name: 'Revelación', level: 3, description: 'Ganas una revelación adicional.' },
+      { name: 'Hechizo Misterioso', level: 4, description: 'Ganas un hechizo del misterio.' },
+      { name: 'Hechizo Misterioso', level: 6, description: 'Ganas un hechizo del misterio.' },
+      { name: 'Revelación', level: 7, description: 'Ganas una revelación.' },
+      { name: 'Hechizo Misterioso', level: 8, description: 'Ganas un hechizo del misterio.' },
+      { name: 'Hechizo Misterioso', level: 10, description: 'Ganas un hechizo del misterio.' },
+      { name: 'Revelación', level: 11, description: 'Ganas una revelación.' },
+      { name: 'Hechizo Misterioso', level: 12, description: 'Ganas un hechizo del misterio.' },
+      { name: 'Hechizo Misterioso', level: 14, description: 'Ganas un hechizo del misterio.' },
+      { name: 'Revelación', level: 15, description: 'Ganas una revelación.' },
+      { name: 'Hechizo Misterioso', level: 16, description: 'Ganas un hechizo del misterio.' },
+      { name: 'Hechizo Misterioso', level: 18, description: 'Ganas un hechizo del misterio.' },
+      { name: 'Revelación', level: 19, description: 'Ganas una revelación.' },
       { name: 'Revelación Final', level: 20, description: 'La revelación definitiva transforma tu ser.' },
+    ],
+    spellsPerDay: [
+      [3, 1],               // lv 1
+      [4, 2],               // lv 2
+      [5, 3],               // lv 3
+      [6, 3, 1],            // lv 4
+      [6, 4, 2],            // lv 5
+      [6, 5, 3],            // lv 6
+      [6, 6, 4],            // lv 7
+      [6, 6, 5, 3],         // lv 8
+      [6, 6, 6, 4],         // lv 9
+      [6, 6, 6, 5, 3],      // lv 10
+      [6, 6, 6, 6, 4],      // lv 11
+      [6, 6, 6, 6, 5, 3],   // lv 12
+      [6, 6, 6, 6, 6, 4],   // lv 13
+      [6, 6, 6, 6, 6, 5, 3], // lv 14
+      [6, 6, 6, 6, 6, 6, 4], // lv 15
+      [6, 6, 6, 6, 6, 6, 5, 3], // lv 16
+      [6, 6, 6, 6, 6, 6, 6, 4], // lv 17
+      [6, 6, 6, 6, 6, 6, 6, 5, 3], // lv 18
+      [6, 6, 6, 6, 6, 6, 6, 6, 4], // lv 19
+      [6, 6, 6, 6, 6, 6, 6, 6, 6], // lv 20
     ],
     alignment: ['Cualquiera'],
     description: 'Canalizadores de poder divino guiados por una maldición y un misterio.',
     magicType: 'divine',
     casterAbility: 'charisma',
     startingGoldDice: '3d6*10',
-    spellsPerDay: [
-      [4, 3],               // lv 1
-      [5, 4],               // lv 2
-      [5, 4, 2],             // lv 3
-      [5, 5, 3],             // lv 4
-      [5, 5, 3, 2],           // lv 5
-      [5, 5, 4, 3],           // lv 6
-      [5, 5, 4, 3, 2],         // lv 7
-      [5, 5, 4, 4, 3],         // lv 8
-      [5, 5, 5, 4, 3, 2],       // lv 9
-      [5, 5, 5, 4, 4, 3],       // lv 10
-      [5, 5, 5, 5, 4, 3, 2],     // lv 11
-      [5, 5, 5, 5, 4, 4, 3],     // lv 12
-      [5, 5, 5, 5, 5, 4, 3, 2],   // lv 13
-      [5, 5, 5, 5, 5, 4, 4, 3],   // lv 14
-      [5, 5, 5, 5, 5, 5, 4, 3, 2], // lv 15
-      [5, 5, 5, 5, 5, 5, 4, 4, 3], // lv 16
-      [5, 5, 5, 5, 5, 5, 5, 4, 3, 2],// lv 17
-      [5, 5, 5, 5, 5, 5, 5, 4, 4, 3],// lv 18
-      [5, 5, 5, 5, 5, 5, 5, 5, 4, 4],// lv 19
-      [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],// lv 20
-    ],
   },
   {
     id: 'inquisitor',
@@ -566,18 +617,35 @@ export const CLASSES: ClassData[] = [
     classSkills: ['bluff', 'craft', 'diplomacy', 'disguise', 'heal', 'intimidate', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_local', 'knowledge_nature', 'knowledge_planes', 'knowledge_religion', 'perception', 'profession', 'ride', 'sense_motive', 'spellcraft', 'stealth', 'survival', 'use_magic_device'],
     features: [
       { name: 'Dominio', level: 1, description: 'Ganas un dominio divino de tu deidad.' },
-      { name: 'Juicio', level: 1, description: 'Puedes proclamar juicio sobre un enemigo, ganando bonificadores de combate.' },
-      { name: 'Juzgar al Monstruo', level: 1, description: '+2 a las tiradas de Conocimiento para identificar criaturas.' },
-      { name: 'Rastrear', level: 1, description: '+1 por nivel a Supervivencia para rastrear.' },
-      { name: 'Magia del Inquisidor', level: 1, description: 'Lanzas hechizos divinos del inquisidor.' },
-      { name: 'Juicio Adicional', level: 3, description: 'Puedes pronunciar un juicio adicional simultáneo.' },
-      { name: 'Golpe del Inquisidor', level: 5, description: '+1d6 de daño extra en la primera ronda de combate.' },
-      { name: 'Juicio Adicional', level: 7, description: 'Puedes pronunciar un juicio adicional simultáneo.' },
-      { name: 'Gran Juicio', level: 10, description: 'Tus juicios se potencian.' },
-      { name: 'Juicio Adicional', level: 13, description: 'Puedes pronunciar un juicio adicional simultáneo.' },
-      { name: 'Gran Rastreo', level: 12, description: 'Puedes rastrear a velocidad completa sin penalizar.' },
-      { name: 'Juicio Adicional', level: 16, description: 'Puedes pronunciar un juicio adicional simultáneo.' },
-      { name: 'Juicio Definitivo', level: 20, description: 'Tu juicio es absoluto e irresistible.' },
+      { name: 'Juicio 1/día', level: 1, description: 'Puedes proclamar juicio sobre un enemigo.' },
+      { name: 'Tradición de Monstruos', level: 1, description: '+2 a Conocimiento para identificar criaturas.' },
+      { name: 'Orisons', level: 1, description: 'Puedes preparar hechizos de nivel 0.' },
+      { name: 'Mirada Severa', level: 1, description: 'Intimida a criaturas.' },
+      { name: 'Iniciativa Astuta', level: 2, description: '+2 a Iniciativa.' },
+      { name: 'Detectar Alineación', level: 2, description: 'Puedes detectar alineación.' },
+      { name: 'Pista', level: 2, description: 'Puedes seguir rastros.' },
+      { name: 'Tácticas en Solitario', level: 3, description: 'Puedes trabajar solo.' },
+      { name: 'Hazaña de Trabajo en Equipo', level: 3, description: 'Ganas una hazaña de trabajo en equipo.' },
+      { name: 'Sentencia 2/día', level: 4, description: 'Puedes pronunciar 2 sentencias.' },
+      { name: 'Bane', level: 5, description: 'Puedes cargar armas con poder sagrado.' },
+      { name: 'Discernir Mentiras', level: 5, description: 'Puedes detectar mentiras.' },
+      { name: 'Trabajo en Equipo Feat', level: 6, description: 'Ganas un talento de trabajo en equipo.' },
+      { name: 'Sentencia 3/día', level: 7, description: 'Puedes pronunciar 3 sentencias.' },
+      { name: 'Segunda Sentencia', level: 8, description: 'Puedes tener dos sentencias activas.' },
+      { name: 'Trabajo en Equipo Feat', level: 9, description: 'Ganas un talento de trabajo en equipo.' },
+      { name: 'Sentencia 4/día', level: 10, description: 'Puedes pronunciar 4 sentencias.' },
+      { name: 'Leal', level: 11, description: 'Eres leal a tu causa.' },
+      { name: 'Mayor Pesadilla', level: 12, description: 'Tu PESadilla es más poderosa.' },
+      { name: 'Hazaña de Trabajo en Equipo', level: 12, description: 'Ganas un talento de trabajo en equipo.' },
+      { name: 'Sentencia 5/día', level: 13, description: 'Puedes pronunciar 5 sentencias.' },
+      { name: 'Explotar la Debilidad', level: 14, description: 'Puedes explotar debilidades del enemigo.' },
+      { name: 'Trabajo en Equipo Feat', level: 15, description: 'Ganas un talento de trabajo en equipo.' },
+      { name: 'Sentencia 6/día', level: 16, description: 'Puedes pronunciar 6 sentencias.' },
+      { name: 'Tercera Sentencia', level: 16, description: 'Puedes tener tres sentencias activas.' },
+      { name: 'Asesino', level: 17, description: 'Eres un asesino efectivo.' },
+      { name: 'Trabajo en Equipo Feat', level: 18, description: 'Ganas un talento de trabajo en equipo.' },
+      { name: 'Sentencia 7/día', level: 19, description: 'Puedes pronunciar 7 sentencias.' },
+      { name: 'Juicio Verdadero', level: 20, description: 'Tu juicio es absoluto.' },
     ],
     alignment: ['Cualquiera (misma deidad)'],
     description: 'Cazadores de herejes que combinan magia divina y habilidades de combate.',
@@ -605,6 +673,28 @@ export const CLASSES: ClassData[] = [
       [5, 5, 5, 5, 4, 3],   // lv 18
       [5, 5, 5, 5, 5, 4],   // lv 19
       [5, 5, 5, 5, 5, 5],   // lv 20
+    ],
+    spellsKnown: [
+      [4, 2],           // lv 1
+      [5, 3],           // lv 2
+      [6, 4],           // lv 3
+      [6, 4, 2],        // lv 4
+      [6, 4, 3],        // lv 5
+      [6, 4, 4],        // lv 6
+      [6, 5, 4, 2],     // lv 7
+      [6, 5, 4, 3],     // lv 8
+      [6, 5, 4, 4],     // lv 9
+      [6, 5, 5, 4, 2],  // lv 10
+      [6, 6, 5, 4, 3],  // lv 11
+      [6, 6, 5, 4, 4],  // lv 12
+      [6, 6, 5, 5, 4, 2], // lv 13
+      [6, 6, 6, 5, 4, 3], // lv 14
+      [6, 6, 6, 5, 4, 4], // lv 15
+      [6, 6, 6, 5, 5, 4, 2], // lv 16
+      [6, 6, 6, 6, 5, 4, 3], // lv 17
+      [6, 6, 6, 6, 5, 4, 4], // lv 18
+      [6, 6, 6, 6, 5, 5, 4], // lv 19
+      [6, 6, 6, 6, 6, 5, 5], // lv 20
     ],
   },
   {
@@ -674,20 +764,31 @@ export const CLASSES: ClassData[] = [
     skillPointsPerLevel: 4,
     classSkills: ['bluff', 'climb', 'craft', 'diplomacy', 'handle_animal', 'intimidate', 'profession', 'ride', 'sense_motive', 'swim'],
     features: [
-      { name: 'Orden', level: 1, description: 'Juras lealtad a una orden caballeresca que te otorga poderes especiales.' },
-      { name: 'Montura', level: 1, description: 'Obtienes una montura especial como compañero permanente.' },
-      { name: 'Desafío', level: 1, description: 'Puedes desafiar a un enemigo, ganando bonificadores de ataque y daño contra él.' },
-      { name: 'Inspeccionar', level: 2, description: 'Puedes analizar a los enemigos para revelar sus debilidades.' },
-      { name: 'Carga Montada', level: 3, description: 'Puedes realizar cargas con la montura con mayor eficacia.' },
-      { name: 'Desafío', level: 4, description: 'Puedes desafiar a un enemigo, ganando bonificadores.' },
-      { name: 'Defensa de Bandera', level: 5, description: 'Proteges a tus aliados con tu presencia.' },
-      { name: 'Desafío', level: 7, description: 'Puedes desafiar a un enemigo, ganando bonificadores.' },
-      { name: 'Desafío', level: 10, description: 'Puedes desafiar a un enemigo, ganando bonificadores.' },
-      { name: 'Gran Desafío', level: 12, description: 'Tu desafío se vuelve más poderoso.' },
-      { name: 'Desafío', level: 13, description: 'Puedes desafiar a un enemigo, ganando bonificadores.' },
-      { name: 'Desafío', level: 16, description: 'Puedes desafiar a un enemigo, ganando bonificadores.' },
-      { name: 'Maestro de la Carga', level: 17, description: 'Tus cargas son devastadoras.' },
-      { name: 'Campeón Supremo', level: 20, description: 'Alcanzas la cima de la orden caballeresca.' },
+      { name: 'Desafío 1/día', level: 1, description: 'Desafías a un enemigo: +2 a ataques y +2 a daño.' },
+      { name: 'Montaje', level: 1, description: 'Obtienes una montura especial como compañero permanente.' },
+      { name: 'Pedido', level: 1, description: 'Juras lealtad a una orden caballeresca.' },
+      { name: 'Táctico', level: 1, description: 'Ganas habilidades tácticas.' },
+      { name: 'Capacidad de Pedido', level: 2, description: 'Puedes dar órdenes a tus aliados.' },
+      { name: 'El Cargo de Cavalier', level: 3, description: 'Tu cargo te otorga poderes especiales.' },
+      { name: 'Desafío 2/día', level: 4, description: 'Desafías a un enemigo: +2 a ataques y +2 a daño.' },
+      { name: 'Formador Experto', level: 4, description: 'Puedes entrenar monturas.' },
+      { name: 'Bandera', level: 5, description: 'Tu presencia inspira a tus aliados.' },
+      { name: 'Hazaña de Caballo', level: 6, description: 'Ganas una hazaña de caballero.' },
+      { name: 'Desafío 3/día', level: 7, description: 'Desafías a un enemigo: +2 a ataques y +2 a daño.' },
+      { name: 'Capacidad de Pedido', level: 8, description: 'Puedes dar órdenes a tus aliados.' },
+      { name: 'Gran Táctico', level: 9, description: 'Eres un táctico magistral.' },
+      { name: 'Desafío 4/día', level: 10, description: 'Desafías a un enemigo: +2 a ataques y +2 a daño.' },
+      { name: 'Carga Poderosa', level: 11, description: 'Tus cargas son devastadoras.' },
+      { name: 'Obra Extra', level: 12, description: 'Ganas una acción adicional por día.' },
+      { name: 'Desafío Exigente', level: 12, description: 'Desafío otorga +3 a daño.' },
+      { name: 'Desafío 5/día', level: 13, description: 'Desafías a un enemigo: +2 a ataques y +2 a daño.' },
+      { name: 'Bandera Mayor', level: 14, description: 'Tu presencia inspira más a tus aliados (+2).' },
+      { name: 'Capacidad de Pedido', level: 15, description: 'Puedes dar órdenes a tus aliados.' },
+      { name: 'Desafío 6/día', level: 16, description: 'Desafías a un enemigo: +2 a ataques y +2 a daño.' },
+      { name: 'Maestro Táctico', level: 17, description: 'Eres un maestro de la táctica.' },
+      { name: 'Hazaña de Caballo', level: 18, description: 'Ganas una hazaña de caballero.' },
+      { name: 'Desafío 7/día', level: 19, description: 'Desafías a un enemigo: +2 a ataques y +2 a daño.' },
+      { name: 'Cargo Supremo', level: 20, description: 'Alcanzas la cima de la orden caballeresca.' },
     ],
     alignment: ['Cualquiera'],
     description: 'Guerreros montados vinculados a una orden caballeresca.',
@@ -1024,10 +1125,10 @@ export function getMulticlassStats(classes: CharacterClass[]): MulticlassStats {
   for (const cc of classes) {
     const cd = getClassById(cc.id)
     if (!cd) continue
-    bab       += getBABForLevel(cc.level, cd.baseAttackBonus)
+    bab += getBABForLevel(cc.level, cd.baseAttackBonus)
     fortitude += getSaveForLevel(cc.level, cd.fortitudeSave)
-    reflex    += getSaveForLevel(cc.level, cd.reflexSave)
-    will      += getSaveForLevel(cc.level, cd.willSave)
+    reflex += getSaveForLevel(cc.level, cd.reflexSave)
+    will += getSaveForLevel(cc.level, cd.willSave)
   }
   return { bab, fortitude, reflex, will }
 }
