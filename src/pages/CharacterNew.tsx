@@ -1,60 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, ChevronRight, ChevronDown, Check, Lightbulb, Dice6 } from 'lucide-react'
 import { Button, Card } from '../components/ui'
 import { useCharacterStore, generateId, calculateModifier } from '../store'
 import { getClassById } from '../data'
+import { useSRDStore } from '../store/srdStore'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
 import styles from './CharacterNew.module.css'
 
-// ── Race data by category ──
-const RACE_GROUPS: { label: string; races: { value: string; label: string; bonus: string; desc: string }[] }[] = [
-  {
-    label: 'Razas Principales',
-    races: [
-      { value: 'human',     label: 'Humano',      bonus: '+2 a cualquier atributo',         desc: 'Versátiles y ambiciosos.' },
-      { value: 'elf',       label: 'Elfo',        bonus: '+2 DES, +2 INT, −2 CON',          desc: 'Longevos y gráciles, maestros de la magia.' },
-      { value: 'dwarf',     label: 'Enano',       bonus: '+2 CON, +2 SAB, −2 CAR',          desc: 'Tenaces y resistentes, guardianes de la montaña.' },
-      { value: 'halfling',  label: 'Halfling',    bonus: '+2 DES, +2 CAR, −2 FUE',          desc: 'Pequeños y ágiles, con suerte innata.' },
-      { value: 'gnome',     label: 'Gnomo',       bonus: '+2 CON, +2 CAR, −2 FUE',          desc: 'Curiosos, ingeniosos y conectados a lo feérico.' },
-      { value: 'half-orc',  label: 'Medio Orco',  bonus: '+2 a cualquier atributo',         desc: 'Fuertes y resistentes, entre dos mundos.' },
-      { value: 'half-elf',  label: 'Medio Elfo',  bonus: '+2 a cualquier atributo',         desc: 'Herederos de dos herencias, versátiles.' },
-    ],
-  },
-  {
-    label: 'Razas Destacadas',
-    races: [
-      { value: 'aasimar',   label: 'Aasimar',     bonus: '+2 SAB, +2 CAR',                  desc: 'Herencia celestial, resistencia a energías.' },
-      { value: 'tiefling',  label: 'Tiefling',    bonus: '+2 DES, +2 INT, −2 CAR',          desc: 'Herencia infernal, magia oscura innata.' },
-      { value: 'tengu',     label: 'Tengu',       bonus: '+2 DES, +2 SAB, −2 CON',          desc: 'Aviformes políglotas expertos con espadas.' },
-      { value: 'catfolk',   label: 'Catfolk',     bonus: '+2 DES, +2 CAR, −2 SAB',          desc: 'Felinos ágiles con instinto cazador.' },
-      { value: 'dhampir',   label: 'Dhampir',     bonus: '+2 DES, +2 CAR, −2 CON',          desc: 'Híbridos de vampiro, visión en la oscuridad.' },
-      { value: 'fetchling', label: 'Fetchling',   bonus: '+2 DES, +2 CAR, −2 SAB',          desc: 'Seres del Plano de las Sombras.' },
-      { value: 'goblin',    label: 'Goblin',      bonus: '+4 DES, −2 FUE, −2 CAR',          desc: 'Pequeños, ágiles y pirómanos.' },
-      { value: 'hobgoblin', label: 'Hobgoblin',   bonus: '+2 DES, +2 CON',                  desc: 'Goblinoides disciplinados y estratégicos.' },
-      { value: 'ifrit',     label: 'Ifrit',       bonus: '+2 DES, +2 CAR, −2 SAB',          desc: 'Descendientes de genios del fuego.' },
-      { value: 'kobold',    label: 'Kobold',      bonus: '+2 DES, −4 FUE, −2 CON',          desc: 'Reptilianos veneradores de dragones.' },
-      { value: 'orc',       label: 'Orco',        bonus: '+4 FUE, −2 INT, −2 SAB, −2 CAR',  desc: 'Guerreros salvajes de fuerza brutal.' },
-      { value: 'oread',     label: 'Oread',       bonus: '+2 FUE, +2 SAB, −2 CAR',          desc: 'Descendientes de genios de tierra.' },
-      { value: 'ratfolk',   label: 'Ratfolk',     bonus: '+2 DES, +2 INT, −2 FUE',          desc: 'Roedores inteligentes, alquimistas natos.' },
-      { value: 'sylph',     label: 'Sylph',       bonus: '+2 DES, +2 INT, −2 CON',          desc: 'Descendientes de genios del aire.' },
-      { value: 'drow',      label: 'Drow',        bonus: '+2 DES, +2 CAR, −2 CON',          desc: 'Elfos oscuros subterráneos con magia innata.' },
-      { value: 'undine',    label: 'Undine',      bonus: '+2 DES, +2 SAB, −2 FUE',          desc: 'Descendientes de genios del agua.' },
-    ],
-  },
-  {
-    label: 'Razas Poco Comunes',
-    races: [
-      { value: 'kitsune',   label: 'Kitsune',     bonus: '+2 DES, +2 CAR, −2 FUE',          desc: 'Cambiaformas feéricos con forma de zorro.' },
-      { value: 'nagaji',    label: 'Nagaji',      bonus: '+2 FUE, +2 CAR, −2 INT',          desc: 'Humanoides reptilianos creados por nagas.' },
-      { value: 'samsaran',  label: 'Samsaran',    bonus: '+2 INT, +2 SAB, −2 CON',          desc: 'Seres que reencarnan perpetuamente.' },
-      { value: 'wayang',    label: 'Wayang',      bonus: '+2 DES, +2 INT, −2 SAB',          desc: 'Pequeños seres de sombra melancólicos.' },
-      { value: 'vanara',    label: 'Vanara',      bonus: '+2 DES, +2 SAB, −2 CAR',          desc: 'Humanoides simianos espirituales.' },
-      { value: 'grippli',   label: 'Grippli',     bonus: '+2 DES, +2 SAB, −2 FUE',          desc: 'Anfibios guardabosques de pantanos.' },
-      { value: 'strix',     label: 'Strix',       bonus: '+2 DES, −2 SAB, −2 CAR',          desc: 'Humanoides alados nocturnos.' },
-    ],
-  },
-]
+const CORE_RACES = ['human', 'elf', 'dwarf', 'halfling', 'gnome', 'half-orc', 'half-elf']
+const UNCOMMON_RACES = ['kitsune', 'nagaji', 'samsaran', 'wayang', 'vanara', 'grippli', 'strix']
 
 // ── Class data by category ──
 const CLASS_GROUPS: { label: string; classes: { value: string; label: string; role: string; desc: string; hitDie: string }[] }[] = [
@@ -125,8 +80,7 @@ const CLASS_GROUPS: { label: string; classes: { value: string; label: string; ro
   },
 ]
 
-// Flat arrays for lookups
-const RACES = RACE_GROUPS.flatMap((g) => g.races)
+// Flat array for class lookups
 const CLASSES = CLASS_GROUPS.flatMap((g) => g.classes)
 
 const ALIGNMENTS = [
@@ -202,6 +156,16 @@ const DEFAULT_ABILITIES: Record<AbilityKey, number> = {
 export function CharacterNew() {
   const navigate = useNavigate()
   const addCharacter = useCharacterStore((state) => state.addCharacter)
+  const storeRaces = useSRDStore(s => s.races)
+  const fetchAll = useSRDStore(s => s.fetchAll)
+
+  useEffect(() => { fetchAll() }, [fetchAll])
+
+  const RACE_GROUPS = [
+    { label: 'Razas Principales',   races: storeRaces.filter(r => CORE_RACES.includes(r.id)) },
+    { label: 'Razas Destacadas',    races: storeRaces.filter(r => !CORE_RACES.includes(r.id) && !UNCOMMON_RACES.includes(r.id)) },
+    { label: 'Razas Poco Comunes',  races: storeRaces.filter(r => UNCOMMON_RACES.includes(r.id)) },
+  ]
   const [step, setStep] = useState<Step>('race')
 
   const [form, setForm] = useState({
@@ -289,7 +253,7 @@ export function CharacterNew() {
   }
 
   // ── Submit ──
-  const selectedRace = RACES.find((r) => r.value === form.race)
+  const selectedRace = storeRaces.find((r) => r.id === form.race)
   const selectedClass = CLASSES.find((c) => c.value === form.class)
   const [submitting, setSubmitting] = useState(false)
 
@@ -391,7 +355,7 @@ export function CharacterNew() {
               <div className={styles.accordionList}>
                 {RACE_GROUPS.map((group) => {
                   const isOpen = openRaceGroup === group.label
-                  const groupHasSelected = group.races.some((r) => r.value === form.race)
+                  const groupHasSelected = group.races.some((r) => r.id === form.race)
                   return (
                     <div key={group.label} className={styles.accordionGroup}>
                       <button
@@ -406,13 +370,13 @@ export function CharacterNew() {
                         <div className={styles.raceGrid}>
                           {group.races.map((race) => (
                             <button
-                              key={race.value}
-                              className={`${styles.raceCard} ${form.race === race.value ? styles.selected : ''}`}
-                              onClick={() => updateForm('race', race.value)}
+                              key={race.id}
+                              className={`${styles.raceCard} ${form.race === race.id ? styles.selected : ''}`}
+                              onClick={() => updateForm('race', race.id)}
                             >
                               <span className={styles.raceName}>{race.label}</span>
-                              <span className={styles.raceBonus}>{race.bonus}</span>
-                              {form.race === race.value && <Check size={16} className={styles.selectedCheck} />}
+                              <span className={styles.raceBonus}>{race.bonusDesc}</span>
+                              {form.race === race.id && <Check size={16} className={styles.selectedCheck} />}
                             </button>
                           ))}
                         </div>

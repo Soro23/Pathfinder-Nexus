@@ -27,7 +27,22 @@
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
       "Bash(git *)",
-      "mcp__claude_ai_Vercel__deploy_to_vercel"
+      "mcp__claude_ai_Vercel__deploy_to_vercel",
+      "Bash(sed -i \"s/    id: 'barbarian',/    id: 'barbarian',\\\\n    source: 'core' as const,/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/    id: 'bard',/    id: 'bard',\\\\n    source: 'core' as const,/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/    id: 'cleric',/    id: 'cleric',\\\\n    source: 'core' as const,/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/    id: 'druid',/    id: 'druid',\\\\n    source: 'core' as const,/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/    id: 'fighter',/    id: 'fighter',\\\\n    source: 'core' as const,/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/    id: 'alchemist',/    id: 'alchemist',\\\\n    source: 'apg' as const,/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/    id: 'oracle',/    id: 'oracle',\\\\n    source: 'apg' as const,/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/    id: 'inquisitor',/    id: 'inquisitor',\\\\n    source: 'apg' as const,/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/    id: 'witch',/    id: 'witch',\\\\n    source: 'apg' as const,/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/    id: 'cavalier',/    id: 'cavalier',\\\\n    source: 'apg' as const,/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/  source: 'core' | 'apg' | 'acg'/  source: 'core' | 'apg' | 'acg' | 'other'/\" src/data/classes.ts)",
+      "Bash(sed -i \"s/    source: 'apg' as const,\\\\n.*id: 'magus'/fix/\" src/data/classes.ts)",
+      "Bash(sed -i '945s/apg/other/' src/data/classes.ts)",
+      "Bash(sed -i '1130s/acg/other/' src/data/classes.ts)",
+      "Bash(node -e \"const { CLASSES } = require\\('./D:/Code/ClaudeWorkspace/Pathfinder-Nexus/src/data/classes.ts'\\)\")"
     ]
   }
 }

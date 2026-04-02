@@ -1,0 +1,650 @@
+[
+  {
+    "id": "invulnerable-rager",
+    "classId": "barbarian",
+    "name": "Invulnerable Rager",
+    "description": "Cambia la resistencia estándar por invulnerabilidad y resistencia al daño que crece con el nivel."
+  },
+  {
+    "id": "brutal-pugilist",
+    "classId": "barbarian",
+    "name": "Brutal Pugilist",
+    "description": "Sustituye algunas características por maestría en combate desarmado y agarres."
+  },
+  {
+    "id": "urban-barbarian",
+    "classId": "barbarian",
+    "name": "Urban Barbarian",
+    "description": "Adapta la furia salvaje a un entorno urbano, cambiando algunas habilidades de clase."
+  },
+  {
+    "id": "armored-hulk",
+    "classId": "barbarian",
+    "name": "Armored Hulk",
+    "description": "Especialista en armadura pesada que mantiene la movilidad bárbara."
+  },
+  {
+    "id": "arcane-duelist",
+    "classId": "bard",
+    "name": "Arcane Duelist",
+    "description": "Combina esgrima mágica con actuación. Reemplaza algunas inspiraciones por habilidades de combate."
+  },
+  {
+    "id": "court-bard",
+    "classId": "bard",
+    "name": "Court Bard",
+    "description": "Especializado en intriga y política de la corte. Cambia la inspiración por manipulación social."
+  },
+  {
+    "id": "street-performer",
+    "classId": "bard",
+    "name": "Street Performer",
+    "description": "Artista callejero que actúa para multitudes y usa el caos urbano a su favor."
+  },
+  {
+    "id": "herald-caller",
+    "classId": "cleric",
+    "name": "Herald Caller",
+    "description": "Especialista en convocar aliados divinos en lugar de canalizar energía."
+  },
+  {
+    "id": "theologian",
+    "classId": "cleric",
+    "name": "Theologian",
+    "description": "Clérigo especializado en un único dominio que lo lleva a la maestría absoluta."
+  },
+  {
+    "id": "ecclesitheurge",
+    "classId": "cleric",
+    "name": "Ecclesitheurge",
+    "description": "Clérigo puro de la fe que evita la lucha y maximiza el poder divino."
+  },
+  {
+    "id": "blight-druid",
+    "classId": "druid",
+    "name": "Blight Druid",
+    "description": "Druida de la putrefacción y la decadencia. Cambia compañero animal por plaga."
+  },
+  {
+    "id": "cave-druid",
+    "classId": "druid",
+    "name": "Cave Druid",
+    "description": "Druida de las cavernas y los subterráneos. Adapta la magia de naturaleza al inframundo."
+  },
+  {
+    "id": "storm-druid",
+    "classId": "druid",
+    "name": "Storm Druid",
+    "description": "Druida especializado en tormentas y fenómenos atmosféricos."
+  },
+  {
+    "id": "archer",
+    "classId": "fighter",
+    "name": "Archer",
+    "description": "Guerrero especializado en arco y armas de proyectil."
+  },
+  {
+    "id": "two-weapon-warrior",
+    "classId": "fighter",
+    "name": "Two-Weapon Warrior",
+    "description": "Maestro del combate con dos armas que minimiza las penalizaciones."
+  },
+  {
+    "id": "weapon-master",
+    "classId": "fighter",
+    "name": "Weapon Master",
+    "description": "Guerrero que se concentra en dominar un arma específica a la perfección."
+  },
+  {
+    "id": "lore-warden",
+    "classId": "fighter",
+    "name": "Lore Warden",
+    "description": "Guerrero académico que combina conocimiento estratégico con habilidades de combate."
+  },
+  {
+    "id": "master-of-many-styles",
+    "classId": "monk",
+    "name": "Master of Many Styles",
+    "description": "Monje que domina múltiples estilos de combate desarmado."
+  },
+  {
+    "id": "zen-archer",
+    "classId": "monk",
+    "name": "Zen Archer",
+    "description": "Monje que canaliza disciplina interna a través del arco."
+  },
+  {
+    "id": "tetori",
+    "classId": "monk",
+    "name": "Tetori",
+    "description": "Especialista en lucha y agarres, adaptando la disciplina monástica a la inmovilización."
+  },
+  {
+    "id": "divine-defender",
+    "classId": "paladin",
+    "name": "Divine Defender",
+    "description": "Paladín protector que refuerza a sus aliados en lugar de atacar."
+  },
+  {
+    "id": "hospitaler",
+    "classId": "paladin",
+    "name": "Hospitaler",
+    "description": "Paladín dedicado a la curación y el apoyo de sus aliados."
+  },
+  {
+    "id": "sacred-servant",
+    "classId": "paladin",
+    "name": "Sacred Servant",
+    "description": "Paladín que añade poder de dominio clerical a sus capacidades divinas."
+  },
+  {
+    "id": "beastmaster",
+    "classId": "ranger",
+    "name": "Beast Master",
+    "description": "Explorador que cultiva múltiples compañeros animales."
+  },
+  {
+    "id": "guide",
+    "classId": "ranger",
+    "name": "Guide",
+    "description": "Explorador experto en navegar terreno y guiar grupos."
+  },
+  {
+    "id": "skirmisher",
+    "classId": "ranger",
+    "name": "Skirmisher",
+    "description": "Explorador que usa trucos de combate en lugar de magia."
+  },
+  {
+    "id": "ranger-archer",
+    "classId": "ranger",
+    "name": "Archer (Ranger)",
+    "description": "Explorador especializado en combate a distancia con arco."
+  },
+  {
+    "id": "scout",
+    "classId": "rogue",
+    "name": "Scout",
+    "description": "Pícaro explorador que activa su ataque furtivo al moverse."
+  },
+  {
+    "id": "swashbuckler-rogue",
+    "classId": "rogue",
+    "name": "Swashbuckler",
+    "description": "Pícaro que usa ingenio y agilidad acrobática en lugar de ocultación."
+  },
+  {
+    "id": "thug",
+    "classId": "rogue",
+    "name": "Thug",
+    "description": "Pícaro violento que usa el miedo como arma principal."
+  },
+  {
+    "id": "acrobat",
+    "classId": "rogue",
+    "name": "Acrobat",
+    "description": "Pícaro que usa la acrobacia extrema para moverse y atacar."
+  },
+  {
+    "id": "tattooed-sorcerer",
+    "classId": "sorcerer",
+    "name": "Tattooed Sorcerer",
+    "description": "Hechicero que almacena poderes mágicos en tatuajes corporales."
+  },
+  {
+    "id": "crossblooded",
+    "classId": "sorcerer",
+    "name": "Crossblooded",
+    "description": "Hechicero con dos linajes de sangre que potencian ciertos hechizos."
+  },
+  {
+    "id": "seeker",
+    "classId": "sorcerer",
+    "name": "Seeker",
+    "description": "Hechicero explorador de ruinas y conocimiento arcano perdido."
+  },
+  {
+    "id": "wizard-abjurer",
+    "classId": "wizard",
+    "name": "Especialista Abjurador",
+    "description": "Mago especializado en conjuros de Abjuración. Obtiene poderes de resistencia y protección mágica. Escuelas prohibidas recomendadas: Evocación, Ilusión."
+  },
+  {
+    "id": "wizard-conjurer",
+    "classId": "wizard",
+    "name": "Especialista Conjurador",
+    "description": "Mago especializado en conjuros de Conjuración. Convoca aliados con mayor potencia. Escuelas prohibidas recomendadas: Evocación, Ilusión."
+  },
+  {
+    "id": "wizard-diviner",
+    "classId": "wizard",
+    "name": "Especialista Adivino",
+    "description": "Mago especializado en adivinación y predicción del futuro. Escuelas prohibidas recomendadas: Ilusión, Nigromancia."
+  },
+  {
+    "id": "wizard-enchanter",
+    "classId": "wizard",
+    "name": "Especialista Encantador",
+    "description": "Mago especializado en conjuros de Encantamiento. Manipula mentes y emociones. Escuelas prohibidas recomendadas: Evocación, Nigromancia."
+  },
+  {
+    "id": "wizard-evoker",
+    "classId": "wizard",
+    "name": "Especialista Evocador",
+    "description": "Mago especializado en conjuros de Evocación. Daño mágico potenciado. Escuelas prohibidas recomendadas: Encantamiento, Conjuración."
+  },
+  {
+    "id": "wizard-illusionist",
+    "classId": "wizard",
+    "name": "Especialista Ilusionista",
+    "description": "Mago especializado en conjuros de Ilusión. Manipula la percepción y crea engaños. Escuelas prohibidas recomendadas: Nigromancia, Conjuración."
+  },
+  {
+    "id": "wizard-necromancer",
+    "classId": "wizard",
+    "name": "Especialista Nigromante",
+    "description": "Mago especializado en conjuros de Nigromancia. Domina la muerte y los no-muertos. Escuelas prohibidas recomendadas: Encantamiento, Ilusión."
+  },
+  {
+    "id": "wizard-transmuter",
+    "classId": "wizard",
+    "name": "Especialista Transmutador",
+    "description": "Mago especializado en conjuros de Transmutación. Altera la realidad física. Escuelas prohibidas recomendadas: Abjuración, Conjuración."
+  },
+  {
+    "id": "wizard-air-elementalist",
+    "classId": "wizard",
+    "name": "Elementalista del Aire",
+    "description": "Mago especializado en magia del elemento Aire. Puede incluir agua como escuela secundaria."
+  },
+  {
+    "id": "wizard-earth-elementalist",
+    "classId": "wizard",
+    "name": "Elementalista de la Tierra",
+    "description": "Mago especializado en magia del elemento Tierra. Puede incluir ácido como escuela secundaria."
+  },
+  {
+    "id": "wizard-fire-elementalist",
+    "classId": "wizard",
+    "name": "Elementalista del Fuego",
+    "description": "Mago especializado en magia del elemento Fuego. Puede incluir rayo como escuela secundaria."
+  },
+  {
+    "id": "wizard-water-elementalist",
+    "classId": "wizard",
+    "name": "Elementalista del Agua",
+    "description": "Mago especializado en magia del elemento Agua. Puede incluir hielo como escuela secundaria."
+  },
+  {
+    "id": "arcane-bomber",
+    "classId": "wizard",
+    "name": "Arcane Bomber",
+    "description": "Mago que canaliza su magia en bombas de energía arcana lanzables, a expensas de poderes de escuela."
+  },
+  {
+    "id": "scrollmaster",
+    "classId": "wizard",
+    "name": "Scrollmaster",
+    "description": "Mago especializado en el uso ofensivo y defensivo de pergaminos mágicos como arma y escudo."
+  },
+  {
+    "id": "shadow-caller",
+    "classId": "wizard",
+    "name": "Shadow Caller",
+    "description": "Mago que invoca criaturas del Plano de las Sombras en lugar de criaturas normales."
+  },
+  {
+    "id": "spellslinger",
+    "classId": "wizard",
+    "name": "Spellslinger",
+    "description": "Mago que combina el uso de armas de fuego con la magia arcana, canalizando conjuros a través del cañón."
+  },
+  {
+    "id": "exploiter-wizard",
+    "classId": "wizard",
+    "name": "Exploiter Wizard",
+    "description": "Mago que intercambia la especialización de escuela y el vínculo arcano por explotaciones arcanas del Arcanista. (Advanced Class Guide)"
+  },
+  {
+    "id": "spell-sage",
+    "classId": "wizard",
+    "name": "Spell Sage",
+    "description": "Erudito arcano que puede identificar y replicar hechizos de cualquier lista de conjuros."
+  },
+  {
+    "id": "pact-wizard",
+    "classId": "wizard",
+    "name": "Pact Wizard",
+    "description": "Mago que ha sellado un pacto con un espíritu u outsider a cambio de poder arcano adicional. (Horror Adventures)"
+  },
+  {
+    "id": "thassilonian-specialist",
+    "classId": "wizard",
+    "name": "Thassilonian Specialist",
+    "description": "Mago de las antiguas tradiciones Thassilonianas: domina una única escuela con maestría absoluta pero tiene dos escuelas prohibidas. (Rise of the Runelords)"
+  },
+  {
+    "id": "siege-mage",
+    "classId": "wizard",
+    "name": "Siege Mage",
+    "description": "Mago entrenado en magia militar a gran escala: mejora motores de asedio y lanza conjuros de área masiva. (Ultimate Combat)"
+  },
+  {
+    "id": "superstitious-barbarian",
+    "classId": "barbarian",
+    "name": "Superstitious",
+    "description": "Bárbaro con desconfianza innata hacia la magia. Gana resistencia a conjuros durante la furia."
+  },
+  {
+    "id": "titan-mauler",
+    "classId": "barbarian",
+    "name": "Titan Mauler",
+    "description": "Bárbaro especializado en empuñar armas enormes diseñadas para criaturas de mayor tamaño."
+  },
+  {
+    "id": "wild-rager",
+    "classId": "barbarian",
+    "name": "Wild Rager",
+    "description": "Bárbaro cuya furia es tan incontrolable que puede atacar a aliados, pero gana potencia extrema."
+  },
+  {
+    "id": "mooncursed-barbarian",
+    "classId": "barbarian",
+    "name": "Mooncursed",
+    "description": "Bárbaro maldito que adopta rasgos animales durante la furia dependiendo de la fase lunar."
+  },
+  {
+    "id": "elemental-kin",
+    "classId": "barbarian",
+    "name": "Elemental Kin",
+    "description": "Bárbaro con sangre elemental en sus venas que canaliza ese poder durante la furia."
+  },
+  {
+    "id": "archaeologist",
+    "classId": "bard",
+    "name": "Archaeologist",
+    "description": "Explorador de ruinas y reliquias que usa la suerte en lugar de la música. No necesita bardic performance."
+  },
+  {
+    "id": "detective-bard",
+    "classId": "bard",
+    "name": "Detective",
+    "description": "Bardo especializado en resolución de misterios e interrogación, usando la música para revelar mentiras."
+  },
+  {
+    "id": "magician-bard",
+    "classId": "bard",
+    "name": "Magician",
+    "description": "Bardo que se especializa en ilusiones y trucos de manos, combinando actuación con magia real."
+  },
+  {
+    "id": "savage-skald",
+    "classId": "bard",
+    "name": "Savage Skald",
+    "description": "Bardo guerrero que usa cantos de guerra tribales para impulsar a sus aliados al combate."
+  },
+  {
+    "id": "thundercaller",
+    "classId": "bard",
+    "name": "Thundercaller",
+    "description": "Bardo cuya voz es un arma literal: canaliza truenos y relámpagos a través de su canto."
+  },
+  {
+    "id": "cloistered-cleric",
+    "classId": "cleric",
+    "name": "Cloistered Cleric",
+    "description": "Clérigo erudito de biblioteca que sacrifica combate por mayor versatilidad mágica y conocimiento."
+  },
+  {
+    "id": "crusader-cleric",
+    "classId": "cleric",
+    "name": "Crusader",
+    "description": "Clérigo guerrero que lidera a sus tropas desde el frente, sacrificando preparación de conjuros por potencia marcial."
+  },
+  {
+    "id": "divine-strategist",
+    "classId": "cleric",
+    "name": "Divine Strategist",
+    "description": "Clérigo táctico que coordina el campo de batalla con precisión divina."
+  },
+  {
+    "id": "merciful-healer",
+    "classId": "cleric",
+    "name": "Merciful Healer",
+    "description": "Clérigo dedicado exclusivamente a la sanación, con poderes de curación muy potenciados."
+  },
+  {
+    "id": "separatist-cleric",
+    "classId": "cleric",
+    "name": "Separatist",
+    "description": "Clérigo que sigue sus propias convicciones en lugar de las de su deidad, eligiendo un dominio fuera de los permitidos."
+  },
+  {
+    "id": "evangelist-cleric",
+    "classId": "cleric",
+    "name": "Evangelist",
+    "description": "Clérigo predicador que convierte y lidera masas, combinando poderes de bardo con los del clérigo."
+  },
+  {
+    "id": "urban-druid",
+    "classId": "druid",
+    "name": "Urban Druid",
+    "description": "Druida de la jungla de piedra que protege ecosistemas urbanos y la naturaleza que sobrevive en las ciudades."
+  },
+  {
+    "id": "world-walker-druid",
+    "classId": "druid",
+    "name": "World Walker",
+    "description": "Druida nómada que protege múltiples terrenos y viaja constantemente, adaptándose a cualquier entorno."
+  },
+  {
+    "id": "aquatic-druid",
+    "classId": "druid",
+    "name": "Aquatic Druid",
+    "description": "Druida guardián de océanos, ríos y costas, con poderes especiales bajo el agua."
+  },
+  {
+    "id": "arctic-druid",
+    "classId": "druid",
+    "name": "Arctic Druid",
+    "description": "Druida de tundras y glaciares que domina el frío extremo y la supervivencia en entornos helados."
+  },
+  {
+    "id": "jungle-druid",
+    "classId": "druid",
+    "name": "Jungle Druid",
+    "description": "Druida de selvas tropicales y junglas densas, experto en venenos y criaturas exóticas."
+  },
+  {
+    "id": "verdant-gnome-druid",
+    "classId": "druid",
+    "name": "Verdant Gnome",
+    "description": "Druida gnomo con vínculo especial con las plantas. Puede hablar con plantas y animarlas."
+  },
+  {
+    "id": "mobile-fighter",
+    "classId": "fighter",
+    "name": "Mobile Fighter",
+    "description": "Guerrero que usa la movilidad y el movimiento dinámico como arma táctica principal."
+  },
+  {
+    "id": "phalanx-soldier",
+    "classId": "fighter",
+    "name": "Phalanx Soldier",
+    "description": "Guerrero especializado en combate en formación cerrada con escudo y lanza."
+  },
+  {
+    "id": "gladiator-fighter",
+    "classId": "fighter",
+    "name": "Gladiator",
+    "description": "Guerrero entrenado en arenas y espectáculos de combate que usa la intimidación como arma."
+  },
+  {
+    "id": "dragoon-fighter",
+    "classId": "fighter",
+    "name": "Dragoon",
+    "description": "Guerrero especializado en combate montado y el uso de lanzas desde la silla."
+  },
+  {
+    "id": "tower-shield-specialist",
+    "classId": "fighter",
+    "name": "Tower Shield Specialist",
+    "description": "Guerrero que convierte el escudo de torre en una fortaleza ambulante."
+  },
+  {
+    "id": "unbreakable-fighter",
+    "classId": "fighter",
+    "name": "Unbreakable",
+    "description": "Guerrero cuya resistencia física es legendaria: absorbe golpes que matarían a otros."
+  },
+  {
+    "id": "flowing-monk",
+    "classId": "monk",
+    "name": "Flowing Monk",
+    "description": "Monje que usa el flujo del combate enemigo contra ellos mismos, redirigiendo ataques y ataques."
+  },
+  {
+    "id": "hungry-ghost-monk",
+    "classId": "monk",
+    "name": "Hungry Ghost Monk",
+    "description": "Monje que drena la fuerza vital de sus enemigos para potenciar su propia ki."
+  },
+  {
+    "id": "weapon-adept-monk",
+    "classId": "monk",
+    "name": "Weapon Adept",
+    "description": "Monje que integra el uso de armas tradicionales monásticas en su disciplina de ki."
+  },
+  {
+    "id": "sohei",
+    "classId": "monk",
+    "name": "Sohei",
+    "description": "Guerrero-monje montado que combina disciplina marcial con el combate a caballo."
+  },
+  {
+    "id": "ki-mystic",
+    "classId": "monk",
+    "name": "Ki Mystic",
+    "description": "Monje que desarrolla poderes psíquicos y de adivinación a través de la meditación profunda."
+  },
+  {
+    "id": "holy-tactician",
+    "classId": "paladin",
+    "name": "Holy Tactician",
+    "description": "Paladín que lidera a sus aliados con maestría táctica en lugar de auras y bendiciones personales."
+  },
+  {
+    "id": "shining-knight",
+    "classId": "paladin",
+    "name": "Shining Knight",
+    "description": "Paladín con énfasis en el combate montado y la caballería sagrada."
+  },
+  {
+    "id": "undead-scourge",
+    "classId": "paladin",
+    "name": "Undead Scourge",
+    "description": "Paladín especializado en la destrucción de no-muertos, con poderes especiales contra ellos."
+  },
+  {
+    "id": "warrior-of-holy-light",
+    "classId": "paladin",
+    "name": "Warrior of the Holy Light",
+    "description": "Paladín que no sigue a ninguna deidad específica sino a la causa del bien absoluto, con poderes de luz."
+  },
+  {
+    "id": "falconer",
+    "classId": "ranger",
+    "name": "Falconer",
+    "description": "Explorador que usa aves de presa como compañeros de caza, coordinando ataques con ellas."
+  },
+  {
+    "id": "infiltrator-ranger",
+    "classId": "ranger",
+    "name": "Infiltrator",
+    "description": "Explorador espía que adopta las costumbres de sus enemigos favoritos para infiltrarse entre ellos."
+  },
+  {
+    "id": "trapper-ranger",
+    "classId": "ranger",
+    "name": "Trapper",
+    "description": "Explorador especializado en trampas mecánicas y mágicas, creando zonas de peligro en el campo de batalla."
+  },
+  {
+    "id": "warden-ranger",
+    "classId": "ranger",
+    "name": "Warden",
+    "description": "Explorador guardián de un territorio específico con poderes especiales dentro de él."
+  },
+  {
+    "id": "wild-hunter",
+    "classId": "ranger",
+    "name": "Wild Hunter",
+    "description": "Explorador que abandona la magia por capacidades físicas mejoradas, pareciéndose más a un bárbaro."
+  },
+  {
+    "id": "knife-master",
+    "classId": "rogue",
+    "name": "Knife Master",
+    "description": "Pícaro especializado en cuchillos y dagas que maximiza el daño con armas de filo pequeñas."
+  },
+  {
+    "id": "pirate-rogue",
+    "classId": "rogue",
+    "name": "Pirate",
+    "description": "Pícaro marino especializado en combate naval y abordajes, con habilidades de intimidación."
+  },
+  {
+    "id": "poisoner-rogue",
+    "classId": "rogue",
+    "name": "Poisoner",
+    "description": "Pícaro especializado en venenos que puede crearlos y aplicarlos con rapidez excepcional."
+  },
+  {
+    "id": "spy-rogue",
+    "classId": "rogue",
+    "name": "Spy",
+    "description": "Pícaro maestro del engaño e infiltración en organizaciones enemigas."
+  },
+  {
+    "id": "charlatan-rogue",
+    "classId": "rogue",
+    "name": "Charlatan",
+    "description": "Pícaro estafador y manipulador social que usa el engaño como arma principal."
+  },
+  {
+    "id": "phantom-thief",
+    "classId": "rogue",
+    "name": "Phantom Thief",
+    "description": "Pícaro ladrón de alto nivel especializado en robar objetos irremplazables con elegancia y precisión."
+  },
+  {
+    "id": "wildblooded",
+    "classId": "sorcerer",
+    "name": "Wildblooded",
+    "description": "Hechicero con una versión mutada de su linaje de sangre que cambia algunos poderes por alternativas únicas."
+  },
+  {
+    "id": "sylvan-sorcerer",
+    "classId": "sorcerer",
+    "name": "Sylvan Sorcerer",
+    "description": "Hechicero con sangre feérica que obtiene un compañero animal en lugar de familiar."
+  },
+  {
+    "id": "empyreal-sorcerer",
+    "classId": "sorcerer",
+    "name": "Empyreal Sorcerer",
+    "description": "Hechicero con sangre celestial que usa Sabiduría en lugar de Carisma para sus conjuros."
+  },
+  {
+    "id": "mongrel-mage",
+    "classId": "sorcerer",
+    "name": "Mongrel Mage",
+    "description": "Hechicero sin linaje definido que puede acceder a poderes de múltiples linajes pero de forma menos potente."
+  },
+  {
+    "id": "razmiran-priest",
+    "classId": "sorcerer",
+    "name": "Razmiran Priest",
+    "description": "Hechicero que finge ser un sacerdote divino, ocultando su magia arcana como milagros religiosos."
+  }
+]

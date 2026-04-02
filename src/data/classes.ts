@@ -30,6 +30,8 @@ export interface ClassData {
   magicType: MagicType
   casterAbility: 'intelligence' | 'wisdom' | 'charisma' | null
   startingGoldDice: string
+  source: 'core' | 'apg' | 'acg' | 'other'
+  proficiencies?: { weapons: string; armor: string }
   spellsPerDay?: SpellsPerDayTable
   spellsKnown?: SpellsKnownTable
 }
@@ -37,6 +39,7 @@ export interface ClassData {
 export const CLASSES: ClassData[] = [
   {
     id: 'barbarian',
+    source: 'core' as const,
     name: 'Bárbaro',
     hitDie: 12,
     baseAttackBonus: 'good',
@@ -70,9 +73,11 @@ export const CLASSES: ClassData[] = [
     magicType: null,
     casterAbility: null,
     startingGoldDice: '3d6*10',
+    proficiencies: { weapons: 'Armas simples y marciales', armor: 'Armaduras ligeras y medias, escudos (no de torre)' },
   },
   {
     id: 'bard',
+    source: 'core' as const,
     name: 'Bardo',
     hitDie: 8,
     baseAttackBonus: 'medium',
@@ -108,9 +113,33 @@ export const CLASSES: ClassData[] = [
     magicType: 'bardic',
     casterAbility: 'charisma',
     startingGoldDice: '3d6*10',
+    proficiencies: { weapons: 'Armas simples, espada corta, espada larga, rapieras, sai, arco corto, látigo', armor: 'Armaduras ligeras (sin interferencia arcana)' },
+    spellsPerDay: [
+      [2, 1],               // lv 1
+      [3, 2],               // lv 2
+      [4, 3],               // lv 3
+      [4, 3, 1],            // lv 4
+      [4, 4, 2],            // lv 5
+      [5, 4, 3],            // lv 6
+      [5, 4, 3, 1],         // lv 7
+      [5, 4, 4, 2],         // lv 8
+      [5, 5, 4, 3],         // lv 9
+      [5, 5, 4, 3, 1],      // lv 10
+      [5, 5, 4, 4, 2],      // lv 11
+      [5, 5, 5, 4, 3],      // lv 12
+      [5, 5, 5, 4, 3, 1],   // lv 13
+      [5, 5, 5, 4, 4, 2],   // lv 14
+      [5, 5, 5, 5, 4, 3],   // lv 15
+      [5, 5, 5, 5, 4, 3, 1], // lv 16
+      [5, 5, 5, 5, 4, 4, 2], // lv 17
+      [5, 5, 5, 5, 5, 4, 3], // lv 18
+      [5, 5, 5, 5, 5, 5, 4], // lv 19
+      [5, 5, 5, 5, 5, 5, 5], // lv 20
+    ],
   },
   {
     id: 'cleric',
+    source: 'core' as const,
     name: 'Clérigo',
     hitDie: 8,
     baseAttackBonus: 'medium',
@@ -129,9 +158,33 @@ export const CLASSES: ClassData[] = [
     magicType: 'divine',
     casterAbility: 'wisdom',
     startingGoldDice: '4d6*10',
+    proficiencies: { weapons: 'Armas simples (+ arma de su deidad)', armor: 'Armaduras ligeras, medias y pesadas; escudos (no de torre)' },
+    spellsPerDay: [
+      [3, 1],               // lv 1
+      [4, 2],               // lv 2
+      [4, 2, 1],            // lv 3
+      [4, 3, 2],            // lv 4
+      [4, 3, 2, 1],         // lv 5
+      [4, 3, 3, 2],         // lv 6
+      [4, 4, 3, 2, 1],      // lv 7
+      [4, 4, 3, 3, 2],      // lv 8
+      [4, 4, 4, 3, 2, 1],   // lv 9
+      [4, 4, 4, 3, 3, 2],   // lv 10
+      [4, 4, 4, 4, 3, 2, 1], // lv 11
+      [4, 4, 4, 4, 3, 3, 2], // lv 12
+      [4, 4, 4, 4, 4, 3, 2, 1], // lv 13
+      [4, 4, 4, 4, 4, 3, 3, 2], // lv 14
+      [4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 15
+      [4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 16
+      [4, 4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 17
+      [4, 4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 18
+      [4, 4, 4, 4, 4, 4, 4, 4, 3, 3], // lv 19
+      [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // lv 20
+    ],
   },
   {
     id: 'druid',
+    source: 'core' as const,
     name: 'Druida',
     hitDie: 8,
     baseAttackBonus: 'medium',
@@ -166,9 +219,33 @@ export const CLASSES: ClassData[] = [
     magicType: 'divine',
     casterAbility: 'wisdom',
     startingGoldDice: '2d6*10',
+    proficiencies: { weapons: 'Garrote, daga, hoz, lanza, honda, bastón, jabalina y armas naturales', armor: 'Armaduras ligeras y medias no metálicas, escudo de madera' },
+    spellsPerDay: [
+      [3, 1],               // lv 1
+      [4, 2],               // lv 2
+      [4, 2, 1],            // lv 3
+      [4, 3, 2],            // lv 4
+      [4, 3, 2, 1],         // lv 5
+      [4, 3, 3, 2],         // lv 6
+      [4, 4, 3, 2, 1],      // lv 7
+      [4, 4, 3, 3, 2],      // lv 8
+      [4, 4, 4, 3, 2, 1],   // lv 9
+      [4, 4, 4, 3, 3, 2],   // lv 10
+      [4, 4, 4, 4, 3, 2, 1], // lv 11
+      [4, 4, 4, 4, 3, 3, 2], // lv 12
+      [4, 4, 4, 4, 4, 3, 2, 1], // lv 13
+      [4, 4, 4, 4, 4, 3, 3, 2], // lv 14
+      [4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 15
+      [4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 16
+      [4, 4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 17
+      [4, 4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 18
+      [4, 4, 4, 4, 4, 4, 4, 4, 3, 3], // lv 19
+      [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // lv 20
+    ],
   },
   {
     id: 'fighter',
+    source: 'core' as const,
     name: 'Guerrero',
     hitDie: 10,
     baseAttackBonus: 'good',
@@ -211,9 +288,11 @@ export const CLASSES: ClassData[] = [
     magicType: null,
     casterAbility: null,
     startingGoldDice: '5d6*10',
+    proficiencies: { weapons: 'Todas las armas simples y marciales', armor: 'Todas las armaduras y escudos, incluido el de torre' },
   },
   {
     id: 'monk',
+    source: 'core' as const,
     name: 'Monje',
     hitDie: 8,
     baseAttackBonus: 'good',
@@ -272,9 +351,11 @@ export const CLASSES: ClassData[] = [
     magicType: null,
     casterAbility: null,
     startingGoldDice: '1d6*10',
+    proficiencies: { weapons: 'Armas de monje (bastón, nunchaku, kama, sai, shuriken, siangham)', armor: 'Ninguna' },
   },
   {
     id: 'paladin',
+    source: 'core' as const,
     name: 'Paladín',
     hitDie: 10,
     baseAttackBonus: 'good',
@@ -310,9 +391,33 @@ export const CLASSES: ClassData[] = [
     magicType: 'divine',
     casterAbility: 'wisdom',
     startingGoldDice: '5d6*10',
+    proficiencies: { weapons: 'Todas las armas simples y marciales', armor: 'Todas las armaduras y escudos (no de torre)' },
+    spellsPerDay: [
+      [],              // lv 1
+      [],              // lv 2
+      [],              // lv 3
+      [1],             // lv 4
+      [1],             // lv 5
+      [1],             // lv 6
+      [1, 1],          // lv 7
+      [1, 1],          // lv 8
+      [2, 1],          // lv 9
+      [2, 1, 1],       // lv 10
+      [2, 1, 1],       // lv 11
+      [2, 1, 1, 1],    // lv 12
+      [3, 2, 1, 1],    // lv 13
+      [3, 2, 1, 1],    // lv 14
+      [3, 2, 1, 1],    // lv 15
+      [3, 2, 2, 1],    // lv 16
+      [4, 3, 2, 1],    // lv 17
+      [4, 3, 2, 1],    // lv 18
+      [4, 3, 3, 2],    // lv 19
+      [4, 3, 3, 2],    // lv 20
+    ],
   },
   {
     id: 'ranger',
+    source: 'core' as const,
     name: 'Explorador',
     hitDie: 10,
     baseAttackBonus: 'good',
@@ -345,9 +450,33 @@ export const CLASSES: ClassData[] = [
     magicType: 'divine',
     casterAbility: 'wisdom',
     startingGoldDice: '5d6*10',
+    proficiencies: { weapons: 'Todas las armas simples y marciales', armor: 'Armaduras ligeras y medias, escudos (no de torre)' },
+    spellsPerDay: [
+      [],              // lv 1
+      [],              // lv 2
+      [],              // lv 3
+      [1],             // lv 4
+      [1],             // lv 5
+      [1],             // lv 6
+      [1, 1],          // lv 7
+      [1, 1],          // lv 8
+      [2, 1],          // lv 9
+      [2, 1, 1],       // lv 10
+      [2, 1, 1],       // lv 11
+      [2, 1, 1, 1],    // lv 12
+      [3, 2, 1, 1],    // lv 13
+      [3, 2, 1, 1],    // lv 14
+      [3, 2, 1, 1],    // lv 15
+      [3, 2, 2, 1],    // lv 16
+      [4, 3, 2, 1],    // lv 17
+      [4, 3, 2, 1],    // lv 18
+      [4, 3, 3, 2],    // lv 19
+      [4, 3, 3, 2],    // lv 20
+    ],
   },
   {
     id: 'rogue',
+    source: 'core' as const,
     name: 'Pícaro',
     hitDie: 6,
     baseAttackBonus: 'poor',
@@ -397,9 +526,11 @@ export const CLASSES: ClassData[] = [
     magicType: null,
     casterAbility: null,
     startingGoldDice: '4d6*10',
+    proficiencies: { weapons: 'Armas simples, ballesta de mano, espada corta, sai', armor: 'Armaduras ligeras' },
   },
   {
     id: 'sorcerer',
+    source: 'core' as const,
     name: 'Hechicero',
     hitDie: 6,
     baseAttackBonus: 'poor',
@@ -417,9 +548,11 @@ export const CLASSES: ClassData[] = [
     magicType: 'arcane',
     casterAbility: 'charisma',
     startingGoldDice: '2d6*10',
+    proficiencies: { weapons: 'Armas simples', armor: 'Ninguna' },
   },
   {
     id: 'wizard',
+    source: 'core' as const,
     name: 'Mago',
     hitDie: 6,
     baseAttackBonus: 'poor',
@@ -448,6 +581,7 @@ export const CLASSES: ClassData[] = [
     magicType: 'arcane',
     casterAbility: 'intelligence',
     startingGoldDice: '2d6*10',
+    proficiencies: { weapons: 'Bastón, daga, ballesta ligera y pesada', armor: 'Ninguna' },
     // Pathfinder 1e Wizard spells per day (levels 0-9, index = char level - 1)
     spellsPerDay: [
       [3, 1],               // lv 1
@@ -475,6 +609,7 @@ export const CLASSES: ClassData[] = [
   // ── APG Base Classes ──
   {
     id: 'alchemist',
+    source: 'apg' as const,
     name: 'Alquimista',
     hitDie: 8,
     baseAttackBonus: 'medium',
@@ -523,6 +658,7 @@ export const CLASSES: ClassData[] = [
     magicType: 'alchemist',
     casterAbility: 'intelligence',
     startingGoldDice: '3d6*10',
+    proficiencies: { weapons: 'Armas simples, bombas', armor: 'Armaduras ligeras' },
     spellsPerDay: [
       [1],               // lv 1
       [2],               // lv 2
@@ -548,6 +684,7 @@ export const CLASSES: ClassData[] = [
   },
   {
     id: 'oracle',
+    source: 'apg' as const,
     name: 'Oráculo',
     hitDie: 8,
     baseAttackBonus: 'medium',
@@ -604,9 +741,11 @@ export const CLASSES: ClassData[] = [
     magicType: 'divine',
     casterAbility: 'charisma',
     startingGoldDice: '3d6*10',
+    proficiencies: { weapons: 'Armas simples', armor: 'Armaduras ligeras y medias, escudos (no de torre)' },
   },
   {
     id: 'inquisitor',
+    source: 'apg' as const,
     name: 'Inquisidor',
     hitDie: 8,
     baseAttackBonus: 'medium',
@@ -652,6 +791,7 @@ export const CLASSES: ClassData[] = [
     magicType: 'divine',
     casterAbility: 'wisdom',
     startingGoldDice: '4d6*10',
+    proficiencies: { weapons: 'Armas simples y marciales', armor: 'Armaduras ligeras y medias, escudos (no de torre)' },
     spellsPerDay: [
       [1],             // lv 1
       [2],             // lv 2
@@ -699,6 +839,7 @@ export const CLASSES: ClassData[] = [
   },
   {
     id: 'witch',
+    source: 'apg' as const,
     name: 'Bruja',
     hitDie: 6,
     baseAttackBonus: 'poor',
@@ -730,6 +871,7 @@ export const CLASSES: ClassData[] = [
     magicType: 'arcane',
     casterAbility: 'intelligence',
     startingGoldDice: '2d6*10',
+    proficiencies: { weapons: 'Armas simples', armor: 'Ninguna' },
     spellsPerDay: [
       [3, 1],               // lv 1
       [4, 2],               // lv 2
@@ -755,6 +897,7 @@ export const CLASSES: ClassData[] = [
   },
   {
     id: 'cavalier',
+    source: 'apg' as const,
     name: 'Caballero',
     hitDie: 10,
     baseAttackBonus: 'good',
@@ -795,9 +938,11 @@ export const CLASSES: ClassData[] = [
     magicType: null,
     casterAbility: null,
     startingGoldDice: '5d6*10',
+    proficiencies: { weapons: 'Todas las armas simples y marciales', armor: 'Todas las armaduras y escudos' },
   },
   {
     id: 'magus',
+    source: 'other' as const,
     name: 'Magus',
     hitDie: 8,
     baseAttackBonus: 'medium',
@@ -826,6 +971,7 @@ export const CLASSES: ClassData[] = [
     magicType: 'arcane',
     casterAbility: 'intelligence',
     startingGoldDice: '4d6*10',
+    proficiencies: { weapons: 'Armas simples y marciales', armor: 'Armaduras ligeras' },
     spellsPerDay: [
       [3, 1],           // lv 1
       [4, 2],           // lv 2
@@ -851,6 +997,7 @@ export const CLASSES: ClassData[] = [
   },
   {
     id: 'summoner',
+    source: 'apg' as const,
     name: 'Invocador',
     hitDie: 8,
     baseAttackBonus: 'medium',
@@ -934,9 +1081,11 @@ export const CLASSES: ClassData[] = [
     magicType: 'arcane',
     casterAbility: 'charisma',
     startingGoldDice: '2d6*10',
+    proficiencies: { weapons: 'Armas simples', armor: 'Armaduras ligeras' },
   },
   {
     id: 'swashbuckler',
+    source: 'acg' as const,
     name: 'Espadachín',
     hitDie: 10,
     baseAttackBonus: 'good',
@@ -974,9 +1123,11 @@ export const CLASSES: ClassData[] = [
     magicType: null,
     casterAbility: null,
     startingGoldDice: '4d6*10',
+    proficiencies: { weapons: 'Armas simples, espada corta, espada larga, rapieras', armor: 'Armaduras ligeras' },
   },
   {
     id: 'vigilante',
+    source: 'other' as const,
     name: 'Vigilante',
     hitDie: 8,
     baseAttackBonus: 'medium',
@@ -1019,9 +1170,11 @@ export const CLASSES: ClassData[] = [
     magicType: null,
     casterAbility: null,
     startingGoldDice: '3d6*10',
+    proficiencies: { weapons: 'Armas simples y marciales', armor: 'Armaduras ligeras y medias, escudos' },
   },
   {
     id: 'warpriest',
+    source: 'acg' as const,
     name: 'Sacerdote de Guerra',
     hitDie: 10,
     baseAttackBonus: 'medium',
@@ -1068,6 +1221,7 @@ export const CLASSES: ClassData[] = [
     magicType: 'divine',
     casterAbility: 'wisdom',
     startingGoldDice: '4d6*10',
+    proficiencies: { weapons: 'Todas las armas simples y marciales', armor: 'Todas las armaduras y escudos' },
     spellsPerDay: [
       [3, 1],               // lv 1
       [4, 2],               // lv 2
@@ -1089,6 +1243,591 @@ export const CLASSES: ClassData[] = [
       [5, 5, 5, 5, 5, 4, 3], // lv 18
       [5, 5, 5, 5, 5, 5, 4], // lv 19
       [5, 5, 5, 5, 5, 5, 5], // lv 20
+    ],
+  },
+  // ── APG adicional ──
+  {
+    id: 'antipaladin',
+    source: 'apg' as const,
+    name: 'Antipaladín',
+    hitDie: 10,
+    baseAttackBonus: 'good',
+    fortitudeSave: 'good',
+    reflexSave: 'poor',
+    willSave: 'good',
+    skillPointsPerLevel: 2,
+    classSkills: ['bluff', 'craft', 'disguise', 'handle_animal', 'intimidate', 'knowledge_nobility', 'knowledge_planes', 'knowledge_religion', 'ride', 'sense_motive', 'spellcraft', 'stealth'],
+    features: [
+      { name: 'Aura de Maldad', level: 1, description: 'Emites un aura de maldad fuerte.' },
+      { name: 'Detectar Bien', level: 1, description: 'Detectas bien a voluntad como acción de concentración.' },
+      { name: 'Toque de Corrupción', level: 1, description: 'Daña criaturas buenas o cura no-muertos. Usos/día = 1 + nivel/2.' },
+      { name: 'Escudo Impío', level: 2, description: 'Añade modificador CAR a todas las tiradas de salvación.' },
+      { name: 'Golpe Maligno', level: 2, description: 'Añade bonus CAR a ataques/daño vs. objetivos buenos y otorga PV temporales.' },
+      { name: 'Crueldad', level: 3, description: 'Toque de Corrupción también aplica una condición negativa al objetivo.' },
+      { name: 'Canal de Energía Negativa', level: 4, description: 'Usa Toque de Corrupción para canalizar energía negativa.' },
+      { name: 'Magia Maligna', level: 4, description: 'Prepara y lanza hechizos divinos de la lista del antipaladín.' },
+      { name: 'Amigo Fiendish', level: 5, description: 'Convoca un compañero fiendish (animal o familiar extraplanar).' },
+      { name: 'Crueldad', level: 6, description: 'Toque de Corrupción aplica una condición adicional.' },
+      { name: 'Aura de Cobardía', level: 8, description: 'Enemigos a 10 pies sufren –4 a salvaciones contra miedo.' },
+      { name: 'Crueldad', level: 9, description: 'Toque de Corrupción aplica una condición adicional.' },
+      { name: 'Aura de Desesperación', level: 11, description: 'Enemigos a 10 pies sufren –2 a todas las tiradas.' },
+      { name: 'Crueldad', level: 12, description: 'Toque de Corrupción aplica una condición adicional.' },
+      { name: 'Aura de Venganza', level: 14, description: 'Gasta 2 usos para que aliados usen tu Golpe Maligno.' },
+      { name: 'Crueldad', level: 15, description: 'Toque de Corrupción aplica una condición adicional.' },
+      { name: 'Aura de Pecado', level: 17, description: 'DR 5/Bien y aliados cercanos obtienen DR 5/Bien.' },
+      { name: 'Crueldad', level: 18, description: 'Toque de Corrupción aplica una condición adicional.' },
+      { name: 'Campeón Impío', level: 20, description: 'Al activar Golpe Maligno, emites un campo de maldad que protege a no-muertos.' },
+    ],
+    alignment: ['Caótico Malvado'],
+    description: 'Paladines caídos que se entregan al mal, combinando magia oscura con habilidades de combate.',
+    magicType: 'divine',
+    casterAbility: 'charisma',
+    startingGoldDice: '5d6*10',
+    proficiencies: { weapons: 'Todas las armas simples y marciales', armor: 'Todas las armaduras y escudos (no de torre)' },
+    spellsPerDay: [
+      [],              // lv 1
+      [],              // lv 2
+      [],              // lv 3
+      [1],             // lv 4
+      [1],             // lv 5
+      [1],             // lv 6
+      [1, 1],          // lv 7
+      [1, 1],          // lv 8
+      [2, 1],          // lv 9
+      [2, 1, 1],       // lv 10
+      [2, 1, 1],       // lv 11
+      [2, 1, 1, 1],    // lv 12
+      [3, 2, 1, 1],    // lv 13
+      [3, 2, 1, 1],    // lv 14
+      [3, 2, 1, 1],    // lv 15
+      [3, 2, 2, 1],    // lv 16
+      [4, 3, 2, 1],    // lv 17
+      [4, 3, 2, 1],    // lv 18
+      [4, 3, 3, 2],    // lv 19
+      [4, 3, 3, 2],    // lv 20
+    ],
+  },
+  // ── Ultimate Magic / Ultimate Combat ──
+  {
+    id: 'gunslinger',
+    source: 'other' as const,
+    name: 'Pistolero',
+    hitDie: 10,
+    baseAttackBonus: 'good',
+    fortitudeSave: 'good',
+    reflexSave: 'good',
+    willSave: 'poor',
+    skillPointsPerLevel: 4,
+    classSkills: ['acrobatics', 'bluff', 'climb', 'craft', 'handle_animal', 'heal', 'intimidate', 'knowledge_engineering', 'knowledge_local', 'perception', 'profession', 'ride', 'sleight_of_hand', 'survival', 'swim'],
+    features: [
+      { name: 'Valentía', level: 1, description: 'Reserva de valentía = mod SAB. Se recupera con golpes críticos y matando enemigos.' },
+      { name: 'Hazañas', level: 1, description: 'Usa valentía para activar hazañas: maniobras y trucos especiales con armas de fuego.' },
+      { name: 'Herrero de Armas', level: 1, description: 'Comienzas con un arma de fuego artesanal y herramientas para fabricar munición.' },
+      { name: 'Ágil 1', level: 2, description: '+1 CA sin armadura o con armadura ligera cuando no estás sin defensas.' },
+      { name: 'Hazaña de Bono', level: 2, description: 'Ganas una hazaña de combate adicional.' },
+      { name: 'Pistolero Diestro 1', level: 5, description: '+1 a ataques con armas de fuego del grupo elegido.' },
+      { name: 'Ágil 2', level: 6, description: '+2 CA sin armadura o con armadura ligera.' },
+      { name: 'Hazaña de Bono', level: 6, description: 'Ganas una hazaña de combate adicional.' },
+      { name: 'Pistolero Diestro 2', level: 9, description: '+2 a ataques con armas de fuego del grupo elegido.' },
+      { name: 'Ágil 3', level: 10, description: '+3 CA sin armadura o con armadura ligera.' },
+      { name: 'Hazaña de Bono', level: 10, description: 'Ganas una hazaña de combate adicional.' },
+      { name: 'Pistolero Diestro 3', level: 13, description: '+3 a ataques con armas de fuego del grupo elegido.' },
+      { name: 'Ágil 4', level: 14, description: '+4 CA sin armadura o con armadura ligera.' },
+      { name: 'Hazaña de Bono', level: 14, description: 'Ganas una hazaña de combate adicional.' },
+      { name: 'Pistolero Diestro 4', level: 17, description: '+4 a ataques con armas de fuego del grupo elegido.' },
+      { name: 'Ágil 5', level: 18, description: '+5 CA sin armadura o con armadura ligera.' },
+      { name: 'Hazaña de Bono', level: 18, description: 'Ganas una hazaña de combate adicional.' },
+      { name: 'Maestro Pistolero', level: 20, description: 'Puedes recargar armas de fuego como acción libre.' },
+    ],
+    alignment: ['Cualquiera'],
+    description: 'Guerrero que domina las armas de fuego, combinando valentía y puntería letal.',
+    magicType: null,
+    casterAbility: null,
+    startingGoldDice: '5d6*10',
+    proficiencies: { weapons: 'Armas simples, todas las armas de fuego', armor: 'Armaduras ligeras y medias, escudos (no de torre)' },
+  },
+  {
+    id: 'ninja',
+    source: 'other' as const,
+    name: 'Ninja',
+    hitDie: 8,
+    baseAttackBonus: 'medium',
+    fortitudeSave: 'poor',
+    reflexSave: 'good',
+    willSave: 'poor',
+    skillPointsPerLevel: 8,
+    classSkills: ['acrobatics', 'appraise', 'bluff', 'climb', 'craft', 'diplomacy', 'disable_device', 'disguise', 'escape_artist', 'intimidate', 'knowledge_local', 'knowledge_nobility', 'linguistics', 'perception', 'perform', 'profession', 'sense_motive', 'sleight_of_hand', 'stealth', 'swim', 'use_magic_device'],
+    features: [
+      { name: 'Ataque Furtivo +1d6', level: 1, description: '+1d6 daño cuando el objetivo está desprevenido o flanqueado.' },
+      { name: 'Trucos del Ninja', level: 2, description: 'Ganas un truco de ninja: habilidades especiales de sigilo y combate.' },
+      { name: 'Reserva de Ki', level: 2, description: 'Reserva de ki = nivel + mod CAR. Permite acciones especiales.' },
+      { name: 'Veneno de Baso', level: 2, description: 'Puedes crear un veneno especial de ninja con tu ki.' },
+      { name: 'Evasión', level: 2, description: 'Con éxito en Reflejos, no sufres daño.' },
+      { name: 'Ataque Furtivo +2d6', level: 3, description: '+2d6 daño cuando el objetivo está desprevenido o flanqueado.' },
+      { name: 'Truco de Ninja', level: 4, description: 'Ganas un truco adicional.' },
+      { name: 'Ataque Furtivo +3d6', level: 5, description: '+3d6 daño cuando el objetivo está desprevenido o flanqueado.' },
+      { name: 'Ocultarse a Simple Vista', level: 6, description: 'Puedes usar Furtividad incluso mientras te observan.' },
+      { name: 'Truco de Ninja', level: 6, description: 'Ganas un truco adicional.' },
+      { name: 'Ataque Furtivo +4d6', level: 7, description: '+4d6 daño cuando el objetivo está desprevenido o flanqueado.' },
+      { name: 'Evasión Mejorada', level: 8, description: 'Con fallo en Reflejos solo recibes la mitad del daño.' },
+      { name: 'Trucos Avanzados', level: 8, description: 'Accedes a trucos de ninja avanzados.' },
+      { name: 'Truco de Ninja', level: 8, description: 'Ganas un truco adicional.' },
+      { name: 'Ataque Furtivo +5d6', level: 9, description: '+5d6 daño cuando el objetivo está desprevenido o flanqueado.' },
+      { name: 'Ataque Furtivo +6d6', level: 11, description: '+6d6 daño cuando el objetivo está desprevenido o flanqueado.' },
+      { name: 'Truco de Ninja', level: 12, description: 'Ganas un truco adicional.' },
+      { name: 'Ataque Furtivo +7d6', level: 13, description: '+7d6 daño cuando el objetivo está desprevenido o flanqueado.' },
+      { name: 'Ataque Furtivo +8d6', level: 15, description: '+8d6 daño cuando el objetivo está desprevenido o flanqueado.' },
+      { name: 'Truco de Ninja', level: 16, description: 'Ganas un truco adicional.' },
+      { name: 'Ataque Furtivo +9d6', level: 17, description: '+9d6 daño cuando el objetivo está desprevenido o flanqueado.' },
+      { name: 'Ataque Furtivo +10d6', level: 19, description: '+10d6 daño cuando el objetivo está desprevenido o flanqueado.' },
+      { name: 'Maestro del Sigilo', level: 20, description: 'Tu ataque furtivo puede afectar a criaturas inmunes a críticos.' },
+    ],
+    alignment: ['Cualquiera'],
+    description: 'Asesino ágil que usa ki, veneno y sigilo para eliminar objetivos sin ser detectado.',
+    magicType: null,
+    casterAbility: null,
+    startingGoldDice: '4d6*10',
+    proficiencies: { weapons: 'Armas simples, ballesta de mano, kama, kukri, nunchaku, sai, arco corto, espada corta, shuriken, siangham, wakizashi', armor: 'Armaduras ligeras' },
+  },
+  {
+    id: 'samurai',
+    source: 'other' as const,
+    name: 'Samurai',
+    hitDie: 10,
+    baseAttackBonus: 'good',
+    fortitudeSave: 'good',
+    reflexSave: 'poor',
+    willSave: 'poor',
+    skillPointsPerLevel: 4,
+    classSkills: ['climb', 'craft', 'handle_animal', 'intimidate', 'knowledge_history', 'knowledge_nobility', 'perception', 'profession', 'ride', 'sense_motive', 'survival', 'swim'],
+    features: [
+      { name: 'Desafío 1/día', level: 1, description: 'Desafías a un enemigo: +2 a ataques y daño, con bonificador de orden.' },
+      { name: 'Montura', level: 1, description: 'Obtienes una montura especial como compañero permanente.' },
+      { name: 'Orden', level: 1, description: 'Juras lealtad a un código bushido y obtienes habilidades de orden.' },
+      { name: 'Resolución', level: 1, description: 'Gastas un uso de desafío para relanzar una tirada fallida una vez por combate.' },
+      { name: 'Reto', level: 3, description: 'Tu cargo de caballero otorga poderes especiales en combate montado.' },
+      { name: 'Bono de Orden', level: 4, description: 'Ganas habilidades adicionales de tu orden.' },
+      { name: 'Desafío 2/día', level: 4, description: 'Puedes lanzar 2 desafíos por día.' },
+      { name: 'Gran Táctico', level: 5, description: 'Bandera: tu presencia inspira a aliados cercanos.' },
+      { name: 'Desafío 3/día', level: 7, description: 'Puedes lanzar 3 desafíos por día.' },
+      { name: 'Entrenador Experto', level: 4, description: 'Puedes entrenar monturas con mayor eficacia.' },
+      { name: 'Kata', level: 9, description: 'Técnica especial de combate que mejora un tipo de ataque.' },
+      { name: 'Desafío 4/día', level: 10, description: 'Puedes lanzar 4 desafíos por día.' },
+      { name: 'Kiai', level: 11, description: 'Una vez por día puedes proclamar un kiai para obtener un ataque adicional.' },
+      { name: 'Desafío 5/día', level: 13, description: 'Puedes lanzar 5 desafíos por día.' },
+      { name: 'Bandera Mayor', level: 14, description: 'Tu inspira a más aliados con mayor bonificador.' },
+      { name: 'Desafío 6/día', level: 16, description: 'Puedes lanzar 6 desafíos por día.' },
+      { name: 'Honorable Stand', level: 17, description: 'Puedes luchar hasta 0 PV sin caer inconsciente una vez por día.' },
+      { name: 'Desafío 7/día', level: 19, description: 'Puedes lanzar 7 desafíos por día.' },
+      { name: 'Maestro Samurai', level: 20, description: 'Tus desafíos infunden terror sobrenatural en los enemigos.' },
+    ],
+    alignment: ['Cualquiera'],
+    description: 'Guerrero de honor ligado a un código bushido, maestro del combate montado y el duelo.',
+    magicType: null,
+    casterAbility: null,
+    startingGoldDice: '5d6*10',
+    proficiencies: { weapons: 'Todas las armas simples y marciales, más armas de samurai (daiklave, katana, naginata, wakizashi)', armor: 'Todas las armaduras y escudos' },
+  },
+  // ── ACG adicionales ──
+  {
+    id: 'arcanist',
+    source: 'acg' as const,
+    name: 'Arcanista',
+    hitDie: 6,
+    baseAttackBonus: 'poor',
+    fortitudeSave: 'poor',
+    reflexSave: 'poor',
+    willSave: 'good',
+    skillPointsPerLevel: 2,
+    classSkills: ['appraise', 'craft', 'fly', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_engineering', 'knowledge_geography', 'knowledge_history', 'knowledge_local', 'knowledge_nature', 'knowledge_nobility', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'profession', 'spellcraft', 'use_magic_device'],
+    features: [
+      { name: 'Reserva Arcana', level: 1, description: 'Reserva de puntos = 3 + INT. Permite potenciar conjuros y exploits.' },
+      { name: 'Exploits del Arcanista', level: 1, description: 'Ganas exploits especiales que mejoran tu magia.' },
+      { name: 'Consumir Conjuros', level: 1, description: 'Sacrifica ranuras de conjuros preparados para recuperar puntos de reserva arcana.' },
+      { name: 'Exploit Arcano Bono', level: 3, description: 'Ganas un exploit adicional.' },
+      { name: 'Exploit Arcano Bono', level: 7, description: 'Ganas un exploit adicional.' },
+      { name: 'Exploit Arcano Bono', level: 11, description: 'Ganas un exploit adicional.' },
+      { name: 'Exploit Mayor', level: 11, description: 'Accedes a exploits de mayor poder.' },
+      { name: 'Exploit Arcano Bono', level: 15, description: 'Ganas un exploit adicional.' },
+      { name: 'Exploit Arcano Bono', level: 19, description: 'Ganas un exploit adicional.' },
+      { name: 'Maestría Arcana Suprema', level: 20, description: 'Tus hechizos de clase se potencian al máximo sin coste adicional.' },
+    ],
+    alignment: ['Cualquiera'],
+    description: 'Híbrido de mago y hechicero que prepara conjuros del libro pero los lanza con flexibilidad innata.',
+    magicType: 'arcane',
+    casterAbility: 'intelligence',
+    startingGoldDice: '2d6*10',
+    proficiencies: { weapons: 'Bastón, daga, ballesta ligera y pesada', armor: 'Ninguna' },
+    spellsPerDay: [
+      [3, 1],               // lv 1
+      [4, 2],               // lv 2
+      [4, 2, 1],            // lv 3
+      [4, 3, 2],            // lv 4
+      [4, 3, 2, 1],         // lv 5
+      [4, 3, 3, 2],         // lv 6
+      [4, 4, 3, 2, 1],      // lv 7
+      [4, 4, 3, 3, 2],      // lv 8
+      [4, 4, 4, 3, 2, 1],   // lv 9
+      [4, 4, 4, 3, 3, 2],   // lv 10
+      [4, 4, 4, 4, 3, 2, 1], // lv 11
+      [4, 4, 4, 4, 3, 3, 2], // lv 12
+      [4, 4, 4, 4, 4, 3, 2, 1], // lv 13
+      [4, 4, 4, 4, 4, 3, 3, 2], // lv 14
+      [4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 15
+      [4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 16
+      [4, 4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 17
+      [4, 4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 18
+      [4, 4, 4, 4, 4, 4, 4, 4, 3, 3], // lv 19
+      [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // lv 20
+    ],
+  },
+  {
+    id: 'hunter',
+    source: 'acg' as const,
+    name: 'Cazador',
+    hitDie: 8,
+    baseAttackBonus: 'medium',
+    fortitudeSave: 'good',
+    reflexSave: 'good',
+    willSave: 'poor',
+    skillPointsPerLevel: 6,
+    classSkills: ['climb', 'craft', 'handle_animal', 'heal', 'intimidate', 'knowledge_dungeoneering', 'knowledge_geography', 'knowledge_nature', 'perception', 'profession', 'ride', 'spellcraft', 'stealth', 'survival', 'swim'],
+    features: [
+      { name: 'Compañero Animal', level: 1, description: 'Obtienes un compañero animal al nivel completo del cazador.' },
+      { name: 'Empatía Salvaje', level: 1, description: 'Puedes mejorar actitud de animales como Diplomacia.' },
+      { name: 'Foco Animal', level: 1, description: 'Canalizas los atributos de un animal en ti o en tu compañero.' },
+      { name: 'Hazañas de Trabajo en Equipo', level: 2, description: 'Ganas hazañas de trabajo en equipo que compartes con tu compañero animal.' },
+      { name: 'Paso por el Bosque', level: 2, description: 'Ignoras penalización por terreno difícil natural.' },
+      { name: 'Compañero Preciso', level: 3, description: 'Tu compañero animal no te bloquea en ataques.' },
+      { name: 'Foco Animal 2', level: 4, description: 'Puedes mantener 2 focos de animal simultáneos.' },
+      { name: 'Paso sin Pista', level: 4, description: 'No puedes ser rastreado en exteriores.' },
+      { name: 'Rastrear', level: 4, description: '+1/2 nivel a Supervivencia para rastrear.' },
+      { name: 'Hazañas de Trabajo en Equipo', level: 6, description: 'Ganas hazañas adicionales de trabajo en equipo.' },
+      { name: 'Sincronía con la Presa', level: 8, description: 'Tu compañero y tú compartís mejoras de combate.' },
+      { name: 'Uno con la Bestia', level: 17, description: 'Puedes asumir las características físicas de tu foco animal.' },
+      { name: 'Maestro de la Manada', level: 20, description: 'Tu compañero gana poderes divinos y tu foco se vuelve permanente.' },
+    ],
+    alignment: ['Cualquiera'],
+    description: 'Guerrero de la naturaleza con un compañero animal poderoso y magia de druid/explorador.',
+    magicType: 'divine',
+    casterAbility: 'wisdom',
+    startingGoldDice: '4d6*10',
+    proficiencies: { weapons: 'Todas las armas simples y marciales', armor: 'Armaduras ligeras y medias, escudos (no de torre)' },
+    spellsPerDay: [
+      [2, 1],               // lv 1
+      [3, 2],               // lv 2
+      [4, 3],               // lv 3
+      [4, 3, 1],            // lv 4
+      [4, 4, 2],            // lv 5
+      [5, 4, 3],            // lv 6
+      [5, 4, 3, 1],         // lv 7
+      [5, 4, 4, 2],         // lv 8
+      [5, 5, 4, 3],         // lv 9
+      [5, 5, 4, 3, 1],      // lv 10
+      [5, 5, 4, 4, 2],      // lv 11
+      [5, 5, 5, 4, 3],      // lv 12
+      [5, 5, 5, 4, 3, 1],   // lv 13
+      [5, 5, 5, 4, 4, 2],   // lv 14
+      [5, 5, 5, 5, 4, 3],   // lv 15
+      [5, 5, 5, 5, 4, 3, 1], // lv 16
+      [5, 5, 5, 5, 4, 4, 2], // lv 17
+      [5, 5, 5, 5, 5, 4, 3], // lv 18
+      [5, 5, 5, 5, 5, 5, 4], // lv 19
+      [5, 5, 5, 5, 5, 5, 5], // lv 20
+    ],
+  },
+  {
+    id: 'shaman',
+    source: 'acg' as const,
+    name: 'Chamán',
+    hitDie: 8,
+    baseAttackBonus: 'medium',
+    fortitudeSave: 'poor',
+    reflexSave: 'poor',
+    willSave: 'good',
+    skillPointsPerLevel: 4,
+    classSkills: ['craft', 'diplomacy', 'fly', 'handle_animal', 'heal', 'knowledge_arcana', 'knowledge_nature', 'knowledge_planes', 'knowledge_religion', 'profession', 'ride', 'sense_motive', 'spellcraft', 'survival'],
+    features: [
+      { name: 'Espíritu', level: 1, description: 'Elige un espíritu que guía tus poderes: magia de espíritu y hex de espíritu.' },
+      { name: 'Animal Espiritual', level: 1, description: 'Un espíritu animal se vincula a ti y almacena tus hechizos.' },
+      { name: 'Orisons', level: 1, description: 'Lanzas hechizos de nivel 0 a voluntad.' },
+      { name: 'Hex', level: 1, description: 'Ganas un hex de chamán: poderes que afectan a aliados y enemigos.' },
+      { name: 'Espíritu Errante', level: 4, description: 'Puedes acceder a los poderes de un segundo espíritu.' },
+      { name: 'Hex', level: 2, description: 'Ganas un hex adicional.' },
+      { name: 'Hex', level: 4, description: 'Ganas un hex adicional.' },
+      { name: 'Hex', level: 6, description: 'Ganas un hex adicional.' },
+      { name: 'Gran Hex', level: 10, description: 'Accedes a hexes de mayor poder.' },
+      { name: 'Hex Mayor', level: 10, description: 'Ganas un hex de alto nivel.' },
+      { name: 'Hex', level: 12, description: 'Ganas un hex adicional.' },
+      { name: 'Magia Espiritual Mayor', level: 14, description: 'El espíritu errante otorga poderes mejorados.' },
+      { name: 'Hex', level: 16, description: 'Ganas un hex adicional.' },
+      { name: 'Espíritu Verdadero', level: 20, description: 'Tu espíritu principal se vuelve parte de tu alma.' },
+    ],
+    alignment: ['Cualquiera'],
+    description: 'Lanzador divino que canaliza espíritus del mundo natural a través de un animal espiritual.',
+    magicType: 'divine',
+    casterAbility: 'wisdom',
+    startingGoldDice: '3d6*10',
+    proficiencies: { weapons: 'Armas simples', armor: 'Armaduras ligeras y medias, escudos (no de torre)' },
+    spellsPerDay: [
+      [3, 1],               // lv 1
+      [4, 2],               // lv 2
+      [4, 2, 1],            // lv 3
+      [4, 3, 2],            // lv 4
+      [4, 3, 2, 1],         // lv 5
+      [4, 3, 3, 2],         // lv 6
+      [4, 4, 3, 2, 1],      // lv 7
+      [4, 4, 3, 3, 2],      // lv 8
+      [4, 4, 4, 3, 2, 1],   // lv 9
+      [4, 4, 4, 3, 3, 2],   // lv 10
+      [4, 4, 4, 4, 3, 2, 1], // lv 11
+      [4, 4, 4, 4, 3, 3, 2], // lv 12
+      [4, 4, 4, 4, 4, 3, 2, 1], // lv 13
+      [4, 4, 4, 4, 4, 3, 3, 2], // lv 14
+      [4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 15
+      [4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 16
+      [4, 4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 17
+      [4, 4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 18
+      [4, 4, 4, 4, 4, 4, 4, 4, 3, 3], // lv 19
+      [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // lv 20
+    ],
+  },
+  {
+    id: 'skald',
+    source: 'acg' as const,
+    name: 'Escaldo',
+    hitDie: 8,
+    baseAttackBonus: 'medium',
+    fortitudeSave: 'good',
+    reflexSave: 'poor',
+    willSave: 'good',
+    skillPointsPerLevel: 4,
+    classSkills: ['acrobatics', 'climb', 'craft', 'diplomacy', 'escape_artist', 'intimidate', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_engineering', 'knowledge_geography', 'knowledge_history', 'knowledge_local', 'knowledge_nature', 'knowledge_nobility', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'perception', 'perform', 'profession', 'sense_motive', 'spellcraft', 'swim', 'use_magic_device'],
+    features: [
+      { name: 'Canción Furiosa', level: 1, description: 'Otorga a aliados acceso a poderes de rabia controlada mientras cantas/recitas.' },
+      { name: 'Conocimiento Bardo', level: 1, description: '+nivel/2 a todas las tiradas de Conocimiento.' },
+      { name: 'Composición Versátil', level: 2, description: 'Puedes usar Representación para habilidades adicionales.' },
+      { name: 'Poder de Rabia', level: 3, description: 'Ganas un poder de rabia bárbaro.' },
+      { name: 'Bien Preparado', level: 5, description: '+2 a tiradas de ataque mientras la canción furiosa está activa.' },
+      { name: 'Kenning del Hechizo', level: 6, description: 'Puedes lanzar hechizos de listas de druida o clérigo gastando puntos de actuación.' },
+      { name: 'Poder de Rabia', level: 6, description: 'Ganas un poder de rabia adicional.' },
+      { name: 'Actuación sin Fin', level: 8, description: 'Las rondas de actuación bárdica se extienden automáticamente.' },
+      { name: 'Poder de Rabia', level: 9, description: 'Ganas un poder de rabia adicional.' },
+      { name: 'Actuación Magistral', level: 12, description: 'Puedes iniciar actuación como acción rápida.' },
+      { name: 'Poder de Rabia', level: 12, description: 'Ganas un poder de rabia adicional.' },
+      { name: 'Poder de Rabia', level: 15, description: 'Ganas un poder de rabia adicional.' },
+      { name: 'Actuación Perpetua', level: 20, description: 'Puedes mantener actuaciones sin límite de rondas.' },
+    ],
+    alignment: ['No Legal'],
+    description: 'Bardo guerrero que inspira furia salvaje en sus aliados mientras relata hazañas épicas.',
+    magicType: 'bardic',
+    casterAbility: 'charisma',
+    startingGoldDice: '3d6*10',
+    proficiencies: { weapons: 'Armas simples y marciales', armor: 'Armaduras ligeras y medias, escudos (no de torre)' },
+    spellsPerDay: [
+      [2, 1],               // lv 1
+      [3, 2],               // lv 2
+      [4, 3],               // lv 3
+      [4, 3, 1],            // lv 4
+      [4, 4, 2],            // lv 5
+      [5, 4, 3],            // lv 6
+      [5, 4, 3, 1],         // lv 7
+      [5, 4, 4, 2],         // lv 8
+      [5, 5, 4, 3],         // lv 9
+      [5, 5, 4, 3, 1],      // lv 10
+      [5, 5, 4, 4, 2],      // lv 11
+      [5, 5, 5, 4, 3],      // lv 12
+      [5, 5, 5, 4, 3, 1],   // lv 13
+      [5, 5, 5, 4, 4, 2],   // lv 14
+      [5, 5, 5, 5, 4, 3],   // lv 15
+      [5, 5, 5, 5, 4, 3, 1], // lv 16
+      [5, 5, 5, 5, 4, 4, 2], // lv 17
+      [5, 5, 5, 5, 5, 4, 3], // lv 18
+      [5, 5, 5, 5, 5, 5, 4], // lv 19
+      [5, 5, 5, 5, 5, 5, 5], // lv 20
+    ],
+  },
+  {
+    id: 'slayer',
+    source: 'acg' as const,
+    name: 'Exterminador',
+    hitDie: 10,
+    baseAttackBonus: 'good',
+    fortitudeSave: 'good',
+    reflexSave: 'good',
+    willSave: 'poor',
+    skillPointsPerLevel: 6,
+    classSkills: ['acrobatics', 'bluff', 'climb', 'craft', 'disguise', 'intimidate', 'knowledge_dungeoneering', 'knowledge_geography', 'knowledge_local', 'perception', 'profession', 'ride', 'sense_motive', 'stealth', 'survival', 'swim'],
+    features: [
+      { name: 'Objetivo Estudiado +1', level: 1, description: '+1 a ataques, CA y tiradas de habilidad vs un objetivo marcado. Acción rápida para marcar.' },
+      { name: 'Rastrear', level: 1, description: '+1/2 nivel a Supervivencia para rastrear.' },
+      { name: 'Talento del Exterminador', level: 2, description: 'Ganas un talento de explorador o pícaro.' },
+      { name: 'Ataque Furtivo +1d6', level: 3, description: '+1d6 daño cuando el objetivo está desprevenido.' },
+      { name: 'Objetivo Estudiado +2', level: 5, description: '+2 a ataques, CA y tiradas vs objetivo marcado.' },
+      { name: 'Talento del Exterminador', level: 6, description: 'Ganas un talento adicional.' },
+      { name: 'Ataque Furtivo +2d6', level: 7, description: '+2d6 daño cuando el objetivo está desprevenido.' },
+      { name: 'Objetivo Estudiado +3', level: 10, description: '+3 a ataques, CA y tiradas vs objetivo marcado.' },
+      { name: 'Ataque Furtivo +3d6', level: 11, description: '+3d6 daño cuando el objetivo está desprevenido.' },
+      { name: 'Presa', level: 14, description: 'Marca a un enemigo y ganas +4 a ataques y siempre cuenta como flanqueado.' },
+      { name: 'Ataque Furtivo +4d6', level: 15, description: '+4d6 daño cuando el objetivo está desprevenido.' },
+      { name: 'Objetivo Estudiado +4', level: 15, description: '+4 a ataques, CA y tiradas vs objetivo marcado.' },
+      { name: 'Presa Mayor', level: 19, description: 'Gastar una acción rápida para recuperar usos de presa.' },
+      { name: 'Ataque Furtivo +5d6', level: 19, description: '+5d6 daño cuando el objetivo está desprevenido.' },
+      { name: 'Objetivo Estudiado +5', level: 20, description: '+5 a ataques, CA y tiradas vs objetivo marcado.' },
+    ],
+    alignment: ['Cualquiera'],
+    description: 'Cazador de primas que estudia a sus objetivos para eliminarlos con eficiencia letal.',
+    magicType: null,
+    casterAbility: null,
+    startingGoldDice: '5d6*10',
+    proficiencies: { weapons: 'Todas las armas simples y marciales', armor: 'Armaduras ligeras y medias, escudos (no de torre)' },
+  },
+  {
+    id: 'investigator',
+    source: 'acg' as const,
+    name: 'Investigador',
+    hitDie: 8,
+    baseAttackBonus: 'medium',
+    fortitudeSave: 'poor',
+    reflexSave: 'good',
+    willSave: 'good',
+    skillPointsPerLevel: 6,
+    classSkills: ['appraise', 'bluff', 'craft', 'diplomacy', 'disable_device', 'disguise', 'escape_artist', 'heal', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_engineering', 'knowledge_geography', 'knowledge_history', 'knowledge_local', 'knowledge_nature', 'knowledge_nobility', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'perception', 'perform', 'profession', 'sense_motive', 'sleight_of_hand', 'spellcraft', 'stealth', 'use_magic_device'],
+    features: [
+      { name: 'Alquimia', level: 1, description: 'Creas extractos alquímicos (como hechizos de bardo/mago) preparados en un libro.' },
+      { name: 'Inspiración', level: 1, description: 'Reserva de puntos = INT. Añade 1d6 a tiradas de habilidad o de ataque.' },
+      { name: 'Buscar Trampas', level: 1, description: 'Busca trampas con Percepción; habilita Abrir Cerraduras.' },
+      { name: 'Talento del Investigador', level: 2, description: 'Ganas un talento especial de investigador.' },
+      { name: 'Alquimia Rápida', level: 3, description: 'Crea extractos más rápidamente.' },
+      { name: 'Sentido de Trampa +1', level: 3, description: '+1 a Reflejos y CA contra trampas.' },
+      { name: 'Combate Estudiado', level: 4, description: 'Acción de movimiento: +INT a tiradas de ataque cuerpo a cuerpo.' },
+      { name: 'Golpe Estudiado +2d6', level: 4, description: 'Termina combate estudiado para añadir +2d6 daño.' },
+      { name: 'Talento del Investigador', level: 4, description: 'Ganas un talento adicional.' },
+      { name: 'Inspiración Amplia', level: 5, description: 'Puedes usar Inspiración en más tiradas de habilidad.' },
+      { name: 'Golpe Estudiado +3d6', level: 6, description: '+3d6 al daño del golpe estudiado.' },
+      { name: 'Evasión', level: 7, description: 'Con éxito en Reflejos, no sufres daño.' },
+      { name: 'Golpe Estudiado +4d6', level: 8, description: '+4d6 al daño del golpe estudiado.' },
+      { name: 'Gran Inspiración', level: 9, description: 'Puedes re-lanzar tiradas de habilidad usando inspiración.' },
+      { name: 'Golpe Estudiado +5d6', level: 10, description: '+5d6 al daño del golpe estudiado.' },
+      { name: 'Maestro Alquimista', level: 20, description: 'Tus extractos se potencian automáticamente al nivel máximo.' },
+    ],
+    alignment: ['Cualquiera'],
+    description: 'Detective alquímico que combina extractos mágicos e inspiración para resolver crímenes y eliminar enemigos.',
+    magicType: 'alchemist',
+    casterAbility: 'intelligence',
+    startingGoldDice: '3d6*10',
+    proficiencies: { weapons: 'Armas simples, ballesta de mano, rapieras, porras, arco corto, espada corta', armor: 'Armaduras ligeras' },
+    spellsPerDay: [
+      [1],               // lv 1
+      [2],               // lv 2
+      [3],               // lv 3
+      [3, 1],            // lv 4
+      [4, 2],            // lv 5
+      [4, 3],            // lv 6
+      [4, 3, 1],         // lv 7
+      [4, 4, 2],         // lv 8
+      [5, 4, 3],         // lv 9
+      [5, 4, 3, 1],      // lv 10
+      [5, 4, 4, 2],      // lv 11
+      [5, 5, 4, 3],      // lv 12
+      [5, 5, 4, 3, 1],   // lv 13
+      [5, 5, 4, 4, 2],   // lv 14
+      [5, 5, 5, 4, 3],   // lv 15
+      [5, 5, 5, 4, 3, 1], // lv 16
+      [5, 5, 5, 4, 4, 2], // lv 17
+      [5, 5, 5, 5, 4, 3], // lv 18
+      [5, 5, 5, 5, 5, 4], // lv 19
+      [5, 5, 5, 5, 5, 5], // lv 20
+    ],
+  },
+  {
+    id: 'brawler',
+    source: 'acg' as const,
+    name: 'Pugilista',
+    hitDie: 10,
+    baseAttackBonus: 'good',
+    fortitudeSave: 'good',
+    reflexSave: 'good',
+    willSave: 'poor',
+    skillPointsPerLevel: 4,
+    classSkills: ['acrobatics', 'climb', 'craft', 'escape_artist', 'handle_animal', 'intimidate', 'knowledge_dungeoneering', 'knowledge_local', 'perception', 'profession', 'ride', 'sense_motive', 'swim'],
+    features: [
+      { name: 'Inteligencia Pugilista', level: 1, description: 'Usa INT en lugar de FUE para cumplir prerrequisitos de hazañas de combate cuerpo a cuerpo.' },
+      { name: 'Golpe Desarmado', level: 1, description: 'Daño desarmado 1d6, no provoca AoO.' },
+      { name: 'Flexibilidad Marcial', level: 2, description: 'Gana temporalmente hazañas de combate durante el combate sin cumplir prerrequisitos.' },
+      { name: 'Entrenamiento de Maniobras', level: 3, description: '+1 a CMB con una maniobra de combate.' },
+      { name: 'Bono de CA', level: 4, description: '+1 CA sin armadura o con armadura ligera.' },
+      { name: 'Golpe del Pugilista', level: 5, description: 'Ataques desarmados superan DR/magia.' },
+      { name: 'Golpe de Nocaut', level: 5, description: 'Una vez/día: una criatura golpeada debe superar Fort o queda inconsciente.' },
+      { name: 'Entrenamiento de Maniobras', level: 7, description: '+1 a CMB con maniobra adicional.' },
+      { name: 'Cerrar Hueco', level: 8, description: 'No provocas ataques de oportunidad al moverte junto a enemigos.' },
+      { name: 'Golpe Feroz', level: 9, description: 'Ataques cuerpo a cuerpo superan DR/plata e hierro frío.' },
+      { name: 'Entrenamiento de Maniobras', level: 11, description: '+1 a CMB con maniobra adicional.' },
+      { name: 'Bono de CA mejorado', level: 12, description: '+2 CA sin armadura o con armadura ligera.' },
+      { name: 'Golpe Legendario', level: 17, description: 'Ataques superan DR/adamantina y DR/—.' },
+      { name: 'Maestro del Combate Desarmado', level: 20, description: 'Tu golpe desarmado tiene el doble de multiplicador de crítico.' },
+    ],
+    alignment: ['Cualquiera'],
+    description: 'Luchador versátil que mezcla técnicas del guerrero y el monje con flexibilidad táctica.',
+    magicType: null,
+    casterAbility: null,
+    startingGoldDice: '3d6*10',
+    proficiencies: { weapons: 'Armas simples y marciales, armas de monje', armor: 'Armaduras ligeras y medias, escudos' },
+  },
+  {
+    id: 'bloodrager',
+    source: 'acg' as const,
+    name: 'Rabioso de sangre',
+    hitDie: 10,
+    baseAttackBonus: 'good',
+    fortitudeSave: 'good',
+    reflexSave: 'poor',
+    willSave: 'poor',
+    skillPointsPerLevel: 4,
+    classSkills: ['acrobatics', 'climb', 'craft', 'handle_animal', 'intimidate', 'knowledge_arcana', 'perception', 'ride', 'spellcraft', 'survival', 'swim'],
+    features: [
+      { name: 'Rabia de Sangre', level: 1, description: '+4 FUE y CON, +2 Voluntad, −2 CA. Puede lanzar conjuros durante la rabia. Rondas/día = 4 + CON + 2×(nivel−1).' },
+      { name: 'Movimiento Rápido', level: 1, description: '+10 pies a velocidad base en tierra.' },
+      { name: 'Linaje de Sangre', level: 1, description: 'Poder de un linaje de sangre arcana que otorga habilidades únicas.' },
+      { name: 'Sentido de Trampa +1', level: 3, description: '+1 a Reflejos y CA contra trampas.' },
+      { name: 'Poder de Linaje', level: 4, description: 'El linaje de sangre otorga un poder adicional.' },
+      { name: 'Castigo de Sangre', level: 4, description: 'Puedes lanzar conjuros mientras estás en rabia de sangre.' },
+      { name: 'Descaro Indomable', level: 5, description: '+2 a Voluntad mientras estás en rabia de sangre.' },
+      { name: 'Reducción de Daño 1/—', level: 7, description: 'DR 1/— mientras no estás en rabia.' },
+      { name: 'Sentido de Trampa +2', level: 6, description: '+2 a Reflejos y CA contra trampas.' },
+      { name: 'Rabia Mayor', level: 11, description: '+6 FUE y CON, +3 Voluntad, −2 CA.' },
+      { name: 'Poder de Linaje Mayor', level: 12, description: 'El linaje otorga un poder de mayor nivel.' },
+      { name: 'Rabia Incansable', level: 17, description: 'Ya no te fatigas al salir de la rabia.' },
+      { name: 'Poder de Linaje Superior', level: 20, description: 'El poder definitivo de tu linaje arcano se despierta.' },
+      { name: 'Rabia de Sangre Mítica', level: 20, description: 'Tu rabia de sangre dura sin límite de rondas.' },
+    ],
+    alignment: ['Cualquiera no legal'],
+    description: 'Híbrido de bárbaro y hechicero cuya sangre mágica explota en una rabia arcana devastadora.',
+    magicType: 'arcane',
+    casterAbility: 'charisma',
+    startingGoldDice: '4d6*10',
+    proficiencies: { weapons: 'Armas simples y marciales', armor: 'Armaduras ligeras y medias, escudos (no de torre)' },
+    spellsPerDay: [
+      [],              // lv 1
+      [],              // lv 2
+      [],              // lv 3
+      [1],             // lv 4
+      [1],             // lv 5
+      [1],             // lv 6
+      [1, 1],          // lv 7
+      [1, 1],          // lv 8
+      [2, 1],          // lv 9
+      [2, 1, 1],       // lv 10
+      [2, 1, 1],       // lv 11
+      [2, 1, 1, 1],    // lv 12
+      [3, 2, 1, 1],    // lv 13
+      [3, 2, 1, 1],    // lv 14
+      [3, 2, 1, 1],    // lv 15
+      [3, 2, 2, 1],    // lv 16
+      [4, 3, 2, 1],    // lv 17
+      [4, 3, 2, 1],    // lv 18
+      [4, 3, 3, 2],    // lv 19
+      [4, 3, 3, 2],    // lv 20
     ],
   },
 ]

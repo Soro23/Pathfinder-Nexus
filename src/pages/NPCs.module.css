@@ -48,6 +48,22 @@
   gap: 1px;
 }
 
+.navGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-bottom: var(--space-2);
+}
+
+.navGroupLabel {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-accent-gold);
+  padding: var(--space-1) var(--space-2);
+  opacity: 0.8;
+}
+
 .navBtn {
   display: block;
   width: 100%;
@@ -102,21 +118,29 @@
   color: var(--color-text-secondary);
 }
 
-/* ── Class list ── */
-.classList {
+.loadingText,
+.emptyText {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  padding: var(--space-8) 0;
+  text-align: center;
+}
+
+/* ── NPC list ── */
+.npcList {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
 }
 
-/* ── Source group ── */
-.sourceGroup {
+/* ── CR group ── */
+.crGroup {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
 }
 
-.sourceHeader {
+.groupHeader {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -124,11 +148,7 @@
   border-bottom: 2px solid var(--color-accent-gold);
 }
 
-.sourceHeader::before {
-  content: '';
-}
-
-.sourceLabel {
+.groupLabel {
   font-family: var(--font-display);
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -136,31 +156,16 @@
   color: var(--color-accent-gold);
 }
 
-/* ── Nav group ── */
-.navGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  margin-bottom: var(--space-2);
-}
-
-.navGroupLabel {
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--color-accent-gold);
-  padding: var(--space-1) var(--space-2);
-  opacity: 0.8;
-}
-
-/* ── Class card ── */
-.classCard {
+/* ── NPC card ── */
+.npcCard {
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  scroll-margin-top: var(--space-4);
 }
 
+/* ── Card header ── */
 .cardHeader {
   padding: var(--space-4);
   border-bottom: 1px solid var(--color-border);
@@ -175,43 +180,94 @@
   margin-bottom: var(--space-2);
 }
 
-.className {
+.npcName {
   font-family: var(--font-display);
   font-size: 1.25rem;
   color: var(--color-accent-gold);
 }
 
-.classDesc {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-}
-
-.hitDieBadge {
-  flex-shrink: 0;
-  padding: 4px 10px;
-  border: 1px solid var(--color-accent-gold);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  color: var(--color-accent-gold);
-  background: rgba(212, 164, 76, 0.08);
-}
-
-/* ── Race title row extras ── */
-.raceMeta {
+.badges {
   display: flex;
   gap: var(--space-2);
   flex-shrink: 0;
 }
 
-.raceTag {
-  padding: 3px 8px;
+/* CR badge color variants */
+.crBadge {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid;
+}
+
+.crGreen {
+  color: #4caf50;
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.crYellow {
+  color: #d4a44c;
+  border-color: #d4a44c;
+  background: rgba(212, 164, 76, 0.1);
+}
+
+.crOrange {
+  color: #e67e22;
+  border-color: #e67e22;
+  background: rgba(230, 126, 34, 0.1);
+}
+
+.crRed {
+  color: #e74c3c;
+  border-color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.crPurple {
+  color: #9b59b6;
+  border-color: #9b59b6;
+  background: rgba(155, 89, 182, 0.1);
+}
+
+.xpBadge {
+  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-1);
+}
+
+.metaTag {
+  padding: 2px 8px;
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: 0.72rem;
   color: var(--color-text-secondary);
+}
+
+.classLine {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+  font-style: italic;
+}
+
+.auraLine {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
 }
 
 /* ── Stats row ── */
@@ -229,7 +285,7 @@
   gap: 1px;
   padding: var(--space-2) var(--space-3);
   background: var(--color-bg-secondary);
-  flex: 1 1 120px;
+  flex: 1 1 100px;
 }
 
 .statLabel {
@@ -240,7 +296,8 @@
 }
 
 .statVal {
-  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
   color: var(--color-text-primary);
 }
 
@@ -257,139 +314,185 @@
   text-transform: uppercase;
   letter-spacing: 0.07em;
   margin-bottom: var(--space-3);
+  display: block;
 }
 
-/* ── Feature table ── */
-.featureTable {
+/* ── Defense grid ── */
+.defenseGrid {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
 }
 
-.featureRow {
+.defItem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.defLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.defVal {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+}
+
+.defSub {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  width: 100%;
+  padding-left: 148px;
+}
+
+/* ── Offense block ── */
+.offenseBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.attackRow {
   display: flex;
   gap: var(--space-3);
   align-items: flex-start;
-  padding: var(--space-2) var(--space-2);
-  border-radius: var(--radius-sm);
-  transition: background 0.1s;
 }
 
-.featureRow:hover {
-  background: var(--color-bg-primary);
-}
-
-.featureLevel {
+.attackLabel {
   flex-shrink: 0;
-  width: 36px;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--color-accent-gold);
+  width: 140px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
   padding-top: 2px;
 }
 
-.featureBody {
+.attackVal {
+  font-size: 0.82rem;
+  color: var(--color-text-primary);
+  line-height: 1.5;
   flex: 1;
+}
+
+/* ── Ability scores ── */
+.abilityGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1px;
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+
+.abilityItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2);
+  background: var(--color-bg-secondary);
+}
+
+.abilityLabel {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-secondary);
+}
+
+.abilityScore {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.abilityMod {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-accent-gold);
+}
+
+/* ── Combat stats row ── */
+.combatRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.combatItem {
+  font-size: 0.82rem;
+}
+
+.combatLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+  margin-right: var(--space-1);
+}
+
+.combatVal {
+  font-family: var(--font-mono);
+  color: var(--color-text-primary);
+}
+
+.cmdNote {
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+}
+
+/* ── Note text ── */
+.noteText {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-top: var(--space-2);
+}
+
+.noteText strong {
+  color: var(--color-text-primary);
+}
+
+/* ── Gear list ── */
+.gearList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.featureName {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.featureDesc {
-  font-size: 0.8rem;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-}
-
-/* ── Skill pills ── */
-.skillPills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-}
-
-.skillPill {
-  padding: 3px var(--space-2);
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  font-size: 0.72rem;
-  color: var(--color-text-secondary);
-  text-transform: capitalize;
-}
-
-/* ── Subraces ── */
-.subraceGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--space-3);
-}
-
-.subraceCard {
-  padding: var(--space-3);
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-}
-
-.subraceName {
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  color: var(--color-text-primary);
-  margin-bottom: 2px;
-}
-
-.subraceBonus {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--color-accent-gold);
-  margin-bottom: var(--space-2);
-}
-
-.subraceTraitRow {
-  font-size: 0.8rem;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-  margin-bottom: 4px;
-}
-
-.subraceTraitRow strong {
-  color: var(--color-text-primary);
-}
-
-/* ── Proficiencies ── */
-.proficiencies {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.profRow {
-  display: flex;
-  gap: var(--space-3);
+.gearItem {
   font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
   line-height: 1.5;
 }
 
-.profLabel {
-  flex-shrink: 0;
-  width: 60px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding-top: 1px;
+.gearItem:last-child {
+  border-bottom: none;
 }
 
-.profVal {
-  color: var(--color-text-primary);
+/* ── Description ── */
+.descText {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
 }
 
 /* ── Collapsible button ── */
@@ -412,94 +515,6 @@
 .collapseBtn svg {
   color: var(--color-accent-gold);
   flex-shrink: 0;
-}
-
-/* ── Scrollable table wrapper ── */
-.tableWrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ── Progression table ── */
-.progTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.78rem;
-  font-family: var(--font-mono);
-  min-width: 320px;
-}
-
-.progTable th {
-  text-align: left;
-  font-size: 0.64rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--color-text-secondary);
-  padding: var(--space-1) var(--space-2);
-  border-bottom: 1px solid var(--color-border);
-  white-space: nowrap;
-}
-
-.progTable td {
-  padding: 3px var(--space-2);
-  color: var(--color-text-primary);
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-
-.progTable tr:last-child td {
-  border-bottom: none;
-}
-
-.progTable tr:nth-child(even) td {
-  background: rgba(255,255,255,0.02);
-}
-
-.progLv {
-  color: var(--color-accent-gold) !important;
-  font-weight: 600;
-}
-
-/* ── Spells per day table ── */
-.spellTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.75rem;
-  font-family: var(--font-mono);
-  min-width: 280px;
-}
-
-.spellTable th {
-  text-align: center;
-  font-size: 0.64rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--color-text-secondary);
-  padding: var(--space-1) var(--space-2);
-  border-bottom: 1px solid var(--color-border);
-  white-space: nowrap;
-}
-
-.spellTable th:first-child {
-  text-align: left;
-}
-
-.spellTable td {
-  padding: 3px var(--space-2);
-  text-align: center;
-  color: var(--color-text-primary);
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-
-.spellTable td:first-child {
-  text-align: left;
-}
-
-.spellTable tr:last-child td {
-  border-bottom: none;
-}
-
-.spellTable tr:nth-child(even) td {
-  background: rgba(255,255,255,0.02);
 }
 
 /* ── Responsive ── */
@@ -547,8 +562,25 @@
     font-size: 1.3rem;
   }
 
-  .statsRow {
+  .abilityGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .defSub {
+    padding-left: 0;
+  }
+
+  .defItem {
     flex-direction: column;
-    gap: 0;
+    gap: 2px;
+  }
+
+  .attackRow {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .attackLabel {
+    width: auto;
   }
 }

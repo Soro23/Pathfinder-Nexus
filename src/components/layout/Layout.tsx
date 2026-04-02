@@ -18,6 +18,7 @@ const compendiumLinks = [
   { path: '/bestiary',    icon: PawPrint,   label: 'Bestiario' },
   { path: '/classes',     icon: Shield,     label: 'Clases' },
   { path: '/races',       icon: Globe,      label: 'Razas' },
+  { path: '/npcs',        icon: Users,      label: 'NPCs' },
 ]
 
 const compendiumSoon = [
@@ -198,6 +199,13 @@ export function Layout() {
           >
             <Globe size={18} />
             <span>Razas</span>
+          </Link>
+          <Link
+            to="/npcs"
+            className={`${styles.navItem} ${isActive('/npcs', false) ? styles.active : ''}`}
+          >
+            <Users size={18} />
+            <span>NPCs</span>
           </Link>
           {compendiumSoon.map(({ icon: Icon, label }) => (
             <span key={label} className={`${styles.navItem} ${styles.disabled}`}>

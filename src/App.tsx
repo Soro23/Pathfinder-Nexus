@@ -24,6 +24,7 @@ import { Feats } from './pages/Feats'
 import { Bestiary } from './pages/Bestiary'
 import { Classes } from './pages/Classes'
 import { Races } from './pages/Races'
+import { NPCs } from './pages/NPCs'
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
               <Route path="bestiary" element={<Bestiary />} />
               <Route path="classes" element={<Classes />} />
               <Route path="races" element={<Races />} />
+              <Route path="npcs" element={<NPCs />} />
               <Route path="campaigns" element={<CampaignList />} />
               <Route path="campaigns/new" element={<CampaignNew />} />
               <Route path="campaigns/import" element={<CampaignImport />} />

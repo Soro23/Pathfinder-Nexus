@@ -1,5 +1,6 @@
+import { useEffect } from 'react'
 import { Globe, ChevronDown } from 'lucide-react'
-import { RACES } from '../data/races'
+import { useSRDStore } from '../store/srdStore'
 import styles from './Classes.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
@@ -9,6 +10,11 @@ const ABILITY_ABBR: Record<string, string> = {
 }
 
 export function Races() {
+  const races = useSRDStore(s => s.races)
+  const fetchAll = useSRDStore(s => s.fetchAll)
+
+  useEffect(() => { fetchAll() }, [fetchAll])
+
   function scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -26,7 +32,7 @@ export function Races() {
             onChange={e => { scrollTo(e.target.value); (e.target as HTMLSelectElement).value = '' }}
           >
             <option value="" disabled>Ir a raza…</option>
-            {RACES.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
+            {races.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
           </select>
           <ChevronDown size={15} className={mobile.mobileCatChevron} />
         </div>
@@ -37,7 +43,7 @@ export function Races() {
         <div className={styles.sideNavInner}>
           <p className={styles.navTitle}>Razas</p>
           <div className={styles.navList}>
-            {RACES.map(r => (
+            {races.map(r => (
               <button key={r.id} className={styles.navBtn} onClick={() => scrollTo(r.id)}>
                 {r.label}
               </button>
@@ -57,7 +63,7 @@ export function Races() {
         </header>
 
         <div className={styles.classList}>
-          {RACES.map(race => (
+          {races.map(race => (
             <div key={race.id} id={race.id} className={styles.classCard}>
 
               {/* Card header */}
