@@ -34,6 +34,7 @@
 
 .mobileCatSelect {
   width: 100%;
+  min-width: 0;
   padding: var(--space-2) var(--space-8) var(--space-2) calc(var(--space-3) + 22px);
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-accent-gold);
@@ -46,6 +47,7 @@
   appearance: none;
   -webkit-appearance: none;
   letter-spacing: 0.02em;
+  flex: 1;
 }
 
 /* ── Mobile breakpoint ── */
@@ -67,7 +69,9 @@
 
   /* Select bar */
   .mobileCatBar {
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
     position: sticky;
     top: 0;
     z-index: 10;
@@ -78,6 +82,11 @@
     margin-bottom: var(--space-4);
     border-bottom: 1px solid var(--color-border);
     width: stretch;
+  }
+
+  .mobileCatSelectWrap {
+    flex: 1 1 calc(50% - var(--space-1));
+    min-width: 140px;
   }
 
   /* Chip nav container (Feats, Bestiary) */

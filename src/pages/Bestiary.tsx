@@ -9,6 +9,7 @@ const CATEGORIES = [
   { id: 'aberration', label: 'Aberraciones', icon: <Skull size={14} /> },
   { id: 'animal', label: 'Animales', icon: <Bug size={14} /> },
   { id: 'construct', label: 'Constructos', icon: <Sparkles size={14} /> },
+  { id: 'creature', label: 'Criaturas', icon: <PawPrint size={14} /> },
   { id: 'dragon', label: 'Dragones', icon: <Flame size={14} /> },
   { id: 'elemental', label: 'Elementales', icon: <Flame size={14} /> },
   { id: 'fey', label: 'Feéricos', icon: <CloudRain size={14} /> },
@@ -16,6 +17,7 @@ const CATEGORIES = [
   { id: 'humanoid', label: 'Humanoides', icon: <Users size={14} /> },
   { id: 'magical-beast', label: 'Bestias Mágicas', icon: <Bug size={14} /> },
   { id: 'monstrous-humanoid', label: 'Humanoides Monstruosos', icon: <Skull size={14} /> },
+  { id: 'ooze', label: 'Gelatinas', icon: <Bug size={14} /> },
   { id: 'outsider', label: 'Extranjeros', icon: <Sparkles size={14} /> },
   { id: 'plant', label: 'Plantas', icon: <TreeDeciduous size={14} /> },
   { id: 'undead', label: 'No-muertos', icon: <Ghost size={14} /> },
@@ -56,6 +58,8 @@ export function Bestiary() {
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [crFilter, setCrFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const PAGE_SIZE = 50
 
   const filteredMonsters = monsters.filter((monster) => {
     const matchesCategory = activeCategory === 'all' || monster.type.toLowerCase().includes(activeCategory)
@@ -66,9 +70,22 @@ export function Bestiary() {
     return matchesCategory && matchesSearch && matchesCR
   })
 
+  const totalPages = Math.ceil(filteredMonsters.length / PAGE_SIZE)
+  const paginatedMonsters = filteredMonsters.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  )
+
   const getCRString = (cr: number) => {
     if (cr < 1) return `1/${Math.round(1/cr)}`
     return cr.toString()
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   return (
@@ -81,10 +98,25 @@ export function Bestiary() {
           <select
             className={mobile.mobileCatSelect}
             value={activeCategory}
-            onChange={e => setActiveCategory(e.target.value)}
+            onChange={e => { setActiveCategory(e.target.value); setCurrentPage(1) }}
           >
             {CATEGORIES.map(cat => (
               <option key={cat.id} value={cat.id}>{cat.label}</option>
+            ))}
+          </select>
+          <ChevronDown size={15} className={mobile.mobileCatChevron} />
+        </div>
+
+        {/* Mobile CR filter */}
+        <div className={mobile.mobileCatSelectWrap}>
+          <Skull size={15} className={mobile.mobileCatIcon} />
+          <select
+            className={mobile.mobileCatSelect}
+            value={crFilter}
+            onChange={e => { setCrFilter(e.target.value); setCurrentPage(1) }}
+          >
+            {CR_RANGES.map(cr => (
+              <option key={cr.id} value={cr.id}>{cr.label}</option>
             ))}
           </select>
           <ChevronDown size={15} className={mobile.mobileCatChevron} />
@@ -106,9 +138,25 @@ export function Bestiary() {
                 <span>{cat.label}</span>
                 {cat.id !== 'all' && (
                   <span className={styles.monsterCount}>
-                    {monsters.filter((m) => m.type.toLowerCase().includes(cat.id)).length}
+                    {monsters.filter((m) => m.type.toLowerCase().includes(cat.id.replace('-', ' '))).length}
                   </span>
                 )}
+              </button>
+            ))}
+          </div>
+
+          <p className={styles.navTitle} style={{ marginTop: 'var(--space-4)' }}>Nivel de Desafío (CR)</p>
+          <div className={styles.navList}>
+            {CR_RANGES.map((cr) => (
+              <button
+                key={cr.id}
+                className={`${styles.navBtn} ${crFilter === cr.id ? styles.navBtnActive : ''}`}
+                onClick={() => { setCrFilter(cr.id); setCurrentPage(1) }}
+              >
+                <span>{cr.label}</span>
+                <span className={styles.monsterCount}>
+                  {monsters.filter((m) => crMatchesRange(m.cr, cr.id)).length}
+                </span>
               </button>
             ))}
           </div>
@@ -134,7 +182,7 @@ export function Bestiary() {
             type="text"
             placeholder="Buscar criaturas..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1) }}
             className={styles.searchInput}
           />
           {search && (
@@ -150,7 +198,7 @@ export function Bestiary() {
           <select
             className={styles.crFilterSelect}
             value={crFilter}
-            onChange={(e) => setCrFilter(e.target.value)}
+            onChange={(e) => { setCrFilter(e.target.value); setCurrentPage(1) }}
           >
             {CR_RANGES.map((cr) => (
               <option key={cr.id} value={cr.id}>{cr.label}</option>
@@ -158,14 +206,38 @@ export function Bestiary() {
           </select>
         </div>
 
-        {/* Results count */}
-        <p className={styles.resultsCount}>
-          {filteredMonsters.length} criatura{filteredMonsters.length !== 1 ? 's' : ''} encontrada{filteredMonsters.length !== 1 ? 's' : ''}
-        </p>
+        {/* Results count and pagination */}
+        <div className={styles.resultsAndPagination}>
+          <p className={styles.resultsCount}>
+            {filteredMonsters.length} criatura{filteredMonsters.length !== 1 ? 's' : ''} encontrada{filteredMonsters.length !== 1 ? 's' : ''}
+          </p>
+
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button
+                className={styles.paginationBtn}
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Anterior
+              </button>
+              <span className={styles.paginationInfo}>
+                Página {currentPage} de {totalPages}
+              </span>
+              <button
+                className={styles.paginationBtn}
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Monster grid */}
-        <div key={activeCategory} className={styles.monstersGrid}>
-          {filteredMonsters.map((monster) => (
+        <div key={activeCategory + crFilter + search + currentPage} className={styles.monstersGrid}>
+          {paginatedMonsters.map((monster) => (
             <div key={monster.id} id={monster.id} className={styles.monsterCard}>
               <div className={styles.monsterHeader}>
                 <div className={styles.monsterNameRow}>
@@ -191,9 +263,10 @@ export function Bestiary() {
                   <span className={styles.statLabel}>PG</span>
                   <span className={styles.statValue}>{monster.hp}{monster.hpNotes && <span className={styles.statNote}> {monster.hpNotes}</span>}</span>
                 </div>
+              </div>
+              <div className={styles.statBlock}>
                 <div className={styles.statRow}>
-                  <span className={styles.statLabel}>F/R/V</span>
-                  <span className={styles.statValue}>{monster.fort}/{monster.ref}/{monster.will}</span>
+                  <span className={styles.statLabel}>Fort +{monster.fort} / Ref +{monster.ref} / Vol +{monster.will}</span>
                 </div>
               </div>
 
@@ -211,10 +284,12 @@ export function Bestiary() {
                   <span className={styles.detailLabel}>Iniciativa</span>
                   <span className={styles.detailValue}>{monster.init >= 0 ? '+' : ''}{monster.init}</span>
                 </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Velocidad</span>
-                  <span className={styles.detailValue}>{monster.speed}</span>
-                </div>
+                { monster.speed && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Velocidad</span>
+                    <span className={styles.detailValue}>{monster.speed}</span>
+                  </div>
+                )}
               </div>
 
               {monster.senses && (
@@ -228,7 +303,18 @@ export function Bestiary() {
                 <div className={styles.monsterSection}>
                   <span className={styles.sectionLabel}>Defensas</span>
                   <span className={styles.sectionValue}>
-                    {[monster.dr && `RD ${monster.dr}`, monster.immune && `Inmunidad: ${monster.immune}`, monster.resist && `Resistencia: ${monster.resist}`].filter(Boolean).join('; ')}
+                  {[
+                      monster.dr && `RD ${monster.dr}`,
+                      monster.immune && `Inmunidad: ${monster.immune}`,
+                      monster.resist && `Resistencia: ${monster.resist}`
+                    ]
+                      .filter(Boolean)
+                      .map((item, i) => (
+                        <span key={i}>
+                          {item}
+                          <br />
+                        </span>
+                      ))}
                   </span>
                 </div>
               )}
@@ -301,6 +387,29 @@ export function Bestiary() {
             </div>
           ))}
         </div>
+
+        {/* Pagination bottom */}
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button
+              className={styles.paginationBtn}
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </button>
+            <span className={styles.paginationInfo}>
+              Página {currentPage} de {totalPages}
+            </span>
+            <button
+              className={styles.paginationBtn}
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
 
         {filteredMonsters.length === 0 && (
           <div className={styles.noResults}>

@@ -424,6 +424,23 @@
 }
 
 @media (max-width: 640px) {
+  .pageLayout {
+    width: 100%;
+    max-width: 100%;
+    padding-left: var(--space-2);
+    padding-right: var(--space-2);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .monstersGrid {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .monsterNav {
     display: none;
   }
@@ -434,6 +451,98 @@
 
   .header h1 {
     font-size: 1.3rem;
+  }
+
+  .monsterCard {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    padding: var(--space-2);
+  }
+
+  .monsterNameRow {
+    flex-wrap: wrap;
+  }
+
+  .monsterName {
+    font-size: 1rem;
+  }
+
+  .statBlock {
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    overflow-x: hidden;
+  }
+
+  .statRow {
+    min-width: 60px;
+    max-width: 100%;
+  }
+
+  .statLabel, .statValue {
+    word-break: break-word;
+  }
+
+  .abilityScores {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-1);
+    overflow-x: hidden;
+  }
+
+  .ability {
+    word-break: break-word;
+    text-align: center;
+  }
+
+  .ability span {
+    display: block;
+    word-break: break-word;
+  }
+
+  .monsterDetails {
+    flex-direction: column;
+    gap: var(--space-2);
+    overflow-x: hidden;
+  }
+
+  .detailRow {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    word-break: break-word;
+  }
+
+  .monsterSection {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-x: hidden;
+    word-break: break-word;
+  }
+
+  .sectionLabel {
+    word-break: break-word;
+  }
+
+  .sectionValue {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+  }
+
+  .monsterDetails,
+  .statBlock,
+  .abilityScores,
+  .monsterSection,
+  .monsterDescription {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .monsterDescription {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 }
 
@@ -469,4 +578,67 @@
 .crFilterSelect:focus {
   outline: none;
   border-color: var(--color-accent-gold);
+}
+
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-6) 0;
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.paginationBtn {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.paginationBtn:hover:not(:disabled) {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+}
+
+.paginationBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.paginationInfo {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.resultsAndPagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.resultsAndPagination .pagination {
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+@media (max-width: 640px) {
+  .resultsAndPagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .resultsAndPagination .pagination {
+    justify-content: space-between;
+  }
 }
