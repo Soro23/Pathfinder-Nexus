@@ -40,6 +40,10 @@ export function useAllRaces() {
   return [...RACES, ...brew]
 }
 
+export { DOMAINS, getDomainById } from './domains'
+export type { DomainData, DomainPower, DomainSpellEntry } from './domains'
+export { BLESSINGS, getBlessingById } from './blessings'
+export type { BlessingData, BlessingPower } from './blessings'
 export { RACES, RACE_OPTIONS, getRaceById } from './races'
 export type { Race, Subrace, RacialTrait } from './races'
 export { useSRDStore, srdStore } from '../store/srdStore'

@@ -142,6 +142,9 @@ export interface Character {
   journalEntries?: JournalEntry[]
   preparedSpells?: string[]
   classFeatureUses?: Record<string, number>
+  selectedDomains?: string[]
+  selectedBlessings?: string[]
+  channelType?: 'positive' | 'negative'
   createdAt: string
   updatedAt: string
 }

@@ -1,0 +1,247 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.counter {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-accent-gold);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.search {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  flex: 1;
+  min-width: 160px;
+}
+
+.search:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+.selectedSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionLabel {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.readonlyList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.emptyHint {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Card */
+.card {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.cardSelected {
+  border-color: var(--color-accent-gold);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  cursor: pointer;
+}
+
+.cardHeader:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.cardTitle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.domainName {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+}
+
+.domainDesc {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.addBtn {
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  border: 1px solid var(--color-accent-gold);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent-gold);
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.addBtn:hover:not(:disabled) {
+  background: var(--color-accent-gold);
+  color: var(--color-bg-primary);
+}
+
+.addBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.removeBtn {
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.removeBtn:hover {
+  border-color: #e05252;
+  color: #e05252;
+}
+
+.expandIcon {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+/* Card body */
+.cardBody {
+  padding: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.power {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.powerLocked {
+  opacity: 0.45;
+}
+
+.powerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.powerName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.powerMeta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-accent-gold);
+}
+
+.powerDesc {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.spellList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.spellListTitle {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.spellGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-1) var(--space-3);
+}
+
+.spellRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.spellLevel {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-accent-gold);
+  min-width: 1.5rem;
+}
+
+.spellName {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}

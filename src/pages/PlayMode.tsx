@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Plus, Minus, Dices, History, Shield, Heart, Brain,
   Swords, Flame, X, Zap, BookOpen, Activity, Power, Pencil, Check
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, StatusEffect, BonusTarget } from '../store'
-import { getClassById, getMulticlassStats, useSRDStore } from '../data'
+import { getClassById, getMulticlassStats, useSRDStore, getDomainById, getBlessingById } from '../data'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card } from '../components/ui'
 import styles from './PlayMode.module.css'
@@ -87,6 +87,9 @@ const INTERACTIVE_FEATURE_NAMES = new Set([
   'Aspecto', 'Aspecto Mayor',
   'Hexos',
   'Eídolón',
+  'Blessings Menores',
+  'Blessings Mayores',
+  'Fervor',
 ])
 
 export function PlayMode() {
@@ -271,6 +274,7 @@ export function PlayMode() {
   const gunslingerClass= classByType('gunslinger')
   const shifterClass   = classByType('shifter')
   const oracleClass    = classByType('oracle')
+  const warpriestClass = classByType('warpriest')
   const witchClass     = classByType('witch')
   const summonerClass  = classByType('summoner')
 
@@ -289,6 +293,10 @@ export function PlayMode() {
   const gritMax            = gunslingerClass ? Math.max(1, wisMod) : 0
   const aspectRoundsMax    = shifterClass   ? shifterClass.level + wisMod : 0
   const oracleChannelMax   = oracleClass    ? Math.max(1, 3 + chaMod) : 0
+  const fervorDice         = warpriestClass && warpriestClass.level >= 2
+    ? Math.max(1, Math.floor((warpriestClass.level - 2) / 3) + 1)
+    : 0
+  const fervorMax          = warpriestClass ? Math.max(1, Math.floor(warpriestClass.level / 2) + wisMod) : 0
 
   const featureUses = character.classFeatureUses ?? {}
   const rageUses         = featureUses['rage']        ?? rageMaxUses
@@ -306,11 +314,12 @@ export function PlayMode() {
   const gritUses         = featureUses['grit']        ?? gritMax
   const aspectUses       = featureUses['aspect']      ?? aspectRoundsMax
   const oracleChannelUses= featureUses['ochannel']    ?? oracleChannelMax
+  const fervorUses       = featureUses['fervor']      ?? fervorMax
 
   const hasAnyFeature = barbarianClass || clericClass || rogueClass || paladinClass || monkClass ||
     bardClass || druidClass || fighterClass || rangerClass || alchemistClass ||
     inquisitorClass || cavalierClass || maguClass || gunslingerClass || shifterClass ||
-    oracleClass || witchClass || summonerClass
+    oracleClass || witchClass || summonerClass || warpriestClass
 
   const useFeature = (key: string, max: number) => {
     const current = featureUses[key] ?? max
@@ -879,7 +888,11 @@ export function PlayMode() {
                       <div className={styles.featureRow}>
                         <div className={styles.featureInfo}>
                           <span className={styles.featureName}>Canalizar Energía</span>
-                          <span className={styles.featureMeta}>{Math.ceil(clericClass.level / 2)}d6 — CD {10 + Math.floor(clericClass.level / 2) + chaMod}</span>
+                          <span className={styles.featureMeta}>
+                            {Math.ceil(clericClass.level / 2)}d6 —{' '}
+                            {character.channelType === 'negative' ? 'Negativa (daña vivos)' : 'Positiva (cura vivos)'}{' '}
+                            — CD {10 + Math.floor(clericClass.level / 2) + chaMod}
+                          </span>
                         </div>
                         <div className={styles.featureActions}>
                           <span className={styles.featureUses}>{channelUses}/{channelMaxUses}</span>
@@ -894,6 +907,110 @@ export function PlayMode() {
                         </div>
                       </div>
                     )}
+
+                    {/* Cleric Domain Powers */}
+                    {clericClass && (character.selectedDomains ?? []).map(domainId => {
+                      const domain = getDomainById(domainId)
+                      if (!domain) return null
+                      const p1 = domain.powers[0]
+                      const p1Max = p1.usesFormula === 'fixed' ? (p1.fixedUses ?? 1) : p1.usesFormula === 'unlimited' ? 99 : Math.max(1, 3 + wisMod)
+                      const p1Uses = featureUses[`domain_${domainId}_p1`] ?? p1Max
+                      const p2 = domain.powers[1]
+                      const hasP2 = p2 && clericClass.level >= p2.unlocksAtLevel
+                      const p2Max = p2 ? (p2.usesFormula === 'fixed' ? (p2.fixedUses ?? 1) : p2.usesFormula === 'unlimited' ? 99 : Math.max(1, 3 + wisMod)) : 0
+                      const p2Uses = featureUses[`domain_${domainId}_p2`] ?? p2Max
+                      return (
+                        <React.Fragment key={domainId}>
+                          <div className={styles.featureRow}>
+                            <div className={styles.featureInfo}>
+                              <span className={styles.featureName}>{domain.name} — {p1.name}</span>
+                              <span className={styles.featureMeta}>{p1.usesFormula === 'unlimited' ? 'A voluntad' : `${p1Max}/día`}</span>
+                            </div>
+                            {p1.usesFormula !== 'unlimited' && (
+                              <div className={styles.featureActions}>
+                                <span className={styles.featureUses}>{p1Uses}/{p1Max}</span>
+                                <Button variant="secondary" size="sm" onClick={() => useFeature(`domain_${domainId}_p1`, p1Max)} disabled={p1Uses <= 0}>Usar</Button>
+                              </div>
+                            )}
+                          </div>
+                          {hasP2 && p2 && (
+                            <div className={styles.featureRow}>
+                              <div className={styles.featureInfo}>
+                                <span className={styles.featureName}>{domain.name} — {p2.name}</span>
+                                <span className={styles.featureMeta}>{p2.usesFormula === 'unlimited' ? 'A voluntad' : `${p2Max}/día`}</span>
+                              </div>
+                              {p2.usesFormula !== 'unlimited' && (
+                                <div className={styles.featureActions}>
+                                  <span className={styles.featureUses}>{p2Uses}/{p2Max}</span>
+                                  <Button variant="secondary" size="sm" onClick={() => useFeature(`domain_${domainId}_p2`, p2Max)} disabled={p2Uses <= 0}>Usar</Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </React.Fragment>
+                      )
+                    })}
+
+                    {/* Warpriest Fervor */}
+                    {warpriestClass && warpriestClass.level >= 2 && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Fervor</span>
+                          <span className={styles.featureMeta}>{fervorDice}d6 — Acción veloz (auto) o estándar (aliado)</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{fervorUses}/{fervorMax}</span>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => { useFeature('fervor', fervorMax); handleQuickRoll(`${fervorDice}d6`, 'Fervor') }}
+                            disabled={fervorUses <= 0}
+                          >
+                            Usar Fervor
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Warpriest Blessing Powers */}
+                    {warpriestClass && (character.selectedBlessings ?? []).map(blessingId => {
+                      const blessing = getBlessingById(blessingId)
+                      if (!blessing) return null
+                      const minor = blessing.powers[0]
+                      const major = blessing.powers[1]
+                      const hasMinorUses = minor.costsFervor
+                      const majorUnlocked = major && warpriestClass.level >= 10
+                      return (
+                        <React.Fragment key={blessingId}>
+                          <div className={styles.featureRow}>
+                            <div className={styles.featureInfo}>
+                              <span className={styles.featureName}>{blessing.name} — {minor.name} <span style={{ fontSize: '0.7em', opacity: 0.6 }}>(Menor)</span></span>
+                              <span className={styles.featureMeta}>
+                                {minor.actionType === 'swift' ? 'Acción veloz' : 'Acción estándar'}
+                                {minor.costsFervor ? ' · cuesta Fervor' : ' · a voluntad'}
+                              </span>
+                            </div>
+                            {hasMinorUses && (
+                              <div className={styles.featureActions}>
+                                <span className={styles.featureUses}>{fervorUses}/{fervorMax} Fervor</span>
+                              </div>
+                            )}
+                          </div>
+                          {major && (
+                            <div className={styles.featureRow} style={{ opacity: majorUnlocked ? 1 : 0.45 }}>
+                              <div className={styles.featureInfo}>
+                                <span className={styles.featureName}>{blessing.name} — {major.name} <span style={{ fontSize: '0.7em', opacity: 0.6 }}>(Mayor)</span></span>
+                                <span className={styles.featureMeta}>
+                                  {majorUnlocked
+                                    ? (major.actionType === 'swift' ? 'Acción veloz' : 'Acción estándar')
+                                    : 'Requiere nivel 10'}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </React.Fragment>
+                      )
+                    })}
 
                     {/* Rogue Sneak Attack (passive) */}
                     {rogueClass && (

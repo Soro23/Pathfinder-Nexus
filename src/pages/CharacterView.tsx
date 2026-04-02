@@ -13,7 +13,7 @@ import { getBonusSpells } from '../data/bonusSpells'
 import { resolveClassSkills } from '../data/resolveArchetype'
 import { resolveModifiers } from '../engine'
 import { Card, Button } from '../components/ui'
-import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal } from '../components/character'
+import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker } from '../components/character'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
 import type { LevelUpUpdates } from '../components/character'
 import styles from './CharacterView.module.css'
@@ -563,6 +563,50 @@ export function CharacterView() {
                 </Card>
               )
             })()}
+
+            {/* Cleric Domains */}
+            {character.classes.some(c => c.id === 'cleric') && (
+              <Card padding="md" className={styles.colSpan2}>
+                <h3 className={styles.sectionTitle}>Dominios</h3>
+                {isEditing && (
+                  <div className={styles.channelTypeRow}>
+                    <span className={styles.channelTypeLabel}>Canal de Energía:</span>
+                    <button
+                      className={`${styles.channelTypeBtn} ${(!character.channelType || character.channelType === 'positive') ? styles.channelTypeActive : ''}`}
+                      onClick={() => updateCharacter(character.id, { channelType: 'positive' })}
+                    >
+                      Positivo (cura vivos)
+                    </button>
+                    <button
+                      className={`${styles.channelTypeBtn} ${character.channelType === 'negative' ? styles.channelTypeActive : ''}`}
+                      onClick={() => updateCharacter(character.id, { channelType: 'negative' })}
+                    >
+                      Negativo (daña vivos)
+                    </button>
+                  </div>
+                )}
+                <DomainPicker
+                  selected={character.selectedDomains ?? []}
+                  onChange={(ids) => updateCharacter(character.id, { selectedDomains: ids })}
+                  characterLevel={character.classes.find(c => c.id === 'cleric')?.level ?? 1}
+                  wisdomMod={Math.floor((character.abilities.wisdom - 10) / 2)}
+                  disabled={!isEditing}
+                />
+              </Card>
+            )}
+
+            {/* Warpriest Blessings */}
+            {character.classes.some(c => c.id === 'warpriest') && (
+              <Card padding="md" className={styles.colSpan2}>
+                <h3 className={styles.sectionTitle}>Bendiciones</h3>
+                <BlessingPicker
+                  selected={character.selectedBlessings ?? []}
+                  onChange={(ids) => updateCharacter(character.id, { selectedBlessings: ids })}
+                  characterLevel={character.classes.find(c => c.id === 'warpriest')?.level ?? 1}
+                  disabled={!isEditing}
+                />
+              </Card>
+            )}
 
             {/* Status Effects */}
             <Card padding="md" className={styles.alignStart}>
