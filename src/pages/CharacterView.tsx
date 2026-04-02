@@ -835,11 +835,12 @@ export function CharacterView() {
         {activeTab === 'feats' && (
           <Card padding="md">
             <div className={styles.sectionHeaderRow}>
-              <h3 className={styles.sectionTitle}>Dotes ({character.feats.length})</h3>
+              <h3 className={styles.sectionTitle}>Dotes ({character.feats.length}/{Math.ceil(character.level / 2)})</h3>
             </div>
             {isEditing ? (
               <FeatsSelector
                 selectedFeats={character.feats}
+                maxFeats={Math.ceil(character.level / 2)}
                 onAdd={(featId, specification) => {
                   updateCharacter(character.id, { feats: [...character.feats, { id: featId, specification }] })
                 }}

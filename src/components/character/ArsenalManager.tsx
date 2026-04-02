@@ -23,7 +23,7 @@ const ARMOR_TYPE_LABELS: Record<Armor['type'], string> = {
 }
 
 const DEFAULT_WEAPON = {
-  name: '', attackBonus: 0, damage: '1d6', critical: '×2', range: 'Melee', type: 'Cortante', notes: '',
+  name: '', attackBonus: 0, damage: '1d6', critical: '×2', range: 'melee', type: 'Cortante', notes: '',
 }
 const DEFAULT_ARMOR: Omit<Armor, 'id'> = {
   name: '', type: 'light', acBonus: 1, armorCheckPenalty: 0, maxDex: null,
@@ -131,9 +131,17 @@ export function ArsenalManager({
               <Input label="Crítico" value={newWeapon.critical}
                 onChange={(e) => setNewWeapon({ ...newWeapon, critical: e.target.value })}
                 placeholder="19–20/×2" />
-              <Input label="Alcance" value={newWeapon.range}
-                onChange={(e) => setNewWeapon({ ...newWeapon, range: e.target.value })}
-                placeholder="Melee / 30 ft" />
+              <div className={styles.formField}>
+                <label className={styles.formLabel}>Alcance</label>
+                <select
+                  className={styles.formSelect}
+                  value={newWeapon.range}
+                  onChange={(e) => setNewWeapon({ ...newWeapon, range: e.target.value })}
+                >
+                  <option value="melee">Cuerpo a cuerpo</option>
+                  <option value="ranged">A distancia</option>
+                </select>
+              </div>
               <Input label="Tipo de daño" value={newWeapon.type}
                 onChange={(e) => setNewWeapon({ ...newWeapon, type: e.target.value })}
                 placeholder="Cortante" />
@@ -165,8 +173,17 @@ export function ArsenalManager({
                         onChange={(e) => setEditingWeapon({ ...editingWeapon, damage: e.target.value })}/>
                       <Input label="Crítico" value={editingWeapon.critical}
                         onChange={(e) => setEditingWeapon({ ...editingWeapon, critical: e.target.value })}/>
-                      <Input label="Alcance" value={editingWeapon.range}
-                        onChange={(e) => setEditingWeapon({ ...editingWeapon, range: e.target.value })}/>
+                      <div className={styles.formField}>
+                        <label className={styles.formLabel}>Alcance</label>
+                        <select
+                          className={styles.formSelect}
+                          value={editingWeapon.range}
+                          onChange={(e) => setEditingWeapon({ ...editingWeapon, range: e.target.value })}
+                        >
+                          <option value="melee">Cuerpo a cuerpo</option>
+                          <option value="ranged">A distancia</option>
+                        </select>
+                      </div>
                       <Input label="Tipo de daño" value={editingWeapon.type}
                         onChange={(e) => setEditingWeapon({ ...editingWeapon, type: e.target.value })}/>
                       <Input label="Notas" value={editingWeapon.notes}
@@ -179,13 +196,13 @@ export function ArsenalManager({
                   </Card>
                 )
               }
-              const isRanged = /ft|ranged/i.test(w.range)
+              const isRanged = w.range === 'ranged'
               const total = calcAttack(w.attackBonus, isRanged)
               return (
                 <div key={w.id} className={styles.weaponRow}>
                   <div className={styles.weaponInfo}>
                     <span className={styles.itemName}>{w.name}</span>
-                    <span className={styles.itemMeta}>{w.type} · {w.range}{w.notes && ` · ${w.notes}`}</span>
+                    <span className={styles.itemMeta}>{w.type} · {w.range === 'melee' ? 'Cuerpo a cuerpo' : 'A distancia'}{w.notes && ` · ${w.notes}`}</span>
                   </div>
                   <div className={styles.weaponStats}>
                     <div className={styles.statCol}>

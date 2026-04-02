@@ -42,7 +42,10 @@
       "Bash(sed -i \"s/    source: 'apg' as const,\\\\n.*id: 'magus'/fix/\" src/data/classes.ts)",
       "Bash(sed -i '945s/apg/other/' src/data/classes.ts)",
       "Bash(sed -i '1130s/acg/other/' src/data/classes.ts)",
-      "Bash(node -e \"const { CLASSES } = require\\('./D:/Code/ClaudeWorkspace/Pathfinder-Nexus/src/data/classes.ts'\\)\")"
+      "Bash(node -e \"const { CLASSES } = require\\('./D:/Code/ClaudeWorkspace/Pathfinder-Nexus/src/data/classes.ts'\\)\")",
+      "Bash(node:*)",
+      "Bash(python3)",
+      "Bash(npx tsx:*)"
     ]
   }
 }

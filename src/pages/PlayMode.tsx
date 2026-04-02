@@ -768,8 +768,10 @@ export function PlayMode() {
                 <div className={styles.weaponList}>
                   {character.weapons && character.weapons.length > 0 ? (
                     character.weapons.map((weapon) => {
-                      const atkTotal = bab + weapon.attackBonus + effectAttack
-                      const dmgNotation = addModifierToNotation(weapon.damage, effectDamage)
+                      const isRanged = weapon.range === 'ranged'
+                      const atkTotal = bab + (isRanged ? dexMod : strMod) + weapon.attackBonus + effectAttack
+                      const dmgMod = isRanged ? dexMod : strMod
+                      const dmgNotation = addModifierToNotation(weapon.damage, effectDamage + dmgMod)
                       return (
                         <div key={weapon.id} className={styles.weaponRow}>
                           <div className={styles.weaponInfo}>

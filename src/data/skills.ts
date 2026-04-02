@@ -93,7 +93,7 @@ export const SKILLS: Skill[] = [
   },
   {
     id: 'craft',
-    name: 'Oficio',
+    name: 'Artesanía',
     ability: 'intelligence',
     isClassSkill: true,
     hasArmorCheckPenalty: false,

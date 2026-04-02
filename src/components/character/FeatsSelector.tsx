@@ -38,6 +38,7 @@ export function FeatsSelector({ selectedFeats, onAdd, onRemove, maxFeats }: Feat
   })
 
   const canAddMore = !maxFeats || selectedFeats.length < maxFeats
+  const availableFeats = maxFeats ? maxFeats - selectedFeats.length : null
 
   const instancesOf = (featId: string) =>
     selectedFeats.reduce<number[]>((acc, f, i) => { if (f.id === featId) acc.push(i); return acc }, [])
@@ -46,7 +47,7 @@ export function FeatsSelector({ selectedFeats, onAdd, onRemove, maxFeats }: Feat
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.stats}>
-          <span>Feats: {selectedFeats.length}{maxFeats ? `/${maxFeats}` : ''}</span>
+          <span>Dotes: {selectedFeats.length}{maxFeats ? `/${maxFeats}` : ''}{availableFeats !== null ? ` (${availableFeats} disponibles)` : ''}</span>
         </div>
         <div className={styles.filters}>
           <input
