@@ -11,6 +11,9 @@ export type MagicType = 'arcane' | 'divine' | 'bardic' | 'alchemist' | null
 // spellsPerDay[charLevel - 1][spellLevel] = number of slots (undefined = no access)
 export type SpellsPerDayTable = Array<Array<number | undefined>>
 
+// spellsKnown[charLevel - 1][spellLevel] = number of spells known (undefined = no access)
+export type SpellsKnownTable = Array<Array<number | undefined>>
+
 export interface ClassData {
   id: string
   name: string
@@ -28,6 +31,7 @@ export interface ClassData {
   casterAbility: 'intelligence' | 'wisdom' | 'charisma' | null
   startingGoldDice: string
   spellsPerDay?: SpellsPerDayTable
+  spellsKnown?: SpellsKnownTable
 }
 
 export const CLASSES: ClassData[] = [
@@ -402,14 +406,18 @@ export const CLASSES: ClassData[] = [
     skillPointsPerLevel: 2,
     classSkills: ['appraise', 'craft', 'fly', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_engineering', 'knowledge_geography', 'knowledge_history', 'knowledge_local', 'knowledge_nature', 'knowledge_nobility', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'profession', 'spellcraft', 'use_magic_device'],
     features: [
-      { name: 'Grimorio', level: 1, description: 'Tienes un libro de hechizos.' },
-      { name: 'Escuela de Especialización', level: 1, description: 'Te especializas en una escuela de magia.' },
-      { name: 'Descanso de Estudio', level: 1, description: 'Puedes preparar hechizos durante el descanso.' },
+      { name: 'Arcane Bond', level: 1, description: 'Estás vinculado a un objeto o familiar mágica.' },
+      { name: 'Escuela Arcana', level: 1, description: 'Te especializas en una escuela de magia (Abjuración, Conjuración, Encantamiento, Ilusión, Nigromancia, Transmutación, Universal).' },
+      { name: 'Cantrips', level: 1, description: 'Puedes lanzar hechizos de nivel 0 a voluntad.' },
+      { name: 'Scribe Scroll', level: 1, description: 'Puedes crear pergaminos de hechizos.' },
       { name: 'Hechizo de Grimorio', level: 3, description: 'Puedes copiar hechizos adicionales de pergaminos y otros grimorios.' },
-      { name: 'Hechizo en Bono', level: 5, description: 'Ganas un poder de escuela adicional.' },
+      { name: 'Talento de Bonus', level: 5, description: 'Ganas un talento de mago adicional.' },
       { name: 'Arma de Mago', level: 7, description: 'Puedes usar un tipo de arma marcial.' },
+      { name: 'Talento de Bonus', level: 10, description: 'Ganas un talento de mago adicional.' },
       { name: 'Grimorio Mejorado', level: 10, description: 'Tu grimorio gana protecciones mágicas.' },
+      { name: 'Talento de Bonus', level: 15, description: 'Ganas un talento de mago adicional.' },
       { name: 'Maestría Arcana', level: 15, description: 'Reduces el coste de componentes en hechizos de tu escuela.' },
+      { name: 'Talento de Bonus', level: 20, description: 'Ganas un talento de mago adicional.' },
       { name: 'Gran Maestría Arcana', level: 20, description: 'Tus hechizos de escuela ignoran resistencia a la magia.' },
     ],
     alignment: ['Cualquiera'],
@@ -611,17 +619,21 @@ export const CLASSES: ClassData[] = [
     classSkills: ['craft', 'fly', 'heal', 'intimidate', 'knowledge_arcana', 'knowledge_history', 'knowledge_nature', 'knowledge_planes', 'profession', 'spellcraft', 'use_magic_device'],
     features: [
       { name: 'Familiar', level: 1, description: 'Obtienes un familiar especial que almacena tus hechizos.' },
+      { name: 'Cantrips', level: 1, description: 'Puedes lanzar hechizos de nivel 0 a voluntad.' },
+      { name: 'Hex', level: 1, description: 'Ganas un hex: poder de bruja que afecta a los enemigos.' },
       { name: 'Maldición de Bruja', level: 1, description: 'Puedes maldecir a los enemigos con efectos debilitantes.' },
       { name: 'Patrono', level: 1, description: 'Pides hechizos a un patrono misterioso.' },
-      { name: 'Hex', level: 2, description: 'Ganas hexes: poderes de bruja especiales de efecto variado.' },
-      { name: 'Hex', level: 4, description: 'Ganas hexes adicionales.' },
-      { name: 'Hex', level: 6, description: 'Ganas hexes adicionales.' },
-      { name: 'Hex', level: 8, description: 'Ganas hexes adicionales.' },
+      { name: 'Hex', level: 2, description: 'Ganas un hex adicional.' },
+      { name: 'Hex', level: 4, description: 'Ganas un hex adicional.' },
+      { name: 'Hex', level: 6, description: 'Ganas un hex adicional.' },
+      { name: 'Hex', level: 8, description: 'Ganas un hex adicional.' },
       { name: 'Gran Hex', level: 10, description: 'Accedes a hexes de mayor poder.' },
-      { name: 'Hex', level: 12, description: 'Ganas hexes adicionales.' },
-      { name: 'Hex', level: 14, description: 'Ganas hexes adicionales.' },
-      { name: 'Hex', level: 16, description: 'Ganas hexes adicionales.' },
-      { name: 'Hex Mayor', level: 18, description: 'Accedes a los hexes más poderosos de la bruja.' },
+      { name: 'Hex Mayor', level: 10, description: 'Ganas un hex de nivel alto.' },
+      { name: 'Hex', level: 12, description: 'Ganas un hex adicional.' },
+      { name: 'Hex', level: 14, description: 'Ganas un hex adicional.' },
+      { name: 'Hex', level: 16, description: 'Ganas un hex adicional.' },
+      { name: 'Gran Hexágono', level: 18, description: 'Accedes a los hexes más poderosos.' },
+      { name: 'Hex', level: 20, description: 'Ganas un hex adicional.' },
     ],
     alignment: ['Cualquiera'],
     description: 'Lanzadoras arcanas conectadas a misteriosos patrones a través de familiares.',
@@ -748,108 +760,119 @@ export const CLASSES: ClassData[] = [
     classSkills: ['craft', 'fly', 'handle_animal', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_engineering', 'knowledge_local', 'knowledge_nature', 'knowledge_nobility', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'profession', 'ride', 'spellcraft', 'use_magic_device'],
     features: [
       { name: 'Eidolón', level: 1, description: 'Estás vinculado a una criatura mágica que crece con tu poder.' },
-      { name: 'Lazo', level: 1, description: 'Tu vínculo con el eidolón te otorga poderes especiales.' },
+      { name: 'Life Link', level: 1, description: 'Compartes daño con tu eidolón.' },
+      { name: 'Cantrips', level: 1, description: 'Puedes lanzar hechizos de nivel 0 a voluntad.' },
       { name: 'Invocación (SM I)', level: 1, description: 'Puedes convocar criaturas como conjuración summon.' },
       { name: 'Evolucionar Eidolón', level: 1, description: 'Tu eidolón gana puntos de evolución para mejorar sus capacidades.' },
-      { name: 'Fusión Carnal', level: 4, description: 'Puedes fusionarte con tu eidolón.' },
-      { name: 'Invocación Mejorada', level: 7, description: 'Invocaciones más poderosas.' },
-      { name: 'Fusión Carnal Mejorada', level: 9, description: 'Fusión más efectiva con el eidolón.' },
-      { name: 'Invocación Mejorada', level: 11, description: 'Invocaciones más poderosas.' },
-      { name: 'Fuerza del Transporte', level: 12, description: 'Tu convocación se acelera.' },
-      { name: 'Invocación Mejorada', level: 15, description: 'Invocaciones más poderosas.' },
-      { name: 'Gran Invocación', level: 19, description: 'Puedes invocar criaturas extremadamente poderosas.' },
-      { name: 'Vínculo Eterno', level: 20, description: 'Tu vínculo con el eidolón trasciende la vida y la muerte.' },
+      { name: 'Bond Senses', level: 2, description: 'Puedes usar los sentidos de tu eidolón.' },
+      { name: 'Invocación (SM II)', level: 3, description: 'Puedes invocar monstruos de nivel 2.' },
+      { name: 'Shield Ally', level: 4, description: 'Tu eidolón puede protegerte.' },
+      { name: 'Invocación (SM III)', level: 5, description: 'Puedes invocar monstruos de nivel 3.' },
+      { name: 'Maker\'s Call', level: 6, description: 'Puedes llamar a tu eidolón a tu lado.' },
+      { name: 'Invocación (SM IV)', level: 7, description: 'Puedes invocar monstruos de nivel 4.' },
+      { name: 'Transposition', level: 8, description: 'Puedes intercambiaposiciones con tu eidolón.' },
+      { name: 'Invocación (SM V)', level: 9, description: 'Puedes invocar monstruos de nivel 5.' },
+      { name: 'Aspect', level: 10, description: 'Tu eidolón puede adoptar una forma alternativa.' },
+      { name: 'Invocación (SM VI)', level: 11, description: 'Puedes invocar monstruos de nivel 6.' },
+      { name: 'Greater Shield Ally', level: 12, description: 'Tu eidolón te protege mejor.' },
+      { name: 'Invocación (SM VII)', level: 13, description: 'Puedes invocar monstruos de nivel 7.' },
+      { name: 'Life Bond', level: 14, description: 'Protección adicional contra daño.' },
+      { name: 'Invocación (SM VIII)', level: 15, description: 'Puedes invocar monstruos de nivel 8.' },
+      { name: 'Merge Forms', level: 16, description: 'Puedes fusionarte completamente con tu eidolón.' },
+      { name: 'Invocación (SM IX)', level: 17, description: 'Puedes invocar monstruos de nivel 9.' },
+      { name: 'Greater Aspect', level: 18, description: 'Tu aspect se vuelve más poderoso.' },
+      { name: 'Gate', level: 19, description: 'Puedes invocar criaturas a través de un portal.' },
+      { name: 'Twin Eidolon', level: 20, description: 'Tu eidolón se divide en dos.' },
+    ],
+    spellsPerDay: [
+      [1],              // lv 1
+      [2],              // lv 2
+      [3],              // lv 3
+      [3, 1],           // lv 4
+      [4, 2],           // lv 5
+      [4, 3],           // lv 6
+      [4, 3, 1],        // lv 7
+      [4, 4, 2],        // lv 8
+      [5, 4, 3],        // lv 9
+      [5, 4, 3, 1],     // lv 10
+      [5, 4, 4, 2],     // lv 11
+      [5, 5, 4, 3],     // lv 12
+      [5, 5, 4, 3, 1],  // lv 13
+      [5, 5, 4, 4, 2],  // lv 14
+      [5, 5, 5, 4, 3],  // lv 15
+      [5, 5, 5, 4, 3, 1], // lv 16
+      [5, 5, 5, 4, 4, 2], // lv 17
+      [5, 5, 5, 5, 4, 3], // lv 18
+      [5, 5, 5, 5, 5, 4], // lv 19
+      [5, 5, 5, 5, 5, 5], // lv 20
+    ],
+    spellsKnown: [
+      [4, 2],           // lv 1
+      [5, 3],           // lv 2
+      [6, 4],           // lv 3
+      [6, 4, 2],        // lv 4
+      [6, 4, 3],        // lv 5
+      [6, 4, 4],        // lv 6
+      [6, 5, 4, 2],     // lv 7
+      [6, 5, 4, 3],     // lv 8
+      [6, 5, 4, 4],     // lv 9
+      [6, 5, 5, 4, 2],  // lv 10
+      [6, 6, 5, 4, 3],  // lv 11
+      [6, 6, 5, 4, 4],  // lv 12
+      [6, 6, 5, 5, 4, 2], // lv 13
+      [6, 6, 6, 5, 4, 3], // lv 14
+      [6, 6, 6, 5, 4, 4], // lv 15
+      [6, 6, 6, 5, 5, 4, 2], // lv 16
+      [6, 6, 6, 6, 5, 4, 3], // lv 17
+      [6, 6, 6, 6, 5, 4, 4], // lv 18
+      [6, 6, 6, 6, 5, 5, 4], // lv 19
+      [6, 6, 6, 6, 6, 5, 5], // lv 20
     ],
     alignment: ['Cualquiera'],
     description: 'Mágicos vinculados a un eidolón: una criatura extraplanar personalizable.',
     magicType: 'arcane',
     casterAbility: 'charisma',
     startingGoldDice: '2d6*10',
-    spellsPerDay: [
-      [4, 1],           // lv 1
-      [5, 2],           // lv 2
-      [5, 3],           // lv 3
-      [5, 3, 1],         // lv 4
-      [5, 4, 2],         // lv 5
-      [5, 4, 3],         // lv 6
-      [5, 4, 3, 1],       // lv 7
-      [5, 4, 4, 2],       // lv 8
-      [5, 5, 4, 3],       // lv 9
-      [5, 5, 4, 3, 1],     // lv 10
-      [5, 5, 4, 4, 2],     // lv 11
-      [5, 5, 5, 4, 3],     // lv 12
-      [5, 5, 5, 4, 3, 1],   // lv 13
-      [5, 5, 5, 4, 4, 2],   // lv 14
-      [5, 5, 5, 5, 4, 3],   // lv 15
-      [5, 5, 5, 5, 4, 3, 1], // lv 16
-      [5, 5, 5, 5, 4, 4, 2], // lv 17
-      [5, 5, 5, 5, 5, 4, 3], // lv 18
-      [5, 5, 5, 5, 5, 5, 4], // lv 19
-      [5, 5, 5, 5, 5, 5, 5], // lv 20
-    ],
   },
-  // ── Remaining Base Classes ──
   {
-    id: 'gunslinger',
-    name: 'Pistolero',
+    id: 'swashbuckler',
+    name: 'Espadachín',
     hitDie: 10,
     baseAttackBonus: 'good',
-    fortitudeSave: 'good',
+    fortitudeSave: 'poor',
     reflexSave: 'good',
     willSave: 'poor',
     skillPointsPerLevel: 4,
-    classSkills: ['acrobatics', 'bluff', 'climb', 'craft', 'handle_animal', 'heal', 'intimidate', 'knowledge_engineering', 'knowledge_local', 'perception', 'profession', 'ride', 'sleight_of_hand', 'survival', 'swim'],
+    classSkills: ['acrobatics', 'bluff', 'climb', 'craft', 'diplomacy', 'disguise', 'escape_artist', 'intimidate', 'knowledge_local', 'linguistics', 'perception', 'perform', 'profession', 'ride', 'sense_motive', 'sleight_of_hand', 'stealth', 'swim'],
     features: [
-      { name: 'Chispa', level: 1, description: 'Puntos de suerte que usas para hazañas y trucos de pistolero.' },
-      { name: 'Destreza con Armas de Fuego', level: 1, description: 'Usas DES en lugar de FUE para tiradas de ataque con armas de fuego.' },
-      { name: 'Trucos de Pistolero', level: 1, description: 'Aprendes trucos especiales de combate con armas de fuego.' },
-      { name: 'Disparo Rápido', level: 2, description: 'Puedes recargar como acción libre.' },
-      { name: 'Trucos de Pistolero', level: 4, description: 'Aprendes trucos adicionales.' },
-      { name: 'Disparo Certero', level: 5, description: 'Ignoras el rango de penalización y la cobertura parcial.' },
-      { name: 'Trucos de Pistolero', level: 7, description: 'Aprendes trucos adicionales.' },
-      { name: 'Trucos de Pistolero', level: 9, description: 'Aprendes trucos adicionales.' },
-      { name: 'Gran Disparo', level: 11, description: 'Tus disparos son extremadamente precisos.' },
-      { name: 'Trucos de Pistolero', level: 13, description: 'Aprendes trucos adicionales.' },
-      { name: 'Trucos de Pistolero', level: 15, description: 'Aprendes trucos adicionales.' },
-      { name: 'Trucos de Pistolero', level: 17, description: 'Aprendes trucos adicionales.' },
-      { name: 'Maestro Pistolero', level: 20, description: 'Alcanzas la cima del dominio de las armas de fuego.' },
+      { name: 'Hechos', level: 1, description: 'Puntos de suerte que puedes usar para diversas acciones.' },
+      { name: 'Estilo', level: 1, description: 'Eliges un estilo de combate con el espadachín.' },
+      { name: 'Delicadeza de Espada', level: 1, description: 'Puedes usar agilidad con espadas.' },
+      { name: 'Vida Encantada 3/día', level: 2, description: 'Puedes obtener puntos de vida temporales.' },
+      { name: 'Hechos Ágiles +1', level: 3, description: '+1 a una tirada de ataque o daño.' },
+      { name: 'Hazaña de Espada', level: 4, description: 'Ganas una hazaña de espadachín.' },
+      { name: 'Entrenamiento con Armas +1', level: 5, description: '+1 a ataques y daño con espadas.' },
+      { name: 'Vida Encantada 4/día', level: 6, description: 'Puedes obtener más puntos de vida temporales.' },
+      { name: 'Hechos Ágiles +2', level: 7, description: '+2 a una tirada de ataque o daño.' },
+      { name: 'Hazaña de Espada', level: 8, description: 'Ganas una hazaña de espadachín.' },
+      { name: 'Entrenamiento con Armas +2', level: 9, description: '+2 a ataques y daño con espadas.' },
+      { name: 'Vida Encantada 5/día', level: 10, description: 'Puedes obtener más puntos de vida temporales.' },
+      { name: 'Hechos Ágiles +3', level: 11, description: '+3 a una tirada de ataque o daño.' },
+      { name: 'Hazaña de Espada', level: 12, description: 'Ganas una hazaña de espadachín.' },
+      { name: 'Entrenamiento con Armas +3', level: 13, description: '+3 a ataques y daño con espadas.' },
+      { name: 'Vida Encantada 6/día', level: 14, description: 'Puedes obtener más puntos de vida temporales.' },
+      { name: 'Hechos Ágiles +4', level: 15, description: '+4 a una tirada de ataque o daño.' },
+      { name: 'Hazaña de Espada', level: 16, description: 'Ganas una hazaña de espadachín.' },
+      { name: 'Entrenamiento con Armas +4', level: 17, description: '+4 a ataques y daño con espadas.' },
+      { name: 'Vida Encantada 7/día', level: 18, description: 'Puedes obtener más puntos de vida temporales.' },
+      { name: 'Hechos Ágiles +5', level: 19, description: '+5 a una tirada de ataque o daño.' },
+      { name: 'Dominio de Espada', level: 20, description: 'Maestría absoluta con espadas.' },
     ],
     alignment: ['Cualquiera'],
-    description: 'Maestro de las armas de fuego que combina velocidad, precisión y chispa.',
+    description: 'Guerrero ágil que usa estilo y gracia con armas de espada.',
     magicType: null,
     casterAbility: null,
     startingGoldDice: '4d6*10',
-  },
-  {
-    id: 'shifter',
-    name: 'Cambiaformas',
-    hitDie: 10,
-    baseAttackBonus: 'good',
-    fortitudeSave: 'good',
-    reflexSave: 'good',
-    willSave: 'poor',
-    skillPointsPerLevel: 4,
-    classSkills: ['acrobatics', 'climb', 'fly', 'handle_animal', 'knowledge_nature', 'perception', 'profession', 'ride', 'stealth', 'survival', 'swim'],
-    features: [
-      { name: 'Aspecto de Cambista', level: 1, description: 'Adoptas aspectos de animales, ganando sus características parcialmente.' },
-      { name: 'Garras de Cambista', level: 1, description: 'Ataques de garra que mejoran según el aspecto adoptado.' },
-      { name: 'Forma Salvaje', level: 4, description: 'Puedes transformarte completamente en animal.' },
-      { name: 'Aspecto Menor', level: 4, description: 'Puedes activar dos aspectos simultáneamente.' },
-      { name: 'Garras de Cambista +1', level: 6, description: 'Tus ataques de garra mejoran.' },
-      { name: 'Garras de Cambista +2', level: 8, description: 'Tus ataques de garra mejoran.' },
-      { name: 'Aspecto Mayor', level: 9, description: 'Tus aspectos se potencian enormemente.' },
-      { name: 'Garras de Cambista +3', level: 10, description: 'Tus ataques de garra mejoran.' },
-      { name: 'Garras de Cambista +4', level: 12, description: 'Tus ataques de garra mejoran.' },
-      { name: 'Garras de Cambista +5', level: 14, description: 'Tus ataques de garra mejoran.' },
-      { name: 'Garras de Cambista +6', level: 16, description: 'Tus ataques de garra mejoran.' },
-      { name: 'Garras de Cambista +7', level: 18, description: 'Tus ataques de garra mejoran.' },
-      { name: 'Forma Legendaria', level: 20, description: 'Te transformas en una criatura legendaria.' },
-    ],
-    alignment: ['Neutral'],
-    description: 'Guardián de la naturaleza que adopta formas y aspectos animales.',
-    magicType: null,
-    casterAbility: null,
-    startingGoldDice: '3d6*10',
   },
   {
     id: 'vigilante',
@@ -862,446 +885,36 @@ export const CLASSES: ClassData[] = [
     skillPointsPerLevel: 6,
     classSkills: ['acrobatics', 'bluff', 'climb', 'craft', 'diplomacy', 'disguise', 'escape_artist', 'intimidate', 'knowledge_local', 'knowledge_nobility', 'linguistics', 'perception', 'perform', 'profession', 'sense_motive', 'sleight_of_hand', 'stealth', 'swim', 'use_magic_device'],
     features: [
-      { name: 'Identidad Doble', level: 1, description: 'Tienes dos identidades: una social y una de vigilante con habilidades distintas.' },
-      { name: 'Cambio de Identidad', level: 1, description: 'Cambias de identidad en 1 minuto.' },
-      { name: 'Talentos de Vigilante', level: 2, description: 'Ganas talentos especiales de vigilante.' },
-      { name: 'Visión en la Oscuridad', level: 3, description: 'Puedes ver en la oscuridad.' },
-      { name: 'Talentos de Vigilante', level: 4, description: 'Ganas talentos adicionales.' },
-      { name: 'Estilo de Lucha', level: 4, description: 'Adoptas un estilo de combate único.' },
-      { name: 'Talentos de Vigilante', level: 6, description: 'Ganas talentos adicionales.' },
-      { name: 'Talentos de Vigilante', level: 8, description: 'Ganas talentos adicionales.' },
-      { name: 'Talentos de Vigilante', level: 10, description: 'Ganas talentos adicionales.' },
-      { name: 'Ataque sin Dejar Rastro', level: 11, description: 'Tus ataques no pueden rastrearse hasta tu identidad social.' },
-      { name: 'Talentos de Vigilante', level: 12, description: 'Ganas talentos adicionales.' },
-      { name: 'Talentos de Vigilante', level: 14, description: 'Ganas talentos adicionales.' },
-      { name: 'Talentos de Vigilante', level: 16, description: 'Ganas talentos adicionales.' },
-      { name: 'Talentos de Vigilante', level: 18, description: 'Ganas talentos adicionales.' },
-      { name: 'Identidad Legendaria', level: 20, description: 'Tu identidad de vigilante se convierte en leyenda.' },
+      { name: 'Doble Identidad', level: 1, description: 'Tienes una identidad social y una de vigilante.' },
+      { name: 'Apariencia Perfecta', level: 1, description: 'Tu identidad social es irreconocible.' },
+      { name: 'Talento Social', level: 1, description: 'Ganas talentos sociales.' },
+      { name: 'Especialización de Vigilante', level: 1, description: 'Te especializas en un tipo de vigilante.' },
+      { name: 'Talento de Vigilante', level: 2, description: 'Ganas un talento de vigilante.' },
+      { name: 'Talento Social', level: 3, description: 'Ganas un talento social adicional.' },
+      { name: 'Inquebrantable', level: 3, description: '+2 a TS contra efectos de miedo y encantamiento.' },
+      { name: 'Talento de Vigilante', level: 4, description: 'Ganas un talento de vigilante.' },
+      { name: 'Talento Social', level: 5, description: 'Ganas un talento social adicional.' },
+      { name: 'Apariencia Sorprendente', level: 5, description: 'Tu aparición causa sorpresa.' },
+      { name: 'Talento de Vigilante', level: 6, description: 'Ganas un talento de vigilante.' },
+      { name: 'Talento Social', level: 7, description: 'Ganas un talento social adicional.' },
+      { name: 'Talento de Vigilante', level: 8, description: 'Ganas un talento de vigilante.' },
+      { name: 'Talento Social', level: 9, description: 'Ganas un talento social adicional.' },
+      { name: 'Talento de Vigilante', level: 10, description: 'Ganas un talento de vigilante.' },
+      { name: 'Aspecto Aterrador', level: 11, description: 'Tu apariencia asusta a los enemigos.' },
+      { name: 'Talento Social', level: 11, description: 'Ganas un talento social adicional.' },
+      { name: 'Talento de Vigilante', level: 12, description: 'Ganas un talento de vigilante.' },
+      { name: 'Talento Social', level: 13, description: 'Ganas un talento social adicional.' },
+      { name: 'Talento de Vigilante', level: 14, description: 'Ganas un talento de vigilante.' },
+      { name: 'Talento Social', level: 15, description: 'Ganas un talento social adicional.' },
+      { name: 'Talento de Vigilante', level: 16, description: 'Ganas un talento de vigilante.' },
+      { name: 'Apariencia Impresionante', level: 17, description: 'Tu presencia es intimidante.' },
+      { name: 'Talento Social', level: 17, description: 'Ganas un talento social adicional.' },
+      { name: 'Talento de Vigilante', level: 18, description: 'Ganas un talento de vigilante.' },
+      { name: 'Talento Social', level: 19, description: 'Ganas un talento social adicional.' },
+      { name: 'Huelga de Venganza', level: 20, description: 'Golpe devastador contra enemigos.' },
     ],
     alignment: ['Cualquiera'],
-    description: 'Héroe de doble identidad que opera entre la sociedad y las sombras.',
-    magicType: null,
-    casterAbility: null,
-    startingGoldDice: '3d6*10',
-  },
-  // ── Hybrid Classes ──
-  {
-    id: 'arcanist',
-    name: 'Arcanista',
-    hitDie: 6,
-    baseAttackBonus: 'poor',
-    fortitudeSave: 'poor',
-    reflexSave: 'poor',
-    willSave: 'good',
-    skillPointsPerLevel: 2,
-    classSkills: ['appraise', 'craft', 'fly', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_engineering', 'knowledge_geography', 'knowledge_history', 'knowledge_local', 'knowledge_nature', 'knowledge_nobility', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'profession', 'spellcraft', 'use_magic_device'],
-    features: [
-      { name: 'Grimorio', level: 1, description: 'Tienes un grimorio que determina qué hechizos puedes preparar.' },
-      { name: 'Conjuros Conocidos', level: 1, description: 'Conoces hechizos como un hechicero.' },
-      { name: 'Explotación Arcana', level: 1, description: 'Consumes ranuras para activar explotaciones mágicas especiales.' },
-      { name: 'Explotaciones', level: 3, description: 'Ganas explotaciones: poderes arcanos especiales.' },
-      { name: 'Explotaciones', level: 5, description: 'Ganas explotaciones adicionales.' },
-      { name: 'Explotaciones', level: 7, description: 'Ganas explotaciones adicionales.' },
-      { name: 'Explotaciones', level: 9, description: 'Ganas explotaciones adicionales.' },
-      { name: 'Gran Explotación', level: 11, description: 'Accedes a las explotaciones más poderosas.' },
-      { name: 'Explotaciones', level: 13, description: 'Ganas explotaciones adicionales.' },
-      { name: 'Explotaciones', level: 15, description: 'Ganas explotaciones adicionales.' },
-      { name: 'Explotaciones', level: 17, description: 'Ganas explotaciones adicionales.' },
-      { name: 'Maestría Arcana', level: 20, description: 'Dominas la magia arcana como nadie más.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Fusión de mago y hechicero que combina preparación con magia innata.',
-    magicType: 'arcane',
-    casterAbility: 'intelligence',
-    startingGoldDice: '2d6*10',
-    spellsPerDay: [
-      [3, 1],               // lv 1
-      [4, 2],               // lv 2
-      [4, 2, 1],             // lv 3
-      [4, 3, 2],             // lv 4
-      [4, 3, 2, 1],           // lv 5
-      [4, 3, 3, 2],           // lv 6
-      [4, 4, 3, 2, 1],         // lv 7
-      [4, 4, 3, 3, 2],         // lv 8
-      [4, 4, 4, 3, 2, 1],       // lv 9
-      [4, 4, 4, 3, 3, 2],       // lv 10
-      [4, 4, 4, 4, 3, 2, 1],     // lv 11
-      [4, 4, 4, 4, 3, 3, 2],     // lv 12
-      [4, 4, 4, 4, 4, 3, 2, 1],   // lv 13
-      [4, 4, 4, 4, 4, 3, 3, 2],   // lv 14
-      [4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 15
-      [4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 16
-      [4, 4, 4, 4, 4, 4, 4, 3, 2, 1],// lv 17
-      [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],// lv 18
-      [4, 4, 4, 4, 4, 4, 4, 4, 3, 3],// lv 19
-      [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],// lv 20
-    ],
-  },
-  {
-    id: 'bloodrager',
-    name: 'Rabioso de Sangre',
-    hitDie: 10,
-    baseAttackBonus: 'good',
-    fortitudeSave: 'good',
-    reflexSave: 'poor',
-    willSave: 'poor',
-    skillPointsPerLevel: 4,
-    classSkills: ['acrobatics', 'climb', 'craft', 'handle_animal', 'intimidate', 'knowledge_arcana', 'knowledge_nature', 'perception', 'ride', 'spellcraft', 'survival', 'swim'],
-    features: [
-      { name: 'Linaje de Sangre', level: 1, description: 'Tienes un linaje mágico que potencia tu furia con efectos mágicos.' },
-      { name: 'Furia de Sangre', level: 1, description: 'Entras en furia y simultáneamente canalizas poder mágico.' },
-      { name: 'Hechizos', level: 4, description: 'A partir del nivel 4 puedes lanzar hechizos mientras estás en furia.' },
-      { name: 'Hechizos', level: 5, description: 'Accedes a hechizos adicionales.' },
-      { name: 'Hechizos', level: 6, description: 'Accedes a hechizos adicionales.' },
-      { name: 'Poder de Linaje', level: 8, description: 'Tu linaje te otorga poderes especiales.' },
-      { name: 'Hechizos', level: 9, description: 'Accedes a hechizos adicionales.' },
-      { name: 'Hechizos', level: 11, description: 'Accedes a hechizos adicionales.' },
-      { name: 'Hechizos', level: 13, description: 'Accedes a hechizos adicionales.' },
-      { name: 'Hechizos', level: 15, description: 'Accedes a hechizos adicionales.' },
-      { name: 'Hechizos', level: 17, description: 'Accedes a hechizos adicionales.' },
-      { name: 'Gran Furia de Sangre', level: 15, description: 'Tu furia mágica alcanza su apogeo.' },
-      { name: 'Hechizos', level: 19, description: 'Accedes a hechizos adicionales.' },
-    ],
-    alignment: ['No Legal'],
-    description: 'Berserker con linaje mágico que lanza hechizos en plena furia.',
-    magicType: 'arcane',
-    casterAbility: 'charisma',
-    startingGoldDice: '3d6*10',
-    spellsPerDay: [
-      [],              // lv 1 (no spells)
-      [],              // lv 2
-      [],              // lv 3
-      [1],             // lv 4
-      [1],             // lv 5
-      [2],             // lv 6
-      [2],             // lv 7
-      [2, 1],           // lv 8
-      [2, 1],           // lv 9
-      [3, 1],           // lv 10
-      [3, 1],           // lv 11
-      [3, 2, 1],         // lv 12
-      [3, 2, 1],         // lv 13
-      [4, 2, 1],         // lv 14
-      [4, 2, 1],         // lv 15
-      [4, 3, 2, 1],       // lv 16
-      [4, 3, 2, 1],       // lv 17
-      [4, 3, 2, 1],       // lv 18
-      [4, 3, 3, 1],       // lv 19
-      [4, 4, 3, 2],       // lv 20
-    ],
-  },
-  {
-    id: 'brawler',
-    name: 'Luchador',
-    hitDie: 10,
-    baseAttackBonus: 'good',
-    fortitudeSave: 'good',
-    reflexSave: 'good',
-    willSave: 'poor',
-    skillPointsPerLevel: 4,
-    classSkills: ['acrobatics', 'climb', 'craft', 'escape_artist', 'handle_animal', 'intimidate', 'knowledge_dungeoneering', 'knowledge_local', 'linguistics', 'perception', 'profession', 'ride', 'sense_motive', 'sleight_of_hand', 'stealth', 'swim'],
-    features: [
-      { name: 'Golpe sin Arma', level: 1, description: 'Lucha a mano desnuda con efectividad.' },
-      { name: 'Flurry of Blows', level: 1, description: 'Puedes realizar ataques adicionales con armas de monje.' },
-      { name: 'Combate Marcial', level: 2, description: 'Puedes aplicar dotes de combate temporalmente.' },
-      { name: 'Connivencia +1', level: 3, description: '+1 a CMB en maniobras de combate.' },
-      { name: 'Combate Marcial', level: 4, description: 'Puedes aplicar dotes adicionales.' },
-      { name: 'Connivencia +2', level: 6, description: '+2 a CMB en maniobras de combate.' },
-      { name: 'Combate Marcial', level: 6, description: 'Puedes aplicar dotes adicionales.' },
-      { name: 'Connivencia +3', level: 9, description: '+3 a CMB en maniobras de combate.' },
-      { name: 'Combate Marcial', level: 8, description: 'Puedes aplicar dotes adicionales.' },
-      { name: 'Combate Marcial', level: 10, description: 'Puedes aplicar dotes adicionales.' },
-      { name: 'Connivencia +4', level: 12, description: '+4 a CMB en maniobras de combate.' },
-      { name: 'Combate Marcial', level: 12, description: 'Puedes aplicar dotes adicionales.' },
-      { name: 'Combate Marcial', level: 14, description: 'Puedes aplicar dotes adicionales.' },
-      { name: 'Gran Golpe sin Arma', level: 15, description: 'Tu golpe sin arma ignora reducción de daño.' },
-      { name: 'Connivencia +5', level: 15, description: '+5 a CMB en maniobras de combate.' },
-      { name: 'Combate Marcial', level: 16, description: 'Puedes aplicar dotes adicionales.' },
-      { name: 'Combate Marcial', level: 18, description: 'Puedes aplicar dotes adicionales.' },
-      { name: 'Maestro del Combate', level: 20, description: 'Alcanzas la perfección en combate sin armas.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Combatiente sin armas que combina la fuerza del guerrero con las artes marciales del monje.',
-    magicType: null,
-    casterAbility: null,
-    startingGoldDice: '3d6*10',
-  },
-  {
-    id: 'hunter',
-    name: 'Cazador',
-    hitDie: 8,
-    baseAttackBonus: 'medium',
-    fortitudeSave: 'good',
-    reflexSave: 'good',
-    willSave: 'poor',
-    skillPointsPerLevel: 6,
-    classSkills: ['climb', 'craft', 'handle_animal', 'heal', 'knowledge_dungeoneering', 'knowledge_geography', 'knowledge_nature', 'perception', 'profession', 'ride', 'spellcraft', 'stealth', 'survival', 'swim'],
-    features: [
-      { name: 'Compañero Animal', level: 1, description: 'Tienes un compañero animal con poderes mejorados.' },
-      { name: 'Enemigo Favorito +2', level: 1, description: '+2 a ataque, daño, Conocimiento, Percepción, Supervivencia vs tipo elegido.' },
-      { name: 'Terreno Favorito +2', level: 3, description: '+2 Iniciativa y bonificadores en terreno elegido.' },
-      { name: 'Tácticas Conjuntas', level: 3, description: 'Tú y tu compañero comparten dotes de trabajo en equipo.' },
-      { name: 'Enemigo Favorito +4', level: 5, description: '+4 a ataque, daño, Conocimiento, Percepción, Supervivencia vs tipo elegido.' },
-      { name: 'Terreno Favorito +4', level: 6, description: '+4 Iniciativa y bonificadores en terreno elegido.' },
-      { name: 'Enemigo Favorito +6', level: 7, description: '+6 a ataque, daño, Conocimiento, Percepción, Supervivencia vs tipo elegido.' },
-      { name: 'Terreno Favorito +6', level: 9, description: '+6 Iniciativa y bonificadores en terreno elegido.' },
-      { name: 'Enemigo Favorito +8', level: 9, description: '+8 a ataque, daño, Conocimiento, Percepción, Supervivencia vs tipo elegido.' },
-      { name: 'Terreno Favorito +8', level: 12, description: '+8 Iniciativa y bonificadores en terreno elegido.' },
-      { name: 'Enemigo Favorito +10', level: 11, description: '+10 a ataque, daño, Conocimiento, Percepción, Supervivencia vs tipo elegido.' },
-      { name: 'Enemigo Favorito +12', level: 13, description: '+12 a ataque, daño, Conocimiento, Percepción, Supervivencia vs tipo elegido.' },
-      { name: 'Terreno Favorito +10', level: 15, description: '+10 Iniciativa y bonificadores en terreno elegido.' },
-      { name: 'Gran Compañero', level: 14, description: 'Tu compañero se vuelve extraordinariamente poderoso.' },
-      { name: 'Enemigo Favorito +14', level: 15, description: '+14 a ataque, daño, Conocimiento, Percepción, Supervivencia vs tipo elegido.' },
-      { name: 'Enemigo Favorito +16', level: 17, description: '+16 a ataque, daño, Conocimiento, Percepción, Supervivencia vs tipo elegido.' },
-      { name: 'Terreno Favorito +12', level: 18, description: '+12 Iniciativa y bonificadores en terreno elegido.' },
-      { name: 'Enemigo Favorito +18', level: 19, description: '+18 a ataque, daño, Conocimiento, Percepción, Supervivencia vs tipo elegido.' },
-      { name: 'Enemigo Favorito +20', level: 20, description: '+20 a ataque, daño, Conocimiento, Percepción, Supervivencia vs tipo elegido.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Rastreador con compañero animal que combina lo mejor del druida y el explorador.',
-    magicType: 'divine',
-    casterAbility: 'wisdom',
-    startingGoldDice: '4d6*10',
-    spellsPerDay: [
-      [2, 1],           // lv 1
-      [3, 2],           // lv 2
-      [4, 3],           // lv 3
-      [4, 3, 1],         // lv 4
-      [4, 4, 2],         // lv 5
-      [5, 4, 3],         // lv 6
-      [5, 4, 3, 1],       // lv 7
-      [5, 4, 4, 2],       // lv 8
-      [5, 5, 4, 3],       // lv 9
-      [5, 5, 4, 3, 1],     // lv 10
-      [5, 5, 4, 4, 2],     // lv 11
-      [5, 5, 5, 4, 3],     // lv 12
-      [5, 5, 5, 4, 3, 1],   // lv 13
-      [5, 5, 5, 4, 4, 2],   // lv 14
-      [5, 5, 5, 5, 4, 3],   // lv 15
-      [5, 5, 5, 5, 4, 3, 1], // lv 16
-      [5, 5, 5, 5, 4, 4, 2], // lv 17
-      [5, 5, 5, 5, 5, 4, 3], // lv 18
-      [5, 5, 5, 5, 5, 5, 4], // lv 19
-      [5, 5, 5, 5, 5, 5, 5], // lv 20
-    ],
-  },
-  {
-    id: 'investigator',
-    name: 'Investigador',
-    hitDie: 8,
-    baseAttackBonus: 'medium',
-    fortitudeSave: 'poor',
-    reflexSave: 'good',
-    willSave: 'good',
-    skillPointsPerLevel: 6,
-    classSkills: ['acrobatics', 'appraise', 'bluff', 'climb', 'craft', 'diplomacy', 'disable_device', 'disguise', 'escape_artist', 'heal', 'intimidate', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_local', 'knowledge_nature', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'perception', 'perform', 'profession', 'sense_motive', 'sleight_of_hand', 'spellcraft', 'stealth', 'swim', 'use_magic_device'],
-    features: [
-      { name: 'Alquimia', level: 1, description: 'Creas extractos alquímicos y mutágenos.' },
-      { name: 'Inspiración', level: 1, description: 'Pool de inspiración para potenciar tiradas de habilidad e inteligencia.' },
-      { name: 'Estudio Rápido', level: 2, description: 'Estudias a un enemigo para mejorar ataques contra él.' },
-      { name: 'Talentos de Investigador', level: 3, description: 'Ganas talentos especiales de investigador.' },
-      { name: 'Talentos de Investigador', level: 5, description: 'Ganas talentos adicionales.' },
-      { name: 'Talentos de Investigador', level: 7, description: 'Ganas talentos adicionales.' },
-      { name: 'Talentos de Investigador', level: 9, description: 'Ganas talentos adicionales.' },
-      { name: 'Talentos de Investigador', level: 11, description: 'Ganas talentos adicionales.' },
-      { name: 'Gran Inspiración', level: 11, description: 'Tu inspiración mejora notablemente.' },
-      { name: 'Talentos de Investigador', level: 13, description: 'Ganas talentos adicionales.' },
-      { name: 'Talentos de Investigador', level: 15, description: 'Ganas talentos adicionales.' },
-      { name: 'Talentos de Investigador', level: 17, description: 'Ganas talentos adicionales.' },
-      { name: 'Genio Táctico', level: 20, description: 'Tu mente es excepcional en todo sentido.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Detective alquímico con extracts, inspiración y perspicacia fuera de lo común.',
-    magicType: 'alchemist',
-    casterAbility: 'intelligence',
-    startingGoldDice: '3d6*10',
-    spellsPerDay: [
-      [1],             // lv 1
-      [2],             // lv 2
-      [3],             // lv 3
-      [3, 1],           // lv 4
-      [4, 2],           // lv 5
-      [4, 3],           // lv 6
-      [4, 3, 1],         // lv 7
-      [4, 4, 2],         // lv 8
-      [5, 4, 3],         // lv 9
-      [5, 4, 3, 1],       // lv 10
-      [5, 4, 4, 2],       // lv 11
-      [5, 5, 4, 3],       // lv 12
-      [5, 5, 4, 3, 1],     // lv 13
-      [5, 5, 4, 4, 2],     // lv 14
-      [5, 5, 5, 4, 3],     // lv 15
-      [5, 5, 5, 4, 3, 1],   // lv 16
-      [5, 5, 5, 4, 4, 2],   // lv 17
-      [5, 5, 5, 5, 4, 3],   // lv 18
-      [5, 5, 5, 5, 5, 4],   // lv 19
-      [5, 5, 5, 5, 5, 5],   // lv 20
-    ],
-  },
-  {
-    id: 'shaman',
-    name: 'Chamán',
-    hitDie: 8,
-    baseAttackBonus: 'medium',
-    fortitudeSave: 'poor',
-    reflexSave: 'poor',
-    willSave: 'good',
-    skillPointsPerLevel: 4,
-    classSkills: ['craft', 'diplomacy', 'fly', 'handle_animal', 'heal', 'knowledge_arcana', 'knowledge_history', 'knowledge_nature', 'knowledge_planes', 'knowledge_religion', 'profession', 'ride', 'sense_motive', 'spellcraft', 'survival'],
-    features: [
-      { name: 'Espíritu', level: 1, description: 'Te vinculas a un espíritu primordial que otorga poderes y hechizos.' },
-      { name: 'Hechizos de Espíritu', level: 1, description: 'Los espíritus te conceden hechizos adicionales.' },
-      { name: 'Familiar del Espíritu', level: 1, description: 'Tu familiar almacena los secretos de tu espíritu.' },
-      { name: 'Espíritu Errante', level: 4, description: 'Puedes vincular un segundo espíritu temporalmente.' },
-      { name: 'Hechizos de Espíritu', level: 6, description: 'Los espíritus te conceden hechizos adicionales.' },
-      { name: 'Hechizos de Espíritu', level: 8, description: 'Los espíritus te conceden hechizos adicionales.' },
-      { name: 'Hechizos de Espíritu', level: 10, description: 'Los espíritus te conceden hechizos adicionales.' },
-      { name: 'Hechizos de Espíritu', level: 12, description: 'Los espíritus te conceden hechizos adicionales.' },
-      { name: 'Hechizos de Espíritu', level: 14, description: 'Los espíritus te conceden hechizos adicionales.' },
-      { name: 'Hechizos de Espíritu', level: 16, description: 'Los espíritus te conceden hechizos adicionales.' },
-      { name: 'Hechizos de Espíritu', level: 18, description: 'Los espíritus te conceden hechizos adicionales.' },
-      { name: 'Gran Espíritu', level: 20, description: 'Te fusionas completamente con tu espíritu.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Conjurador de espíritus que combina lo arcano de la bruja con lo divino del oráculo.',
-    magicType: 'divine',
-    casterAbility: 'wisdom',
-    startingGoldDice: '3d6*10',
-    spellsPerDay: [
-      [3, 1],               // lv 1
-      [4, 2],               // lv 2
-      [4, 2, 1],             // lv 3
-      [4, 3, 2],             // lv 4
-      [4, 3, 2, 1],           // lv 5
-      [4, 3, 3, 2],           // lv 6
-      [4, 4, 3, 2, 1],         // lv 7
-      [4, 4, 3, 3, 2],         // lv 8
-      [4, 4, 4, 3, 2, 1],       // lv 9
-      [4, 4, 4, 3, 3, 2],       // lv 10
-      [4, 4, 4, 4, 3, 2, 1],     // lv 11
-      [4, 4, 4, 4, 3, 3, 2],     // lv 12
-      [4, 4, 4, 4, 4, 3, 2, 1],   // lv 13
-      [4, 4, 4, 4, 4, 3, 3, 2],   // lv 14
-      [4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 15
-      [4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 16
-      [4, 4, 4, 4, 4, 4, 4, 3, 2, 1],// lv 17
-      [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],// lv 18
-      [4, 4, 4, 4, 4, 4, 4, 4, 3, 3],// lv 19
-      [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],// lv 20
-    ],
-  },
-  {
-    id: 'skald',
-    name: 'Escaldo',
-    hitDie: 8,
-    baseAttackBonus: 'medium',
-    fortitudeSave: 'good',
-    reflexSave: 'poor',
-    willSave: 'good',
-    skillPointsPerLevel: 4,
-    classSkills: ['acrobatics', 'bluff', 'climb', 'craft', 'diplomacy', 'escape_artist', 'intimidate', 'knowledge_arcana', 'knowledge_history', 'knowledge_local', 'knowledge_nature', 'knowledge_nobility', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'perception', 'perform', 'profession', 'ride', 'sense_motive', 'spellcraft', 'swim', 'use_magic_device'],
-    features: [
-      { name: 'Canto Bárbaro', level: 1, description: 'Tu canto de batalla inspira a los aliados a entrar en furia.' },
-      { name: 'Furia Enardecida', level: 1, description: 'Los aliados que escuchan tu canto obtienen bonificadores de furia.' },
-      { name: 'Conocimiento de Escaldo', level: 1, description: 'Conocimiento amplio en muchas áreas.' },
-      { name: 'Descanso sin Fatiga', level: 2, description: 'Tus aliados no sufren fatiga al salir de la furia.' },
-      { name: 'Furia Enardecida +1', level: 4, description: 'Los aliados obtienen bonificadores de furia adicionales.' },
-      { name: 'Furia Enardecida +2', level: 6, description: 'Los aliados obtienen bonificadores de furia adicionales.' },
-      { name: 'Furia Enardecida +3', level: 8, description: 'Los aliados obtienen bonificadores de furia adicionales.' },
-      { name: 'Furia Enardecida +4', level: 10, description: 'Los aliados obtienen bonificadores de furia adicionales.' },
-      { name: 'Gran Furia', level: 11, description: 'Tu canto otorga furia potenciada.' },
-      { name: 'Furia Enardecida +5', level: 12, description: 'Los aliados obtienen bonificadores de furia adicionales.' },
-      { name: 'Furia Enardecida +6', level: 14, description: 'Los aliados obtienen bonificadores de furia adicionales.' },
-      { name: 'Furia Enardecida +7', level: 16, description: 'Los aliados obtienen bonificadores de furia adicionales.' },
-      { name: 'Furia Enardecida +8', level: 18, description: 'Los aliados obtienen bonificadores de furia adicionales.' },
-      { name: 'Maestro Escaldo', level: 20, description: 'Tu canto inspira hazañas legendarias.' },
-    ],
-    alignment: ['No Legal'],
-    description: 'Bardo bárbaro que inspira a sus aliados con cantos de guerra furiosos.',
-    magicType: 'bardic',
-    casterAbility: 'charisma',
-    startingGoldDice: '3d6*10',
-    spellsPerDay: [
-      [2, 1],           // lv 1
-      [3, 2],           // lv 2
-      [4, 3],           // lv 3
-      [4, 3, 1],         // lv 4
-      [4, 4, 2],         // lv 5
-      [5, 4, 3],         // lv 6
-      [5, 4, 3, 1],       // lv 7
-      [5, 4, 4, 2],       // lv 8
-      [5, 5, 4, 3],       // lv 9
-      [5, 5, 4, 3, 1],     // lv 10
-      [5, 5, 4, 4, 2],     // lv 11
-      [5, 5, 5, 4, 3],     // lv 12
-      [5, 5, 5, 4, 3, 1],   // lv 13
-      [5, 5, 5, 4, 4, 2],   // lv 14
-      [5, 5, 5, 5, 4, 3],   // lv 15
-      [5, 5, 5, 5, 4, 3, 1], // lv 16
-      [5, 5, 5, 5, 4, 4, 2], // lv 17
-      [5, 5, 5, 5, 5, 4, 3], // lv 18
-      [5, 5, 5, 5, 5, 5, 4], // lv 19
-      [5, 5, 5, 5, 5, 5, 5], // lv 20
-    ],
-  },
-  {
-    id: 'slayer',
-    name: 'Segador',
-    hitDie: 10,
-    baseAttackBonus: 'good',
-    fortitudeSave: 'good',
-    reflexSave: 'good',
-    willSave: 'poor',
-    skillPointsPerLevel: 6,
-    classSkills: ['acrobatics', 'bluff', 'climb', 'craft', 'disguise', 'handle_animal', 'heal', 'intimidate', 'knowledge_dungeoneering', 'knowledge_geography', 'knowledge_local', 'knowledge_nature', 'perception', 'profession', 'ride', 'sense_motive', 'stealth', 'survival', 'swim'],
-    features: [
-      { name: 'Estudio del Objetivo', level: 1, description: 'Estudias a un enemigo para aplicar daño de ataque furtivo.' },
-      { name: 'Ataque Furtivo', level: 1, description: 'Inflige daño extra a enemigos desprevenidos o flanqueados.' },
-      { name: 'Rastrear', level: 1, description: '+1 por nivel a Supervivencia para rastrear.' },
-      { name: 'Talento de Segador', level: 2, description: 'Ganas talentos especiales de pícaro o segador.' },
-      { name: 'Talento de Segador', level: 4, description: 'Ganas talentos adicionales.' },
-      { name: 'Talento de Segador', level: 6, description: 'Ganas talentos adicionales.' },
-      { name: 'Talento de Segador', level: 8, description: 'Ganas talentos adicionales.' },
-      { name: 'Talento de Segador', level: 10, description: 'Ganas talentos adicionales.' },
-      { name: 'Objetivo Marcado', level: 10, description: 'Aplicas bonificadores mejorados contra objetivos estudiados.' },
-      { name: 'Talento de Segador', level: 12, description: 'Ganas talentos adicionales.' },
-      { name: 'Talento de Segador', level: 14, description: 'Ganas talentos adicionales.' },
-      { name: 'Talento de Segador', level: 16, description: 'Ganas talentos adicionales.' },
-      { name: 'Talento de Segador', level: 18, description: 'Ganas talentos adicionales.' },
-      { name: 'Maestro de la Caza', level: 20, description: 'Ninguna presa puede escapar de ti.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Cazador letal que combina el rastreo del explorador con el sigilo del pícaro.',
-    magicType: null,
-    casterAbility: null,
-    startingGoldDice: '4d6*10',
-  },
-  {
-    id: 'swashbuckler',
-    name: 'Espadachín',
-    hitDie: 10,
-    baseAttackBonus: 'good',
-    fortitudeSave: 'poor',
-    reflexSave: 'good',
-    willSave: 'poor',
-    skillPointsPerLevel: 4,
-    classSkills: ['acrobatics', 'bluff', 'climb', 'craft', 'diplomacy', 'escape_artist', 'intimidate', 'knowledge_local', 'knowledge_nobility', 'perception', 'perform', 'profession', 'ride', 'sense_motive', 'sleight_of_hand', 'swim'],
-    features: [
-      { name: 'Gracia del Espadachín', level: 1, description: 'Añades DES a daño con espadas ligeras.' },
-      { name: 'Panache', level: 1, description: 'Puntos de panache que usas para hazañas y proezas.' },
-      { name: 'Proeza', level: 1, description: 'Hazañas de espadachín: maniobras elegantes de combate.' },
-      { name: 'Gracia del Combate', level: 3, description: 'Añades DES al daño con más armas.' },
-      { name: 'Recuperar Panache', level: 5, description: 'Recuperas panache al confirmar críticos.' },
-      { name: 'Gracia del Combate +1', level: 7, description: 'Añades DES al daño con armas adicionales.' },
-      { name: 'Recuperar Panache', level: 9, description: 'Recuperas panache al confirmar críticos.' },
-      { name: 'Gracia del Combate +2', level: 11, description: 'Añades DES al daño con armas adicionales.' },
-      { name: 'Recuperar Panache', level: 13, description: 'Recuperas panache al confirmar críticos.' },
-      { name: 'Gracia del Combate +3', level: 15, description: 'Añades DES al daño con armas adicionales.' },
-      { name: 'Recuperar Panache', level: 17, description: 'Recuperas panache al confirmar críticos.' },
-      { name: 'Maestro Espadachín', level: 20, description: 'Tu habilidad con la espada es legendaria.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Combatiente ágil y elegante que usa destreza y panache en lugar de fuerza bruta.',
+    description: 'Héroe con identidad secreta que usa habilidades sociales y de combate.',
     magicType: null,
     casterAbility: null,
     startingGoldDice: '3d6*10',
@@ -1309,408 +922,64 @@ export const CLASSES: ClassData[] = [
   {
     id: 'warpriest',
     name: 'Sacerdote de Guerra',
-    hitDie: 8,
+    hitDie: 10,
     baseAttackBonus: 'medium',
     fortitudeSave: 'good',
     reflexSave: 'poor',
     willSave: 'good',
     skillPointsPerLevel: 2,
-    classSkills: ['climb', 'craft', 'diplomacy', 'handle_animal', 'heal', 'intimidate', 'knowledge_religion', 'profession', 'ride', 'sense_motive', 'spellcraft', 'survival', 'swim'],
+    classSkills: ['appraise', 'craft', 'diplomacy', 'heal', 'intimidate', 'knowledge_arcana', 'knowledge_history', 'knowledge_religion', 'linguistics', 'profession', 'sense_motive', 'spellcraft'],
     features: [
-      { name: 'Ferviente de Arma', level: 1, description: 'Potencia tu arma sagrada con bendiciones divinas.' },
-      { name: 'Bendiciones', level: 1, description: 'Invocas bendiciones de tu deidad en combate.' },
-      { name: 'Fervor', level: 2, description: 'Pool de fervor para mejorar ataques y curaciones.' },
-      { name: 'Canalizar Energía', level: 4, description: 'Canaliza energía positiva o negativa.' },
-      { name: 'Bendiciones', level: 6, description: 'Invocas bendiciones adicionales.' },
-      { name: 'Bendiciones', level: 8, description: 'Invocas bendiciones adicionales.' },
-      { name: 'Bendiciones', level: 10, description: 'Invocas bendiciones adicionales.' },
-      { name: 'Sagrado de Arma', level: 12, description: 'Tu arma obtiene propiedades mágicas permanentes.' },
-      { name: 'Bendiciones', level: 14, description: 'Invocas bendiciones adicionales.' },
-      { name: 'Bendiciones', level: 16, description: 'Invocas bendiciones adicionales.' },
-      { name: 'Bendiciones', level: 18, description: 'Invocas bendiciones adicionales.' },
-      { name: 'Maestro de la Fe', level: 20, description: 'Tu fe y tu fuerza son absolutas.' },
+      { name: 'Aura', level: 1, description: 'Emites un aura de tu alineación.' },
+      { name: 'Blessings Menores', level: 1, description: 'Ganas bendiciones menores.' },
+      { name: 'Arma de Enfoque', level: 1, description: 'Obtienes competencia con un arma específica.' },
+      { name: 'Orisons', level: 1, description: 'Puedes preparar hechizos de nivel 0.' },
+      { name: 'Arma Sagrada 1d6', level: 1, description: 'Tu arma dealing daño sagrado.' },
+      { name: 'Fervor 1d6', level: 2, description: 'Puedes canalizar energía para darte energía sagrada.' },
+      { name: 'Hazaña de Guerra', level: 3, description: 'Ganas una hazaña de sacerdote de guerra.' },
+      { name: 'Arma Sagrada +1', level: 4, description: 'Tu arma sagrada es +1.' },
+      { name: 'Fervor 2d6', level: 5, description: 'Tu fervor se potencia a 2d6.' },
+      { name: 'Hazaña de Guerra', level: 6, description: 'Ganas una hazaña de sacerdote de guerra.' },
+      { name: 'Armadura Sagrada +1', level: 7, description: 'Tu armadura otorga bonificador sagrado.' },
+      { name: 'Arma Sagrada +2', level: 8, description: 'Tu arma sagrada es +2.' },
+      { name: 'Fervor 3d6', level: 8, description: 'Tu fervor se potencia a 3d6.' },
+      { name: 'Hazaña de Guerra', level: 9, description: 'Ganas una hazaña de sacerdote de guerra.' },
+      { name: 'Blessings Mayores', level: 10, description: 'Ganas bendiciones mayores.' },
+      { name: 'Armadura Sagrada +2', level: 10, description: 'Tu armadura otorga bonificador sagrado +2.' },
+      { name: 'Fervor 4d6', level: 11, description: 'Tu fervor se potencia a 4d6.' },
+      { name: 'Hazaña de Guerra', level: 12, description: 'Ganas una hazaña de sacerdote de guerra.' },
+      { name: 'Obra Extra', level: 12, description: 'Puedes realizar una acción adicional por día.' },
+      { name: 'Arma Sagrada +3', level: 12, description: 'Tu arma sagrada es +3.' },
+      { name: 'Armadura Sagrada +3', level: 13, description: 'Tu armadura otorga bonificador sagrado +3.' },
+      { name: 'Fervor 5d6', level: 14, description: 'Tu fervor se potencia a 5d6.' },
+      { name: 'Hazaña de Guerra', level: 15, description: 'Ganas una hazaña de sacerdote de guerra.' },
+      { name: 'Armadura Sagrada +4', level: 16, description: 'Tu armadura otorga bonificador sagrado +4.' },
+      { name: 'Arma Sagrada +4', level: 16, description: 'Tu arma sagrada es +4.' },
+      { name: 'Fervor 6d6', level: 17, description: 'Tu fervor se potencia a 6d6.' },
+      { name: 'Hazaña de Guerra', level: 18, description: 'Ganas una hazaña de sacerdote de guerra.' },
+      { name: 'Armadura Sagrada +5', level: 19, description: 'Tu armadura otorga bonificador sagrado +5.' },
+      { name: 'Aspecto de Guerra', level: 20, description: 'Tu presencia es terrorífica en combate.' },
+      { name: 'Fervor 7d6', level: 20, description: 'Tu fervor se potencia a 7d6.' },
+      { name: 'Arma Sagrada +5', level: 20, description: 'Tu arma sagrada es +5.' },
     ],
     alignment: ['Cualquiera'],
-    description: 'Combina la fuerza del guerrero con las bendiciones sagradas del clérigo.',
+    description: 'Sacerdote guerrero que combina magia divina con habilidades de combate.',
     magicType: 'divine',
     casterAbility: 'wisdom',
     startingGoldDice: '4d6*10',
-    spellsPerDay: [
-      [2, 1],           // lv 1
-      [3, 2],           // lv 2
-      [4, 3],           // lv 3
-      [4, 3, 1],         // lv 4
-      [4, 4, 2],         // lv 5
-      [5, 4, 3],         // lv 6
-      [5, 4, 3, 1],       // lv 7
-      [5, 4, 4, 2],       // lv 8
-      [5, 5, 4, 3],       // lv 9
-      [5, 5, 4, 3, 1],     // lv 10
-      [5, 5, 4, 4, 2],     // lv 11
-      [5, 5, 5, 4, 3],     // lv 12
-      [5, 5, 5, 4, 3, 1],   // lv 13
-      [5, 5, 5, 4, 4, 2],   // lv 14
-      [5, 5, 5, 5, 4, 3],   // lv 15
-      [5, 5, 5, 5, 4, 3, 1], // lv 16
-      [5, 5, 5, 5, 4, 4, 2], // lv 17
-      [5, 5, 5, 5, 5, 4, 3], // lv 18
-      [5, 5, 5, 5, 5, 5, 4], // lv 19
-      [5, 5, 5, 5, 5, 5, 5], // lv 20
-    ],
-  },
-  // ── Alternate Classes ──
-  {
-    id: 'antipaladin',
-    name: 'Antipaladín',
-    hitDie: 10,
-    baseAttackBonus: 'good',
-    fortitudeSave: 'good',
-    reflexSave: 'poor',
-    willSave: 'good',
-    skillPointsPerLevel: 2,
-    classSkills: ['bluff', 'craft', 'disguise', 'handle_animal', 'intimidate', 'knowledge_planes', 'knowledge_religion', 'profession', 'ride', 'sense_motive', 'spellcraft', 'stealth'],
-    features: [
-      { name: 'Detectar Bondad', level: 1, description: 'Detectas el bien a voluntad.' },
-      { name: 'Aura de Maldad', level: 1, description: 'Emites un aura de maldad.' },
-      { name: 'Golpe Profano', level: 1, description: 'Tus ataques pueden aplicar energía negativa.' },
-      { name: 'Toque Corruptor', level: 2, description: 'Tu toque causa enfermedades profanas.' },
-      { name: 'Montura Profana', level: 5, description: 'Obtienes una montura oscura.' },
-      { name: 'Toque Corruptor', level: 6, description: 'Tu toque causa enfermedades adicionales.' },
-      { name: 'Toque Corruptor', level: 10, description: 'Tu toque causa enfermedades adicionales.' },
-      { name: 'Toque Corruptor', level: 14, description: 'Tu toque causa enfermedades adicionales.' },
-      { name: 'Toque Corruptor', level: 18, description: 'Tu toque causa enfermedades adicionales.' },
-    ],
-    alignment: ['Legal Malvado'],
-    description: 'La contraparte oscura del paladín, un campeón del mal y la tiranía.',
-    magicType: 'divine',
-    casterAbility: 'charisma',
-    startingGoldDice: '5d6*10',
-    spellsPerDay: [
-      [], [], [],
-      [1], [1], [1],
-      [1, 0], [1, 0], [1, 1],
-      [2, 1, 0], [2, 1, 0], [2, 1, 1],
-      [2, 2, 1, 0], [2, 2, 1, 0], [2, 2, 1, 1],
-      [3, 2, 2, 1], [3, 2, 2, 1], [3, 3, 2, 1],
-      [3, 3, 3, 1], [4, 3, 3, 2],
-    ],
-  },
-  {
-    id: 'ninja',
-    name: 'Ninja',
-    hitDie: 8,
-    baseAttackBonus: 'medium',
-    fortitudeSave: 'poor',
-    reflexSave: 'good',
-    willSave: 'poor',
-    skillPointsPerLevel: 8,
-    classSkills: ['acrobatics', 'appraise', 'bluff', 'climb', 'craft', 'diplomacy', 'disable_device', 'disguise', 'escape_artist', 'intimidate', 'knowledge_local', 'linguistics', 'perception', 'perform', 'profession', 'sense_motive', 'sleight_of_hand', 'stealth', 'swim', 'use_magic_device'],
-    features: [
-      { name: 'Ataque Furtivo', level: 1, description: 'Daño extra contra enemigos desprevenidos o flanqueados.' },
-      { name: 'Reserva Ki', level: 2, description: 'Pool de ki para poderes místicos ninja.' },
-      { name: 'Sigilo Ligero', level: 2, description: 'Puedes usar Sigilo sin necesitar cobertura o distracción.' },
-      { name: 'Trucos Ninja', level: 2, description: 'Habilidades especiales del ninja que mejoran con nivel.' },
-      { name: 'Trucos Ninja', level: 4, description: 'Ganas truco ninja adicional.' },
-      { name: 'Desvanecerse', level: 4, description: 'Puedes volverte invisible como acción rápida.' },
-      { name: 'Trucos Ninja', level: 6, description: 'Ganas truco ninja adicional.' },
-      { name: 'Trucos Ninja', level: 8, description: 'Ganas truco ninja adicional.' },
-      { name: 'Trucos Ninja', level: 10, description: 'Ganas truco ninja adicional.' },
-      { name: 'Trucos Ninja', level: 12, description: 'Ganas truco ninja adicional.' },
-      { name: 'Trucos Ninja', level: 14, description: 'Ganas truco ninja adicional.' },
-      { name: 'Trucos Ninja', level: 16, description: 'Ganas truco ninja adicional.' },
-      { name: 'Trucos Ninja', level: 18, description: 'Ganas truco ninja adicional.' },
-      { name: 'Maestro Ninja', level: 20, description: 'Tu dominio de las artes ninja es absoluto.' },
-    ],
-    alignment: ['No Bueno'],
-    description: 'Espía y asesino que combina las habilidades del pícaro con poderes místicos ki.',
-    magicType: null,
-    casterAbility: null,
-    startingGoldDice: '4d6*10',
-  },
-  {
-    id: 'samurai',
-    name: 'Samurai',
-    hitDie: 10,
-    baseAttackBonus: 'good',
-    fortitudeSave: 'good',
-    reflexSave: 'poor',
-    willSave: 'poor',
-    skillPointsPerLevel: 4,
-    classSkills: ['bluff', 'climb', 'craft', 'diplomacy', 'handle_animal', 'intimidate', 'knowledge_history', 'knowledge_local', 'knowledge_nobility', 'perception', 'profession', 'ride', 'sense_motive', 'swim'],
-    features: [
-      { name: 'Orden', level: 1, description: 'Juras lealtad a un código de honor que define tus capacidades.' },
-      { name: 'Katana Resolvente', level: 1, description: 'Puedes hacer un ataque devastador con tu katana.' },
-      { name: 'Montura', level: 1, description: 'Obtienes una montura entrenada.' },
-      { name: 'Desafío', level: 1, description: 'Desafías a un enemigo: bonificadores de ataque y daño.' },
-      { name: 'Desafío', level: 4, description: 'Puedes desafiar a un enemigo.' },
-      { name: 'Desafío', level: 7, description: 'Puedes desafiar a un enemigo.' },
-      { name: 'Gran Resolución', level: 5, description: 'Tu voluntad es inquebrantable.' },
-      { name: 'Desafío', level: 10, description: 'Puedes desafiar a un enemigo.' },
-      { name: 'Desafío', level: 13, description: 'Puedes desafiar a un enemigo.' },
-      { name: 'Desafío', level: 16, description: 'Puedes desafiar a un enemigo.' },
-      { name: 'Desafío', level: 19, description: 'Puedes desafiar a un enemigo.' },
-      { name: 'Maestro Samurai', level: 20, description: 'Tu código es perfecto, tu filo es legendario.' },
-    ],
-    alignment: ['Legal'],
-    description: 'Guerrero noble guiado por un código de honor, maestro de la katana y el caballo.',
-    magicType: null,
-    casterAbility: null,
-    startingGoldDice: '3d6*10',
-  },
-  // ── Occult Classes ──
-  {
-    id: 'kineticist',
-    name: 'Kineticista',
-    hitDie: 8,
-    baseAttackBonus: 'medium',
-    fortitudeSave: 'good',
-    reflexSave: 'poor',
-    willSave: 'poor',
-    skillPointsPerLevel: 4,
-    classSkills: ['acrobatics', 'craft', 'heal', 'intimidate', 'knowledge_nature', 'perception', 'profession', 'stealth', 'use_magic_device'],
-    features: [
-      { name: 'Elemento Elemental', level: 1, description: 'Eliges un elemento (fuego, agua, tierra, aire, etc.) como tu dominio.' },
-      { name: 'Impulso Cinético', level: 1, description: 'Ataque especial de energía elemental sin necesidad de componentes.' },
-      { name: 'Quemadura', level: 1, description: 'Daño no letal acumulado al usar poderes cinéticos.' },
-      { name: 'Defensa Elemental', level: 2, description: 'Escudo de energía elemental que protege tu cuerpo.' },
-      { name: 'Aceptar Quemadura', level: 3, description: 'Puedes aumentar el daño de impulso aceptando más quemadura.' },
-      { name: 'Defensa Elemental +1', level: 5, description: 'Escudo de energía elemental mejorado.' },
-      { name: 'Defensa Elemental +2', level: 8, description: 'Escudo de energía elemental mejorado.' },
-      { name: 'Defensa Elemental +3', level: 11, description: 'Escudo de energía elemental mejorado.' },
-      { name: 'Defensa Elemental +4', level: 14, description: 'Escudo de energía elemental mejorado.' },
-      { name: 'Defensa Elemental +5', level: 17, description: 'Escudo de energía elemental mejorado.' },
-      { name: 'Maestro Elemental', level: 20, description: 'Tu control elemental es absoluto.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Canal viviente de energía elemental que lanza impulsos cinéticos sin hechizos.',
-    magicType: null,
-    casterAbility: null,
-    startingGoldDice: '2d6*10',
-  },
-  {
-    id: 'psychic',
-    name: 'Psíquico',
-    hitDie: 6,
-    baseAttackBonus: 'poor',
-    fortitudeSave: 'poor',
-    reflexSave: 'poor',
-    willSave: 'good',
-    skillPointsPerLevel: 2,
-    classSkills: ['bluff', 'craft', 'disguise', 'fly', 'intimidate', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_geography', 'knowledge_history', 'knowledge_local', 'knowledge_nature', 'knowledge_nobility', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'perception', 'profession', 'sense_motive', 'spellcraft'],
-    features: [
-      { name: 'Disciplina Psíquica', level: 1, description: 'Eliges una disciplina mental que define tu acceso a hechizos.' },
-      { name: 'Hechizos Psíquicos', level: 1, description: 'Lanzas hechizos psíquicos usando la mente en lugar de componentes verbales/somáticos.' },
-      { name: 'Componentes Pensamiento/Emoción', level: 1, description: 'Reemplazas V/S con componentes mentales.' },
-      { name: 'Phrenic Amplification', level: 1, description: 'Amplificaciones que potencian tus hechizos psíquicos.' },
-      { name: 'Poderes de Disciplina', level: 1, description: 'Poderes especiales de tu disciplina mental.' },
-      { name: 'Amplificación +1', level: 5, description: 'Phrenic Amplification se potencia.' },
-      { name: 'Amplificación +2', level: 10, description: 'Phrenic Amplification se potencia.' },
-      { name: 'Amplificación +3', level: 15, description: 'Phrenic Amplification se potencia.' },
-      { name: 'Gran Psíquico', level: 20, description: 'Tu mente trasciende lo humano.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Lanzador de hechizos psíquicos de máxima potencia que usa la mente como canal arcano.',
-    magicType: 'arcane',
-    casterAbility: 'intelligence',
-    startingGoldDice: '2d6*10',
     spellsPerDay: [
       [3, 1],               // lv 1
       [4, 2],               // lv 2
-      [4, 2, 1],             // lv 3
-      [4, 3, 2],             // lv 4
-      [4, 3, 2, 1],           // lv 5
-      [4, 3, 3, 2],           // lv 6
-      [4, 4, 3, 2, 1],         // lv 7
-      [4, 4, 3, 3, 2],         // lv 8
-      [4, 4, 4, 3, 2, 1],       // lv 9
-      [4, 4, 4, 3, 3, 2],       // lv 10
-      [4, 4, 4, 4, 3, 2, 1],     // lv 11
-      [4, 4, 4, 4, 3, 3, 2],     // lv 12
-      [4, 4, 4, 4, 4, 3, 2, 1],   // lv 13
-      [4, 4, 4, 4, 4, 3, 3, 2],   // lv 14
-      [4, 4, 4, 4, 4, 4, 3, 2, 1], // lv 15
-      [4, 4, 4, 4, 4, 4, 3, 3, 2], // lv 16
-      [4, 4, 4, 4, 4, 4, 4, 3, 2, 1],// lv 17
-      [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],// lv 18
-      [4, 4, 4, 4, 4, 4, 4, 4, 3, 3],// lv 19
-      [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],// lv 20
-    ],
-  },
-  {
-    id: 'mesmerist',
-    name: 'Mesmerista',
-    hitDie: 8,
-    baseAttackBonus: 'medium',
-    fortitudeSave: 'poor',
-    reflexSave: 'good',
-    willSave: 'good',
-    skillPointsPerLevel: 6,
-    classSkills: ['bluff', 'craft', 'diplomacy', 'disguise', 'escape_artist', 'intimidate', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_history', 'knowledge_local', 'knowledge_planes', 'linguistics', 'perception', 'perform', 'profession', 'sense_motive', 'sleight_of_hand', 'spellcraft', 'use_magic_device'],
-    features: [
-      { name: 'Mirada Hipnótica', level: 1, description: 'Tu mirada penetrante puede hipnotizar a los enemigos.' },
-      { name: 'Trucos de Mente', level: 1, description: 'Implanta sugestiones en las mentes de tus enemigos.' },
-      { name: 'Golpe Doloroso', level: 1, description: 'Tus ataques causan efectos mentales adicionales.' },
-      { name: 'Ilusiones Consumadas', level: 3, description: 'Tus ilusiones son extraordinariamente convincentes.' },
-      { name: 'Golpe Doloroso +1', level: 5, description: 'Tus ataques causan efectos mentales adicionales.' },
-      { name: 'Golpe Doloroso +2', level: 7, description: 'Tus ataques causan efectos mentales adicionales.' },
-      { name: 'Golpe Doloroso +3', level: 9, description: 'Tus ataques causan efectos mentales adicionales.' },
-      { name: 'Golpe Doloroso +4', level: 11, description: 'Tus ataques causan efectos mentales adicionales.' },
-      { name: 'Gran Hipnosis', level: 11, description: 'Tu hipnosis es prácticamente irresistible.' },
-      { name: 'Golpe Doloroso +5', level: 13, description: 'Tus ataques causan efectos mentales adicionales.' },
-      { name: 'Golpe Doloroso +6', level: 15, description: 'Tus ataques causan efectos mentales adicionales.' },
-      { name: 'Golpe Doloroso +7', level: 17, description: 'Tus ataques causan efectos mentales adicionales.' },
-      { name: 'Golpe Doloroso +8', level: 19, description: 'Tus ataques causan efectos mentales adicionales.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Maestro del encantamiento y la ilusión que controla mentes con su mirada.',
-    magicType: 'arcane',
-    casterAbility: 'charisma',
-    startingGoldDice: '3d6*10',
-    spellsPerDay: [
-      [2, 1],           // lv 1
-      [3, 2],           // lv 2
-      [4, 3],           // lv 3
-      [4, 3, 1],         // lv 4
-      [4, 4, 2],         // lv 5
-      [5, 4, 3],         // lv 6
-      [5, 4, 3, 1],       // lv 7
-      [5, 4, 4, 2],       // lv 8
-      [5, 5, 4, 3],       // lv 9
-      [5, 5, 4, 3, 1],     // lv 10
-      [5, 5, 4, 4, 2],     // lv 11
-      [5, 5, 5, 4, 3],     // lv 12
-      [5, 5, 5, 4, 3, 1],   // lv 13
-      [5, 5, 5, 4, 4, 2],   // lv 14
-      [5, 5, 5, 5, 4, 3],   // lv 15
-      [5, 5, 5, 5, 4, 3, 1], // lv 16
-      [5, 5, 5, 5, 4, 4, 2], // lv 17
-      [5, 5, 5, 5, 5, 4, 3], // lv 18
-      [5, 5, 5, 5, 5, 5, 4], // lv 19
-      [5, 5, 5, 5, 5, 5, 5], // lv 20
-    ],
-  },
-  {
-    id: 'occultist',
-    name: 'Ocultista',
-    hitDie: 8,
-    baseAttackBonus: 'medium',
-    fortitudeSave: 'good',
-    reflexSave: 'poor',
-    willSave: 'good',
-    skillPointsPerLevel: 4,
-    classSkills: ['appraise', 'craft', 'diplomacy', 'disguise', 'fly', 'heal', 'intimidate', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_engineering', 'knowledge_geography', 'knowledge_history', 'knowledge_local', 'knowledge_nature', 'knowledge_nobility', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'perception', 'profession', 'sense_motive', 'spellcraft', 'use_magic_device'],
-    features: [
-      { name: 'Implementos', level: 1, description: 'Canalizas energía psíquica a través de objetos mágicos.' },
-      { name: 'Escuelas de Implemento', level: 1, description: 'Cada implemento concede acceso a una escuela de magia.' },
-      { name: 'Enfoque Mental', level: 1, description: 'Pool de enfoque para activar poderes de implemento.' },
-      { name: 'Outsider del Implemento', level: 2, description: 'Puedes evocar poderes adicionales de los implementos.' },
-      { name: 'Enfoque Mental +1', level: 6, description: 'Pool de enfoque mental adicional.' },
-      { name: 'Enfoque Mental +2', level: 10, description: 'Pool de enfoque mental adicional.' },
-      { name: 'Enfoque Mental +3', level: 14, description: 'Pool de enfoque mental adicional.' },
-      { name: 'Gran Implemento', level: 18, description: 'Tus implementos alcanzan su potencia máxima.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Canaliza magia psíquica a través de antigüedades y objetos de poder.',
-    magicType: 'arcane',
-    casterAbility: 'intelligence',
-    startingGoldDice: '3d6*10',
-    spellsPerDay: [
-      [2, 1],           // lv 1
-      [3, 2],           // lv 2
-      [4, 3],           // lv 3
-      [4, 3, 1],         // lv 4
-      [4, 4, 2],         // lv 5
-      [5, 4, 3],         // lv 6
-      [5, 4, 3, 1],       // lv 7
-      [5, 4, 4, 2],       // lv 8
-      [5, 5, 4, 3],       // lv 9
-      [5, 5, 4, 3, 1],     // lv 10
-      [5, 5, 4, 4, 2],     // lv 11
-      [5, 5, 5, 4, 3],     // lv 12
-      [5, 5, 5, 4, 3, 1],   // lv 13
-      [5, 5, 5, 4, 4, 2],   // lv 14
-      [5, 5, 5, 5, 4, 3],   // lv 15
-      [5, 5, 5, 5, 4, 3, 1], // lv 16
-      [5, 5, 5, 5, 4, 4, 2], // lv 17
-      [5, 5, 5, 5, 5, 4, 3], // lv 18
-      [5, 5, 5, 5, 5, 5, 4], // lv 19
-      [5, 5, 5, 5, 5, 5, 5], // lv 20
-    ],
-  },
-  {
-    id: 'medium',
-    name: 'Médium',
-    hitDie: 8,
-    baseAttackBonus: 'medium',
-    fortitudeSave: 'poor',
-    reflexSave: 'poor',
-    willSave: 'good',
-    skillPointsPerLevel: 4,
-    classSkills: ['bluff', 'craft', 'diplomacy', 'fly', 'heal', 'intimidate', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_history', 'knowledge_local', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'perception', 'perform', 'profession', 'sense_motive', 'spellcraft', 'use_magic_device'],
-    features: [
-      { name: 'Canal de Espíritu', level: 1, description: 'Contactas espíritus legendarios en lugares de poder.' },
-      { name: 'Espíritus', level: 1, description: 'Canalizas uno de seis arquetipos de espíritu: Archmage, Champion, Guardian, Hierophant, Marshal, Trickster.' },
-      { name: 'Karma Espiritual', level: 1, description: 'Acumulas karma al invocar espíritus poderosos.' },
-      { name: 'Influencia de Espíritu', level: 4, description: 'El espíritu toma mayor influencia sobre ti.' },
-      { name: 'Influencia de Espíritu', level: 8, description: 'El espíritu toma mayor influencia sobre ti.' },
-      { name: 'Influencia de Espíritu', level: 12, description: 'El espíritu toma mayor influencia sobre ti.' },
-      { name: 'Influencia de Espíritu', level: 16, description: 'El espíritu toma mayor influencia sobre ti.' },
-      { name: 'Fusión de Espíritu', level: 20, description: 'Te fusionas permanentemente con un espíritu.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Canaliza la influencia de espíritus legendarios que alteran sus habilidades.',
-    magicType: 'arcane',
-    casterAbility: 'charisma',
-    startingGoldDice: '3d6*10',
-    spellsPerDay: [
-      [1], [1], [2], [2], [3], [3],
-      [3, 1], [3, 1], [4, 1], [4, 2],
-      [4, 2], [4, 3], [4, 3], [4, 3, 1],
-      [4, 4, 1], [4, 4, 2], [4, 4, 2], [4, 4, 3],
-      [4, 4, 3], [4, 4, 4],
-    ],
-  },
-  {
-    id: 'spiritualist',
-    name: 'Espiritista',
-    hitDie: 8,
-    baseAttackBonus: 'medium',
-    fortitudeSave: 'poor',
-    reflexSave: 'poor',
-    willSave: 'good',
-    skillPointsPerLevel: 4,
-    classSkills: ['bluff', 'craft', 'fly', 'heal', 'intimidate', 'knowledge_arcana', 'knowledge_dungeoneering', 'knowledge_history', 'knowledge_planes', 'knowledge_religion', 'linguistics', 'perception', 'profession', 'sense_motive', 'spellcraft', 'use_magic_device'],
-    features: [
-      { name: 'Fantasma', level: 1, description: 'Estás vinculado a un fantasma con asuntos inconclusos.' },
-      { name: 'Vínculo con el Fantasma', level: 1, description: 'El fantasma puede alternar entre forma etérea y ectoplásmica.' },
-      { name: 'Furia del Fantasma', level: 1, description: 'El fantasma puede enloquecer temporalmente en combate.' },
-      { name: 'Fusión Espiritual', level: 4, description: 'Puedes fusionarte con tu fantasma.' },
-      { name: 'Furia del Fantasma', level: 6, description: 'El fantasma puede enloquecer adicionalmente.' },
-      { name: 'Fusión Espiritual', level: 8, description: 'Puedes fusionarte con tu fantasma.' },
-      { name: 'Furia del Fantasma', level: 8, description: 'El fantasma puede enloquecer adicionalmente.' },
-      { name: 'Fusión Espiritual', level: 12, description: 'Puedes fusionarte con tu fantasma.' },
-      { name: 'Manifestación Poderosa', level: 12, description: 'El fantasma puede manifestarse con mayor fuerza.' },
-      { name: 'Furia del Fantasma', level: 12, description: 'El fantasma puede enloquecer adicionalmente.' },
-      { name: 'Unión Eterna', level: 20, description: 'Tu vínculo con el fantasma trasciende la muerte.' },
-    ],
-    alignment: ['Cualquiera'],
-    description: 'Vinculado a un fantasma ectoplásmico que lo acompaña y combate a su lado.',
-    magicType: 'divine',
-    casterAbility: 'wisdom',
-    startingGoldDice: '3d6*10',
-    spellsPerDay: [
-      [2, 1],           // lv 1
-      [3, 2],           // lv 2
-      [4, 3],           // lv 3
-      [4, 3, 1],         // lv 4
-      [4, 4, 2],         // lv 5
-      [5, 4, 3],         // lv 6
-      [5, 4, 3, 1],       // lv 7
-      [5, 4, 4, 2],       // lv 8
-      [5, 5, 4, 3],       // lv 9
-      [5, 5, 4, 3, 1],     // lv 10
-      [5, 5, 4, 4, 2],     // lv 11
-      [5, 5, 5, 4, 3],     // lv 12
+      [4, 3],               // lv 3
+      [4, 3, 1],            // lv 4
+      [4, 4, 2],            // lv 5
+      [5, 4, 3],            // lv 6
+      [5, 4, 3, 1],         // lv 7
+      [5, 4, 4, 2],         // lv 8
+      [5, 5, 4, 3],         // lv 9
+      [5, 5, 4, 3, 1],      // lv 10
+      [5, 5, 4, 4, 2],      // lv 11
+      [5, 5, 5, 4, 3],      // lv 12
       [5, 5, 5, 4, 3, 1],   // lv 13
       [5, 5, 5, 4, 4, 2],   // lv 14
       [5, 5, 5, 5, 4, 3],   // lv 15
