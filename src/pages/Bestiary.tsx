@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { PawPrint, Search, Skull, Flame, CloudRain, Mountain, TreeDeciduous, Users, Ghost, Sparkles, Bug, ChevronDown } from 'lucide-react'
-import { MONSTERS } from '../data/monsters'
+import { useMonsters } from '../hooks/useMonsters'
 import styles from './Bestiary.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
@@ -22,16 +22,48 @@ const CATEGORIES = [
   { id: 'vermin', label: 'Vermes', icon: <Bug size={14} /> },
 ]
 
+const CR_RANGES = [
+  { id: 'all', label: 'Cualquier CR' },
+  { id: '0', label: 'CR 0' },
+  { id: '1/8', label: 'CR 1/8' },
+  { id: '1/4', label: 'CR 1/4' },
+  { id: '1/2', label: 'CR 1/2' },
+  { id: '1-3', label: 'CR 1-3' },
+  { id: '4-6', label: 'CR 4-6' },
+  { id: '7-10', label: 'CR 7-10' },
+  { id: '11-15', label: 'CR 11-15' },
+  { id: '16-20', label: 'CR 16-20' },
+  { id: '21+', label: 'CR 21+' },
+]
+
+function crMatchesRange(cr: number, range: string): boolean {
+  if (range === 'all') return true
+  if (range === '0') return cr === 0
+  if (range === '1/8') return cr === 0.125
+  if (range === '1/4') return cr === 0.25
+  if (range === '1/2') return cr === 0.5
+  if (range === '1-3') return cr >= 1 && cr <= 3
+  if (range === '4-6') return cr >= 4 && cr <= 6
+  if (range === '7-10') return cr >= 7 && cr <= 10
+  if (range === '11-15') return cr >= 11 && cr <= 15
+  if (range === '16-20') return cr >= 16 && cr <= 20
+  if (range === '21+') return cr >= 21
+  return true
+}
+
 export function Bestiary() {
+  const { monsters } = useMonsters()
   const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [crFilter, setCrFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
 
-  const filteredMonsters = MONSTERS.filter((monster) => {
+  const filteredMonsters = monsters.filter((monster) => {
     const matchesCategory = activeCategory === 'all' || monster.type.toLowerCase().includes(activeCategory)
     const matchesSearch = search === '' || 
       monster.name.toLowerCase().includes(search.toLowerCase()) ||
       (monster.type && monster.type.toLowerCase().includes(search.toLowerCase()))
-    return matchesCategory && matchesSearch
+    const matchesCR = crMatchesRange(monster.cr, crFilter)
+    return matchesCategory && matchesSearch && matchesCR
   })
 
   const getCRString = (cr: number) => {
@@ -74,7 +106,7 @@ export function Bestiary() {
                 <span>{cat.label}</span>
                 {cat.id !== 'all' && (
                   <span className={styles.monsterCount}>
-                    {MONSTERS.filter((m) => m.type.toLowerCase().includes(cat.id)).length}
+                    {monsters.filter((m) => m.type.toLowerCase().includes(cat.id)).length}
                   </span>
                 )}
               </button>
@@ -91,11 +123,11 @@ export function Bestiary() {
           </div>
           <div>
             <h1>Bestiario</h1>
-            <p className={styles.subtitle}>Criaturas del sistema Pathfinder ({MONSTERS.length})</p>
+            <p className={styles.subtitle}>Criaturas del sistema Pathfinder ({monsters.length})</p>
           </div>
         </header>
 
-        {/* Search */}
+        {/* Search and filters */}
         <div className={styles.searchBar}>
           <Search size={16} className={styles.searchIcon} />
           <input
@@ -110,6 +142,20 @@ export function Bestiary() {
               ×
             </button>
           )}
+        </div>
+
+        {/* CR Filter */}
+        <div className={styles.crFilterBar}>
+          <span className={styles.crFilterLabel}>Filtrar por CR:</span>
+          <select
+            className={styles.crFilterSelect}
+            value={crFilter}
+            onChange={(e) => setCrFilter(e.target.value)}
+          >
+            {CR_RANGES.map((cr) => (
+              <option key={cr.id} value={cr.id}>{cr.label}</option>
+            ))}
+          </select>
         </div>
 
         {/* Results count */}

@@ -1,0 +1,52 @@
+export type MonsterSize = 'Fine' | 'Diminutive' | 'Tiny' | 'Small' | 'Medium' | 'Large' | 'Huge' | 'Gargantuan' | 'Colossal'
+
+export interface Monster {
+  id: string
+  name: string
+  cr: number
+  xp: number
+  alignment: string
+  size: MonsterSize
+  type: string
+  subtype?: string
+  init: number
+  senses?: string
+  aura?: string
+  ac: number
+  acNotes?: string
+  hp: number
+  hpNotes?: string
+  fort: number
+  ref: number
+  will: number
+  defensiveAbilities?: string
+  dr?: string
+  immune?: string
+  resist?: string
+  speed?: string
+  melee?: string
+  ranged?: string
+  space?: string
+  reach?: string
+  specialAttacks?: string
+  spellLikeAbilities?: string
+  str: number
+  dex: number
+  con: number
+  int: number
+  wis: number
+  cha: number
+  baseAtk: number
+  cmb: number
+  cmd: number
+  feats?: string[]
+  skills?: string
+  languages?: string
+  sq?: string
+  environment?: string
+  organization?: string
+  treasure?: string
+  description?: string
+  source?: string
+  specialAbilities?: string
+}
