@@ -9,7 +9,7 @@ import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
 import styles from './CharacterNew.module.css'
 
 const CORE_RACES = ['human', 'elf', 'dwarf', 'halfling', 'gnome', 'half-orc', 'half-elf']
-const UNCOMMON_RACES = ['kitsune', 'nagaji', 'samsaran', 'wayang', 'vanara', 'grippli', 'strix']
+const UNCOMMON_RACES = ['kitsune', 'nagaji', 'samsaran', 'wayang', 'vanara', 'grippli', 'strix', 'android']
 
 // ── Class data by category ──
 const CLASS_GROUPS: { label: string; classes: { value: string; label: string; role: string; desc: string; hitDie: string }[] }[] = [
@@ -572,8 +572,7 @@ export function CharacterNew() {
                           className={styles.freeInput}
                           value={value}
                           min={3}
-                          max={20}
-                          onChange={(e) => updateForm(attr, Math.max(3, Math.min(20, +e.target.value || 10)))}
+                          onChange={(e) => updateForm(attr, Math.max(3, +e.target.value || 10))}
                         />
                       )}
 
