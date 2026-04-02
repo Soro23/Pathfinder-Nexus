@@ -172,6 +172,123 @@
   text-align: center;
 }
 
+/* ── View toggle (prepared casters) ── */
+.viewToggle {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.viewBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px var(--space-3);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.viewBtnActive {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.08);
+}
+
+/* ── Prepared panel ── */
+.preparedPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.preparedEmpty {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: var(--space-4);
+}
+
+.preparedList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.preparedRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.preparedInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.preparedName {
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.preparedMeta {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+.preparedCount {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-accent-gold);
+}
+
+.preparedRemove {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 2px;
+}
+.preparedRemove:hover { color: #e74c3c; }
+
+/* ── Prepare button in spell row ── */
+.prepareBtn {
+  width: 24px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: none;
+  cursor: pointer;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.prepareBtnActive {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.12);
+}
+
+.spellsHidden {
+  display: none;
+}
+
 .spellList {
   display: flex;
   flex-direction: column;

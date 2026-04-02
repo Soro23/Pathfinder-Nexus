@@ -910,6 +910,7 @@ export function CharacterView() {
             <h3 className={styles.sectionTitle}>Libro de Hechizos</h3>
             <Spellbook
               knownSpells={character.spells}
+              preparedSpells={character.preparedSpells ?? []}
               spellSlots={character.spellSlots || {}}
               abilityModifier={calculateModifier(abilities[casterAbility])}
               classIds={character.classes.map((c) => c.id)}
@@ -918,6 +919,14 @@ export function CharacterView() {
                   ? character.spells.filter((s) => s !== spellId)
                   : [...character.spells, spellId]
                 updateCharacter(character.id, { spells: newSpells })
+              }}
+              onTogglePrepared={(spellId) => {
+                const prepared = character.preparedSpells ?? []
+                const idx = prepared.indexOf(spellId)
+                const newPrepared = idx >= 0
+                  ? [...prepared.slice(0, idx), ...prepared.slice(idx + 1)]
+                  : [...prepared, spellId]
+                updateCharacter(character.id, { preparedSpells: newPrepared })
               }}
               isEditing={isEditing}
               onToggleSlotPip={(level: SpellLevel, pipIndex: number) => {
@@ -933,7 +942,11 @@ export function CharacterView() {
                 Object.keys(slots).forEach((k) => {
                   slots[Number(k)] = { ...slots[Number(k)], used: 0 }
                 })
-                updateCharacter(character.id, { spellSlots: slots })
+                updateCharacter(character.id, {
+                  spellSlots: slots,
+                  preparedSpells: [],
+                  classFeatureUses: {},
+                })
               }}
               onSyncSlots={() => {
                 const syncedSlots = computeSyncedSlots(
