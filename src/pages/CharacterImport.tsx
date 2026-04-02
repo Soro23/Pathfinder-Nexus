@@ -88,11 +88,11 @@ function mapExtractedToCharacter(extracted: ExtractedData, CLASSES: ClassData[],
   const level = extracted.level ?? 1
 
   // Map feats: try to match by name, keep unmatched as raw name strings
-  const featIds: string[] = (extracted.feats ?? []).map((featName) => {
+  const featIds = (extracted.feats ?? []).map((featName) => {
     const match = FEATS.find(
       (f) => f.name.toLowerCase() === featName.toLowerCase() || f.id === featName.toLowerCase().replace(/\s+/g, '_')
     )
-    return match?.id ?? featName
+    return { id: match?.id ?? featName }
   })
 
   // Map skills
@@ -387,8 +387,8 @@ export function CharacterImport() {
       return { ...prev, skills }
     })
 
-  const removeFeat = (feat: string) =>
-    setCharacter((prev) => prev ? { ...prev, feats: prev.feats.filter((f) => f !== feat) } : prev)
+  const removeFeat = (index: number) =>
+    setCharacter((prev) => prev ? { ...prev, feats: prev.feats.filter((_, i) => i !== index) } : prev)
 
   const primaryClassId = character.classes[0]?.id ?? 'fighter'
 
@@ -553,10 +553,10 @@ export function CharacterImport() {
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Dotes</h2>
             <div className={styles.chips}>
-              {character.feats.map((feat) => (
-                <span key={feat} className={styles.chip}>
-                  {feat}
-                  <button className={styles.chipRemove} onClick={() => removeFeat(feat)}><X size={12} /></button>
+              {character.feats.map((cf, idx) => (
+                <span key={idx} className={styles.chip}>
+                  {cf.id}{cf.specification ? ` (${cf.specification})` : ''}
+                  <button className={styles.chipRemove} onClick={() => removeFeat(idx)}><X size={12} /></button>
                 </span>
               ))}
             </div>

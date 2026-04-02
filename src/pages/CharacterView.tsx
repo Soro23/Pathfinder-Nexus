@@ -840,11 +840,11 @@ export function CharacterView() {
             {isEditing ? (
               <FeatsSelector
                 selectedFeats={character.feats}
-                onToggle={(featId) => {
-                  const newFeats = character.feats.includes(featId)
-                    ? character.feats.filter((f) => f !== featId)
-                    : [...character.feats, featId]
-                  updateCharacter(character.id, { feats: newFeats })
+                onAdd={(featId, specification) => {
+                  updateCharacter(character.id, { feats: [...character.feats, { id: featId, specification }] })
+                }}
+                onRemove={(index) => {
+                  updateCharacter(character.id, { feats: character.feats.filter((_, i) => i !== index) })
                 }}
               />
             ) : (
@@ -852,13 +852,15 @@ export function CharacterView() {
                 <p className={styles.editHint}>Sin dotes seleccionadas. Pulsa Editar para añadir.</p>
               ) : (
                 <div className={styles.featsReadGrid}>
-                  {character.feats.map((featId) => {
-                    const feat = FEATS.find((f) => f.id === featId)
+                  {character.feats.map((cf, idx) => {
+                    const feat = FEATS.find((f) => f.id === cf.id)
                     if (!feat) return null
                     return (
-                      <div key={featId} className={styles.featReadCard}>
+                      <div key={idx} className={styles.featReadCard}>
                         <div className={styles.featReadHeader}>
-                          <span className={styles.featReadName}>{feat.name}</span>
+                          <span className={styles.featReadName}>
+                            {feat.name}{cf.specification ? ` (${cf.specification})` : ''}
+                          </span>
                           <span className={styles.featReadType}>{feat.type}</span>
                         </div>
                         <p className={styles.featReadBenefit}>{feat.benefit}</p>

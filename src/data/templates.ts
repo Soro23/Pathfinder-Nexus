@@ -8,7 +8,7 @@ const now = new Date().toISOString()
 
 const empty = {
   xp: 0,
-  feats: [] as string[],
+  feats: [] as { id: string; specification?: string }[],
   skills: [],
   spells: [],
   spellSlots: {},
@@ -47,7 +47,7 @@ export const TEMPLATES: CharacterTemplate[] = [
       alignment: 'ln',
       abilities: { strength: 18, dexterity: 13, constitution: 16, intelligence: 10, wisdom: 12, charisma: 8 },
       hp: { current: 13, max: 13, temp: 0 },
-      feats: ['power-attack', 'toughness'],
+      feats: [{ id: 'power-attack' }, { id: 'toughness' }],
       weapons: [
         { id: 'w1', name: 'Espada larga', attackBonus: 4, damage: '1d8+4', critical: '19-20/×2', range: 'Cuerpo a cuerpo', type: 'Cortante', notes: '' },
         { id: 'w2', name: 'Escudo pesado', attackBonus: 4, damage: '1d4+4', critical: '20/×2', range: 'Cuerpo a cuerpo', type: 'Contundente', notes: '' },
@@ -72,7 +72,7 @@ export const TEMPLATES: CharacterTemplate[] = [
       alignment: 'ng',
       abilities: { strength: 8, dexterity: 16, constitution: 12, intelligence: 19, wisdom: 14, charisma: 10 },
       hp: { current: 7, max: 7, temp: 0 },
-      feats: ['scribe-scroll', 'spell-focus-evocation'],
+      feats: [{ id: 'scribe-scroll' }, { id: 'spell-focus-evocation' }],
       spells: ['magic-missile', 'burning-hands', 'mage-armor', 'detect-magic', 'light', 'prestidigitation'],
       spellSlots: {
         0: { max: 3, used: 0 },
@@ -98,7 +98,7 @@ export const TEMPLATES: CharacterTemplate[] = [
       alignment: 'cn',
       abilities: { strength: 10, dexterity: 19, constitution: 12, intelligence: 14, wisdom: 12, charisma: 14 },
       hp: { current: 9, max: 9, temp: 0 },
-      feats: ['weapon-finesse'],
+      feats: [{ id: 'weapon-finesse' }],
       weapons: [
         { id: 'w1', name: 'Daga', attackBonus: 4, damage: '1d4+4', critical: '19-20/×2', range: 'Cuerpo a cuerpo / Lanzada', type: 'Perforante', notes: 'Finesse' },
         { id: 'w2', name: 'Arco corto', attackBonus: 4, damage: '1d6', critical: '20/×3', range: '60 pies', type: 'Perforante', notes: '' },
@@ -123,7 +123,7 @@ export const TEMPLATES: CharacterTemplate[] = [
       alignment: 'lg',
       abilities: { strength: 14, dexterity: 10, constitution: 16, intelligence: 10, wisdom: 18, charisma: 10 },
       hp: { current: 11, max: 11, temp: 0 },
-      feats: ['combat-casting'],
+      feats: [{ id: 'combat-casting' }],
       spells: ['cure-light-wounds', 'bless', 'divine-favor', 'guidance', 'light', 'resistance'],
       spellSlots: {
         0: { max: 3, used: 0 },
@@ -153,7 +153,7 @@ export const TEMPLATES: CharacterTemplate[] = [
       alignment: 'cn',
       abilities: { strength: 20, dexterity: 14, constitution: 18, intelligence: 8, wisdom: 10, charisma: 6 },
       hp: { current: 16, max: 16, temp: 0 },
-      feats: ['power-attack'],
+      feats: [{ id: 'power-attack' }],
       weapons: [
         { id: 'w1', name: 'Gran hacha', attackBonus: 5, damage: '1d12+7', critical: '20/×3', range: 'Cuerpo a cuerpo', type: 'Cortante', notes: 'Bimano, Power Attack -1/+2' },
       ],

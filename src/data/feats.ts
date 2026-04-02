@@ -16,6 +16,10 @@ export interface Feat {
   source?: string
 }
 
+export function isFeatRepeatable(feat: Feat): boolean {
+  return !!feat.special?.toLowerCase().includes('veces')
+}
+
 export const FEATS: Feat[] = [
   {
     "id": "aberrant-tumor",

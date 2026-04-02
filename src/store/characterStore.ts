@@ -104,6 +104,11 @@ export interface StatusEffect {
   active?: boolean  // undefined/true = active, false = disabled
 }
 
+export interface CharacterFeat {
+  id: string
+  specification?: string
+}
+
 export interface Character {
   id: string
   name: string
@@ -121,7 +126,7 @@ export interface Character {
     charisma: number
   }
   hp: { current: number; max: number; temp: number }
-  feats: string[]
+  feats: CharacterFeat[]
   skills: SkillRank[]
   spells: string[]
   spellSlots: Record<number, SpellSlot>
@@ -159,7 +164,11 @@ export const useCharacterStore = create<CharacterStore>()((set, get) => ({
     set({ loading: true })
     const { data, error } = await supabase.from('characters').select('id, data')
     if (!error && data) {
-      const characters = data.map((row) => ({ ...row.data as Character, id: row.id }))
+      const characters = data.map((row) => {
+        const c = { ...row.data as Character, id: row.id }
+        c.feats = (c.feats ?? []).map((f) => typeof f === 'string' ? { id: f } : f)
+        return c
+      })
       set({ characters })
     }
     set({ loading: false })

@@ -17,13 +17,13 @@ import { makeCharacter } from '../../test/fixtures'
 
 /** Build a character with the given feat ids active */
 function charWithFeats(...featIds: string[]) {
-  return makeCharacter({ feats: featIds })
+  return makeCharacter({ feats: featIds.map(id => ({ id })) })
 }
 
 /** Build a character with given feat ids and skill ranks map */
 function charWithFeatsAndRanks(featIds: string[], ranks: Record<string, number>) {
   return makeCharacter({
-    feats: featIds,
+    feats: featIds.map(id => ({ id })),
     skills: Object.entries(ranks).map(([id, r]) => ({ id, ranks: r })),
   })
 }
@@ -114,7 +114,7 @@ describe('resolveModifiers — rankCondition', () => {
   })
 
   it('should use base value when skill has 0 ranks (no ranks entry)', () => {
-    const char = makeCharacter({ feats: ['skill_focus_perception'], skills: [] })
+    const char = makeCharacter({ feats: [{ id: 'skill_focus_perception' }], skills: [] })
     const result = resolveModifiers(char)
     expect(result.skillBonuses['perception']).toBe(3)
   })

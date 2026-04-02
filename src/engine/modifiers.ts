@@ -38,8 +38,8 @@ function resolveValue(mod: Modifier, skillRanks: Record<string, number>): number
 export function resolveModifiers(character: Character): ResolvedStats {
   const rawModifiers: Modifier[] = []
 
-  for (const featId of character.feats) {
-    const feat = getFeatById(featId)
+  for (const cf of character.feats) {
+    const feat = getFeatById(cf.id)
     if (feat?.effects) {
       rawModifiers.push(...feat.effects)
     }
