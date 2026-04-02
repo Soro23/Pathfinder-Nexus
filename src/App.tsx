@@ -22,6 +22,7 @@ import { Tables } from './pages/Tables'
 import { Skills } from './pages/Skills'
 import { Feats } from './pages/Feats'
 import { Bestiary } from './pages/Bestiary'
+import { Compendium } from './pages/Compendium'
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
               <Route path="skills" element={<Skills />} />
               <Route path="feats" element={<Feats />} />
               <Route path="bestiary" element={<Bestiary />} />
+              <Route path="compendium" element={<Compendium />} />
               <Route path="campaigns" element={<CampaignList />} />
               <Route path="campaigns/new" element={<CampaignNew />} />
               <Route path="campaigns/import" element={<CampaignImport />} />

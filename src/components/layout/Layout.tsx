@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import {
-  Users, Map, BookOpen, LayoutList, Shield, Globe, Zap,
+  Users, Map, BookOpen, LayoutList, Shield, Zap,
   Sparkles, Backpack, Gem, PawPrint, Settings, Sun, Moon, LogOut, Sword, Wand2, X,
 } from 'lucide-react'
 import { useSRDStore } from '../../store/srdStore'
@@ -10,17 +10,16 @@ import { useTheme } from '../../hooks/useTheme'
 import styles from './Layout.module.css'
 
 const compendiumLinks = [
-  { path: '/rules',    icon: BookOpen,   label: 'Reglas Rápidas' },
-  { path: '/homebrew', icon: Wand2,      label: 'Homebrew' },
-  { path: '/tables',   icon: LayoutList, label: 'Tablas' },
-  { path: '/skills',   icon: Zap,        label: 'Habilidades' },
-  { path: '/feats',    icon: Sword,      label: 'Dotes' },
-  { path: '/bestiary', icon: PawPrint,   label: 'Bestiario' },
+  { path: '/rules',       icon: BookOpen,   label: 'Reglas Rápidas' },
+  { path: '/homebrew',    icon: Wand2,      label: 'Homebrew' },
+  { path: '/tables',      icon: LayoutList, label: 'Tablas' },
+  { path: '/skills',      icon: Zap,        label: 'Habilidades' },
+  { path: '/feats',       icon: Sword,      label: 'Dotes' },
+  { path: '/bestiary',    icon: PawPrint,   label: 'Bestiario' },
+  { path: '/compendium',  icon: Shield,     label: 'Clases y Razas' },
 ]
 
 const compendiumSoon = [
-  { icon: Shield,     label: 'Clases' },
-  { icon: Globe,      label: 'Razas' },
   { icon: Sparkles,   label: 'Conjuros' },
   { icon: Backpack,   label: 'Equipación' },
   { icon: Gem,        label: 'Objetos Mágicos' },
@@ -184,6 +183,13 @@ export function Layout() {
           >
             <PawPrint size={18} />
             <span>Bestiario</span>
+          </Link>
+          <Link
+            to="/compendium"
+            className={`${styles.navItem} ${isActive('/compendium', false) ? styles.active : ''}`}
+          >
+            <Shield size={18} />
+            <span>Clases y Razas</span>
           </Link>
           {compendiumSoon.map(({ icon: Icon, label }) => (
             <span key={label} className={`${styles.navItem} ${styles.disabled}`}>

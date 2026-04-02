@@ -1,0 +1,330 @@
+/* ── Page layout ── */
+.pageLayout {
+  display: flex;
+  gap: var(--space-6);
+  align-items: flex-start;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+/* ── Left nav ── */
+.leftNav {
+  width: 200px;
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--space-4);
+  max-height: 95vh;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+@media (min-width: 901px) {
+  .leftNav {
+    position: fixed;
+    top: var(--space-8);
+    z-index: 100;
+  }
+}
+
+.leftNavInner {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+/* Section toggle */
+.sectionToggle {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+
+.sectionBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: none;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.sectionBtnActive {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.08);
+}
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navBtn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  transition: color 0.15s, background 0.15s;
+}
+
+.navBtn:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+}
+
+.navBtnActive {
+  color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.08);
+}
+
+/* ── Main content ── */
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.detailView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Header ── */
+.detailHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.detailTitle {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  color: var(--color-accent-gold);
+  margin-bottom: var(--space-2);
+}
+
+.detailDesc {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  max-width: 680px;
+}
+
+.hitDieBadge {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-accent-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.08);
+}
+
+.raceBadge {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-secondary);
+}
+
+/* ── Stats grid ── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-2);
+}
+
+.statBox {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.statLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-secondary);
+}
+
+.statValue {
+  font-size: 0.82rem;
+  color: var(--color-text-primary);
+}
+
+/* ── Feature list ── */
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-accent-gold);
+  margin-bottom: var(--space-3);
+}
+
+.featureList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.featureRow {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.featureHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.featureHeader:hover {
+  background: var(--color-bg-secondary);
+}
+
+.featureLevel {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-accent-gold);
+  min-width: 32px;
+}
+
+.featureName {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.featureDesc {
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  font-size: 0.825rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  margin: 0;
+}
+
+.traitIcon {
+  color: var(--color-accent-gold);
+  flex-shrink: 0;
+}
+
+/* ── Skill pills ── */
+.skillPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.skillPill {
+  padding: 3px var(--space-2);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  text-transform: capitalize;
+}
+
+/* ── Subraces ── */
+.subraceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.subraceCard {
+  padding: var(--space-3);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.subraceName {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.subraceBonus {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-accent-gold);
+  margin-bottom: var(--space-2);
+}
+
+.subraceTraits {
+  padding-left: var(--space-4);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subraceTraits li {
+  font-size: 0.825rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.subraceTraits strong {
+  color: var(--color-text-primary);
+}
+
+/* ── Mobile ── */
+@media (max-width: 900px) {
+  .leftNav {
+    display: none;
+  }
+
+  .content {
+    width: 100%;
+  }
+
+  .detailHeader {
+    flex-direction: column;
+  }
+}
