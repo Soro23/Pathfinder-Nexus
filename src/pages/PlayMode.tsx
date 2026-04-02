@@ -235,23 +235,63 @@ export function PlayMode() {
   const chaMod = calculateModifier(abilities.charisma)
   const classByType = (id: string) => character.classes.find(c => c.id === id)
 
+  const intMod = calculateModifier(abilities.intelligence)
   const barbarianClass = classByType('barbarian')
   const clericClass    = classByType('cleric')
   const rogueClass     = classByType('rogue')
   const paladinClass   = classByType('paladin')
   const monkClass      = classByType('monk')
+  const bardClass      = classByType('bard')
+  const druidClass     = classByType('druid')
+  const fighterClass   = classByType('fighter')
+  const rangerClass    = classByType('ranger')
+  const alchemistClass = classByType('alchemist')
+  const inquisitorClass= classByType('inquisitor')
+  const cavalierClass  = classByType('cavalier')
+  const maguClass      = classByType('magus')
+  const gunslingerClass= classByType('gunslinger')
+  const shifterClass   = classByType('shifter')
+  const oracleClass    = classByType('oracle')
+  const witchClass     = classByType('witch')
+  const summonerClass  = classByType('summoner')
 
-  const rageMaxUses   = barbarianClass ? 4 + conMod + 2 * (barbarianClass.level - 1) : 0
-  const channelMaxUses = clericClass   ? Math.max(1, 3 + chaMod) : 0
-  const layMaxUses    = paladinClass   ? Math.max(1, Math.floor(paladinClass.level / 2) + chaMod) : 0
-  const stunMaxUses   = monkClass      ? monkClass.level + wisMod : 0
-  const sneakDice     = rogueClass     ? Math.ceil(rogueClass.level / 2) : 0
+  // Max uses per day per class
+  const rageMaxUses        = barbarianClass ? 4 + conMod + 2 * (barbarianClass.level - 1) : 0
+  const channelMaxUses     = clericClass   ? Math.max(1, 3 + chaMod) : 0
+  const layMaxUses         = paladinClass  ? Math.max(1, Math.floor(paladinClass.level / 2) + chaMod) : 0
+  const stunMaxUses        = monkClass     ? monkClass.level + wisMod : 0
+  const sneakDice          = rogueClass    ? Math.ceil(rogueClass.level / 2) : 0
+  const bardPerfMaxRounds  = bardClass     ? 4 + chaMod + 2 * (bardClass.level - 1) : 0
+  const wildShapeMaxUses   = druidClass && druidClass.level >= 4 ? Math.floor((druidClass.level - 2) / 2) : 0
+  const bombMaxUses        = alchemistClass ? intMod + alchemistClass.level : 0
+  const judgementMaxUses   = inquisitorClass ? 1 + Math.floor(inquisitorClass.level / 3) : 0
+  const challengeMaxUses   = cavalierClass  ? 1 + Math.floor((cavalierClass.level - 1) / 4) : 0
+  const arcanePoolMax      = maguClass      ? Math.max(1, Math.floor(maguClass.level / 2) + intMod) : 0
+  const gritMax            = gunslingerClass ? Math.max(1, wisMod) : 0
+  const aspectRoundsMax    = shifterClass   ? shifterClass.level + wisMod : 0
+  const oracleChannelMax   = oracleClass    ? Math.max(1, 3 + chaMod) : 0
 
   const featureUses = character.classFeatureUses ?? {}
-  const rageUses    = featureUses['rage']    ?? rageMaxUses
-  const channelUses = featureUses['channel'] ?? channelMaxUses
-  const layUses     = featureUses['lay']     ?? layMaxUses
-  const stunUses    = featureUses['stun']    ?? stunMaxUses
+  const rageUses         = featureUses['rage']        ?? rageMaxUses
+  const channelUses      = featureUses['channel']     ?? channelMaxUses
+  const layUses          = featureUses['lay']         ?? layMaxUses
+  const stunUses         = featureUses['stun']        ?? stunMaxUses
+  const bardPerfUses     = featureUses['bardperf']    ?? bardPerfMaxRounds
+  const wildShapeUses    = featureUses['wildshape']   ?? wildShapeMaxUses
+  const bombUses         = featureUses['bomb']        ?? bombMaxUses
+  const mutaUses         = featureUses['mutagen']     ?? (alchemistClass ? 1 : 0)
+  const judgementUses    = featureUses['judgement']   ?? judgementMaxUses
+  const challengeUses    = featureUses['challenge']   ?? challengeMaxUses
+  const tacticianUses    = featureUses['tactician']   ?? (cavalierClass ? 1 : 0)
+  const arcanePoolUses   = featureUses['arcanepool']  ?? arcanePoolMax
+  const gritUses         = featureUses['grit']        ?? gritMax
+  const aspectUses       = featureUses['aspect']      ?? aspectRoundsMax
+  const oracleChannelUses= featureUses['ochannel']    ?? oracleChannelMax
+
+  const hasAnyFeature = barbarianClass || clericClass || rogueClass || paladinClass || monkClass ||
+    bardClass || druidClass || fighterClass || rangerClass || alchemistClass ||
+    inquisitorClass || cavalierClass || maguClass || gunslingerClass || shifterClass ||
+    oracleClass || witchClass || summonerClass
 
   const useFeature = (key: string, max: number) => {
     const current = featureUses[key] ?? max
@@ -784,7 +824,7 @@ export function PlayMode() {
               </Card>
 
               {/* Class Features */}
-              {(barbarianClass || clericClass || rogueClass || paladinClass || monkClass) && (
+              {hasAnyFeature && (
                 <Card padding="md">
                   <h3 className={styles.sectionTitle}><Zap size={18} />Poderes de Clase</h3>
                   <div className={styles.featureList}>
@@ -879,14 +919,212 @@ export function PlayMode() {
                         </div>
                         <div className={styles.featureActions}>
                           <span className={styles.featureUses}>{stunUses}/{stunMaxUses}</span>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => useFeature('stun', stunMaxUses)}
-                            disabled={stunUses <= 0}
-                          >
-                            Usar
-                          </Button>
+                          <Button variant="secondary" size="sm" onClick={() => useFeature('stun', stunMaxUses)} disabled={stunUses <= 0}>Usar</Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Bard — Actuación Bárdica */}
+                    {bardClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Actuación Bárdica</span>
+                          <span className={styles.featureMeta}>+{1 + Math.floor(bardClass.level / 6)} ataque/daño aliados (Inspirar Valor)</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{bardPerfUses}/{bardPerfMaxRounds} rondas</span>
+                          <Button variant="secondary" size="sm" onClick={() => useFeature('bardperf', bardPerfMaxRounds)} disabled={bardPerfUses <= 0}>−1 ronda</Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Druid — Forma Salvaje */}
+                    {druidClass && druidClass.level >= 4 && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Forma Salvaje</span>
+                          <span className={styles.featureMeta}>{druidClass.level}h duración · Pequeño-{druidClass.level >= 6 ? 'Grande' : 'Mediano'}</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{wildShapeUses}/{wildShapeMaxUses}</span>
+                          <Button variant="secondary" size="sm" onClick={() => useFeature('wildshape', wildShapeMaxUses)} disabled={wildShapeUses <= 0}>Usar</Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Fighter — passive info */}
+                    {fighterClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Entrenamiento con Armas</span>
+                          <span className={styles.featureMeta}>+{Math.floor((fighterClass.level - 1) / 4) + 1} ataque/daño (grupo principal)</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureMeta}>Pasivo</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Ranger — Favored Enemy */}
+                    {rangerClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Enemigo Predilecto</span>
+                          <span className={styles.featureMeta}>+{2 + 2 * Math.floor((rangerClass.level - 1) / 5)} ataque/daño/habilidades</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureMeta}>Pasivo</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Alchemist — Bombs */}
+                    {alchemistClass && (
+                      <>
+                        <div className={styles.featureRow}>
+                          <div className={styles.featureInfo}>
+                            <span className={styles.featureName}>Bomba</span>
+                            <span className={styles.featureMeta}>{Math.ceil(alchemistClass.level / 2)}d6+{intMod} fuego · salpicadura {Math.ceil(alchemistClass.level / 2)} daño</span>
+                          </div>
+                          <div className={styles.featureActions}>
+                            <span className={styles.featureUses}>{bombUses}/{bombMaxUses}</span>
+                            <Button variant="danger" size="sm" onClick={() => { useFeature('bomb', bombMaxUses); handleQuickRoll(`${Math.ceil(alchemistClass.level / 2)}d6+${intMod}`, 'Bomba') }} disabled={bombUses <= 0}>Lanzar</Button>
+                          </div>
+                        </div>
+                        <div className={styles.featureRow}>
+                          <div className={styles.featureInfo}>
+                            <span className={styles.featureName}>Mutágeno</span>
+                            <span className={styles.featureMeta}>+{2 + Math.floor(alchemistClass.level / 4)} armadura natural, +4 atributo físico, −2 mental · {alchemistClass.level} min</span>
+                          </div>
+                          <div className={styles.featureActions}>
+                            <span className={styles.featureUses}>{mutaUses}/1</span>
+                            <Button variant="secondary" size="sm" onClick={() => useFeature('mutagen', 1)} disabled={mutaUses <= 0}>Usar</Button>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Inquisitor — Sentencia */}
+                    {inquisitorClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Sentencia</span>
+                          <span className={styles.featureMeta}>+{1 + Math.floor((inquisitorClass.level - 1) / 5)} ataque/daño/salvaciones en combate</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{judgementUses}/{judgementMaxUses}</span>
+                          <Button variant="secondary" size="sm" onClick={() => useFeature('judgement', judgementMaxUses)} disabled={judgementUses <= 0}>Iniciar</Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Cavalier — Desafío + Táctico */}
+                    {cavalierClass && (
+                      <>
+                        <div className={styles.featureRow}>
+                          <div className={styles.featureInfo}>
+                            <span className={styles.featureName}>Desafío</span>
+                            <span className={styles.featureMeta}>+{cavalierClass.level} daño al objetivo desafiado</span>
+                          </div>
+                          <div className={styles.featureActions}>
+                            <span className={styles.featureUses}>{challengeUses}/{challengeMaxUses}</span>
+                            <Button variant="secondary" size="sm" onClick={() => useFeature('challenge', challengeMaxUses)} disabled={challengeUses <= 0}>Desafiar</Button>
+                          </div>
+                        </div>
+                        {cavalierClass.level >= 5 && (
+                          <div className={styles.featureRow}>
+                            <div className={styles.featureInfo}>
+                              <span className={styles.featureName}>Táctico</span>
+                              <span className={styles.featureMeta}>Aliados usan tu dote de trabajo en equipo · {Math.floor(cavalierClass.level / 5) + 1} min</span>
+                            </div>
+                            <div className={styles.featureActions}>
+                              <span className={styles.featureUses}>{tacticianUses}/1</span>
+                              <Button variant="secondary" size="sm" onClick={() => useFeature('tactician', 1)} disabled={tacticianUses <= 0}>Activar</Button>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* Magus — Reserva Arcana */}
+                    {maguClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Reserva Arcana</span>
+                          <span className={styles.featureMeta}>Potenciar arma (+{1 + Math.floor(maguClass.level / 4)}) o recuperar hechizo</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{arcanePoolUses}/{arcanePoolMax}</span>
+                          <Button variant="secondary" size="sm" onClick={() => useFeature('arcanepool', arcanePoolMax)} disabled={arcanePoolUses <= 0}>Gastar</Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Gunslinger — Valor */}
+                    {gunslingerClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Valor (Grit)</span>
+                          <span className={styles.featureMeta}>Se recupera: matar con arma de fuego / crítico con arma de fuego</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{gritUses}/{gritMax}</span>
+                          <Button variant="secondary" size="sm" onClick={() => useFeature('grit', gritMax)} disabled={gritUses <= 0}>Gastar</Button>
+                          <Button variant="primary" size="sm" onClick={() => updateCharacter(character.id, { classFeatureUses: { ...featureUses, grit: Math.min((featureUses['grit'] ?? gritMax) + 1, gritMax) } })} disabled={gritUses >= gritMax}>+1</Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Shifter — Aspecto */}
+                    {shifterClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Aspecto</span>
+                          <span className={styles.featureMeta}>Garras {Math.ceil(shifterClass.level / 4)}d6 + bonos de aspecto animal</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{aspectUses}/{aspectRoundsMax} rondas</span>
+                          <Button variant="secondary" size="sm" onClick={() => useFeature('aspect', aspectRoundsMax)} disabled={aspectUses <= 0}>−1 ronda</Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Oracle — Canal de Energía */}
+                    {oracleClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Canal de Energía (Oráculo)</span>
+                          <span className={styles.featureMeta}>{Math.ceil(oracleClass.level / 2)}d6 — CD {10 + Math.floor(oracleClass.level / 2) + chaMod}</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureUses}>{oracleChannelUses}/{oracleChannelMax}</span>
+                          <Button variant="secondary" size="sm" onClick={() => { useFeature('ochannel', oracleChannelMax); handleQuickRoll(`${Math.ceil(oracleClass.level / 2)}d6`, 'Canal de Energía') }} disabled={oracleChannelUses <= 0}>Canalizar</Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Witch — Hexo (genérico) */}
+                    {witchClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Hexos</span>
+                          <span className={styles.featureMeta}>1 vez/objetivo/día · CD {10 + Math.floor(witchClass.level / 2) + intMod}</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureMeta}>Ver lista</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Summoner — Eidolón passive info */}
+                    {summonerClass && (
+                      <div className={styles.featureRow}>
+                        <div className={styles.featureInfo}>
+                          <span className={styles.featureName}>Eídolón</span>
+                          <span className={styles.featureMeta}>PV: {summonerClass.level * 10 + chaMod} · BBA: {summonerClass.level} · {Math.floor(summonerClass.level / 2) + 4} puntos de evolución</span>
+                        </div>
+                        <div className={styles.featureActions}>
+                          <span className={styles.featureMeta}>Compañero</span>
                         </div>
                       </div>
                     )}
