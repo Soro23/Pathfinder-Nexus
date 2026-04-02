@@ -1,8 +1,6 @@
-import { useState } from 'react'
-import { Globe, ChevronDown, ChevronUp, Star } from 'lucide-react'
+import { Globe, ChevronDown } from 'lucide-react'
 import { RACES } from '../data/races'
-import { Card } from '../components/ui'
-import styles from './Compendium.module.css'
+import styles from './Classes.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
 const ABILITY_ABBR: Record<string, string> = {
@@ -11,27 +9,23 @@ const ABILITY_ABBR: Record<string, string> = {
 }
 
 export function Races() {
-  const [selected, setSelected] = useState(RACES[0].id)
-  const [expandedFeature, setExpandedFeature] = useState<string | null>(null)
-
-  const race = RACES.find(r => r.id === selected) ?? RACES[0]
-
-  function toggleFeature(key: string) {
-    setExpandedFeature(prev => prev === key ? null : key)
+  function scrollTo(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
     <div className={`${styles.pageLayout} ${mobile.pageLayout}`}>
 
-      {/* ── Mobile sticky nav ── */}
+      {/* ── Mobile select nav ── */}
       <div className={mobile.mobileCatBar}>
         <div className={mobile.mobileCatSelectWrap}>
           <Globe size={15} className={mobile.mobileCatIcon} />
           <select
             className={mobile.mobileCatSelect}
-            value={selected}
-            onChange={e => { setSelected(e.target.value); setExpandedFeature(null) }}
+            defaultValue=""
+            onChange={e => { scrollTo(e.target.value); (e.target as HTMLSelectElement).value = '' }}
           >
+            <option value="" disabled>Ir a raza…</option>
             {RACES.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
           </select>
           <ChevronDown size={15} className={mobile.mobileCatChevron} />
@@ -39,16 +33,12 @@ export function Races() {
       </div>
 
       {/* ── Left nav ── */}
-      <nav className={styles.leftNav}>
-        <div className={styles.leftNavInner}>
+      <nav className={styles.sideNav}>
+        <div className={styles.sideNavInner}>
           <p className={styles.navTitle}>Razas</p>
           <div className={styles.navList}>
             {RACES.map(r => (
-              <button
-                key={r.id}
-                className={`${styles.navBtn} ${selected === r.id ? styles.navBtnActive : ''}`}
-                onClick={() => { setSelected(r.id); setExpandedFeature(null) }}
-              >
+              <button key={r.id} className={styles.navBtn} onClick={() => scrollTo(r.id)}>
                 {r.label}
               </button>
             ))}
@@ -57,86 +47,88 @@ export function Races() {
       </nav>
 
       {/* ── Main content ── */}
-      <main className={styles.content}>
-        <div className={styles.detailView}>
-          <div className={styles.detailHeader}>
-            <div>
-              <h1 className={styles.detailTitle}>{race.label}</h1>
-              <p className={styles.detailDesc}>{race.desc}</p>
-            </div>
-            <div className={styles.raceBadge}>
-              <span>{race.size === 'small' ? 'Pequeño' : 'Mediano'}</span>
-              <span>{race.speed} pies</span>
-            </div>
+      <div className={styles.content}>
+        <header className={styles.pageHeader}>
+          <Globe size={28} className={styles.headerIcon} />
+          <div>
+            <h1>Razas</h1>
+            <p className={styles.subtitle}>Todas las razas base de Pathfinder</p>
           </div>
+        </header>
 
-          <div className={styles.statsGrid}>
-            <div className={styles.statBox}>
-              <span className={styles.statLabel}>Bonificadores</span>
-              <span className={styles.statValue}>{race.bonusDesc}</span>
-            </div>
-            {race.favoredClass && (
-              <div className={styles.statBox}>
-                <span className={styles.statLabel}>Clase Favorita</span>
-                <span className={styles.statValue}>{race.favoredClass === 'any' ? 'Cualquiera' : race.favoredClass}</span>
-              </div>
-            )}
-            <div className={styles.statBox}>
-              <span className={styles.statLabel}>Tamaño</span>
-              <span className={styles.statValue}>{race.size === 'small' ? 'Pequeño' : 'Mediano'}</span>
-            </div>
-            <div className={styles.statBox}>
-              <span className={styles.statLabel}>Velocidad Base</span>
-              <span className={styles.statValue}>{race.speed} pies</span>
-            </div>
-          </div>
+        <div className={styles.classList}>
+          {RACES.map(race => (
+            <div key={race.id} id={race.id} className={styles.classCard}>
 
-          <Card padding="md">
-            <h2 className={styles.sectionTitle}>Rasgos Raciales</h2>
-            <div className={styles.featureList}>
-              {race.traits.map((t) => {
-                const key = `${race.id}-${t.name}`
-                const expanded = expandedFeature === key
-                return (
-                  <div key={key} className={styles.featureRow}>
-                    <button className={styles.featureHeader} onClick={() => toggleFeature(key)}>
-                      <Star size={12} className={styles.traitIcon} />
-                      <span className={styles.featureName}>{t.name}</span>
-                      {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                    </button>
-                    {expanded && <p className={styles.featureDesc}>{t.description}</p>}
+              {/* Card header */}
+              <div className={styles.cardHeader}>
+                <div className={styles.cardTitleRow}>
+                  <h2 className={styles.className}>{race.label}</h2>
+                  <div className={styles.raceMeta}>
+                    <span className={styles.raceTag}>{race.size === 'small' ? 'Pequeño' : 'Mediano'}</span>
+                    <span className={styles.raceTag}>{race.speed} pies</span>
                   </div>
-                )
-              })}
-            </div>
-          </Card>
-
-          {race.subraces && race.subraces.length > 0 && (
-            <Card padding="md">
-              <h2 className={styles.sectionTitle}>Subrazas</h2>
-              <div className={styles.subraceList}>
-                {race.subraces.map(sub => (
-                  <div key={sub.id} className={styles.subraceCard}>
-                    <h3 className={styles.subraceName}>{sub.label}</h3>
-                    <p className={styles.subraceBonus}>
-                      {Object.entries(sub.bonuses)
-                        .map(([k, v]) => `${v! > 0 ? '+' : ''}${v} ${ABILITY_ABBR[k] ?? k}`)
-                        .join(', ')}
-                    </p>
-                    <ul className={styles.subraceTraits}>
-                      {sub.traits.map(t => (
-                        <li key={t.name}>
-                          <strong>{t.name}:</strong> {t.description}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                </div>
+                <p className={styles.classDesc}>{race.desc}</p>
               </div>
-            </Card>
-          )}
+
+              {/* Stats row */}
+              <div className={styles.statsRow}>
+                <div className={styles.statItem}>
+                  <span className={styles.statLabel}>Bonificadores</span>
+                  <span className={styles.statVal}>{race.bonusDesc}</span>
+                </div>
+                {race.favoredClass && (
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Clase Favorita</span>
+                    <span className={styles.statVal}>{race.favoredClass === 'any' ? 'Cualquiera' : race.favoredClass}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Racial traits */}
+              <div className={styles.cardSection}>
+                <p className={styles.sectionTitle}>Rasgos Raciales</p>
+                <div className={styles.featureTable}>
+                  {race.traits.map(t => (
+                    <div key={t.name} className={styles.featureRow}>
+                      <div className={styles.featureBody}>
+                        <span className={styles.featureName}>{t.name}</span>
+                        <span className={styles.featureDesc}>{t.description}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Subraces */}
+              {race.subraces && race.subraces.length > 0 && (
+                <div className={styles.cardSection}>
+                  <p className={styles.sectionTitle}>Subrazas</p>
+                  <div className={styles.subraceGrid}>
+                    {race.subraces.map(sub => (
+                      <div key={sub.id} className={styles.subraceCard}>
+                        <p className={styles.subraceName}>{sub.label}</p>
+                        <p className={styles.subraceBonus}>
+                          {Object.entries(sub.bonuses)
+                            .map(([k, v]) => `${v! > 0 ? '+' : ''}${v} ${ABILITY_ABBR[k] ?? k}`)
+                            .join(', ')}
+                        </p>
+                        {sub.traits.map(t => (
+                          <p key={t.name} className={styles.subraceTraitRow}>
+                            <strong>{t.name}: </strong>{t.description}
+                          </p>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+          ))}
         </div>
-      </main>
+      </div>
     </div>
   )
 }
