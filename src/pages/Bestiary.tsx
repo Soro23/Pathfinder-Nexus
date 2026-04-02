@@ -54,7 +54,7 @@ function crMatchesRange(cr: number, range: string): boolean {
 }
 
 export function Bestiary() {
-  const { monsters } = useMonsters()
+  const { monsters, loading } = useMonsters()
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [crFilter, setCrFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
@@ -86,6 +86,17 @@ export function Bestiary() {
       setCurrentPage(newPage)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
+  }
+
+  if (loading) {
+    return (
+      <div className={`${styles.pageLayout} ${mobile.pageLayout}`}>
+        <div className={styles.loaderContainer}>
+          <div className={styles.loader}></div>
+          <p>Cargando criaturas...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

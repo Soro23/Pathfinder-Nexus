@@ -70,6 +70,25 @@ interface Combatant {
 
 const PREPARED_CASTERS = ['wizard', 'cleric', 'druid', 'paladin', 'ranger']
 
+// Names of features that already have interactive UI (buttons/toggles) — excluded from passive list
+const INTERACTIVE_FEATURE_NAMES = new Set([
+  'Rabia', 'Despertar de Furia',
+  'Canalizar Energía', 'Canal de Energía (Oráculo)',
+  'Imponer Manos', 'Manos Puestas',
+  'Golpe Aturdidor',
+  'Actuación Bárdica', 'Inspiración de Canción',
+  'Forma Salvaje',
+  'Bombas',
+  'Mutágeno',
+  'Juicio',
+  'Desafío',
+  'Reserva Mágica',
+  'Grit', 'Determinación',
+  'Aspecto', 'Aspecto Mayor',
+  'Hexos',
+  'Eídolón',
+])
+
 export function PlayMode() {
   const { skills: SKILLS, classes: CLASSES_DATA } = useSRDStore()
   const { id } = useParams<{ id: string }>()
@@ -1130,6 +1149,29 @@ export function PlayMode() {
                     )}
 
                   </div>
+
+                  {/* Passive class features from data */}
+                  {character.classes.map((cls) => {
+                    const cd = getClassById(cls.id)
+                    if (!cd) return null
+                    const passive = cd.features.filter(
+                      (f) => f.level <= cls.level && !INTERACTIVE_FEATURE_NAMES.has(f.name)
+                    )
+                    if (passive.length === 0) return null
+                    return (
+                      <div key={cls.id} className={styles.passiveFeaturesGroup}>
+                        <span className={styles.passiveGroupLabel}>{cd.name}</span>
+                        <div className={styles.passiveFeaturesList}>
+                          {passive.map((f) => (
+                            <span key={`${f.name}-${f.level}`} className={styles.passiveFeaturePill} title={f.description}>
+                              {f.name}
+                              <span className={styles.passiveFeatureLevel}>Nv{f.level}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
                 </Card>
               )}
             </div>
