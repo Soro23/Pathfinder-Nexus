@@ -105,19 +105,19 @@ export function CharacterView() {
   const primaryClass = character.classes[0]
   const classData = getClassById(primaryClass?.id || '')
 
-  const equippedBody   = (character.armor ?? []).find((a) => a.equipped && a.type !== 'shield')
+  const equippedBody = (character.armor ?? []).find((a) => a.equipped && a.type !== 'shield')
   const equippedShield = (character.armor ?? []).find((a) => a.equipped && a.type === 'shield')
-  const effectiveDex   = equippedBody
+  const effectiveDex = equippedBody
     ? Math.min(calculateModifier(abilities.dexterity), equippedBody.maxDex ?? 99)
     : calculateModifier(abilities.dexterity)
-  const ac      = 10 + effectiveDex + (equippedBody?.acBonus ?? 0) + (equippedShield?.acBonus ?? 0) + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
+  const ac = 10 + effectiveDex + (equippedBody?.acBonus ?? 0) + (equippedShield?.acBonus ?? 0) + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
   const acTouch = 10 + effectiveDex + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
-  const acFlat  = 10 + (equippedBody?.acBonus ?? 0) + (equippedShield?.acBonus ?? 0) + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection
-  const mcStats   = getMulticlassStats(character.classes)
+  const acFlat = 10 + (equippedBody?.acBonus ?? 0) + (equippedShield?.acBonus ?? 0) + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection
+  const mcStats = getMulticlassStats(character.classes)
   const fortitude = mcStats.fortitude + calculateModifier(abilities.constitution) + resolvedStats.saveBonuses.fort
-  const reflex    = mcStats.reflex    + calculateModifier(abilities.dexterity)    + resolvedStats.saveBonuses.ref
-  const will      = mcStats.will      + calculateModifier(abilities.wisdom)       + resolvedStats.saveBonuses.will
-  const bab       = mcStats.bab
+  const reflex = mcStats.reflex + calculateModifier(abilities.dexterity) + resolvedStats.saveBonuses.ref
+  const will = mcStats.will + calculateModifier(abilities.wisdom) + resolvedStats.saveBonuses.will
+  const bab = mcStats.bab
   const initiative = calculateModifier(abilities.dexterity) + resolvedStats.initiativeBonus
   const strMod = calculateModifier(abilities.strength)
   const cmb = bab + strMod
@@ -205,14 +205,14 @@ export function CharacterView() {
   }
 
   const tabs = [
-    { id: 'combat' as Tab,    label: 'Personaje',   icon: Sword },
+    { id: 'combat' as Tab, label: 'Personaje', icon: Sword },
     ...(isCaster ? [{ id: 'spells' as Tab, label: 'Hechizos', icon: Scroll }] : []),
-    { id: 'inventory' as Tab, label: 'Inventario',  icon: Package },
-    { id: 'skills' as Tab,    label: 'Habilidades', icon: Star },
-    { id: 'feats' as Tab,     label: 'Dotes',       icon: BookOpen },
-    { id: 'weapons' as Tab,   label: 'Arsenal',     icon: Sword },
-    { id: 'companion' as Tab, label: 'Compañero',   icon: PawPrint },
-    { id: 'notes' as Tab,     label: 'Diario',      icon: Eye },
+    { id: 'inventory' as Tab, label: 'Inventario', icon: Package },
+    { id: 'skills' as Tab, label: 'Habilidades', icon: Star },
+    { id: 'feats' as Tab, label: 'Dotes', icon: BookOpen },
+    { id: 'weapons' as Tab, label: 'Arsenal', icon: Sword },
+    { id: 'companion' as Tab, label: 'Compañero', icon: PawPrint },
+    { id: 'notes' as Tab, label: 'Diario', icon: Eye },
   ]
 
   return (
@@ -429,8 +429,8 @@ export function CharacterView() {
               <div className={styles.savesGrid}>
                 {[
                   { label: 'Fort', full: 'Fortaleza', val: fortitude, abbr: 'CON' },
-                  { label: 'Ref',  full: 'Reflejos',  val: reflex,    abbr: 'DES' },
-                  { label: 'Vol',  full: 'Voluntad',  val: will,      abbr: 'SAB' },
+                  { label: 'Ref', full: 'Reflejos', val: reflex, abbr: 'DES' },
+                  { label: 'Vol', full: 'Voluntad', val: will, abbr: 'SAB' },
                 ].map(({ label, full, val, abbr }) => (
                   <div key={label} className={styles.saveBlock} title={full}>
                     <span className={styles.abilityAbbr}>{label}</span>
@@ -444,7 +444,7 @@ export function CharacterView() {
             </Card>
 
             {/* Combat Stats */}
-            <Card padding="md">
+            <Card padding="md" className={styles.sectionCombatStats}>
               <h3 className={styles.sectionTitle}>Estadísticas de Combate</h3>
               <div className={styles.combatStats}>
                 {[

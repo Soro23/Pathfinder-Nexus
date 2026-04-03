@@ -125,7 +125,10 @@
   padding: var(--space-1);
   outline: none;
 }
-.hpEditInput:focus { border-color: var(--color-accent-gold, #d4a44c); }
+
+.hpEditInput:focus {
+  border-color: var(--color-accent-gold, #d4a44c);
+}
 
 .hpEditHint {
   font-size: var(--text-body-sm);
@@ -198,7 +201,8 @@
 }
 
 .quickStatValue {
-  font-family: var(--font-display);   /* Narrative numbers */
+  font-family: var(--font-display);
+  /* Narrative numbers */
   font-size: var(--text-title-md);
   font-weight: 700;
   color: var(--color-on-surface);
@@ -257,20 +261,30 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Combat Tab ── */
 .combatTab {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; /* Atributos (6 columnas) */
-  grid-template-areas: 
-    "abilities saves saves combat combat combat" 
-    "abilityabbr savsam savevol combatstat combatstat combatstat" 
-    "abilities saves saves combat combat combat"; /* Repetir si necesitas mas filas */
+  grid-template-columns: 1fr 1fr;
+  /* Atributos (6 columnas) */
+  grid-template-areas:
+    "abilities saves saves combat combat combat"
+    "abilityabbr savsam savevol combatstat combatstat combatstat"
+    "abilities saves saves combat combat combat";
+  /* Repetir si necesitas mas filas */
   gap: var(--space-2);
-gap: 4px; /* Ajustar si el espacio es太小 */
+  gap: 4px;
+  /* Ajustar si el espacio es太小 */
 }
 
 .colSpan2 {
@@ -385,8 +399,16 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   justify-content: center;
   transition: background var(--transition-fast), color var(--transition-fast);
 }
-.classLevelBtn:hover:not(:disabled) { background: var(--color-primary-container); color: var(--color-primary); }
-.classLevelBtn:disabled { opacity: 0.35; cursor: default; }
+
+.classLevelBtn:hover:not(:disabled) {
+  background: var(--color-primary-container);
+  color: var(--color-primary);
+}
+
+.classLevelBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
 
 .classLevelValue {
   font-family: var(--font-display);
@@ -411,12 +433,10 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   margin-bottom: var(--space-4);
   padding-bottom: var(--space-2);
   /* Tonal line instead of 1px border */
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    transparent calc(100% - 2px),
-    var(--color-surface-container-high) 100%
-  );
+  background: linear-gradient(to bottom,
+      transparent,
+      transparent calc(100% - 2px),
+      var(--color-surface-container-high) 100%);
 }
 
 /* Ability scores grid */
@@ -446,7 +466,8 @@ gap: 4px; /* Ajustar si el espacio es太小 */
 }
 
 .abilityScore {
-  font-family: var(--font-display);  /* Narrative power number */
+  font-family: var(--font-display);
+  /* Narrative power number */
   font-size: var(--text-headline-sm);
   font-weight: 700;
   color: var(--color-on-surface);
@@ -467,15 +488,23 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   outline: none;
   line-height: 1;
 }
-.abilityEditInput:focus { border-color: var(--color-primary); }
+
+.abilityEditInput:focus {
+  border-color: var(--color-primary);
+}
 
 .abilityMod {
   font-size: var(--text-body-md);
   font-weight: 700;
 }
 
-.positive { color: #2d6a2d; }
-.negative { color: var(--color-primary); }
+.positive {
+  color: #2d6a2d;
+}
+
+.negative {
+  color: var(--color-primary);
+}
 
 /* Saving throws */
 .savesGrid {
@@ -496,6 +525,10 @@ gap: 4px; /* Ajustar si el espacio es太小 */
 }
 
 /* Combat stats */
+.sectionCombatStats {
+  grid-column: 1 / -1;
+}
+
 .combatStats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -521,7 +554,8 @@ gap: 4px; /* Ajustar si el espacio es太小 */
 }
 
 .combatValue {
-  font-family: var(--font-display);   /* Narrative power */
+  font-family: var(--font-display);
+  /* Narrative power */
   font-size: var(--text-headline-sm);
   font-weight: 700;
   color: var(--color-secondary);
@@ -631,7 +665,9 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   transition: background var(--transition-fast);
 }
 
-.addEffectBtn:hover { background: var(--color-surface-container-low); }
+.addEffectBtn:hover {
+  background: var(--color-surface-container-low);
+}
 
 .effectForm {
   display: flex;
@@ -677,6 +713,7 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   box-shadow: inset 0 0 0 1px rgba(123, 0, 31, 0.15);
   cursor: pointer;
 }
+
 .effectSelect:focus {
   outline: none;
   box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.3);
@@ -694,6 +731,7 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   text-align: center;
   box-shadow: inset 0 0 0 1px rgba(123, 0, 31, 0.15);
 }
+
 .effectValueInput:focus {
   outline: none;
   box-shadow: inset 0 0 0 2px rgba(123, 0, 31, 0.3);
@@ -705,6 +743,7 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   font-weight: 700;
   color: var(--color-accent-gold, #d4a44c);
 }
+
 .effectBonusNeg {
   font-family: var(--font-mono);
   font-size: var(--text-body-sm);
@@ -797,9 +836,18 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   transition: color var(--transition-fast), background var(--transition-fast);
   flex-shrink: 0;
 }
-.effectToggleOn  { color: #4caf7d; }
-.effectToggleOff { color: var(--color-on-surface-variant); }
-.effectToggleBtn:hover { background: rgba(255,255,255,0.06); }
+
+.effectToggleOn {
+  color: #4caf7d;
+}
+
+.effectToggleOff {
+  color: var(--color-on-surface-variant);
+}
+
+.effectToggleBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
 
 /* Edit / remove buttons */
 .effectEditBtn {
@@ -814,7 +862,10 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   border-radius: var(--radius-sm);
   transition: color var(--transition-fast);
 }
-.effectEditBtn:hover { color: var(--color-accent-gold, #d4a44c); }
+
+.effectEditBtn:hover {
+  color: var(--color-accent-gold, #d4a44c);
+}
 
 .effectRemove {
   display: flex;
@@ -828,7 +879,10 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   border-radius: var(--radius-sm);
   transition: color var(--transition-fast);
 }
-.effectRemove:hover { color: var(--color-error); }
+
+.effectRemove:hover {
+  color: var(--color-error);
+}
 
 /* Inline edit form inside a list item */
 .effectEditInline {
@@ -873,9 +927,13 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   transition: background var(--transition-fast);
 }
 
-.skillRow:hover { background: var(--color-surface-container-lowest); }
+.skillRow:hover {
+  background: var(--color-surface-container-lowest);
+}
 
-.skillRowActive { background: var(--color-surface-container-lowest); }
+.skillRowActive {
+  background: var(--color-surface-container-lowest);
+}
 
 .skillName {
   display: flex;
@@ -948,7 +1006,10 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   color: var(--color-on-surface-variant);
 }
 
-.journalEmptyIcon { opacity: 0.35; color: var(--color-outline); }
+.journalEmptyIcon {
+  opacity: 0.35;
+  color: var(--color-outline);
+}
 
 .journalEmptyHint {
   font-size: var(--text-body-sm);
@@ -986,7 +1047,10 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   padding: 2px var(--space-2);
 }
 
-.journalDateInput:focus { outline: none; box-shadow: inset 0 0 0 2px rgba(123, 88, 0, 0.4); }
+.journalDateInput:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(123, 88, 0, 0.4);
+}
 
 .journalPreview {
   font-size: var(--text-body-sm);
@@ -1042,7 +1106,11 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   font-size: var(--text-body-md);
 }
 
-.journalSection { display: flex; flex-direction: column; gap: var(--space-2); }
+.journalSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
 
 .journalSectionHeader {
   display: flex;
@@ -1109,7 +1177,8 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   color: var(--color-on-surface);
 }
 
-.journalCharNotes, .placeDesc {
+.journalCharNotes,
+.placeDesc {
   font-size: var(--text-body-sm);
   color: var(--color-on-surface-variant);
 }
@@ -1126,9 +1195,20 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   border-radius: var(--radius-full);
 }
 
-.roleBadge.ally { background: rgba(74, 124, 74, 0.15); color: #2d6a2d; }
-.roleBadge.enemy { background: var(--color-error-container); color: var(--color-error); }
-.roleBadge.neutral { background: var(--color-surface-container-high); color: var(--color-on-surface-variant); }
+.roleBadge.ally {
+  background: rgba(74, 124, 74, 0.15);
+  color: #2d6a2d;
+}
+
+.roleBadge.enemy {
+  background: var(--color-error-container);
+  color: var(--color-error);
+}
+
+.roleBadge.neutral {
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface-variant);
+}
 
 .legacyNotesTitle {
   font-size: var(--text-label-sm);
@@ -1157,7 +1237,10 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   background: var(--color-error-container);
 }
 
-.emptyText { font-style: italic; color: var(--color-on-surface-variant); }
+.emptyText {
+  font-style: italic;
+  color: var(--color-on-surface-variant);
+}
 
 /* ── Feats read mode ── */
 .featsReadGrid {
@@ -1251,7 +1334,10 @@ gap: 4px; /* Ajustar si el espacio es太小 */
   align-items: center;
   transition: color var(--transition-fast);
 }
-.modalClose:hover { color: var(--color-on-surface); }
+
+.modalClose:hover {
+  color: var(--color-on-surface);
+}
 
 .modalBody {
   padding: var(--space-4) var(--space-5);
@@ -1267,17 +1353,51 @@ gap: 4px; /* Ajustar si el espacio es太小 */
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .titleRow { flex-direction: column; }
-  .actions { width: 100%; }
-  .actions a, .actions button { flex: 1; }
-  .hpBanner { flex-direction: column; }
-  .hpContent { flex-wrap: wrap; justify-content: center; }
-  .hpControls { width: 100%; justify-content: center; margin-left: 0; margin-top: var(--space-3); }
-  .quickStats { width: 100%; justify-content: space-around; }
-  .abilityGrid { grid-template-columns: repeat(3, 1fr); }
-  .combatStats { grid-template-columns: repeat(2, 1fr); }
+  .titleRow {
+    flex-direction: column;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .actions a,
+  .actions button {
+    flex: 1;
+  }
+
+  .hpBanner {
+    flex-direction: column;
+  }
+
+  .hpContent {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hpControls {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+    margin-top: var(--space-3);
+  }
+
+  .quickStats {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .abilityGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .combatStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 600px) {
-  .abilityGrid { grid-template-columns: repeat(2, 1fr); }
+  .abilityGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
