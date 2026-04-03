@@ -165,6 +165,12 @@ export const useCharacterStore = create<CharacterStore>()((set, get) => ({
       const characters = data.map((row) => {
         const c = { ...row.data as Character, id: row.id }
         c.feats = (c.feats ?? []).map((f) => typeof f === 'string' ? { id: f } : f)
+        if (c.companion) {
+          c.companion.tricks = c.companion.tricks ?? []
+          c.companion.feats = c.companion.feats ?? []
+          c.companion.customSpecialAbilities = c.companion.customSpecialAbilities ?? []
+          c.companion.attacks = c.companion.attacks ?? []
+        }
         return c
       })
       set({ characters })
