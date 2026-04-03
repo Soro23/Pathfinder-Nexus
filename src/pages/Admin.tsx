@@ -729,7 +729,7 @@ function SpellImporterPanel({ onImported, onCancel }: { onImported: () => void; 
   const [duplicate, setDuplicate] = useState<Spell | null>(null)
   const [importError, setImportError] = useState('')
 
-  const { customSpells, addSpell } = useCustomSpellsStore()
+  const { customSpells } = useCustomSpellsStore()
 
   async function handleImport() {
     if (!url.trim()) return
@@ -746,14 +746,17 @@ function SpellImporterPanel({ onImported, onCancel }: { onImported: () => void; 
     }
   }
 
-  async function handleAdd(forceNewId = false) {
+async function handleAdd(forceNewId = false) {
     if (!preview) return
     const spell = { ...preview } as Spell
     if (forceNewId) spell.id = spell.id + '_custom_' + Date.now()
-    const { error } = await addSpell(spell)
-    if (error) { setImportError(error); setImportStatus('error') }
-    else { setPreview(null); setDuplicate(null); onImported() }
-  }
+    const { error } = await supabase.from('spells').insert(spell)
+    if (error) { setImportError(error.message); setImportStatus('error') }
+    else {
+        await refreshSRD()
+        setPreview(null); setDuplicate(null); onImported()
+    }
+}
 
   return (
     <div className={styles.importerCard} style={{ marginBottom: 'var(--space-4)' }}>

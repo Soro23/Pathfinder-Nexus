@@ -37,7 +37,7 @@ export function FeatsSelector({ selectedFeats, onAdd, onRemove, maxFeats }: Feat
     return matchesType && matchesSearch
   })
 
-  const canAddMore = !maxFeats || selectedFeats.length < maxFeats
+  const canAddMore = true
   const availableFeats = maxFeats ? maxFeats - selectedFeats.length : null
 
   const instancesOf = (featId: string) =>
