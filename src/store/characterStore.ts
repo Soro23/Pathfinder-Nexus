@@ -58,20 +58,15 @@ export interface Weapon {
 
 export interface AnimalCompanion {
   name: string
-  type: string
+  animalTypeId: string          // id from ANIMAL_TYPES e.g. 'wolf'
   level: number
   hp: { current: number; max: number }
-  abilities: {
-    strength: number
-    dexterity: number
-    constitution: number
-    intelligence: number
-    wisdom: number
-    charisma: number
-  }
+  tricks: string[]
+  feats: string[]
+  customSpecialAbilities: string[]
   attacks: { name: string; bonus: number; damage: string }[]
   skills: Record<string, number>
-  specialAbilities: string[]
+  notes?: string
 }
 
 export interface JournalEntry {

@@ -16,66 +16,66 @@ const CLASS_GROUPS: { label: string; classes: { value: string; label: string; ro
   {
     label: 'Clases Principales',
     classes: [
-      { value: 'fighter',    label: 'Guerrero',          role: 'Combate',   desc: 'Maestro de las armas y el combate cuerpo a cuerpo.', hitDie: 'd10' },
-      { value: 'barbarian',  label: 'Bárbaro',           role: 'Combate',   desc: 'Guerrero primitivo que entra en cólera devastadora.', hitDie: 'd12' },
-      { value: 'monk',       label: 'Monje',             role: 'Combate',   desc: 'Artista marcial que domina su cuerpo y mente.', hitDie: 'd8' },
-      { value: 'paladin',    label: 'Paladín',           role: 'Sagrado',   desc: 'Campeón sagrado guiado por su código de honor.', hitDie: 'd10' },
-      { value: 'ranger',     label: 'Explorador',        role: 'Natural',   desc: 'Guerrero del natural con compañero animal.', hitDie: 'd10' },
-      { value: 'rogue',      label: 'Pícaro',            role: 'Sigilo',    desc: 'Experto en habilidades, trampas y ataques furtivos.', hitDie: 'd8' },
-      { value: 'wizard',     label: 'Mago',              role: 'Arcano',    desc: 'Lanzador arcano que estudia los secretos del universo.', hitDie: 'd6' },
-      { value: 'sorcerer',   label: 'Hechicero',         role: 'Arcano',    desc: 'Magia innata que fluye por su sangre dracónica.', hitDie: 'd6' },
-      { value: 'bard',       label: 'Bardo',             role: 'Arcano',    desc: 'Maestro de la música y las artes arcanas.', hitDie: 'd8' },
-      { value: 'cleric',     label: 'Clérigo',           role: 'Divino',    desc: 'Canal de poder divino de su deidad.', hitDie: 'd8' },
-      { value: 'druid',      label: 'Druida',            role: 'Natural',   desc: 'Guardián de la naturaleza con poder elemental.', hitDie: 'd8' },
+      { value: 'fighter', label: 'Guerrero', role: 'Combate', desc: 'Maestro de las armas y el combate cuerpo a cuerpo.', hitDie: 'd10' },
+      { value: 'barbarian', label: 'Bárbaro', role: 'Combate', desc: 'Guerrero primitivo que entra en cólera devastadora.', hitDie: 'd12' },
+      { value: 'monk', label: 'Monje', role: 'Combate', desc: 'Artista marcial que domina su cuerpo y mente.', hitDie: 'd8' },
+      { value: 'paladin', label: 'Paladín', role: 'Sagrado', desc: 'Campeón sagrado guiado por su código de honor.', hitDie: 'd10' },
+      { value: 'ranger', label: 'Explorador', role: 'Natural', desc: 'Guerrero del natural con compañero animal.', hitDie: 'd10' },
+      { value: 'rogue', label: 'Pícaro', role: 'Sigilo', desc: 'Experto en habilidades, trampas y ataques furtivos.', hitDie: 'd8' },
+      { value: 'wizard', label: 'Mago', role: 'Arcano', desc: 'Lanzador arcano que estudia los secretos del universo.', hitDie: 'd6' },
+      { value: 'sorcerer', label: 'Hechicero', role: 'Arcano', desc: 'Magia innata que fluye por su sangre dracónica.', hitDie: 'd6' },
+      { value: 'bard', label: 'Bardo', role: 'Arcano', desc: 'Maestro de la música y las artes arcanas.', hitDie: 'd8' },
+      { value: 'cleric', label: 'Clérigo', role: 'Divino', desc: 'Canal de poder divino de su deidad.', hitDie: 'd8' },
+      { value: 'druid', label: 'Druida', role: 'Natural', desc: 'Guardián de la naturaleza con poder elemental.', hitDie: 'd8' },
     ],
   },
   {
     label: 'Clases Base (APG)',
     classes: [
-      { value: 'alchemist',  label: 'Alquimista',        role: 'Alquimia',  desc: 'Maestro de bombas, mutágenos y extractos.', hitDie: 'd8' },
-      { value: 'oracle',     label: 'Oráculo',           role: 'Divino',    desc: 'Canaliza poder divino a través de un misterio.', hitDie: 'd8' },
-      { value: 'inquisitor', label: 'Inquisidor',        role: 'Divino',    desc: 'Cazador de herejes con magia divina y combate.', hitDie: 'd8' },
-      { value: 'witch',      label: 'Bruja',             role: 'Arcano',    desc: 'Lanzadora arcana con familiar, hexes y patrono.', hitDie: 'd6' },
-      { value: 'cavalier',   label: 'Caballero',         role: 'Combate',   desc: 'Guerrero montado vinculado a una orden caballeresca.', hitDie: 'd10' },
-      { value: 'magus',      label: 'Magus',             role: 'Arcano',    desc: 'Fusiona hechizos arcanos con combate marcial.', hitDie: 'd8' },
-      { value: 'summoner',   label: 'Invocador',         role: 'Arcano',    desc: 'Vinculado a un eidolón extraplanar.', hitDie: 'd8' },
-      { value: 'gunslinger', label: 'Pistolero',         role: 'Combate',   desc: 'Maestro de armas de fuego y chispa.', hitDie: 'd10' },
-      { value: 'shifter',    label: 'Cambiaformas',           role: 'Natural',   desc: 'Adopta aspectos y formas animales.', hitDie: 'd10' },
-      { value: 'vigilante',  label: 'Vigilante',         role: 'Sigilo',    desc: 'Héroe de doble identidad entre la sociedad y las sombras.', hitDie: 'd8' },
+      { value: 'alchemist', label: 'Alquimista', role: 'Alquimia', desc: 'Maestro de bombas, mutágenos y extractos.', hitDie: 'd8' },
+      { value: 'oracle', label: 'Oráculo', role: 'Divino', desc: 'Canaliza poder divino a través de un misterio.', hitDie: 'd8' },
+      { value: 'inquisitor', label: 'Inquisidor', role: 'Divino', desc: 'Cazador de herejes con magia divina y combate.', hitDie: 'd8' },
+      { value: 'witch', label: 'Bruja', role: 'Arcano', desc: 'Lanzadora arcana con familiar, hexes y patrono.', hitDie: 'd6' },
+      { value: 'cavalier', label: 'Caballero', role: 'Combate', desc: 'Guerrero montado vinculado a una orden caballeresca.', hitDie: 'd10' },
+      { value: 'magus', label: 'Magus', role: 'Arcano', desc: 'Fusiona hechizos arcanos con combate marcial.', hitDie: 'd8' },
+      { value: 'summoner', label: 'Invocador', role: 'Arcano', desc: 'Vinculado a un eidolón extraplanar.', hitDie: 'd8' },
+      { value: 'gunslinger', label: 'Pistolero', role: 'Combate', desc: 'Maestro de armas de fuego y chispa.', hitDie: 'd10' },
+      { value: 'shifter', label: 'Cambiaformas', role: 'Natural', desc: 'Adopta aspectos y formas animales.', hitDie: 'd10' },
+      { value: 'vigilante', label: 'Vigilante', role: 'Sigilo', desc: 'Héroe de doble identidad entre la sociedad y las sombras.', hitDie: 'd8' },
     ],
   },
   {
     label: 'Clases Híbridas (ACG)',
     classes: [
-      { value: 'arcanist',   label: 'Arcanista',         role: 'Arcano',    desc: 'Fusión de mago y hechicero con explotaciones arcanas.', hitDie: 'd6' },
+      { value: 'arcanist', label: 'Arcanista', role: 'Arcano', desc: 'Fusión de mago y hechicero con explotaciones arcanas.', hitDie: 'd6' },
       { value: 'bloodrager', label: 'Rabioso de Sangre', role: 'Combate', desc: 'Berserker con linaje mágico que lanza hechizos en furia.', hitDie: 'd10' },
-      { value: 'brawler',    label: 'Luchador',          role: 'Combate',   desc: 'Combatiente sin armas: guerrero + monje.', hitDie: 'd10' },
-      { value: 'hunter',     label: 'Cazador',           role: 'Natural',   desc: 'Rastreador con compañero animal: druida + explorador.', hitDie: 'd8' },
-      { value: 'investigator',label:'Investigador',      role: 'Sigilo',    desc: 'Detective alquímico con inspiración e ingenio.', hitDie: 'd8' },
-      { value: 'shaman',     label: 'Chamán',            role: 'Divino',    desc: 'Invocador de espíritus: bruja + oráculo.', hitDie: 'd8' },
-      { value: 'skald',      label: 'Escaldo',             role: 'Arcano',    desc: 'Bardo bárbaro que inspira con cantos de guerra.', hitDie: 'd8' },
-      { value: 'slayer',     label: 'Segador',           role: 'Sigilo',    desc: 'Cazador letal: explorador + pícaro.', hitDie: 'd10' },
-      { value: 'swashbuckler',label:'Espadachín',        role: 'Combate',   desc: 'Combatiente ágil y elegante con panache.', hitDie: 'd10' },
-      { value: 'warpriest',  label: 'Sacerdote de Guerra', role: 'Divino', desc: 'Combina fuerza del guerrero con bendiciones del clérigo.', hitDie: 'd8' },
+      { value: 'brawler', label: 'Luchador', role: 'Combate', desc: 'Combatiente sin armas: guerrero + monje.', hitDie: 'd10' },
+      { value: 'hunter', label: 'Cazador', role: 'Natural', desc: 'Rastreador con compañero animal: druida + explorador.', hitDie: 'd8' },
+      { value: 'investigator', label: 'Investigador', role: 'Sigilo', desc: 'Detective alquímico con inspiración e ingenio.', hitDie: 'd8' },
+      { value: 'shaman', label: 'Chamán', role: 'Divino', desc: 'Invocador de espíritus: bruja + oráculo.', hitDie: 'd8' },
+      { value: 'skald', label: 'Escaldo', role: 'Arcano', desc: 'Bardo bárbaro que inspira con cantos de guerra.', hitDie: 'd8' },
+      { value: 'slayer', label: 'Segador', role: 'Sigilo', desc: 'Cazador letal: explorador + pícaro.', hitDie: 'd10' },
+      { value: 'swashbuckler', label: 'Espadachín', role: 'Combate', desc: 'Combatiente ágil y elegante con panache.', hitDie: 'd10' },
+      { value: 'warpriest', label: 'Sacerdote de Guerra', role: 'Divino', desc: 'Combina fuerza del guerrero con bendiciones del clérigo.', hitDie: 'd8' },
     ],
   },
   {
     label: 'Clases Alternativas',
     classes: [
-      { value: 'antipaladin',label: 'Antipaladín',       role: 'Oscuro',    desc: 'Contraparte oscura del paladín, campeón del mal.', hitDie: 'd10' },
-      { value: 'ninja',      label: 'Ninja',             role: 'Sigilo',    desc: 'Espía y asesino con poderes místicos ki.', hitDie: 'd8' },
-      { value: 'samurai',    label: 'Samurai',           role: 'Combate',   desc: 'Guerrero noble guiado por código de honor, maestro de la katana.', hitDie: 'd10' },
+      { value: 'antipaladin', label: 'Antipaladín', role: 'Oscuro', desc: 'Contraparte oscura del paladín, campeón del mal.', hitDie: 'd10' },
+      { value: 'ninja', label: 'Ninja', role: 'Sigilo', desc: 'Espía y asesino con poderes místicos ki.', hitDie: 'd8' },
+      { value: 'samurai', label: 'Samurai', role: 'Combate', desc: 'Guerrero noble guiado por código de honor, maestro de la katana.', hitDie: 'd10' },
     ],
   },
   {
     label: 'Clases Ocultas (OA)',
     classes: [
-      { value: 'kineticist', label: 'Kineticista',       role: 'Psíquico',  desc: 'Canal de energía elemental con impulsos cinéticos.', hitDie: 'd8' },
-      { value: 'psychic',    label: 'Psíquico',          role: 'Psíquico',  desc: 'Lanzador de máxima potencia que usa la mente como canal.', hitDie: 'd6' },
-      { value: 'mesmerist',  label: 'Mesmerista',        role: 'Psíquico',  desc: 'Maestro del encantamiento que hipnotiza con la mirada.', hitDie: 'd8' },
-      { value: 'occultist',  label: 'Ocultista',         role: 'Psíquico',  desc: 'Canaliza magia psíquica a través de antigüedades.', hitDie: 'd8' },
-      { value: 'medium',     label: 'Médium',            role: 'Psíquico',  desc: 'Canaliza espíritus legendarios que alteran sus capacidades.', hitDie: 'd8' },
-      { value: 'spiritualist',label:'Espiritista',       role: 'Psíquico',  desc: 'Vinculado a un fantasma ectoplásmico compañero.', hitDie: 'd8' },
+      { value: 'kineticist', label: 'Kineticista', role: 'Psíquico', desc: 'Canal de energía elemental con impulsos cinéticos.', hitDie: 'd8' },
+      { value: 'psychic', label: 'Psíquico', role: 'Psíquico', desc: 'Lanzador de máxima potencia que usa la mente como canal.', hitDie: 'd6' },
+      { value: 'mesmerist', label: 'Mesmerista', role: 'Psíquico', desc: 'Maestro del encantamiento que hipnotiza con la mirada.', hitDie: 'd8' },
+      { value: 'occultist', label: 'Ocultista', role: 'Psíquico', desc: 'Canaliza magia psíquica a través de antigüedades.', hitDie: 'd8' },
+      { value: 'medium', label: 'Médium', role: 'Psíquico', desc: 'Canaliza espíritus legendarios que alteran sus capacidades.', hitDie: 'd8' },
+      { value: 'spiritualist', label: 'Espiritista', role: 'Psíquico', desc: 'Vinculado a un fantasma ectoplásmico compañero.', hitDie: 'd8' },
     ],
   },
 ]
@@ -99,33 +99,33 @@ const ABILITY_KEYS = ['strength', 'dexterity', 'constitution', 'intelligence', '
 type AbilityKey = typeof ABILITY_KEYS[number]
 
 const ABILITY_LABELS: Record<AbilityKey, [string, string]> = {
-  strength:     ['FUERZA',       'FUE'],
-  dexterity:    ['DESTREZA',     'DES'],
+  strength: ['FUERZA', 'FUE'],
+  dexterity: ['DESTREZA', 'DES'],
   constitution: ['CONSTITUCIÓN', 'CON'],
   intelligence: ['INTELIGENCIA', 'INT'],
-  wisdom:       ['SABIDURÍA',    'SAB'],
-  charisma:     ['CARISMA',      'CAR'],
+  wisdom: ['SABIDURÍA', 'SAB'],
+  charisma: ['CARISMA', 'CAR'],
 }
 
 type AbilityMethod = 'free' | 'pointbuy' | 'standard' | 'heroic' | 'roll4d6'
 
 const ABILITY_METHODS: { id: AbilityMethod; label: string }[] = [
-  { id: 'free',     label: 'Libre' },
+  { id: 'free', label: 'Libre' },
   { id: 'pointbuy', label: 'Compra (25 pts)' },
   { id: 'standard', label: 'Array Estándar' },
-  { id: 'heroic',   label: 'Array Heroico' },
-  { id: 'roll4d6',  label: 'Tirar 4d6' },
+  { id: 'heroic', label: 'Array Heroico' },
+  { id: 'roll4d6', label: 'Tirar 4d6' },
 ]
 
 const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8]
-const HEROIC_ARRAY   = [18, 16, 14, 12, 10, 8]
+const HEROIC_ARRAY = [18, 16, 14, 12, 10, 8]
 
 function rollStartingGold(notation: string): number {
   const match = notation.match(/^(\d+)d(\d+)\*(\d+)$/)
   if (!match) return 0
   const count = parseInt(match[1])
   const sides = parseInt(match[2])
-  const mult  = parseInt(match[3])
+  const mult = parseInt(match[3])
   let total = 0
   for (let i = 0; i < count; i++) {
     total += Math.floor(Math.random() * sides) + 1
@@ -142,10 +142,10 @@ function roll4d6DropLowest(): number {
 type Step = 'race' | 'class' | 'abilities' | 'summary'
 
 const STEPS: { id: Step; label: string; tip: string }[] = [
-  { id: 'race',      label: 'Raza',      tip: 'Tu raza determina tus bonificadores raciales de atributo y habilidades especiales innatas.' },
-  { id: 'class',     label: 'Clase',     tip: 'La clase define tu rol en el grupo: guerrero, lanzador de hechizos, pícaro... cada una tiene habilidades únicas.' },
+  { id: 'race', label: 'Raza', tip: 'Tu raza determina tus bonificadores raciales de atributo y habilidades especiales innatas.' },
+  { id: 'class', label: 'Clase', tip: 'La clase define tu rol en el grupo: guerrero, lanzador de hechizos, pícaro... cada una tiene habilidades únicas.' },
   { id: 'abilities', label: 'Atributos', tip: 'Elige cómo generar tus atributos: libre, compra de puntos, array predefinido o tirando 4d6 y eliminando el menor.' },
-  { id: 'summary',   label: 'Resumen',   tip: 'Revisa todos los datos antes de crear tu personaje. Podrás editarlos después desde la hoja de personaje.' },
+  { id: 'summary', label: 'Resumen', tip: 'Revisa todos los datos antes de crear tu personaje. Podrás editarlos después desde la hoja de personaje.' },
 ]
 
 const DEFAULT_ABILITIES: Record<AbilityKey, number> = {
@@ -162,9 +162,9 @@ export function CharacterNew() {
   useEffect(() => { fetchAll() }, [fetchAll])
 
   const RACE_GROUPS = [
-    { label: 'Razas Principales',   races: storeRaces.filter(r => CORE_RACES.includes(r.id)) },
-    { label: 'Razas Destacadas',    races: storeRaces.filter(r => !CORE_RACES.includes(r.id) && !UNCOMMON_RACES.includes(r.id)) },
-    { label: 'Razas Poco Comunes',  races: storeRaces.filter(r => UNCOMMON_RACES.includes(r.id)) },
+    { label: 'Razas Principales', races: storeRaces.filter(r => CORE_RACES.includes(r.id)) },
+    { label: 'Razas Destacadas', races: storeRaces.filter(r => !CORE_RACES.includes(r.id) && !UNCOMMON_RACES.includes(r.id)) },
+    { label: 'Razas Poco Comunes', races: storeRaces.filter(r => UNCOMMON_RACES.includes(r.id)) },
   ]
   const [step, setStep] = useState<Step>('race')
 
@@ -215,9 +215,9 @@ export function CharacterNew() {
 
   // ── Array/roll assignment ──
   const currentPool = abilityMethod === 'standard' ? STANDARD_ARRAY
-                    : abilityMethod === 'heroic'   ? HEROIC_ARRAY
-                    : abilityMethod === 'roll4d6'  ? rolledValues
-                    : []
+    : abilityMethod === 'heroic' ? HEROIC_ARRAY
+      : abilityMethod === 'roll4d6' ? rolledValues
+        : []
 
   const usedIndices = new Set(Object.values(assignedIdx))
 
@@ -571,7 +571,7 @@ export function CharacterNew() {
                           type="number"
                           className={styles.freeInput}
                           value={value}
-                          min={3}
+                          min={0}
                           onChange={(e) => updateForm(attr, Math.max(3, +e.target.value || 10))}
                         />
                       )}

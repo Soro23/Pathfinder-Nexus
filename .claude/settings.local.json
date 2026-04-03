@@ -45,7 +45,13 @@
       "Bash(node -e \"const { CLASSES } = require\\('./D:/Code/ClaudeWorkspace/Pathfinder-Nexus/src/data/classes.ts'\\)\")",
       "Bash(node:*)",
       "Bash(python3)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(find /d/Code/ClaudeWorkspace/Pathfinder-Nexus/src -type f \\\\\\( -name \"*.tsx\" -o -name \"*.ts\" \\\\\\) -exec grep -l \"search\" {} \\\\;)",
+      "Bash(grep -l \"\\\\.toLowerCase\\(\\)\\\\.includes\\\\|search\\\\|filter\" /d/Code/ClaudeWorkspace/Pathfinder-Nexus/src/pages/*.tsx)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(wc:*)",
+      "Bash(find:*)"
     ]
   }
 }
