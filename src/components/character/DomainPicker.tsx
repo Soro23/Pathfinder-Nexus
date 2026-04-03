@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { DOMAINS, getDomainById } from '../../data/domains'
+import { useSRDStore } from '../../store/srdStore'
 import type { DomainData } from '../../data/domains'
 import styles from './DomainPicker.module.css'
 
@@ -13,6 +13,7 @@ interface DomainPickerProps {
 
 export function DomainPicker({ selected, onChange, characterLevel = 1, wisdomMod = 0, disabled = false }: DomainPickerProps) {
   const [search, setSearch] = useState('')
+  const { domains: DOMAINS, getDomainById } = useSRDStore()
 
   const filtered = DOMAINS.filter(d =>
     d.name.toLowerCase().includes(search.toLowerCase()) ||

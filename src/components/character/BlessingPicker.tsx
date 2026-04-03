@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BLESSINGS, getBlessingById } from '../../data/blessings'
+import { useSRDStore } from '../../store/srdStore'
 import type { BlessingData } from '../../data/blessings'
 import styles from './BlessingPicker.module.css'
 
@@ -12,6 +12,7 @@ interface BlessingPickerProps {
 
 export function BlessingPicker({ selected, onChange, characterLevel = 1, disabled = false }: BlessingPickerProps) {
   const [search, setSearch] = useState('')
+  const { blessings: BLESSINGS, getBlessingById } = useSRDStore()
 
   const filtered = BLESSINGS.filter(b =>
     b.name.toLowerCase().includes(search.toLowerCase()) ||

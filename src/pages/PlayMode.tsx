@@ -5,7 +5,7 @@ import {
   Swords, Flame, X, Zap, BookOpen, Activity, Power, Pencil, Check
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, StatusEffect, BonusTarget } from '../store'
-import { getClassById, getMulticlassStats, useSRDStore, getDomainById, getBlessingById } from '../data'
+import { getClassById, getMulticlassStats, useSRDStore } from '../data'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card } from '../components/ui'
 import styles from './PlayMode.module.css'
@@ -93,7 +93,7 @@ const INTERACTIVE_FEATURE_NAMES = new Set([
 ])
 
 export function PlayMode() {
-  const { skills: SKILLS, classes: CLASSES_DATA } = useSRDStore()
+  const { skills: SKILLS, classes: CLASSES_DATA, getDomainById, getBlessingById } = useSRDStore()
   const { id } = useParams<{ id: string }>()
   const character = useCharacterStore((state) => state.getCharacter(id || ''))
   const updateCharacter = useCharacterStore((state) => state.updateCharacter)

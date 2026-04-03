@@ -63,16 +63,22 @@ export function useMonsters() {
   useEffect(() => {
     async function fetchMonsters() {
       try {
-        const { data, error } = await supabase
-          .from('monsters')
-          .select('*')
-          .order('name')
-
-        if (error) throw error
-
-        if (data) {
-          setMonsters(data.map(mapMonsterRow))
+        const PAGE = 50
+        const all: Monster[] = []
+        let offset = 0
+        while (true) {
+          const { data, error } = await supabase
+            .from('monsters')
+            .select('*')
+            .order('name')
+            .range(offset, offset + PAGE - 1)
+          if (error) throw error
+          if (!data || data.length === 0) break
+          all.push(...data.map(mapMonsterRow))
+          if (data.length < PAGE) break
+          offset += PAGE
         }
+        setMonsters(all)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Error loading monsters')
       } finally {

@@ -5,11 +5,15 @@ import { FEATS } from '../data/feats'
 import { CLASSES } from '../data/classes'
 import { RACES } from '../data/races'
 import { ARCHETYPES } from '../data/archetypes'
+import { DOMAINS } from '../data/domains'
+import { BLESSINGS } from '../data/blessings'
 import type { Skill } from '../data/skills'
 import type { Feat, FeatType } from '../data/feats'
 import type { ClassData } from '../data/classes'
 import type { Race } from '../data/races'
 import type { Archetype } from '../data/archetypes'
+import type { DomainData } from '../data/domains'
+import type { BlessingData } from '../data/blessings'
 
 export interface NPC {
   id: string
@@ -75,11 +79,41 @@ interface SRDStore {
   races: Race[]
   archetypes: Archetype[]
   npcs: NPC[]
+  domains: DomainData[]
+  blessings: BlessingData[]
   loading: boolean
   initialized: boolean
   fetchAll: () => Promise<void>
   getArchetypesByClass: (classId: string) => Archetype[]
   getArchetypeById: (id: string) => Archetype | undefined
+  getDomainById: (id: string) => DomainData | undefined
+  getBlessingById: (id: string) => BlessingData | undefined
+}
+
+// ── Paginated fetch helper ─────────────────────────────────────────────────
+// Fetches all rows in pages of PAGE_SIZE to avoid Supabase's row limits.
+
+const PAGE_SIZE = 50
+
+async function fetchAllPaginated<T>(
+  table: string,
+  mapper: (r: Record<string, unknown>) => T,
+  orderBy = 'name'
+): Promise<T[]> {
+  const results: T[] = []
+  let offset = 0
+  while (true) {
+    const { data, error } = await supabase
+      .from(table)
+      .select('*')
+      .order(orderBy)
+      .range(offset, offset + PAGE_SIZE - 1)
+    if (error || !data || data.length === 0) break
+    results.push(...(data as Record<string, unknown>[]).map(mapper))
+    if (data.length < PAGE_SIZE) break
+    offset += PAGE_SIZE
+  }
+  return results
 }
 
 // ── Row mappers (snake_case DB → camelCase TS) ─────────────────────────────
@@ -221,6 +255,25 @@ function mapNpcRow(r: Record<string, unknown>): NPC {
   }
 }
 
+function mapDomainRow(r: Record<string, unknown>): DomainData {
+  return {
+    id: r.id as string,
+    name: r.name as string,
+    description: (r.description as string) ?? '',
+    powers: (r.powers as DomainData['powers']) ?? [],
+    spells: (r.spells as DomainData['spells']) ?? [],
+  }
+}
+
+function mapBlessingRow(r: Record<string, unknown>): BlessingData {
+  return {
+    id: r.id as string,
+    name: r.name as string,
+    description: (r.description as string) ?? '',
+    powers: (r.powers as BlessingData['powers']) ?? [],
+  }
+}
+
 // ── Store ──────────────────────────────────────────────────────────────────
 
 export const useSRDStore = create<SRDStore>()((set, get) => ({
@@ -231,6 +284,8 @@ export const useSRDStore = create<SRDStore>()((set, get) => ({
   races: RACES,
   archetypes: ARCHETYPES,
   npcs: [],
+  domains: DOMAINS,
+  blessings: BLESSINGS,
   loading: false,
   initialized: false,
 
@@ -240,42 +295,42 @@ export const useSRDStore = create<SRDStore>()((set, get) => ({
   getArchetypeById: (id) =>
     get().archetypes.find((a) => a.id === id),
 
+  getDomainById: (id) =>
+    get().domains.find((d) => d.id === id),
+
+  getBlessingById: (id) =>
+    get().blessings.find((b) => b.id === id),
+
   fetchAll: async () => {
     if (get().initialized) return
     set({ loading: true })
 
     try {
-      const [skillsRes, featsRes, classesRes, racesRes, archetypesRes, npcsRes] = await Promise.all([
-        supabase.from('skills').select('*').order('name'),
-        supabase.from('feats').select('*').order('name'),
-        supabase.from('classes').select('*').order('name'),
-        supabase.from('races').select('*'),
-        supabase.from('archetypes').select('*').order('name'),
-        supabase.from('npcs').select('*').order('cr'),
+      const [skills, feats, classes, races, archetypes, npcs, domains, blessings] = await Promise.all([
+        fetchAllPaginated('skills', mapSkillRow),
+        fetchAllPaginated('feats', mapFeatRow),
+        fetchAllPaginated('classes', mapClassRow),
+        fetchAllPaginated('races', mapRaceRow, 'id'),
+        fetchAllPaginated('archetypes', mapArchetypeRow),
+        fetchAllPaginated('npcs', mapNpcRow, 'cr'),
+        fetchAllPaginated('domains', mapDomainRow),
+        fetchAllPaginated('blessings', mapBlessingRow),
       ])
 
       const updates: Partial<SRDStore> = { loading: false, initialized: true }
 
-      if (skillsRes.data && skillsRes.data.length > 0) {
-        updates.skills = (skillsRes.data as Record<string, unknown>[]).map(mapSkillRow)
-      }
-      if (featsRes.data && featsRes.data.length > 0) {
-        updates.feats = (featsRes.data as Record<string, unknown>[]).map(mapFeatRow)
-      }
-      if (classesRes.data && classesRes.data.length > 0) {
-        updates.classes = (classesRes.data as Record<string, unknown>[]).map(mapClassRow)
-      }
-      if (racesRes.data && racesRes.data.length > 0) {
-        updates.races = (racesRes.data as Record<string, unknown>[]).map(mapRaceRow)
-      }
-      if (npcsRes.data && npcsRes.data.length > 0) {
-        updates.npcs = (npcsRes.data as Record<string, unknown>[]).map(mapNpcRow)
-      }
-      if (archetypesRes.data && archetypesRes.data.length > 0) {
+      if (skills.length > 0) updates.skills = skills
+      if (feats.length > 0) updates.feats = feats
+      if (classes.length > 0) updates.classes = classes
+      if (races.length > 0) updates.races = races
+      if (npcs.length > 0) updates.npcs = npcs
+      if (domains.length > 0) updates.domains = domains
+      if (blessings.length > 0) updates.blessings = blessings
+
+      if (archetypes.length > 0) {
         // Merge: Supabase rows override static by id
-        const dbArchetypes = (archetypesRes.data as Record<string, unknown>[]).map(mapArchetypeRow)
         const staticById = new Map(ARCHETYPES.map((a) => [a.id, a]))
-        for (const a of dbArchetypes) staticById.set(a.id, a)
+        for (const a of archetypes) staticById.set(a.id, a)
         updates.archetypes = Array.from(staticById.values())
       }
 
