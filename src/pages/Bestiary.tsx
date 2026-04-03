@@ -63,8 +63,9 @@ export function Bestiary() {
 
   const filteredMonsters = monsters.filter((monster) => {
     const matchesCategory = activeCategory === 'all' || monster.type.toLowerCase().includes(activeCategory)
-    const matchesSearch = search === '' || 
+    const matchesSearch = search === '' ||
       monster.name.toLowerCase().includes(search.toLowerCase()) ||
+      monster.id.toLowerCase().includes(search.toLowerCase()) ||
       (monster.type && monster.type.toLowerCase().includes(search.toLowerCase()))
     const matchesCR = crMatchesRange(monster.cr, crFilter)
     return matchesCategory && matchesSearch && matchesCR

@@ -40,8 +40,9 @@ export function Feats() {
 
   const filteredFeats = feats.filter((feat) => {
     const matchesCategory = activeCategory === 'all' || feat.type.includes(activeCategory)
-    const matchesSearch = search === '' || 
+    const matchesSearch = search === '' ||
       feat.name.toLowerCase().includes(search.toLowerCase()) ||
+      feat.id.toLowerCase().includes(search.toLowerCase()) ||
       feat.benefit.toLowerCase().includes(search.toLowerCase())
     return matchesCategory && matchesSearch
   })

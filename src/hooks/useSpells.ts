@@ -124,7 +124,7 @@ export function useSpells(filters: SpellFilters) {
 
         // Custom spells: filter client-side (usually few)
         const filteredCustom = customSpells.filter((cs) => {
-          if (filters.search && !cs.name.toLowerCase().includes(filters.search.toLowerCase())) return false
+          if (filters.search && !cs.name.toLowerCase().includes(filters.search.toLowerCase()) && !cs.id.toLowerCase().includes(filters.search.toLowerCase())) return false
           if (filters.type !== 'all' && cs.type !== filters.type && cs.type !== 'both') return false
           if (filters.school !== 'all' && cs.school !== filters.school) return false
           if (filters.level !== 'all' && cs.level !== parseInt(filters.level)) return false

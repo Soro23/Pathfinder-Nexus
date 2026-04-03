@@ -33,7 +33,7 @@ export function FeatsSelector({ selectedFeats, onAdd, onRemove, maxFeats }: Feat
 
   const filteredFeats = FEATS.filter((feat) => {
     const matchesType = filter === 'all' || feat.type.includes(filter as FeatType)
-    const matchesSearch = feat.name.toLowerCase().includes(search.toLowerCase())
+    const matchesSearch = feat.name.toLowerCase().includes(search.toLowerCase()) || feat.id.toLowerCase().includes(search.toLowerCase())
     return matchesType && matchesSearch
   })
 

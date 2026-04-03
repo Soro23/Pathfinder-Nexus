@@ -998,7 +998,7 @@ function FeatsEditor() {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       const q = search.toLowerCase()
-      const base = q ? feats.filter(f => f.name.toLowerCase().includes(q)) : feats.slice(0, 30)
+      const base = q ? feats.filter(f => f.name.toLowerCase().includes(q) || f.id.toLowerCase().includes(q)) : feats.slice(0, 30)
       setFiltered([...base].sort((a, b) => a.name.localeCompare(b.name, 'es')))
     }, 200)
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }

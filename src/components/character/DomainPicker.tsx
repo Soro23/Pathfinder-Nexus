@@ -16,6 +16,7 @@ export function DomainPicker({ selected, onChange, characterLevel = 1, wisdomMod
 
   const filtered = DOMAINS.filter(d =>
     d.name.toLowerCase().includes(search.toLowerCase()) ||
+    d.id.toLowerCase().includes(search.toLowerCase()) ||
     d.description.toLowerCase().includes(search.toLowerCase())
   )
 

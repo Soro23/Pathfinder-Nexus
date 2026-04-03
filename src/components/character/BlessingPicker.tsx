@@ -15,6 +15,7 @@ export function BlessingPicker({ selected, onChange, characterLevel = 1, disable
 
   const filtered = BLESSINGS.filter(b =>
     b.name.toLowerCase().includes(search.toLowerCase()) ||
+    b.id.toLowerCase().includes(search.toLowerCase()) ||
     b.description.toLowerCase().includes(search.toLowerCase())
   )
 
