@@ -264,9 +264,13 @@
 /* ── Combat Tab ── */
 .combatTab {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--space-4);
-  align-items: start;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; /* Atributos (6 columnas) */
+  grid-template-areas: 
+    "abilities saves saves combat combat combat" 
+    "abilityabbr savsam savevol combatstat combatstat combatstat" 
+    "abilities saves saves combat combat combat"; /* Repetir si necesitas mas filas */
+  gap: var(--space-2);
+gap: 4px; /* Ajustar si el espacio es太小 */
 }
 
 .colSpan2 {
