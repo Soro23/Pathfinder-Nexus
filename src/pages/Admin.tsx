@@ -757,6 +757,7 @@ async function handleAdd(forceNewId = false) {
         setPreview(null); setDuplicate(null); onImported()
     }
 }
+}
 
   return (
     <div className={styles.importerCard} style={{ marginBottom: 'var(--space-4)' }}>
