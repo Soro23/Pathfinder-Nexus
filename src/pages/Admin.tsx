@@ -21,23 +21,23 @@ const PROXIES: Array<{
   build: (url: string) => string
   extract: (res: Response) => Promise<string>
 }> = [
-  {
-    build: (url) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-    extract: async (res) => {
-      const json = await res.json()
-      if (!json.contents) throw new Error('allorigins: sin contenido')
-      return json.contents as string
+    {
+      build: (url) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+      extract: async (res) => {
+        const json = await res.json()
+        if (!json.contents) throw new Error('allorigins: sin contenido')
+        return json.contents as string
+      },
     },
-  },
-  {
-    build: (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-    extract: (res) => res.text(),
-  },
-  {
-    build: (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-    extract: (res) => res.text(),
-  },
-]
+    {
+      build: (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+      extract: (res) => res.text(),
+    },
+    {
+      build: (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+      extract: (res) => res.text(),
+    },
+  ]
 
 async function fetchWithProxy(url: string): Promise<string> {
   let lastError = ''
@@ -249,7 +249,7 @@ function SpellsEditor() {
         <ul className={styles.searchResults}>
           {results.map(spell => (
             <li key={spell.id} className={styles.searchResultItem}
-                onClick={() => { setSelectedId(spell.id); setSelectedName(spell.name); setPhase('edit') }}>
+              onClick={() => { setSelectedId(spell.id); setSelectedName(spell.name); setPhase('edit') }}>
               <div className={styles.searchResultMain}>
                 <span className={styles.searchResultName}>{spell.name}</span>
                 <span className={styles.searchResultMeta}>
@@ -444,7 +444,7 @@ function SpellEditForm({ spellId, spellName, onBack }: SpellEditFormProps) {
 
             <Field label="Nivel">
               <select className={styles.fieldInput} value={form.level} onChange={e => set('level', e.target.value)}>
-                {[0,1,2,3,4,5,6,7,8,9].map(n => <option key={n} value={n}>{n === 0 ? '0 (Cantrip)' : n}</option>)}
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => <option key={n} value={n}>{n === 0 ? '0 (Cantrip)' : n}</option>)}
               </select>
             </Field>
 
@@ -746,18 +746,17 @@ function SpellImporterPanel({ onImported, onCancel }: { onImported: () => void; 
     }
   }
 
-async function handleAdd(forceNewId = false) {
+  async function handleAdd(forceNewId = false) {
     if (!preview) return
     const spell = { ...preview } as Spell
     if (forceNewId) spell.id = spell.id + '_custom_' + Date.now()
     const { error } = await supabase.from('spells').insert(spell)
     if (error) { setImportError(error.message); setImportStatus('error') }
     else {
-        await refreshSRD()
-        setPreview(null); setDuplicate(null); onImported()
+      await refreshSRD()
+      setPreview(null); setDuplicate(null); onImported()
     }
-}
-}
+  }
 
   return (
     <div className={styles.importerCard} style={{ marginBottom: 'var(--space-4)' }}>
