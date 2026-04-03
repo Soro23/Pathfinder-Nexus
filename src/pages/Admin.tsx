@@ -750,7 +750,30 @@ function SpellImporterPanel({ onImported, onCancel }: { onImported: () => void; 
     if (!preview) return
     const spell = { ...preview } as Spell
     if (forceNewId) spell.id = spell.id + '_custom_' + Date.now()
-    const { error } = await supabase.from('spells').insert(spell)
+    const payload = {
+      id: spell.id,
+      name: spell.name,
+      school: spell.school,
+      subschool: spell.subschool ?? null,
+      descriptor: spell.descriptor ?? null,
+      level: spell.level,
+      type: spell.type,
+      class_lists: spell.classLists ?? null,
+      casting_time: spell.castingTime,
+      range: spell.range,
+      target: spell.target ?? null,
+      area: spell.area ?? null,
+      effect: spell.effect ?? null,
+      duration: spell.duration,
+      saving_throw: spell.savingThrow ?? null,
+      spell_resistance: spell.spellResistance ?? null,
+      description: spell.description,
+      material: spell.material ?? null,
+      arcane_focus: spell.arcaneFocus ?? null,
+      divine_focus: spell.divineFocus ?? null,
+      costly_components: spell.costlyComponents ?? null,
+    }
+    const { error } = await supabase.from('spells').insert(payload)
     if (error) { setImportError(error.message); setImportStatus('error') }
     else {
       await refreshSRD()
