@@ -156,8 +156,8 @@ export function PlayMode() {
 
   const { abilities } = character
   const classData = getClassById(character.classes[0]?.id || '')   // mantener — se usa en hasSpells, concentrationBonus, classSkillIds
-  const mcStats  = getMulticlassStats(character.classes)
-  const bab      = mcStats.bab
+  const mcStats = getMulticlassStats(character.classes)
+  const bab = mcStats.bab
 
   // Correct AC calculation using equipped armor
   const equippedArmor = (character.armor ?? []).filter((a) => a.equipped)
@@ -172,8 +172,8 @@ export function PlayMode() {
   const strMod = calculateModifier(abilities.strength)
   const dexMod = calculateModifier(abilities.dexterity)
 
-  const ac         = 10 + totalArmorBonus + dexForAC
-  const touchAC    = 10 + calculateModifier(abilities.dexterity)
+  const ac = 10 + totalArmorBonus + dexForAC
+  const touchAC = 10 + calculateModifier(abilities.dexterity)
   const flatFootedAC = 10 + totalArmorBonus
 
   // Power Attack
@@ -181,24 +181,24 @@ export function PlayMode() {
   const powerAttackPenalty = Math.floor(bab / 4) + 1
   const powerAttackDmgBonus = powerAttackPenalty * 2
 
-  const fortSave   = mcStats.fortitude + calculateModifier(abilities.constitution)
-  const refSave    = mcStats.reflex    + calculateModifier(abilities.dexterity)
-  const willSave   = mcStats.will      + calculateModifier(abilities.wisdom)
-  const cmb        = bab + strMod
-  const cmd        = 10 + bab + strMod + dexMod
+  const fortSave = mcStats.fortitude + calculateModifier(abilities.constitution)
+  const refSave = mcStats.reflex + calculateModifier(abilities.dexterity)
+  const willSave = mcStats.will + calculateModifier(abilities.wisdom)
+  const cmb = bab + strMod
+  const cmd = 10 + bab + strMod + dexMod
   const initiative = dexMod
 
   const statusEffects = character.statusEffects ?? []
 
-  const effectAC         = getEffectBonus(statusEffects, 'ac')
-  const effectFort       = getEffectBonus(statusEffects, 'fort')
-  const effectRef        = getEffectBonus(statusEffects, 'ref')
-  const effectWill       = getEffectBonus(statusEffects, 'will')
+  const effectAC = getEffectBonus(statusEffects, 'ac')
+  const effectFort = getEffectBonus(statusEffects, 'fort')
+  const effectRef = getEffectBonus(statusEffects, 'ref')
+  const effectWill = getEffectBonus(statusEffects, 'will')
   const effectInitiative = getEffectBonus(statusEffects, 'initiative')
-  const effectCMB        = getEffectBonus(statusEffects, 'cmb')
-  const effectCMD        = getEffectBonus(statusEffects, 'cmd')
-  const effectAttack     = getEffectBonus(statusEffects, 'attack')
-  const effectDamage     = getEffectBonus(statusEffects, 'damage')
+  const effectCMB = getEffectBonus(statusEffects, 'cmb')
+  const effectCMD = getEffectBonus(statusEffects, 'cmd')
+  const effectAttack = getEffectBonus(statusEffects, 'attack')
+  const effectDamage = getEffectBonus(statusEffects, 'damage')
 
   function triggerRollAnimation(cb: () => void) {
     setRolling(true)
@@ -270,62 +270,62 @@ export function PlayMode() {
 
   const intMod = calculateModifier(abilities.intelligence)
   const barbarianClass = classByType('barbarian')
-  const clericClass    = classByType('cleric')
-  const rogueClass     = classByType('rogue')
-  const paladinClass   = classByType('paladin')
-  const monkClass      = classByType('monk')
-  const bardClass      = classByType('bard')
-  const druidClass     = classByType('druid')
-  const fighterClass   = classByType('fighter')
-  const rangerClass    = classByType('ranger')
+  const clericClass = classByType('cleric')
+  const rogueClass = classByType('rogue')
+  const paladinClass = classByType('paladin')
+  const monkClass = classByType('monk')
+  const bardClass = classByType('bard')
+  const druidClass = classByType('druid')
+  const fighterClass = classByType('fighter')
+  const rangerClass = classByType('ranger')
   const alchemistClass = classByType('alchemist')
-  const inquisitorClass= classByType('inquisitor')
-  const cavalierClass  = classByType('cavalier')
-  const maguClass      = classByType('magus')
-  const gunslingerClass= classByType('gunslinger')
-  const shifterClass   = classByType('shifter')
-  const oracleClass    = classByType('oracle')
+  const inquisitorClass = classByType('inquisitor')
+  const cavalierClass = classByType('cavalier')
+  const maguClass = classByType('magus')
+  const gunslingerClass = classByType('gunslinger')
+  const shifterClass = classByType('shifter')
+  const oracleClass = classByType('oracle')
   const warpriestClass = classByType('warpriest')
-  const witchClass     = classByType('witch')
-  const summonerClass  = classByType('summoner')
+  const witchClass = classByType('witch')
+  const summonerClass = classByType('summoner')
 
   // Max uses per day per class
-  const rageMaxUses        = barbarianClass ? 4 + conMod + 2 * (barbarianClass.level - 1) : 0
-  const channelMaxUses     = clericClass   ? Math.max(1, 3 + chaMod) : 0
-  const layMaxUses         = paladinClass  ? Math.max(1, Math.floor(paladinClass.level / 2) + chaMod) : 0
-  const stunMaxUses        = monkClass     ? monkClass.level + wisMod : 0
-  const sneakDice          = rogueClass    ? Math.ceil(rogueClass.level / 2) : 0
-  const bardPerfMaxRounds  = bardClass     ? 4 + chaMod + 2 * (bardClass.level - 1) : 0
-  const wildShapeMaxUses   = druidClass && druidClass.level >= 4 ? Math.floor((druidClass.level - 2) / 2) : 0
-  const bombMaxUses        = alchemistClass ? intMod + alchemistClass.level : 0
-  const judgementMaxUses   = inquisitorClass ? 1 + Math.floor(inquisitorClass.level / 3) : 0
-  const challengeMaxUses   = cavalierClass  ? 1 + Math.floor((cavalierClass.level - 1) / 4) : 0
-  const arcanePoolMax      = maguClass      ? Math.max(1, Math.floor(maguClass.level / 2) + intMod) : 0
-  const gritMax            = gunslingerClass ? Math.max(1, wisMod) : 0
-  const aspectRoundsMax    = shifterClass   ? shifterClass.level + wisMod : 0
-  const oracleChannelMax   = oracleClass    ? Math.max(1, 3 + chaMod) : 0
-  const fervorDice         = warpriestClass && warpriestClass.level >= 2
+  const rageMaxUses = barbarianClass ? 4 + conMod + 2 * (barbarianClass.level - 1) : 0
+  const channelMaxUses = clericClass ? Math.max(1, 3 + chaMod) : 0
+  const layMaxUses = paladinClass ? Math.max(1, Math.floor(paladinClass.level / 2) + chaMod) : 0
+  const stunMaxUses = monkClass ? monkClass.level + wisMod : 0
+  const sneakDice = rogueClass ? Math.ceil(rogueClass.level / 2) : 0
+  const bardPerfMaxRounds = bardClass ? 4 + chaMod + 2 * (bardClass.level - 1) : 0
+  const wildShapeMaxUses = druidClass && druidClass.level >= 4 ? Math.floor((druidClass.level - 2) / 2) : 0
+  const bombMaxUses = alchemistClass ? intMod + alchemistClass.level : 0
+  const judgementMaxUses = inquisitorClass ? 1 + Math.floor(inquisitorClass.level / 3) : 0
+  const challengeMaxUses = cavalierClass ? 1 + Math.floor((cavalierClass.level - 1) / 4) : 0
+  const arcanePoolMax = maguClass ? Math.max(1, Math.floor(maguClass.level / 2) + intMod) : 0
+  const gritMax = gunslingerClass ? Math.max(1, wisMod) : 0
+  const aspectRoundsMax = shifterClass ? shifterClass.level + wisMod : 0
+  const oracleChannelMax = oracleClass ? Math.max(1, 3 + chaMod) : 0
+  const fervorDice = warpriestClass && warpriestClass.level >= 2
     ? Math.max(1, Math.floor((warpriestClass.level - 2) / 3) + 1)
     : 0
-  const fervorMax          = warpriestClass ? Math.max(1, Math.floor(warpriestClass.level / 2) + wisMod) : 0
+  const fervorMax = warpriestClass ? Math.max(1, Math.floor(warpriestClass.level / 2) + wisMod) : 0
 
   const featureUses = character.classFeatureUses ?? {}
-  const rageUses         = featureUses['rage']        ?? rageMaxUses
-  const channelUses      = featureUses['channel']     ?? channelMaxUses
-  const layUses          = featureUses['lay']         ?? layMaxUses
-  const stunUses         = featureUses['stun']        ?? stunMaxUses
-  const bardPerfUses     = featureUses['bardperf']    ?? bardPerfMaxRounds
-  const wildShapeUses    = featureUses['wildshape']   ?? wildShapeMaxUses
-  const bombUses         = featureUses['bomb']        ?? bombMaxUses
-  const mutaUses         = featureUses['mutagen']     ?? (alchemistClass ? 1 : 0)
-  const judgementUses    = featureUses['judgement']   ?? judgementMaxUses
-  const challengeUses    = featureUses['challenge']   ?? challengeMaxUses
-  const tacticianUses    = featureUses['tactician']   ?? (cavalierClass ? 1 : 0)
-  const arcanePoolUses   = featureUses['arcanepool']  ?? arcanePoolMax
-  const gritUses         = featureUses['grit']        ?? gritMax
-  const aspectUses       = featureUses['aspect']      ?? aspectRoundsMax
-  const oracleChannelUses= featureUses['ochannel']    ?? oracleChannelMax
-  const fervorUses       = featureUses['fervor']      ?? fervorMax
+  const rageUses = featureUses['rage'] ?? rageMaxUses
+  const channelUses = featureUses['channel'] ?? channelMaxUses
+  const layUses = featureUses['lay'] ?? layMaxUses
+  const stunUses = featureUses['stun'] ?? stunMaxUses
+  const bardPerfUses = featureUses['bardperf'] ?? bardPerfMaxRounds
+  const wildShapeUses = featureUses['wildshape'] ?? wildShapeMaxUses
+  const bombUses = featureUses['bomb'] ?? bombMaxUses
+  const mutaUses = featureUses['mutagen'] ?? (alchemistClass ? 1 : 0)
+  const judgementUses = featureUses['judgement'] ?? judgementMaxUses
+  const challengeUses = featureUses['challenge'] ?? challengeMaxUses
+  const tacticianUses = featureUses['tactician'] ?? (cavalierClass ? 1 : 0)
+  const arcanePoolUses = featureUses['arcanepool'] ?? arcanePoolMax
+  const gritUses = featureUses['grit'] ?? gritMax
+  const aspectUses = featureUses['aspect'] ?? aspectRoundsMax
+  const oracleChannelUses = featureUses['ochannel'] ?? oracleChannelMax
+  const fervorUses = featureUses['fervor'] ?? fervorMax
 
   const hasAnyFeature = barbarianClass || clericClass || rogueClass || paladinClass || monkClass ||
     bardClass || druidClass || fighterClass || rangerClass || alchemistClass ||
@@ -417,7 +417,7 @@ export function PlayMode() {
             {critEvent.type === 'crit' ? (
               <>
                 <div className={styles.critIcon}><Flame size={44} /></div>
-                <h2 className={styles.critTitle}>¡GOLPE CRÍTICO!</h2>
+                <h2 className={styles.critTitle}>¡CRÍTICO!</h2>
                 <p className={styles.critSub}>{critEvent.name}</p>
                 <p className={styles.critDesc}>
                   20 natural. Confirma el crítico tirando de nuevo con el mismo bonificador.
@@ -781,13 +781,13 @@ export function PlayMode() {
               {/* Combat Stats Bar */}
               <div className={styles.combatStats}>
                 {([
-                  { label: 'CA',       value: ac + effectAC,              bonus: effectAC,         fmt: (v: number) => `${v}` },
-                  { label: 'Toque',    value: touchAC + effectAC,         bonus: effectAC,         fmt: (v: number) => `${v}` },
-                  { label: 'Desprev',  value: flatFootedAC + effectAC,    bonus: effectAC,         fmt: (v: number) => `${v}` },
+                  { label: 'CA', value: ac + effectAC, bonus: effectAC, fmt: (v: number) => `${v}` },
+                  { label: 'Toque', value: touchAC + effectAC, bonus: effectAC, fmt: (v: number) => `${v}` },
+                  { label: 'Desprev', value: flatFootedAC + effectAC, bonus: effectAC, fmt: (v: number) => `${v}` },
                   { label: 'INI', value: initiative + effectInitiative, bonus: effectInitiative, fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
-                  { label: 'CMB', value: cmb + effectCMB,         bonus: effectCMB,         fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
-                  { label: 'CMD', value: cmd + effectCMD,         bonus: effectCMD,         fmt: (v: number) => `${v}` },
-                  { label: 'BAB', value: bab,                     bonus: 0,                 fmt: (v: number) => `+${v}` },
+                  { label: 'CMB', value: cmb + effectCMB, bonus: effectCMB, fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
+                  { label: 'CMD', value: cmd + effectCMD, bonus: effectCMD, fmt: (v: number) => `${v}` },
+                  { label: 'BAB', value: bab, bonus: 0, fmt: (v: number) => `+${v}` },
                 ] as { label: string; value: number; bonus: number; fmt: (v: number) => string }[]).map(({ label, value, bonus, fmt }) => (
                   <div key={label} className={styles.statPill}>
                     <span className={styles.statPillLabel}>{label}</span>
@@ -819,7 +819,7 @@ export function PlayMode() {
                     character.weapons.map((weapon) => {
                       const isRanged = weapon.range === 'ranged'
                       const paAtkPenalty = (powerAttackActive && !isRanged) ? -powerAttackPenalty : 0
-                      const paDmgBonus  = (powerAttackActive && !isRanged) ? powerAttackDmgBonus : 0
+                      const paDmgBonus = (powerAttackActive && !isRanged) ? powerAttackDmgBonus : 0
                       const atkBase = bab + (isRanged ? dexMod : strMod) + weapon.attackBonus + effectAttack + paAtkPenalty
                       const dmgMod = isRanged ? dexMod : strMod
                       const dmgNotation = addModifierToNotation(weapon.damage, effectDamage + dmgMod + paDmgBonus)
@@ -869,7 +869,7 @@ export function PlayMode() {
                     <div className={styles.quickRolls}>
                       {(() => {
                         const paAtkPenalty = powerAttackActive ? -powerAttackPenalty : 0
-                        const paDmgBonus  = powerAttackActive ? powerAttackDmgBonus : 0
+                        const paDmgBonus = powerAttackActive ? powerAttackDmgBonus : 0
                         const meleeAtk = bab + strMod + effectAttack + paAtkPenalty
                         const rangedAtk = bab + dexMod + effectAttack
                         const iterOffsets = (() => {
@@ -912,8 +912,8 @@ export function PlayMode() {
                 <div className={styles.savesRow}>
                   {([
                     { label: 'Fortaleza', base: fortSave, eff: effectFort },
-                    { label: 'Reflejos',  base: refSave,  eff: effectRef  },
-                    { label: 'Voluntad',  base: willSave, eff: effectWill },
+                    { label: 'Reflejos', base: refSave, eff: effectRef },
+                    { label: 'Voluntad', base: willSave, eff: effectWill },
                   ] as { label: string; base: number; eff: number }[]).map(({ label, base, eff }) => {
                     const total = base + eff
                     return (
