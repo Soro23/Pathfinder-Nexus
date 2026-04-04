@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
-  ArrowLeft, Plus, Minus, Dices, History, Shield, Heart, Brain,
+  ArrowLeft, Plus, Minus, Dices, Shield, Heart, Brain,
   Swords, Flame, X, Zap, BookOpen, Activity, Power, Pencil, Check
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, StatusEffect, BonusTarget } from '../store'
@@ -134,6 +134,9 @@ export function PlayMode() {
   // ── Rage state ──
   const [raging, setRaging] = useState(false)
 
+  // ── Power Attack toggle ──
+  const [powerAttackActive, setPowerAttackActive] = useState(false)
+
   const { spells: spellMap } = useSpellsByIds(character?.spells ?? [])
   const { spells: preparedSpellMap } = useSpellsByIds(character?.preparedSpells ?? [])
 
@@ -170,6 +173,14 @@ export function PlayMode() {
   const dexMod = calculateModifier(abilities.dexterity)
 
   const ac         = 10 + totalArmorBonus + dexForAC
+  const touchAC    = 10 + calculateModifier(abilities.dexterity)
+  const flatFootedAC = 10 + totalArmorBonus
+
+  // Power Attack
+  const hasPowerAttack = character.feats.some(f => f.id === 'power-attack')
+  const powerAttackPenalty = Math.floor(bab / 4) + 1
+  const powerAttackDmgBonus = powerAttackPenalty * 2
+
   const fortSave   = mcStats.fortitude + calculateModifier(abilities.constitution)
   const refSave    = mcStats.reflex    + calculateModifier(abilities.dexterity)
   const willSave   = mcStats.will      + calculateModifier(abilities.wisdom)
@@ -713,6 +724,23 @@ export function PlayMode() {
             </div>
           </Card>
 
+          {/* Roll Result Strip */}
+          {rollResult !== null && (
+            <div className={styles.rollResultStrip}>
+              <span className={styles.rollStripType}>{lastRollType}</span>
+              <span key={rollResult.key} className={styles.rollStripTotal}>{rollResult.total}</span>
+              {history.length > 1 && (
+                <span className={styles.rollStripHistory}>
+                  {history.slice(1, 4).map((h, i) => (
+                    <span key={i} className={`${styles.rollStripPrev} ${h.isCrit ? styles.historyItemCrit : ''} ${h.isFumble ? styles.historyItemFumble : ''}`}>
+                      {h.result}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Tab Navigation */}
           <nav className={styles.tabNav}>
             <button
@@ -753,7 +781,9 @@ export function PlayMode() {
               {/* Combat Stats Bar */}
               <div className={styles.combatStats}>
                 {([
-                  { label: 'CA',  value: ac + effectAC,           bonus: effectAC,         fmt: (v: number) => `${v}` },
+                  { label: 'CA',       value: ac + effectAC,              bonus: effectAC,         fmt: (v: number) => `${v}` },
+                  { label: 'Toque',    value: touchAC + effectAC,         bonus: effectAC,         fmt: (v: number) => `${v}` },
+                  { label: 'Desprev',  value: flatFootedAC + effectAC,    bonus: effectAC,         fmt: (v: number) => `${v}` },
                   { label: 'INI', value: initiative + effectInitiative, bonus: effectInitiative, fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
                   { label: 'CMB', value: cmb + effectCMB,         bonus: effectCMB,         fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
                   { label: 'CMD', value: cmd + effectCMD,         bonus: effectCMD,         fmt: (v: number) => `${v}` },
@@ -773,14 +803,33 @@ export function PlayMode() {
 
               {/* Weapons */}
               <Card padding="md">
-                <h3 className={styles.sectionTitle}><Shield size={18} />Ataques</h3>
+                <div className={styles.sectionTitleRow}>
+                  <h3 className={styles.sectionTitle}><Shield size={18} />Ataques</h3>
+                  {hasPowerAttack && (
+                    <button
+                      className={`${styles.powerAttackToggle} ${powerAttackActive ? styles.powerAttackToggleActive : ''}`}
+                      onClick={() => setPowerAttackActive(v => !v)}
+                    >
+                      Ataque Poderoso {powerAttackActive ? 'ON' : 'OFF'}
+                    </button>
+                  )}
+                </div>
                 <div className={styles.weaponList}>
                   {character.weapons && character.weapons.length > 0 ? (
                     character.weapons.map((weapon) => {
                       const isRanged = weapon.range === 'ranged'
-                      const atkTotal = bab + (isRanged ? dexMod : strMod) + weapon.attackBonus + effectAttack
+                      const paAtkPenalty = (powerAttackActive && !isRanged) ? -powerAttackPenalty : 0
+                      const paDmgBonus  = (powerAttackActive && !isRanged) ? powerAttackDmgBonus : 0
+                      const atkBase = bab + (isRanged ? dexMod : strMod) + weapon.attackBonus + effectAttack + paAtkPenalty
                       const dmgMod = isRanged ? dexMod : strMod
-                      const dmgNotation = addModifierToNotation(weapon.damage, effectDamage + dmgMod)
+                      const dmgNotation = addModifierToNotation(weapon.damage, effectDamage + dmgMod + paDmgBonus)
+                      const iterativeOffsets = (() => {
+                        const offsets: number[] = []
+                        let cur = bab
+                        while (cur > 0 && offsets.length < 4) { offsets.push(bab - cur); cur -= 5 }
+                        if (offsets.length === 0) offsets.push(0)
+                        return offsets
+                      })()
                       return (
                         <div key={weapon.id} className={styles.weaponRow}>
                           <div className={styles.weaponInfo}>
@@ -788,17 +837,23 @@ export function PlayMode() {
                             <span className={styles.weaponCrit}>×{weapon.critical || '20/×2'}</span>
                           </div>
                           <div className={styles.weaponBtns}>
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => handleQuickRoll(
-                                `1d20+${atkTotal}`,
-                                `${weapon.name} (Ataque)`,
-                                true
-                              )}
-                            >
-                              Atacar {atkTotal >= 0 ? `+${atkTotal}` : atkTotal}
-                            </Button>
+                            {iterativeOffsets.map((offset, i) => {
+                              const iterAtk = atkBase - offset
+                              return (
+                                <Button
+                                  key={i}
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => handleQuickRoll(
+                                    `1d20+${iterAtk}`,
+                                    `${weapon.name} (Ataque${i > 0 ? ` ${i + 1}` : ''})`,
+                                    true
+                                  )}
+                                >
+                                  {i === 0 ? 'Atacar' : `Atq.${i + 1}`} {iterAtk >= 0 ? `+${iterAtk}` : iterAtk}
+                                </Button>
+                              )
+                            })}
                             <Button
                               variant="danger"
                               size="sm"
@@ -812,18 +867,40 @@ export function PlayMode() {
                     })
                   ) : (
                     <div className={styles.quickRolls}>
-                      <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${bab + strMod + effectAttack}`, `Melee (+${bab + strMod + effectAttack})`, true)}>
-                        Melee +{bab + strMod + effectAttack}
-                      </Button>
-                      <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${bab + dexMod + effectAttack}`, `Ranged (+${bab + dexMod + effectAttack})`, true)}>
-                        Ranged +{bab + dexMod + effectAttack}
-                      </Button>
-                      <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d6+${strMod}`, effectDamage), 'Daño Melee')}>
-                        Daño Melee {addModifierToNotation(`1d6+${strMod}`, effectDamage)}
-                      </Button>
-                      <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d8+${dexMod}`, effectDamage), 'Daño Ranged')}>
-                        Daño Ranged {addModifierToNotation(`1d8+${dexMod}`, effectDamage)}
-                      </Button>
+                      {(() => {
+                        const paAtkPenalty = powerAttackActive ? -powerAttackPenalty : 0
+                        const paDmgBonus  = powerAttackActive ? powerAttackDmgBonus : 0
+                        const meleeAtk = bab + strMod + effectAttack + paAtkPenalty
+                        const rangedAtk = bab + dexMod + effectAttack
+                        const iterOffsets = (() => {
+                          const offsets: number[] = []
+                          let cur = bab
+                          while (cur > 0 && offsets.length < 4) { offsets.push(bab - cur); cur -= 5 }
+                          if (offsets.length === 0) offsets.push(0)
+                          return offsets
+                        })()
+                        return (
+                          <>
+                            {iterOffsets.map((offset, i) => {
+                              const atk = meleeAtk - offset
+                              return (
+                                <Button key={`melee-${i}`} variant="secondary" onClick={() => handleQuickRoll(`1d20+${atk}`, `Melee Atq.${i + 1} (${atk >= 0 ? `+${atk}` : atk})`, true)}>
+                                  Melee {i > 0 ? `Atq.${i + 1} ` : ''}{atk >= 0 ? `+${atk}` : atk}
+                                </Button>
+                              )
+                            })}
+                            <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${rangedAtk}`, `Ranged (+${rangedAtk})`, true)}>
+                              Ranged +{rangedAtk}
+                            </Button>
+                            <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d6+${strMod}`, effectDamage + paDmgBonus), 'Daño Melee')}>
+                              Daño Melee {addModifierToNotation(`1d6+${strMod}`, effectDamage + paDmgBonus)}
+                            </Button>
+                            <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d8+${dexMod}`, effectDamage), 'Daño Ranged')}>
+                              Daño Ranged {addModifierToNotation(`1d8+${dexMod}`, effectDamage)}
+                            </Button>
+                          </>
+                        )
+                      })()}
                     </div>
                   )}
                 </div>
@@ -1555,52 +1632,6 @@ export function PlayMode() {
             </div>
           )}
         </div>
-
-        {/* ── Side Panel (desktop only) ── */}
-        <aside className={styles.sidePanel}>
-          <Card padding="md" className={styles.resultCard}>
-            <h3 className={styles.sectionTitle}>Resultado</h3>
-            <div className={styles.result}>
-              {rollResult !== null ? (
-                <span key={rollResult.key} className={styles.resultNumber}>{rollResult.total}</span>
-              ) : (
-                <span className={styles.resultPlaceholder}>-</span>
-              )}
-              {rollResult !== null && rollResult.rolls.length > 1 && (
-                <span className={styles.rollsDetail}>[{rollResult.rolls.join(' + ')}]</span>
-              )}
-            </div>
-            {lastRollType && <span className={styles.rollType}>{lastRollType}</span>}
-          </Card>
-
-          <Card padding="md" className={styles.historyCard}>
-            <h3 className={styles.sectionTitle}><History size={18} />Historial</h3>
-            {history.length === 0 ? (
-              <p className={styles.emptyHistory}>Sin tiradas aún</p>
-            ) : (
-              <ul className={styles.historyList}>
-                {history.map((h, i) => (
-                  <li key={i} className={`${styles.historyItem} ${h.isCrit ? styles.historyItemCrit : ''} ${h.isFumble ? styles.historyItemFumble : ''}`}>
-                    <span className={styles.historyNotation}>
-                      {h.isCrit && '⚡ '}{h.isFumble && '💀 '}{h.notation}
-                    </span>
-                    <span className={styles.historyResult}>{h.result}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-
-          <Card padding="sm" className={styles.statsCard}>
-            <div className={styles.miniStats}>
-              <div><span>CA</span><strong>{ac}</strong></div>
-              <div><span>INI</span><strong>{initiative >= 0 ? `+${initiative}` : initiative}</strong></div>
-              <div><span>CMB</span><strong>{cmb >= 0 ? `+${cmb}` : cmb}</strong></div>
-              <div><span>CMD</span><strong>{cmd}</strong></div>
-              <div><span>BAB</span><strong>+{bab}</strong></div>
-            </div>
-          </Card>
-        </aside>
 
         {/* ── Dice Panel Floating ── */}
         {dicePanelOpen && (

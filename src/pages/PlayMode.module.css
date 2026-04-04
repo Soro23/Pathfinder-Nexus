@@ -83,7 +83,7 @@
 /* ── Page Layout ── */
 .pageLayout {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr;
   gap: var(--space-4);
   align-items: start;
 }
@@ -197,6 +197,75 @@
   font-size: 1rem;
   color: var(--color-accent-gold);
   margin-bottom: var(--space-3);
+}
+
+.sectionTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.sectionTitleRow .sectionTitle {
+  margin-bottom: 0;
+}
+
+.powerAttackToggle {
+  font-size: 0.75rem;
+  font-family: var(--font-mono, 'Fira Code', monospace);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.powerAttackToggleActive {
+  background: var(--color-accent-gold);
+  color: var(--color-bg-primary);
+  border-color: var(--color-accent-gold);
+  font-weight: 700;
+}
+
+/* ── Roll Result Strip ── */
+.rollResultStrip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.rollStripType {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rollStripTotal {
+  font-family: var(--font-mono, 'Fira Code', monospace);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+}
+
+.rollStripHistory {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.rollStripPrev {
+  font-family: var(--font-mono, 'Fira Code', monospace);
+  font-size: 0.85rem;
+  color: var(--color-text-muted, var(--color-text-secondary));
+  opacity: 0.6;
 }
 
 /* ── Combat Stats Bar ── */
