@@ -14,6 +14,13 @@ export interface InventoryItem {
   weight: number
   equipped: boolean
   notes?: string
+  // Optional fields from the items catalog
+  itemDbId?: string
+  itemType?: string
+  priceGp?: number
+  magical?: boolean
+  consumable?: boolean
+  description?: string
 }
 
 export interface EquipmentSlot {
