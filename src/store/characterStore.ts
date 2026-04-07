@@ -16,6 +16,16 @@ export interface InventoryItem {
   notes?: string
 }
 
+export interface EquipmentSlot {
+  slotId: string
+  itemId: string | null
+}
+
+export interface CustomSlot {
+  id: string
+  label: string
+}
+
 export interface MiscBonus {
   value: number
   description: string
@@ -135,6 +145,8 @@ export interface Character {
   companion?: AnimalCompanion
   statusEffects?: StatusEffect[]
   journalEntries?: JournalEntry[]
+  equippedSlots?: EquipmentSlot[]
+  customSlots?: CustomSlot[]
   preparedSpells?: string[]
   classFeatureUses?: Record<string, number>
   selectedDomains?: string[]

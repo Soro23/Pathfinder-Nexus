@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Plus, Trash2, Sword, Shield, Check, Pencil } from 'lucide-react'
+import { Plus, Trash2, Sword, Shield, Check, Pencil, ChevronDown, ChevronUp, X } from 'lucide-react'
 import { Card, Button, Input } from '../ui'
 import { generateId } from '../../store'
-import type { Weapon, Armor } from '../../store'
+import type { Weapon, Armor, InventoryItem, EquipmentSlot, CustomSlot } from '../../store'
 import styles from './ArsenalManager.module.css'
 
 interface ArsenalManagerProps {
@@ -13,7 +13,29 @@ interface ArsenalManagerProps {
   dexMod: number
   onWeaponsChange: (weapons: Weapon[]) => void
   onArmorChange: (armor: Armor[]) => void
+  inventory: InventoryItem[]
+  equippedSlots: EquipmentSlot[]
+  customSlots: CustomSlot[]
+  onEquippedSlotsChange: (slots: EquipmentSlot[]) => void
+  onCustomSlotsChange: (slots: CustomSlot[]) => void
 }
+
+const FIXED_SLOTS: { slotId: string; label: string; color: string }[] = [
+  { slotId: 'head',       label: 'Cabeza',                    color: '#4fc3f7' },
+  { slotId: 'headband',   label: 'Diadema / Casco',           color: '#81c784' },
+  { slotId: 'eyes',       label: 'Ojos (gafas/visor)',        color: '#a5d6a7' },
+  { slotId: 'neck',       label: 'Cuello (amuleto/collar)',   color: '#ef9a9a' },
+  { slotId: 'shoulders',  label: 'Hombros',                   color: '#ffb74d' },
+  { slotId: 'chest',      label: 'Pecho (armadura principal)', color: '#f44336' },
+  { slotId: 'body',       label: 'Cuerpo (ropa/base)',        color: '#9ccc65' },
+  { slotId: 'armor_extra',label: 'Armadura adicional',        color: '#8bc34a' },
+  { slotId: 'belt',       label: 'Cinturón',                  color: '#ce93d8' },
+  { slotId: 'wrists',     label: 'Muñecas',                   color: '#b39ddb' },
+  { slotId: 'hands',      label: 'Manos (guantes)',           color: '#9575cd' },
+  { slotId: 'ring1',      label: 'Anillo 1',                  color: '#4db6ac' },
+  { slotId: 'ring2',      label: 'Anillo 2',                  color: '#26a69a' },
+  { slotId: 'feet',       label: 'Pies (botas)',              color: '#42a5f5' },
+]
 
 const ARMOR_TYPE_LABELS: Record<Armor['type'], string> = {
   light: 'Ligera',
@@ -32,7 +54,12 @@ const DEFAULT_ARMOR: Omit<Armor, 'id'> = {
 
 export function ArsenalManager({
   weapons, armor, bab, strMod, dexMod, onWeaponsChange, onArmorChange,
+  inventory, equippedSlots, customSlots, onEquippedSlotsChange, onCustomSlotsChange,
 }: ArsenalManagerProps) {
+  const [equipadoOpen, setEquipadoOpen] = useState(false)
+  const [assigningSlot, setAssigningSlot] = useState<string | null>(null)
+  const [newCustomLabel, setNewCustomLabel] = useState('')
+  const [addingCustomSlot, setAddingCustomSlot] = useState(false)
   const [addingWeapon, setAddingWeapon] = useState(false)
   const [addingArmor, setAddingArmor]   = useState(false)
   const [newWeapon, setNewWeapon] = useState(DEFAULT_WEAPON)
@@ -103,7 +130,200 @@ export function ArsenalManager({
     setAddingArmor(false)
   }
 
+  // ── Equipment slot helpers ──
+  const getSlotItem = (slotId: string): InventoryItem | undefined => {
+    const slot = equippedSlots.find((s) => s.slotId === slotId)
+    if (!slot?.itemId) return undefined
+    return inventory.find((i) => i.id === slot.itemId)
+  }
+
+  const assignItem = (slotId: string, itemId: string) => {
+    // Remove item from any other slot first
+    const cleared = equippedSlots
+      .filter((s) => s.slotId !== slotId)
+      .map((s) => s.itemId === itemId ? { ...s, itemId: null } : s)
+    const existing = cleared.find((s) => s.slotId === slotId)
+    if (existing) {
+      onEquippedSlotsChange(cleared.map((s) => s.slotId === slotId ? { ...s, itemId } : s))
+    } else {
+      onEquippedSlotsChange([...cleared, { slotId, itemId }])
+    }
+    setAssigningSlot(null)
+  }
+
+  const unassignItem = (slotId: string) => {
+    onEquippedSlotsChange(equippedSlots.map((s) => s.slotId === slotId ? { ...s, itemId: null } : s))
+  }
+
+  const addCustomSlot = () => {
+    if (!newCustomLabel.trim()) return
+    onCustomSlotsChange([...customSlots, { id: generateId(), label: newCustomLabel.trim() }])
+    setNewCustomLabel('')
+    setAddingCustomSlot(false)
+  }
+
+  const removeCustomSlot = (id: string) => {
+    onCustomSlotsChange(customSlots.filter((s) => s.id !== id))
+    onEquippedSlotsChange(equippedSlots.filter((s) => s.slotId !== `custom_${id}`))
+  }
+
+  // Items not currently assigned to any slot
+  const assignedItemIds = new Set(equippedSlots.map((s) => s.itemId).filter((id): id is string => id !== null))
+  const availableItems = (slotId: string) => {
+    const currentItemId = equippedSlots.find((s) => s.slotId === slotId)?.itemId
+    return inventory.filter((i) => !assignedItemIds.has(i.id) || i.id === currentItemId)
+  }
+
+  const renderSlotRow = (slotId: string, label: string, color: string) => {
+    const item = getSlotItem(slotId)
+    const isAssigning = assigningSlot === slotId
+    return (
+      <div key={slotId} className={styles.slotRow}>
+        <span className={styles.slotDot} style={{ background: color }} />
+        <span className={styles.slotLabel}>{label}</span>
+        {isAssigning ? (
+          <div className={styles.slotAssignRow}>
+            <select
+              className={styles.slotSelect}
+              defaultValue=""
+              onChange={(e) => { if (e.target.value) assignItem(slotId, e.target.value) }}
+            >
+              <option value="" disabled>Seleccionar objeto...</option>
+              {availableItems(slotId).map((i) => (
+                <option key={i.id} value={i.id}>{i.name}{i.quantity > 1 ? ` (×${i.quantity})` : ''}</option>
+              ))}
+            </select>
+            <button className={styles.slotCancelBtn} onClick={() => setAssigningSlot(null)}>
+              <X size={12} />
+            </button>
+          </div>
+        ) : item ? (
+          <div className={styles.slotFilled}>
+            <span className={styles.slotItemName}>{item.name}</span>
+            <button className={styles.slotUnassignBtn} onClick={() => unassignItem(slotId)} title="Desequipar">
+              <X size={12} />
+            </button>
+          </div>
+        ) : (
+          <div className={styles.slotEmpty}>
+            <span className={styles.slotEmptyText}>— vacío —</span>
+            <button
+              className={styles.slotAssignBtn}
+              onClick={() => setAssigningSlot(slotId)}
+              disabled={inventory.length === 0}
+            >
+              Asignar
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
+    <div className={styles.wrapper}>
+    {/* ══════════════ EQUIPADO ══════════════ */}
+    <div className={styles.equipadoSection}>
+      <button className={styles.equipadoHeader} onClick={() => setEquipadoOpen((v) => !v)}>
+        <span className={styles.equipadoTitle}>Equipado</span>
+        <span className={styles.equipadoCount}>
+          {equippedSlots.filter((s) => s.itemId).length} / {FIXED_SLOTS.length + customSlots.length}
+        </span>
+        {equipadoOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      </button>
+
+      {equipadoOpen && (
+        <div className={styles.equipadoBody}>
+          <div className={styles.slotsGrid}>
+            {FIXED_SLOTS.map((s) => renderSlotRow(s.slotId, s.label, s.color))}
+          </div>
+
+          {/* Custom slots */}
+          <div className={styles.customSlotsSection}>
+            <span className={styles.customSlotsTitle}>Huecos personalizados (Homebrew)</span>
+            {customSlots.length > 0 && (
+              <div className={styles.slotsGrid}>
+                {customSlots.map((cs) => {
+                  const slotId = `custom_${cs.id}`
+                  const item = getSlotItem(slotId)
+                  const isAssigning = assigningSlot === slotId
+                  return (
+                    <div key={cs.id} className={`${styles.slotRow} ${styles.slotRowCustom}`}>
+                      <span className={styles.slotDot} style={{ background: '#90a4ae' }} />
+                      <span className={styles.slotLabel}>{cs.label}</span>
+                      {isAssigning ? (
+                        <div className={styles.slotAssignRow}>
+                          <select
+                            className={styles.slotSelect}
+                            defaultValue=""
+                            onChange={(e) => { if (e.target.value) assignItem(slotId, e.target.value) }}
+                          >
+                            <option value="" disabled>Seleccionar objeto...</option>
+                            {availableItems(slotId).map((i) => (
+                              <option key={i.id} value={i.id}>{i.name}{i.quantity > 1 ? ` (×${i.quantity})` : ''}</option>
+                            ))}
+                          </select>
+                          <button className={styles.slotCancelBtn} onClick={() => setAssigningSlot(null)}>
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ) : item ? (
+                        <div className={styles.slotFilled}>
+                          <span className={styles.slotItemName}>{item.name}</span>
+                          <button className={styles.slotUnassignBtn} onClick={() => unassignItem(slotId)} title="Desequipar">
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className={styles.slotEmpty}>
+                          <span className={styles.slotEmptyText}>— vacío —</span>
+                          <button
+                            className={styles.slotAssignBtn}
+                            onClick={() => setAssigningSlot(slotId)}
+                            disabled={inventory.length === 0}
+                          >
+                            Asignar
+                          </button>
+                        </div>
+                      )}
+                      <button
+                        className={styles.removeBtn}
+                        onClick={() => removeCustomSlot(cs.id)}
+                        title="Eliminar hueco"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+            {addingCustomSlot ? (
+              <div className={styles.addCustomRow}>
+                <Input
+                  value={newCustomLabel}
+                  onChange={(e) => setNewCustomLabel(e.target.value)}
+                  placeholder="Nombre del hueco..."
+                  onKeyDown={(e) => { if (e.key === 'Enter') addCustomSlot() }}
+                />
+                <Button variant="ghost" size="sm" onClick={() => { setAddingCustomSlot(false); setNewCustomLabel('') }}>
+                  Cancelar
+                </Button>
+                <Button variant="primary" size="sm" onClick={addCustomSlot}>
+                  Añadir
+                </Button>
+              </div>
+            ) : (
+              <Button variant="secondary" size="sm" onClick={() => setAddingCustomSlot(true)}>
+                <Plus size={14} />
+                Añadir hueco
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+
     <div className={styles.split}>
       {/* ══════════════ ARMAS ══════════════ */}
       <div className={styles.panel}>
@@ -367,6 +587,7 @@ export function ArsenalManager({
           </div>
         )}
       </div>
+    </div>
     </div>
   )
 }

@@ -210,7 +210,7 @@ export function CharacterView() {
     { id: 'inventory' as Tab, label: 'Inventario', icon: Package },
     { id: 'skills' as Tab, label: 'Habilidades', icon: Star },
     { id: 'feats' as Tab, label: 'Dotes', icon: BookOpen },
-    { id: 'weapons' as Tab, label: 'Arsenal', icon: Sword },
+    { id: 'weapons' as Tab, label: 'Equipo', icon: Sword },
     { id: 'companion' as Tab, label: 'Compañero', icon: PawPrint },
     { id: 'notes' as Tab, label: 'Diario', icon: Eye },
   ]
@@ -918,10 +918,10 @@ export function CharacterView() {
           </Card>
         )}
 
-        {/* ══ ARSENAL ══ */}
+        {/* ══ EQUIPO ══ */}
         {activeTab === 'weapons' && (
           <Card padding="md">
-            <h3 className={styles.sectionTitle}>Arsenal</h3>
+            <h3 className={styles.sectionTitle}>Equipo</h3>
             <ArsenalManager
               weapons={character.weapons || []}
               armor={character.armor ?? []}
@@ -930,6 +930,11 @@ export function CharacterView() {
               dexMod={calculateModifier(abilities.dexterity)}
               onWeaponsChange={(weapons) => updateCharacter(character.id, { weapons })}
               onArmorChange={(armor) => updateCharacter(character.id, { armor })}
+              inventory={character.inventory ?? []}
+              equippedSlots={character.equippedSlots ?? []}
+              customSlots={character.customSlots ?? []}
+              onEquippedSlotsChange={(equippedSlots) => updateCharacter(character.id, { equippedSlots })}
+              onCustomSlotsChange={(customSlots) => updateCharacter(character.id, { customSlots })}
             />
           </Card>
         )}
