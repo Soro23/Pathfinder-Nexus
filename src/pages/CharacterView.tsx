@@ -80,7 +80,8 @@ export function CharacterView() {
   const resolvedStats = useMemo(
     () => character ? resolveModifiers(character) : {
       skillBonuses: {}, saveBonuses: { fort: 0, ref: 0, will: 0 },
-      acBonuses: { natural: 0, deflection: 0, dodge: 0, armor: 0, total: 0 },
+      acBonuses: { natural: 0, deflection: 0, dodge: 0, armor: 0, shield: 0, total: 0 },
+      abilityBonuses: { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 },
       initiativeBonus: 0, attackBonus: 0, damageBonus: 0,
       hpBonus: 0, speedBonus: 0, cmbBonus: 0, cmdBonus: 0, allModifiers: [],
     },
@@ -106,13 +107,12 @@ export function CharacterView() {
   const classData = getClassById(primaryClass?.id || '')
 
   const equippedBody = (character.armor ?? []).find((a) => a.equipped && a.type !== 'shield')
-  const equippedShield = (character.armor ?? []).find((a) => a.equipped && a.type === 'shield')
   const effectiveDex = equippedBody
     ? Math.min(calculateModifier(abilities.dexterity), equippedBody.maxDex ?? 99)
     : calculateModifier(abilities.dexterity)
-  const ac = 10 + effectiveDex + (equippedBody?.acBonus ?? 0) + (equippedShield?.acBonus ?? 0) + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
+  const ac = 10 + effectiveDex + resolvedStats.acBonuses.armor + resolvedStats.acBonuses.shield + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
   const acTouch = 10 + effectiveDex + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
-  const acFlat = 10 + (equippedBody?.acBonus ?? 0) + (equippedShield?.acBonus ?? 0) + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection
+  const acFlat = 10 + resolvedStats.acBonuses.armor + resolvedStats.acBonuses.shield + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection
   const mcStats = getMulticlassStats(character.classes)
   const fortitude = mcStats.fortitude + calculateModifier(abilities.constitution) + resolvedStats.saveBonuses.fort
   const reflex = mcStats.reflex + calculateModifier(abilities.dexterity) + resolvedStats.saveBonuses.ref

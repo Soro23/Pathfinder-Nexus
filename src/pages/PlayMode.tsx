@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Plus, Minus, Dices, Shield, Heart, Brain,
@@ -6,15 +6,10 @@ import {
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, StatusEffect, BonusTarget } from '../store'
 import { getClassById, getMulticlassStats, useSRDStore } from '../data'
+import { resolveModifiers } from '../engine'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card } from '../components/ui'
 import styles from './PlayMode.module.css'
-
-function getEffectBonus(effects: StatusEffect[], target: BonusTarget): number {
-  return effects
-    .filter(e => e.active !== false && e.bonusTarget === target && e.bonusValue !== undefined)
-    .reduce((sum, e) => sum + (e.bonusValue ?? 0), 0)
-}
 
 function addModifierToNotation(notation: string, extra: number): string {
   if (extra === 0) return notation
@@ -159,9 +154,11 @@ export function PlayMode() {
   const mcStats = getMulticlassStats(character.classes)
   const bab = mcStats.bab
 
-  // Correct AC calculation using equipped armor
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const resolvedStats = useMemo(() => resolveModifiers(character), [character])
+
+  // maxDex cap requiere leer armor directamente (es un techo, no un bonus aditivo)
   const equippedArmor = (character.armor ?? []).filter((a) => a.equipped)
-  const totalArmorBonus = equippedArmor.reduce((sum, a) => sum + a.acBonus, 0)
   const armorMaxDex = equippedArmor.reduce((min, a) =>
     a.maxDex === null ? min : Math.min(min, a.maxDex), Infinity)
   const dexForAC = Math.min(
@@ -172,33 +169,23 @@ export function PlayMode() {
   const strMod = calculateModifier(abilities.strength)
   const dexMod = calculateModifier(abilities.dexterity)
 
-  const ac = 10 + totalArmorBonus + dexForAC
-  const touchAC = 10 + calculateModifier(abilities.dexterity)
-  const flatFootedAC = 10 + totalArmorBonus
+  const ac = 10 + resolvedStats.acBonuses.armor + resolvedStats.acBonuses.shield + dexForAC + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge + resolvedStats.acBonuses.total
+  const touchAC = 10 + calculateModifier(abilities.dexterity) + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
+  const flatFootedAC = 10 + resolvedStats.acBonuses.armor + resolvedStats.acBonuses.shield + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection
 
   // Power Attack
   const hasPowerAttack = character.feats.some(f => f.id === 'power-attack')
   const powerAttackPenalty = Math.floor(bab / 4) + 1
   const powerAttackDmgBonus = powerAttackPenalty * 2
 
-  const fortSave = mcStats.fortitude + calculateModifier(abilities.constitution)
-  const refSave = mcStats.reflex + calculateModifier(abilities.dexterity)
-  const willSave = mcStats.will + calculateModifier(abilities.wisdom)
-  const cmb = bab + strMod
-  const cmd = 10 + bab + strMod + dexMod
-  const initiative = dexMod
+  const fortSave = mcStats.fortitude + calculateModifier(abilities.constitution) + resolvedStats.saveBonuses.fort
+  const refSave = mcStats.reflex + calculateModifier(abilities.dexterity) + resolvedStats.saveBonuses.ref
+  const willSave = mcStats.will + calculateModifier(abilities.wisdom) + resolvedStats.saveBonuses.will
+  const cmb = bab + strMod + resolvedStats.cmbBonus
+  const cmd = 10 + bab + strMod + dexMod + resolvedStats.cmdBonus
+  const initiative = dexMod + resolvedStats.initiativeBonus
 
   const statusEffects = character.statusEffects ?? []
-
-  const effectAC = getEffectBonus(statusEffects, 'ac')
-  const effectFort = getEffectBonus(statusEffects, 'fort')
-  const effectRef = getEffectBonus(statusEffects, 'ref')
-  const effectWill = getEffectBonus(statusEffects, 'will')
-  const effectInitiative = getEffectBonus(statusEffects, 'initiative')
-  const effectCMB = getEffectBonus(statusEffects, 'cmb')
-  const effectCMD = getEffectBonus(statusEffects, 'cmd')
-  const effectAttack = getEffectBonus(statusEffects, 'attack')
-  const effectDamage = getEffectBonus(statusEffects, 'damage')
 
   function triggerRollAnimation(cb: () => void) {
     setRolling(true)
@@ -343,9 +330,9 @@ export function PlayMode() {
     const playerCombatant: Combatant = {
       id: character.id,
       name: character.name,
-      initiative: initiative + effectInitiative + Math.floor(Math.random() * 20) + 1,
+      initiative: initiative + Math.floor(Math.random() * 20) + 1,
       hp: { current: character.hp.current, max: character.hp.max },
-      ac: ac + effectAC,
+      ac: ac,
       isPlayer: true,
     }
     setCombatants([playerCombatant])
@@ -781,12 +768,12 @@ export function PlayMode() {
               {/* Combat Stats Bar */}
               <div className={styles.combatStats}>
                 {([
-                  { label: 'CA', value: ac + effectAC, bonus: effectAC, fmt: (v: number) => `${v}` },
-                  { label: 'Toque', value: touchAC + effectAC, bonus: effectAC, fmt: (v: number) => `${v}` },
-                  { label: 'Desprev', value: flatFootedAC + effectAC, bonus: effectAC, fmt: (v: number) => `${v}` },
-                  { label: 'INI', value: initiative + effectInitiative, bonus: effectInitiative, fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
-                  { label: 'CMB', value: cmb + effectCMB, bonus: effectCMB, fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
-                  { label: 'CMD', value: cmd + effectCMD, bonus: effectCMD, fmt: (v: number) => `${v}` },
+                  { label: 'CA', value: ac, bonus: 0, fmt: (v: number) => `${v}` },
+                  { label: 'Toque', value: touchAC, bonus: 0, fmt: (v: number) => `${v}` },
+                  { label: 'Desprev', value: flatFootedAC, bonus: 0, fmt: (v: number) => `${v}` },
+                  { label: 'INI', value: initiative, bonus: 0, fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
+                  { label: 'CMB', value: cmb, bonus: 0, fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
+                  { label: 'CMD', value: cmd, bonus: 0, fmt: (v: number) => `${v}` },
                   { label: 'BAB', value: bab, bonus: 0, fmt: (v: number) => `+${v}` },
                 ] as { label: string; value: number; bonus: number; fmt: (v: number) => string }[]).map(({ label, value, bonus, fmt }) => (
                   <div key={label} className={styles.statPill}>
@@ -820,9 +807,9 @@ export function PlayMode() {
                       const isRanged = weapon.range === 'ranged'
                       const paAtkPenalty = (powerAttackActive && !isRanged) ? -powerAttackPenalty : 0
                       const paDmgBonus = (powerAttackActive && !isRanged) ? powerAttackDmgBonus : 0
-                      const atkBase = bab + (isRanged ? dexMod : strMod) + weapon.attackBonus + effectAttack + paAtkPenalty
+                      const atkBase = bab + (isRanged ? dexMod : strMod) + weapon.attackBonus + resolvedStats.attackBonus + paAtkPenalty
                       const dmgMod = isRanged ? dexMod : strMod
-                      const dmgNotation = addModifierToNotation(weapon.damage, effectDamage + dmgMod + paDmgBonus)
+                      const dmgNotation = addModifierToNotation(weapon.damage, resolvedStats.damageBonus + dmgMod + paDmgBonus)
                       const iterativeOffsets = (() => {
                         const offsets: number[] = []
                         let cur = bab
@@ -870,8 +857,8 @@ export function PlayMode() {
                       {(() => {
                         const paAtkPenalty = powerAttackActive ? -powerAttackPenalty : 0
                         const paDmgBonus = powerAttackActive ? powerAttackDmgBonus : 0
-                        const meleeAtk = bab + strMod + effectAttack + paAtkPenalty
-                        const rangedAtk = bab + dexMod + effectAttack
+                        const meleeAtk = bab + strMod + resolvedStats.attackBonus + paAtkPenalty
+                        const rangedAtk = bab + dexMod + resolvedStats.attackBonus
                         const iterOffsets = (() => {
                           const offsets: number[] = []
                           let cur = bab
@@ -892,11 +879,11 @@ export function PlayMode() {
                             <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${rangedAtk}`, `Ranged (+${rangedAtk})`, true)}>
                               Ranged +{rangedAtk}
                             </Button>
-                            <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d6+${strMod}`, effectDamage + paDmgBonus), 'Daño Melee')}>
-                              Daño Melee {addModifierToNotation(`1d6+${strMod}`, effectDamage + paDmgBonus)}
+                            <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d6+${strMod}`, resolvedStats.damageBonus + paDmgBonus), 'Daño Melee')}>
+                              Daño Melee {addModifierToNotation(`1d6+${strMod}`, resolvedStats.damageBonus + paDmgBonus)}
                             </Button>
-                            <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d8+${dexMod}`, effectDamage), 'Daño Ranged')}>
-                              Daño Ranged {addModifierToNotation(`1d8+${dexMod}`, effectDamage)}
+                            <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d8+${dexMod}`, resolvedStats.damageBonus), 'Daño Ranged')}>
+                              Daño Ranged {addModifierToNotation(`1d8+${dexMod}`, resolvedStats.damageBonus)}
                             </Button>
                           </>
                         )
@@ -911,9 +898,9 @@ export function PlayMode() {
                 <h3 className={styles.sectionTitle}><Heart size={18} />Tiros de Salvación</h3>
                 <div className={styles.savesRow}>
                   {([
-                    { label: 'Fortaleza', base: fortSave, eff: effectFort },
-                    { label: 'Reflejos', base: refSave, eff: effectRef },
-                    { label: 'Voluntad', base: willSave, eff: effectWill },
+                    { label: 'Fortaleza', base: fortSave, eff: 0 },
+                    { label: 'Reflejos', base: refSave, eff: 0 },
+                    { label: 'Voluntad', base: willSave, eff: 0 },
                   ] as { label: string; base: number; eff: number }[]).map(({ label, base, eff }) => {
                     const total = base + eff
                     return (
@@ -1389,7 +1376,7 @@ export function PlayMode() {
                         const miscTotal = (skillRank.miscBonuses ?? []).reduce((s, b) => s + b.value, 0)
                         const isClassSkill = classSkillIds.includes(skillRank.id)
                         const classBonus = isClassSkill && skillRank.ranks > 0 ? 3 : 0
-                        const skillEffectBonus = getEffectBonus(statusEffects, `skill:${skillRank.id}` as BonusTarget)
+                        const skillEffectBonus = resolvedStats.skillBonuses[skillRank.id] ?? 0
                         const total = skillRank.ranks + abilityMod + miscTotal + classBonus + skillEffectBonus
                         return (
                           <button

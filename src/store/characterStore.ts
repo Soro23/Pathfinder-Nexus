@@ -121,6 +121,20 @@ export interface CharacterFeat {
   specification?: string
 }
 
+export interface Condition {
+  id: string
+  label: string
+  active: boolean
+}
+
+export interface TemporaryEffect {
+  id: string
+  name: string
+  modifiers: import('../engine/types').Modifier[]
+  duration?: string
+  active?: boolean
+}
+
 export interface Character {
   id: string
   name: string
@@ -151,6 +165,8 @@ export interface Character {
   imageUrl?: string
   companion?: AnimalCompanion
   statusEffects?: StatusEffect[]
+  conditions?: Condition[]
+  temporaryEffects?: TemporaryEffect[]
   journalEntries?: JournalEntry[]
   equippedSlots?: EquipmentSlot[]
   customSlots?: CustomSlot[]

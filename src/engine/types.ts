@@ -11,6 +11,8 @@ export type ModifierType =
   | 'dodge'
   | 'sacred'
   | 'profane'
+  | 'armor'
+  | 'shield'
   | 'untyped'
 
 export type ModifierTarget =
@@ -18,6 +20,14 @@ export type ModifierTarget =
   | 'ac_natural'
   | 'ac_deflection'
   | 'ac_dodge'
+  | 'ac_armor'
+  | 'ac_shield'
+  | 'str'
+  | 'dex'
+  | 'con'
+  | 'int'
+  | 'wis'
+  | 'cha'
   | 'attack'
   | 'damage'
   | 'save_fort'
@@ -48,7 +58,8 @@ export interface Modifier {
 export interface ResolvedStats {
   skillBonuses: Record<string, number>
   saveBonuses: { fort: number; ref: number; will: number }
-  acBonuses: { natural: number; deflection: number; dodge: number; armor: number; total: number }
+  acBonuses: { natural: number; deflection: number; dodge: number; armor: number; shield: number; total: number }
+  abilityBonuses: { str: number; dex: number; con: number; int: number; wis: number; cha: number }
   initiativeBonus: number
   attackBonus: number
   damageBonus: number
