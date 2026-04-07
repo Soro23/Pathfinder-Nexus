@@ -21,7 +21,7 @@ interface Props {
 const DEFAULT_ANIMAL_ID = 'wolf'
 
 function makeDefaultCompanion(): AnimalCompanionType {
-  const base = ANIMAL_TYPES.find(a => a.id === DEFAULT_ANIMAL_ID)!
+  const base = ANIMAL_TYPES.find(a => a.id === DEFAULT_ANIMAL_ID) ?? ANIMAL_TYPES[0]
   const computed = calculateCompanionStats(base, 1)
   return {
     name: '',
@@ -72,7 +72,7 @@ export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
   const autoSpecials = [...prog.special, ...base.specialQualities, ...base.senses]
 
   const handleAnimalTypeChange = (newId: string) => {
-    const newBase = ANIMAL_TYPES.find(a => a.id === newId)!
+    const newBase = ANIMAL_TYPES.find(a => a.id === newId) ?? ANIMAL_TYPES[0]
     const newComputed = calculateCompanionStats(newBase, companion.level)
     update({
       animalTypeId: newId,

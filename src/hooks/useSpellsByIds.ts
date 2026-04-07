@@ -36,7 +36,7 @@ export function useSpellsByIds(ids: string[]) {
         }
         setLoading(false)
       })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Omitting stable module-level refs (supabase, mapSpellRow) from deps — eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key])
 
   return { spells, loading }

@@ -362,12 +362,17 @@ function SpellEditForm({ spellId, spellName, onBack }: SpellEditFormProps) {
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
+    let active = true
     setLoadingSpell(true)
-    supabase.from('spells').select(SPELL_COLS).eq('id', spellId).single()
-      .then(({ data }) => {
-        if (data) setForm(rowToForm(data as unknown as Record<string, unknown>))
-        setLoadingSpell(false)
-      })
+    ;(async () => {
+      try {
+        const { data } = await supabase.from('spells').select(SPELL_COLS).eq('id', spellId).single()
+        if (active && data) setForm(rowToForm(data as unknown as Record<string, unknown>))
+      } finally {
+        if (active) setLoadingSpell(false)
+      }
+    })()
+    return () => { active = false }
   }, [spellId])
 
   function set<K extends keyof SpellFormState>(key: K, value: SpellFormState[K]) {

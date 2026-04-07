@@ -232,7 +232,6 @@ export function CharacterImport() {
 
       if (fnError) throw new Error(fnError.message)
       if (data?.error) {
-        console.error('Edge function error:', data)
         throw new Error(data.raw ? `${data.error}\n\nRAW: ${data.raw}` : data.error)
       }
 

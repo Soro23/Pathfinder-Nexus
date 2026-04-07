@@ -145,7 +145,8 @@ export function useSpells(filters: SpellFilters) {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Individual filter fields listed instead of the filters object to avoid referential instability;
+    // .join(',') used for the array field — eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     filters.search,
     filters.type,

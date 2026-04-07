@@ -161,7 +161,9 @@ export const useCharacterStore = create<CharacterStore>()((set, get) => ({
   fetchCharacters: async () => {
     set({ loading: true })
     const { data, error } = await supabase.from('characters').select('id, data')
-    if (!error && data) {
+    if (error) {
+      console.warn('[characterStore] fetchCharacters failed:', error.message)
+    } else if (data) {
       const characters = data.map((row) => {
         const c = { ...row.data as Character, id: row.id }
         c.feats = (c.feats ?? []).map((f) => typeof f === 'string' ? { id: f } : f)
@@ -186,7 +188,9 @@ export const useCharacterStore = create<CharacterStore>()((set, get) => ({
       .insert({ id: character.id, user_id: user.id, data: character })
       .select('id')
       .single()
-    if (!error && data) {
+    if (error) {
+      console.warn('[characterStore] addCharacter failed:', error.message)
+    } else if (data) {
       set((state) => ({ characters: [...state.characters, { ...character, id: data.id }] }))
     }
   },
@@ -199,7 +203,9 @@ export const useCharacterStore = create<CharacterStore>()((set, get) => ({
       .from('characters')
       .update({ data: merged })
       .eq('id', id)
-    if (!error) {
+    if (error) {
+      console.warn('[characterStore] updateCharacter failed:', error.message)
+    } else {
       set((state) => ({
         characters: state.characters.map((c) => c.id === id ? merged : c),
       }))
@@ -208,7 +214,9 @@ export const useCharacterStore = create<CharacterStore>()((set, get) => ({
 
   deleteCharacter: async (id) => {
     const { error } = await supabase.from('characters').delete().eq('id', id)
-    if (!error) {
+    if (error) {
+      console.warn('[characterStore] deleteCharacter failed:', error.message)
+    } else {
       set((state) => ({ characters: state.characters.filter((c) => c.id !== id) }))
     }
   },
