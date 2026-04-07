@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users, Wand2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users, Wand2, ChevronLeft, ChevronRight, Package, Plus } from 'lucide-react'
 import type { Spell } from '../data/spells'
 import { SPELL_SCHOOLS } from '../data/spells'
 import { useCustomSpellsStore } from '../store/customSpellsStore'
@@ -12,6 +12,7 @@ import type { Feat, FeatType } from '../data/feats'
 import type { ClassData } from '../data/classes'
 import type { Race } from '../data/races'
 import type { Archetype, ReplacementType } from '../data/archetypes'
+import type { CatalogItem } from '../lib/itemsService'
 import { CLASSES } from '../data/classes'
 import styles from './Admin.module.css'
 
@@ -84,7 +85,7 @@ async function findDuplicateInDB(name: string, customSpells: Spell[]): Promise<S
 
 // ── Admin page ────────────────────────────────────────────────────────────────
 
-type TabId = 'spells' | 'skills' | 'feats' | 'classes' | 'races' | 'archetypes'
+type TabId = 'spells' | 'skills' | 'feats' | 'classes' | 'races' | 'archetypes' | 'items'
 type ImportStatus = 'idle' | 'loading' | 'done' | 'error'
 
 export function Admin() {
@@ -159,6 +160,12 @@ export function Admin() {
           >
             <Sword size={16} /> Arquetipos
           </button>
+          <button
+            className={`${styles.tabBtn} ${activeTab === 'items' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('items')}
+          >
+            <Package size={16} /> Objetos
+          </button>
         </nav>
         {showRightArrow && (
           <button className={`${styles.tabArrow} ${styles.right}`} onClick={() => scrollTabs('right')}>
@@ -174,6 +181,7 @@ export function Admin() {
         {activeTab === 'classes' && <ClassesEditor />}
         {activeTab === 'races' && <RacesEditor />}
         {activeTab === 'archetypes' && <ArchetypesEditor />}
+        {activeTab === 'items' && <ItemsEditor />}
       </div>
     </div>
   )
@@ -1676,6 +1684,238 @@ function ArchetypesEditor() {
           </button>
           {status && <span className={styles.statusMsg}>{status}</span>}
         </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Items Editor ───────────────────────────────────────────────────────────────
+
+const ITEM_TYPE_OPTIONS = [
+  'weapon', 'armor', 'shield', 'potion', 'scroll', 'wand', 'staff',
+  'ring', 'rod', 'wondrous', 'mundane', 'ammunition', 'tool', 'other',
+]
+
+const SLOT_OPTIONS = [
+  '', 'head', 'headband', 'eyes', 'shoulders', 'neck', 'chest',
+  'body', 'armor', 'belt', 'wrists', 'hands', 'ring', 'feet',
+]
+
+const EMPTY_ITEM_FORM: Omit<CatalogItem, 'id'> = {
+  name: '',
+  item_type: 'mundane',
+  subtype: '',
+  slot: '',
+  price_gp: undefined,
+  weight: undefined,
+  magical: false,
+  consumable: false,
+  description: '',
+}
+
+function ItemsEditor() {
+  const [items, setItems] = useState<CatalogItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [filterType, setFilterType] = useState('')
+  const [selected, setSelected] = useState<CatalogItem | null>(null)
+  const [form, setForm] = useState<Omit<CatalogItem, 'id'>>(EMPTY_ITEM_FORM)
+  const [saving, setSaving] = useState(false)
+  const [status, setStatus] = useState('')
+  const [isNew, setIsNew] = useState(false)
+
+  useEffect(() => {
+    loadItems()
+  }, [])
+
+  async function loadItems() {
+    setLoading(true)
+    const { data } = await supabase
+      .from('items')
+      .select('id, name, item_type, subtype, slot, price_gp, weight, magical, consumable, description')
+      .order('name')
+      .limit(200)
+    setItems((data ?? []) as CatalogItem[])
+    setLoading(false)
+  }
+
+  function startNew() {
+    setSelected(null)
+    setForm(EMPTY_ITEM_FORM)
+    setIsNew(true)
+    setStatus('')
+  }
+
+  function startEdit(item: CatalogItem) {
+    setSelected(item)
+    setForm({
+      name: item.name,
+      item_type: item.item_type,
+      subtype: item.subtype ?? '',
+      slot: item.slot ?? '',
+      price_gp: item.price_gp,
+      weight: item.weight,
+      magical: item.magical,
+      consumable: item.consumable,
+      description: item.description ?? '',
+    })
+    setIsNew(false)
+    setStatus('')
+  }
+
+  async function handleSave() {
+    if (!form.name.trim() || !form.item_type) { setStatus('Nombre y tipo son obligatorios'); return }
+    setSaving(true)
+    setStatus('')
+    try {
+      const payload = {
+        name: form.name.trim(),
+        item_type: form.item_type,
+        subtype: form.subtype || null,
+        slot: form.slot || null,
+        price_gp: form.price_gp ?? null,
+        weight: form.weight ?? null,
+        magical: form.magical,
+        consumable: form.consumable,
+        description: form.description || null,
+      }
+      if (isNew) {
+        const id = form.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Date.now()
+        const { error } = await supabase.from('items').insert({ id, ...payload })
+        if (error) { setStatus('Error: ' + error.message); return }
+        setStatus('Objeto creado')
+      } else if (selected) {
+        const { error } = await supabase.from('items').update(payload).eq('id', selected.id)
+        if (error) { setStatus('Error: ' + error.message); return }
+        setStatus('Guardado')
+      }
+      await loadItems()
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('¿Eliminar este objeto?')) return
+    await supabase.from('items').delete().eq('id', id)
+    if (selected?.id === id) startNew()
+    await loadItems()
+  }
+
+  const filtered = items.filter(item => {
+    const matchesSearch = !search || item.name.toLowerCase().includes(search.toLowerCase())
+    const matchesType = !filterType || item.item_type === filterType
+    return matchesSearch && matchesType
+  })
+
+  return (
+    <div className={styles.editorLayout}>
+      <aside className={styles.editorSidebar}>
+        <div className={styles.editorSidebarHeader}>
+          <select className={styles.filterSelect} value={filterType} onChange={e => setFilterType(e.target.value)}>
+            <option value="">Todos los tipos</option>
+            {ITEM_TYPE_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+          <button className={styles.newBtn} onClick={startNew}>+ Nuevo</button>
+        </div>
+        <div style={{ padding: 'var(--space-2) var(--space-3) 0' }}>
+          <input
+            className={styles.inputFull}
+            placeholder="Buscar objeto..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ fontSize: '0.8rem' }}
+          />
+        </div>
+        <ul className={styles.itemList}>
+          {loading ? (
+            <li style={{ padding: 'var(--space-3)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Cargando...</li>
+          ) : filtered.length === 0 ? (
+            <li style={{ padding: 'var(--space-3)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Sin resultados</li>
+          ) : filtered.map(item => (
+            <div
+              key={item.id}
+              className={[styles.listItem, selected?.id === item.id ? styles.listItemActive : ''].join(' ')}
+              onClick={() => startEdit(item)}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
+                <span className={styles.listItemName}>{item.name}</span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>{item.item_type}{item.magical ? ' · mágico' : ''}</span>
+              </div>
+              <button className={styles.deleteBtn} onClick={e => { e.stopPropagation(); handleDelete(item.id) }}>
+                <Trash2 size={13} />
+              </button>
+            </div>
+          ))}
+        </ul>
+      </aside>
+
+      <div className={styles.editorForm}>
+        <h3 className={styles.formTitle}>
+          {isNew ? 'Nuevo Objeto' : selected ? 'Editar: ' + selected.name : 'Selecciona o crea un objeto'}
+        </h3>
+
+        {(isNew || selected) && (
+          <>
+            <div className={styles.editGrid} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3) var(--space-4)', marginBottom: 'var(--space-4)' }}>
+              <div className={styles.fieldWide}>
+                <label className={styles.fieldLabel}>Nombre *</label>
+                <input className={styles.fieldInput} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Nombre del objeto" />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Tipo *</label>
+                <select className={styles.fieldInput} value={form.item_type} onChange={e => setForm(f => ({ ...f, item_type: e.target.value }))}>
+                  {ITEM_TYPE_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Subtipo</label>
+                <input className={styles.fieldInput} value={form.subtype ?? ''} onChange={e => setForm(f => ({ ...f, subtype: e.target.value }))} placeholder="p.ej. espada larga" />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Ranura</label>
+                <select className={styles.fieldInput} value={form.slot ?? ''} onChange={e => setForm(f => ({ ...f, slot: e.target.value }))}>
+                  {SLOT_OPTIONS.map(s => <option key={s} value={s}>{s || '— ninguna —'}</option>)}
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Precio (po)</label>
+                <input className={styles.fieldInput} type="number" min={0} step={0.01} value={form.price_gp ?? ''} onChange={e => setForm(f => ({ ...f, price_gp: e.target.value === '' ? undefined : parseFloat(e.target.value) }))} placeholder="0" />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Peso (lb)</label>
+                <input className={styles.fieldInput} type="number" min={0} step={0.1} value={form.weight ?? ''} onChange={e => setForm(f => ({ ...f, weight: e.target.value === '' ? undefined : parseFloat(e.target.value) }))} placeholder="0" />
+              </div>
+              <div className={styles.checkboxRow}>
+                <label className={styles.checkboxLabel}>
+                  <input type="checkbox" checked={form.magical} onChange={e => setForm(f => ({ ...f, magical: e.target.checked }))} />
+                  Mágico
+                </label>
+                <label className={styles.checkboxLabel}>
+                  <input type="checkbox" checked={form.consumable} onChange={e => setForm(f => ({ ...f, consumable: e.target.checked }))} />
+                  Consumible
+                </label>
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <label className={styles.fieldLabel}>Descripción</label>
+              <textarea className={styles.textareaFull} rows={5} value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Descripción del objeto..." />
+            </div>
+            <div className={styles.formActions}>
+              <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
+                {isNew ? <><Plus size={15} /> Crear</> : <><Save size={15} /> Guardar</>}
+                {saving && <span className={styles.spinner} style={{ marginLeft: 'var(--space-2)' }} />}
+              </button>
+              {status && <span className={styles.statusMsg}>{status}</span>}
+            </div>
+          </>
+        )}
+
+        {!isNew && !selected && (
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+            Selecciona un objeto de la lista o crea uno nuevo.
+          </p>
+        )}
       </div>
     </div>
   )
