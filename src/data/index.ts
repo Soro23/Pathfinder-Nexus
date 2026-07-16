@@ -1,4 +1,4 @@
-export { FEATS, FEAT_TYPES, getFeatById } from './feats'
+export { FEAT_TYPES, getFeatById } from './feats'
 export type { Feat, FeatType } from './feats'
 export { SKILLS, CLASS_SKILLS, getSkillById, getAbilityModifier } from './skills'
 export type { Skill } from './skills'
@@ -6,27 +6,15 @@ export { CLASSES, getClassById, getBABForLevel, getSaveForLevel, getMulticlassSt
 export type { ClassData, ClassFeature, MagicType, MulticlassStats } from './classes'
 export { calculateModifier } from '../store/characterStore'
 export type { CharacterClass } from '../store/characterStore'
-export { SPELLS, SPELL_SCHOOLS, SPELL_DESCRIPTORS, SPELL_TYPES, getSpellById, getSpellsByLevel, calculateSpellDC } from './spells'
+export { SPELL_SCHOOLS, SPELL_DESCRIPTORS, SPELL_TYPES, calculateSpellDC } from './spells'
 export type { Spell, SpellLevel } from './spells'
 
 // Hooks that merge static SRD data with homebrew content
-import { SPELLS } from './spells'
-import { FEATS } from './feats'
 import { SKILLS } from './skills'
 import { CLASSES } from './classes'
 import { RACES } from './races'
-import { useCustomSpellsStore } from '../store/customSpellsStore'
 import { useHomebrewStore } from '../store/homebrewStore'
 
-export function useAllSpells() {
-  const customSpells = useCustomSpellsStore(s => s.customSpells)
-  const brewSpells = useHomebrewStore(s => s.spells)
-  return [...SPELLS, ...customSpells, ...brewSpells]
-}
-export function useAllFeats() {
-  const brew = useHomebrewStore(s => s.feats)
-  return [...FEATS, ...brew]
-}
 export function useAllSkills() {
   const brew = useHomebrewStore(s => s.skills)
   return [...SKILLS, ...brew]

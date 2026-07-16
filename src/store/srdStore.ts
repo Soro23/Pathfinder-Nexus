@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { SKILLS } from '../data/skills'
-import { FEATS } from '../data/feats'
 import { CLASSES } from '../data/classes'
 import { RACES } from '../data/races'
 import { ARCHETYPES } from '../data/archetypes'
@@ -92,8 +91,10 @@ interface SRDStore {
 
 // ── Paginated fetch helper ─────────────────────────────────────────────────
 // Fetches all rows in pages of PAGE_SIZE to avoid Supabase's row limits.
+// PAGE_SIZE alto (cerca del máximo típico de PostgREST) para minimizar
+// round-trips en catálogos grandes como feats (~5.7k filas).
 
-const PAGE_SIZE = 50
+const PAGE_SIZE = 1000
 
 async function fetchAllPaginated<T>(
   table: string,
@@ -277,9 +278,11 @@ function mapBlessingRow(r: Record<string, unknown>): BlessingData {
 // ── Store ──────────────────────────────────────────────────────────────────
 
 export const useSRDStore = create<SRDStore>()((set, get) => ({
-  // Static arrays as initial fallback — app works offline immediately
+  // Static arrays as initial fallback — app works offline immediately.
+  // `feats` no tiene fallback estático: se ampliará a ~5.7k filas con
+  // traducciones y vive solo en Supabase (ver decisión del plan de integración SRD).
   skills: SKILLS,
-  feats: FEATS,
+  feats: [],
   classes: CLASSES,
   races: RACES,
   archetypes: ARCHETYPES,
