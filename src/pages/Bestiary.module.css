@@ -1,10 +1,16 @@
 /* ── Page layout ── */
+@keyframes unfoldReveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
 .pageLayout {
   display: flex;
   gap: var(--space-6);
   align-items: flex-start;
-  max-width: 1300px;
-  margin: 0 auto;
+  max-width: none;
+  margin-left: calc(-1 * var(--space-12));
+  width: calc(100% + var(--space-12));
 }
 
 /* ── Loader ── */
@@ -35,7 +41,7 @@
 
 /* ── Left nav ── */
 .monsterNav {
-  width: 200px;
+  width: 280px;
   flex-shrink: 0;
   position: sticky;
   top: var(--space-4);
@@ -47,7 +53,9 @@
 @media (min-width: 901px) {
   .monsterNav {
     position: fixed;
-    top: var(--space-8);
+    top: 0;
+    bottom: 0;
+    max-height: none;
     z-index: 100;
   }
 }
@@ -57,6 +65,21 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-4);
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.navEntering {
+  animation: unfoldReveal 0.8s ease-out;
+}
+
+.navExiting {
+  animation: unfoldReveal 0.4s ease-in reverse forwards;
+}
+
+.contentExiting {
+  animation: unfoldReveal 0.4s ease-in reverse forwards;
 }
 
 .navTitle {
@@ -116,7 +139,7 @@
 
 @media (min-width: 901px) {
   .content {
-    margin-left: 264px;
+    margin-left: 344px;
   }
 }
 

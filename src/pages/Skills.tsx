@@ -1,5 +1,6 @@
 import { Zap, ChevronDown } from 'lucide-react'
 import { SKILLS } from '../data/skills'
+import { usePageTransition } from '../hooks/usePageTransition'
 import styles from './Skills.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
@@ -16,6 +17,9 @@ function fmtAbility(ability: string): string {
 }
 
 export function Skills() {
+  const { isExiting, isEntering, isLoading } = usePageTransition(true)
+  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+
   function scrollTo(id: string) {
     const el = document.getElementById(id)
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -44,7 +48,7 @@ export function Skills() {
 
       {/* ── Left skill nav ── */}
       <nav className={styles.skillNav}>
-        <div className={styles.skillNavInner}>
+        <div className={`${styles.skillNavInner} ${navClass}`}>
           <p className={styles.navTitle}>Habilidades</p>
           <div className={styles.navList}>
             {SKILLS.map((skill) => (
@@ -61,7 +65,7 @@ export function Skills() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={styles.content}>
+      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
         <header className={styles.header}>
           <Zap size={28} className={styles.headerIcon} />
           <div>
@@ -70,6 +74,12 @@ export function Skills() {
           </div>
         </header>
 
+        {isLoading ? (
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader} />
+            <p>Cargando habilidades...</p>
+          </div>
+        ) : (
         <div className={styles.skillsGrid}>
           {SKILLS.map((skill) => (
             <div key={skill.id} id={skill.id} className={styles.skillCard}>
@@ -140,6 +150,7 @@ export function Skills() {
             </div>
           ))}
         </div>
+        )}
       </div>
     </div>
   )

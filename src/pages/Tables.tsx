@@ -1,5 +1,6 @@
 import { LayoutList, ChevronDown } from 'lucide-react'
 import { BONUS_SPELL_TABLE } from '../data/bonusSpells'
+import { usePageTransition } from '../hooks/usePageTransition'
 import styles from './Tables.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
@@ -368,6 +369,9 @@ const SPELL_LEVELS_BONUS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function Tables() {
+  const { isExiting, isEntering, isLoading } = usePageTransition(true)
+  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+
   function scrollTo(id: string) {
     const el = document.getElementById(id)
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -400,7 +404,7 @@ export function Tables() {
 
       {/* ── Left category nav (desktop) ── */}
       <nav className={styles.tableNav}>
-        <div className={styles.tableNavInner}>
+        <div className={`${styles.tableNavInner} ${navClass}`}>
           <p className={styles.navTitle}>Categorías</p>
           {CATEGORIES.map(cat => (
             <div key={cat.id} className={styles.navGroup}>
@@ -418,7 +422,7 @@ export function Tables() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={styles.content}>
+      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
 
         <header className={styles.header}>
           <LayoutList size={28} className={styles.headerIcon} />
@@ -428,6 +432,13 @@ export function Tables() {
           </div>
         </header>
 
+        {isLoading ? (
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader} />
+            <p>Cargando tablas...</p>
+          </div>
+        ) : (
+        <>
         {/* ══════════════════════════════════════════════
             CARACTERÍSTICAS
         ══════════════════════════════════════════════ */}
@@ -1125,6 +1136,8 @@ export function Tables() {
             </div>
           </section>
         </div>
+        </>
+        )}
 
       </div>{/* end content */}
     </div>/* end pageLayout */

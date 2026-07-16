@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Sword, Shield, Sparkles, Wand2, Users, Target, Zap, BookOpen, Scroll, ChevronDown } from 'lucide-react'
 import { useSRDStore } from '../store/srdStore'
+import { usePageTransition } from '../hooks/usePageTransition'
 import type { FeatType } from '../data/feats'
 import styles from './Feats.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
@@ -33,6 +34,8 @@ export function Feats() {
   const { feats, fetchAll, initialized } = useSRDStore()
   const [activeCategory, setActiveCategory] = useState<FeatType | 'all'>('all')
   const [search, setSearch] = useState('')
+  const { isExiting, isEntering, isLoading } = usePageTransition(initialized)
+  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
 
   useEffect(() => {
     if (!initialized) fetchAll()
@@ -70,7 +73,7 @@ export function Feats() {
 
       {/* ── Left nav ── */}
       <nav className={styles.featNav}>
-        <div className={styles.featNavInner}>
+        <div className={`${styles.featNavInner} ${navClass}`}>
           <p className={styles.navTitle}>Categorías</p>
           <div className={styles.navList}>
             <button
@@ -97,7 +100,7 @@ export function Feats() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={styles.content}>
+      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
         <header className={styles.header}>
           <div className={styles.headerIcon}>
             <Sword size={28} />
@@ -108,6 +111,13 @@ export function Feats() {
           </div>
         </header>
 
+        {isLoading ? (
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader} />
+            <p>Cargando dotes...</p>
+          </div>
+        ) : (
+        <>
         {/* Search */}
         <div className={styles.searchBar}>
           <input
@@ -197,6 +207,8 @@ export function Feats() {
           <div className={styles.noResults}>
             <p>No se encontraron dotes con los criterios seleccionados.</p>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>

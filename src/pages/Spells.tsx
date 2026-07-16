@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Sparkles, Search, ChevronDown } from 'lucide-react'
 import { useSpells } from '../hooks/useSpells'
+import { usePageTransition } from '../hooks/usePageTransition'
 import { SPELL_SCHOOLS, SPELL_TYPES } from '../data/spells'
 import styles from './Spells.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
@@ -49,6 +50,13 @@ export function Spells() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+  useEffect(() => {
+    if (!loading) setHasLoadedOnce(true)
+  }, [loading])
+  const { isExiting, isEntering, isLoading } = usePageTransition(hasLoadedOnce)
+  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setPage(newPage)
@@ -80,7 +88,7 @@ export function Spells() {
 
       {/* ── Left nav ── */}
       <nav className={styles.spellNav}>
-        <div className={styles.spellNavInner}>
+        <div className={`${styles.spellNavInner} ${navClass}`}>
           <p className={styles.navTitle}>Nivel</p>
           <div className={styles.navList}>
             {LEVELS.map((lvl) => (
@@ -97,7 +105,7 @@ export function Spells() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={styles.content}>
+      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
         <header className={styles.header}>
           <div className={styles.headerIcon}>
             <Sparkles size={28} />
@@ -108,6 +116,13 @@ export function Spells() {
           </div>
         </header>
 
+        {isLoading ? (
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader} />
+            <p>Cargando hechizos...</p>
+          </div>
+        ) : (
+        <>
         {/* Search */}
         <div className={styles.searchBar}>
           <Search size={16} className={styles.searchIcon} />
@@ -241,6 +256,8 @@ export function Spells() {
           <div className={styles.noResults}>
             <p>No se encontraron hechizos con los criterios seleccionados.</p>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>

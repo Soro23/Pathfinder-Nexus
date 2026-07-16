@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Shield, ChevronDown, ChevronUp } from 'lucide-react'
 import { CLASSES, getBABForLevel, getSaveForLevel } from '../data/classes'
+import { usePageTransition } from '../hooks/usePageTransition'
 import styles from './Classes.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
@@ -109,6 +110,9 @@ function SpellsTable({ cls }: { cls: typeof CLASSES[0] }) {
 }
 
 export function Classes() {
+  const { isExiting, isEntering, isLoading } = usePageTransition(true)
+  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+
   function scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -138,7 +142,7 @@ export function Classes() {
 
       {/* ── Left nav ── */}
       <nav className={styles.sideNav}>
-        <div className={styles.sideNavInner}>
+        <div className={`${styles.sideNavInner} ${navClass}`}>
           <p className={styles.navTitle}>Clases</p>
           <div className={styles.navList}>
             {GROUPED_CLASSES.map(g => (
@@ -156,7 +160,7 @@ export function Classes() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={styles.content}>
+      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
         <header className={styles.pageHeader}>
           <Shield size={28} className={styles.headerIcon} />
           <div>
@@ -165,6 +169,12 @@ export function Classes() {
           </div>
         </header>
 
+        {isLoading ? (
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader} />
+            <p>Cargando clases...</p>
+          </div>
+        ) : (
         <div className={styles.classList}>
           {GROUPED_CLASSES.map(g => (
             <div key={g.key} className={styles.sourceGroup}>
@@ -275,6 +285,7 @@ export function Classes() {
             </div>
           ))}
         </div>
+        )}
       </div>
     </div>
   )

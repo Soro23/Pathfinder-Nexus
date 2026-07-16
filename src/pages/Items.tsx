@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Backpack, Search, ChevronDown } from 'lucide-react'
 import { useItems, fetchItemDescription } from '../hooks/useItems'
+import { usePageTransition } from '../hooks/usePageTransition'
 import { ITEM_TYPES } from '../lib/itemsService'
 import styles from './Items.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
@@ -37,6 +38,13 @@ export function Items() {
   const { items, loading, total } = useItems({ search, itemType }, page)
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
+
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+  useEffect(() => {
+    if (!loading) setHasLoadedOnce(true)
+  }, [loading])
+  const { isExiting, isEntering, isLoading } = usePageTransition(hasLoadedOnce)
+  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
 
   const resetPage = () => setPage(1)
 
@@ -78,7 +86,7 @@ export function Items() {
 
       {/* ── Left nav ── */}
       <nav className={styles.itemNav}>
-        <div className={styles.itemNavInner}>
+        <div className={`${styles.itemNavInner} ${navClass}`}>
           <p className={styles.navTitle}>Tipo</p>
           <div className={styles.navList}>
             <button
@@ -101,7 +109,7 @@ export function Items() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={styles.content}>
+      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
         <header className={styles.header}>
           <div className={styles.headerIcon}>
             <Backpack size={28} />
@@ -112,6 +120,13 @@ export function Items() {
           </div>
         </header>
 
+        {isLoading ? (
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader} />
+            <p>Cargando equipo...</p>
+          </div>
+        ) : (
+        <>
         {/* Search */}
         <div className={styles.searchBar}>
           <Search size={16} className={styles.searchIcon} />
@@ -224,6 +239,8 @@ export function Items() {
           <div className={styles.noResults}>
             <p>No se encontraron objetos con los criterios seleccionados.</p>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>
