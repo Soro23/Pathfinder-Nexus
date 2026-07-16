@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { PawPrint, Search, Skull, Flame, CloudRain, Mountain, TreeDeciduous, Users, Ghost, Sparkles, Bug, ChevronDown } from 'lucide-react'
-import { useMonsters } from '../hooks/useMonsters'
+import { useEffect, useState } from 'react'
+import { PawPrint, Search, Skull, Flame, CloudRain, Mountain, TreeDeciduous, Users, Ghost, Sparkles, Bug, ChevronDown, Loader2 } from 'lucide-react'
+import { useMonsters, fetchMonsterDescription } from '../hooks/useMonsters'
 import styles from './Bestiary.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
@@ -38,44 +38,34 @@ const CR_RANGES = [
   { id: '21+', label: 'CR 21+' },
 ]
 
-function crMatchesRange(cr: number, range: string): boolean {
-  if (range === 'all') return true
-  if (range === '0') return cr === 0
-  if (range === '1/8') return cr === 0.125
-  if (range === '1/4') return cr === 0.25
-  if (range === '1/2') return cr === 0.5
-  if (range === '1-3') return cr >= 1 && cr <= 3
-  if (range === '4-6') return cr >= 4 && cr <= 6
-  if (range === '7-10') return cr >= 7 && cr <= 10
-  if (range === '11-15') return cr >= 11 && cr <= 15
-  if (range === '16-20') return cr >= 16 && cr <= 20
-  if (range === '21+') return cr >= 21
-  return true
-}
+const PAGE_SIZE = 50
 
 export function Bestiary() {
-  const { monsters, loading } = useMonsters()
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [crFilter, setCrFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const PAGE_SIZE = 50
+  const [descriptions, setDescriptions] = useState<Record<string, string | 'loading'>>({})
 
-  const filteredMonsters = monsters.filter((monster) => {
-    const matchesCategory = activeCategory === 'all' || monster.type.toLowerCase().includes(activeCategory)
-    const matchesSearch = search === '' ||
-      monster.name.toLowerCase().includes(search.toLowerCase()) ||
-      monster.id.toLowerCase().includes(search.toLowerCase()) ||
-      (monster.type && monster.type.toLowerCase().includes(search.toLowerCase()))
-    const matchesCR = crMatchesRange(monster.cr, crFilter)
-    return matchesCategory && matchesSearch && matchesCR
-  })
-
-  const totalPages = Math.ceil(filteredMonsters.length / PAGE_SIZE)
-  const paginatedMonsters = filteredMonsters.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
+  const { monsters, loading, total } = useMonsters(
+    { search, category: activeCategory, crRange: crFilter },
+    currentPage
   )
+
+  const totalPages = Math.ceil(total / PAGE_SIZE)
+
+  const loadDescription = (id: string) => {
+    if (descriptions[id]) return
+    setDescriptions((prev) => ({ ...prev, [id]: 'loading' }))
+    fetchMonsterDescription(id).then((text) => {
+      setDescriptions((prev) => ({ ...prev, [id]: text ?? '' }))
+    })
+  }
+
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+  useEffect(() => {
+    if (!loading) setHasLoadedOnce(true)
+  }, [loading])
 
   const getCRString = (cr: number) => {
     if (cr < 1) return `1/${Math.round(1/cr)}`
@@ -89,7 +79,7 @@ export function Bestiary() {
     }
   }
 
-  if (loading) {
+  if (loading && !hasLoadedOnce) {
     return (
       <div className={`${styles.pageLayout} ${mobile.pageLayout}`}>
         <div className={styles.loaderContainer}>
@@ -148,11 +138,6 @@ export function Bestiary() {
               >
                 {cat.icon}
                 <span>{cat.label}</span>
-                {cat.id !== 'all' && (
-                  <span className={styles.monsterCount}>
-                    {monsters.filter((m) => m.type.toLowerCase().includes(cat.id.replace('-', ' '))).length}
-                  </span>
-                )}
               </button>
             ))}
           </div>
@@ -166,9 +151,6 @@ export function Bestiary() {
                 onClick={() => { setCrFilter(cr.id); setCurrentPage(1) }}
               >
                 <span>{cr.label}</span>
-                <span className={styles.monsterCount}>
-                  {monsters.filter((m) => crMatchesRange(m.cr, cr.id)).length}
-                </span>
               </button>
             ))}
           </div>
@@ -183,7 +165,7 @@ export function Bestiary() {
           </div>
           <div>
             <h1>Bestiario</h1>
-            <p className={styles.subtitle}>Criaturas del sistema Pathfinder ({monsters.length})</p>
+            <p className={styles.subtitle}>Criaturas del sistema Pathfinder</p>
           </div>
         </header>
 
@@ -221,7 +203,11 @@ export function Bestiary() {
         {/* Results count and pagination */}
         <div className={styles.resultsAndPagination}>
           <p className={styles.resultsCount}>
-            {filteredMonsters.length} criatura{filteredMonsters.length !== 1 ? 's' : ''} encontrada{filteredMonsters.length !== 1 ? 's' : ''}
+            {loading ? (
+              <><Loader2 size={14} style={{ verticalAlign: 'middle' }} /> Cargando...</>
+            ) : (
+              <>{total} criatura{total !== 1 ? 's' : ''} encontrada{total !== 1 ? 's' : ''}</>
+            )}
           </p>
 
           {totalPages > 1 && (
@@ -249,7 +235,7 @@ export function Bestiary() {
 
         {/* Monster grid */}
         <div key={activeCategory + crFilter + search + currentPage} className={styles.monstersGrid}>
-          {paginatedMonsters.map((monster) => (
+          {monsters.map((monster) => (
             <div key={monster.id} id={monster.id} className={styles.monsterCard}>
               <div className={styles.monsterHeader}>
                 <div className={styles.monsterNameRow}>
@@ -387,11 +373,21 @@ export function Bestiary() {
                 </div>
               )}
 
-              {monster.description && (
-                <div className={styles.monsterDescription}>
-                  {monster.description}
-                </div>
-              )}
+              <div className={styles.monsterDescription}>
+                {descriptions[monster.id] === 'loading' ? (
+                  <p>Cargando descripción...</p>
+                ) : descriptions[monster.id] ? (
+                  <p>{descriptions[monster.id]}</p>
+                ) : (
+                  <button
+                    type="button"
+                    className={styles.paginationBtn}
+                    onClick={() => loadDescription(monster.id)}
+                  >
+                    Ver descripción completa
+                  </button>
+                )}
+              </div>
 
               {monster.source && (
                 <p className={styles.monsterSource}>Fuente: {monster.source}</p>
@@ -423,7 +419,7 @@ export function Bestiary() {
           </div>
         )}
 
-        {filteredMonsters.length === 0 && (
+        {!loading && monsters.length === 0 && (
           <div className={styles.noResults}>
             <p>No se encontraron criaturas con los criterios seleccionados.</p>
           </div>
