@@ -12,6 +12,7 @@ import type { Feat, FeatType } from '../data/feats'
 import type { ClassData } from '../data/classes'
 import type { Race } from '../data/races'
 import type { Archetype, ReplacementType } from '../data/archetypes'
+import { ITEM_TYPES } from '../lib/itemsService'
 import type { CatalogItem } from '../lib/itemsService'
 import { CLASSES } from '../data/classes'
 import styles from './Admin.module.css'
@@ -1691,10 +1692,7 @@ function ArchetypesEditor() {
 
 // ── Items Editor ───────────────────────────────────────────────────────────────
 
-const ITEM_TYPE_OPTIONS = [
-  'weapon', 'armor', 'shield', 'potion', 'scroll', 'wand', 'staff',
-  'ring', 'rod', 'wondrous', 'mundane', 'ammunition', 'tool', 'other',
-]
+const ITEM_TYPE_OPTIONS: readonly string[] = ITEM_TYPES
 
 const SLOT_OPTIONS = [
   '', 'head', 'headband', 'eyes', 'shoulders', 'neck', 'chest',

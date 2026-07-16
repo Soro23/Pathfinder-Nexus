@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import {
   Users, Map, BookOpen, LayoutList, Shield, Globe, Zap,
-  Sparkles, Backpack, Gem, PawPrint, Settings, Sun, Moon, LogOut, Sword, Wand2, X,
+  Sparkles, Backpack, PawPrint, Settings, Sun, Moon, LogOut, Sword, Wand2, X,
+  Search as SearchIcon,
 } from 'lucide-react'
 import { useSRDStore } from '../../store/srdStore'
 import { useAuth } from '../../contexts/AuthContext'
@@ -11,20 +12,17 @@ import styles from './Layout.module.css'
 
 const compendiumLinks = [
   { path: '/rules',       icon: BookOpen,   label: 'Reglas Rápidas' },
+  { path: '/srd',         icon: SearchIcon, label: 'Buscador de Reglas' },
   { path: '/homebrew',    icon: Wand2,      label: 'Homebrew' },
   { path: '/tables',      icon: LayoutList, label: 'Tablas' },
   { path: '/skills',      icon: Zap,        label: 'Habilidades' },
+  { path: '/spells',      icon: Sparkles,   label: 'Hechizos' },
   { path: '/feats',       icon: Sword,      label: 'Dotes' },
+  { path: '/items',       icon: Backpack,   label: 'Equipo' },
   { path: '/bestiary',    icon: PawPrint,   label: 'Bestiario' },
   { path: '/classes',     icon: Shield,     label: 'Clases' },
   { path: '/races',       icon: Globe,      label: 'Razas' },
   { path: '/npcs',        icon: Users,      label: 'NPCs' },
-]
-
-const compendiumSoon = [
-  { icon: Sparkles,   label: 'Conjuros' },
-  { icon: Backpack,   label: 'Equipación' },
-  { icon: Gem,        label: 'Objetos Mágicos' },
 ]
 
 const bottomNavItems = [
@@ -69,14 +67,6 @@ export function Layout() {
                 <Icon size={20} />
                 <span>{label}</span>
               </Link>
-            ))}
-            <div className={styles.compendiumSheetDivider} />
-            {compendiumSoon.map(({ icon: Icon, label }) => (
-              <span key={label} className={`${styles.compendiumSheetItem} ${styles.disabled}`}>
-                <Icon size={20} />
-                <span>{label}</span>
-                <span className={styles.badge}>Pronto</span>
-              </span>
             ))}
           </div>
         </div>
@@ -152,6 +142,13 @@ export function Layout() {
             <span>Reglas Rápidas</span>
           </Link>
           <Link
+            to="/srd"
+            className={`${styles.navItem} ${isActive('/srd', false) ? styles.active : ''}`}
+          >
+            <SearchIcon size={18} />
+            <span>Buscador de Reglas</span>
+          </Link>
+          <Link
             to="/homebrew"
             className={`${styles.navItem} ${isActive('/homebrew', false) ? styles.active : ''}`}
           >
@@ -173,11 +170,25 @@ export function Layout() {
             <span>Habilidades</span>
           </Link>
           <Link
+            to="/spells"
+            className={`${styles.navItem} ${isActive('/spells', false) ? styles.active : ''}`}
+          >
+            <Sparkles size={18} />
+            <span>Hechizos</span>
+          </Link>
+          <Link
             to="/feats"
             className={`${styles.navItem} ${isActive('/feats', false) ? styles.active : ''}`}
           >
             <Sword size={18} />
             <span>Dotes</span>
+          </Link>
+          <Link
+            to="/items"
+            className={`${styles.navItem} ${isActive('/items', false) ? styles.active : ''}`}
+          >
+            <Backpack size={18} />
+            <span>Equipo</span>
           </Link>
           <Link
             to="/bestiary"
@@ -207,13 +218,6 @@ export function Layout() {
             <Users size={18} />
             <span>NPCs</span>
           </Link>
-          {compendiumSoon.map(({ icon: Icon, label }) => (
-            <span key={label} className={`${styles.navItem} ${styles.disabled}`}>
-              <Icon size={18} />
-              <span>{label}</span>
-              <span className={styles.badge}>Pronto</span>
-            </span>
-          ))}
         </nav>
 
         {/* ── Footer icons ── */}

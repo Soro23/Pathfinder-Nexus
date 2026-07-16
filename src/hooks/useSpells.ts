@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Spell, SpellLevel } from '../data/spells'
 import { useCustomSpellsStore } from '../store/customSpellsStore'
+import { pickLocalized } from '../lib/localization'
+import { escapeForOrFilter } from '../lib/postgrest'
 
 export interface SpellFilters {
   search: string
@@ -23,7 +25,7 @@ const CLASS_ALLOWED_TYPES: Record<string, 'arcane' | 'divine'> = {
 export function mapSpellRow(row: Record<string, unknown>): Spell {
   return {
     id: row.id as string,
-    name: row.name as string,
+    name: pickLocalized(row.name_es as string | null, row.name as string),
     school: (row.school as string) || '',
     subschool: (row.subschool as string) ?? undefined,
     descriptor: (row.descriptor as string) ?? undefined,
@@ -37,22 +39,23 @@ export function mapSpellRow(row: Record<string, unknown>): Spell {
     duration: (row.duration as string) || '',
     savingThrow: (row.saving_throw as string) ?? undefined,
     spellResistance: (row.spell_resistance as string) ?? undefined,
-    description: (row.description as string) || '',
+    description: pickLocalized(row.description_es as string | null, (row.description as string) || ''),
     material: (row.material as string) ?? undefined,
     arcaneFocus: (row.arcane_focus as string) ?? undefined,
     divineFocus: row.divine_focus ? 'DF' : undefined,
     costlyComponents: row.costly_components ? 'yes' : undefined,
+    source: (row.source as string) ?? undefined,
   }
 }
 
 const SPELL_COLUMNS =
-  'id,name,school,subschool,descriptor,level,type,casting_time,range,target,area,' +
-  'effect,duration,saving_throw,spell_resistance,description,material,arcane_focus,' +
-  'divine_focus,costly_components'
+  'id,name,name_es,school,subschool,descriptor,level,type,casting_time,range,target,area,' +
+  'effect,duration,saving_throw,spell_resistance,description,description_es,material,arcane_focus,' +
+  'divine_focus,costly_components,source'
 
-const LIMIT = 150
+const PAGE_SIZE = 150
 
-export function useSpells(filters: SpellFilters) {
+export function useSpells(filters: SpellFilters, page: number = 1) {
   const [spells, setSpells] = useState<Spell[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -89,10 +92,11 @@ export function useSpells(filters: SpellFilters) {
           .from('spells')
           .select(SPELL_COLUMNS, { count: 'exact' })
           .order('name')
-          .limit(LIMIT)
+          .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1)
 
         if (filters.search) {
-          query = query.ilike('name', `%${filters.search}%`)
+          const term = escapeForOrFilter(filters.search)
+          query = query.or(`name.ilike.%${term}%,name_es.ilike.%${term}%`)
         }
 
         if (filters.type !== 'all') {
@@ -122,8 +126,9 @@ export function useSpells(filters: SpellFilters) {
           mapSpellRow(row as unknown as Record<string, unknown>)
         )
 
-        // Custom spells: filter client-side (usually few)
-        const filteredCustom = customSpells.filter((cs) => {
+        // Custom spells: filter client-side (usually few). Solo se muestran en la
+        // primera página para no duplicarlos en cada página del catálogo.
+        const filteredCustom = page === 1 ? customSpells.filter((cs) => {
           if (filters.search && !cs.name.toLowerCase().includes(filters.search.toLowerCase()) && !cs.id.toLowerCase().includes(filters.search.toLowerCase())) return false
           if (filters.type !== 'all' && cs.type !== filters.type && cs.type !== 'both') return false
           if (filters.school !== 'all' && cs.school !== filters.school) return false
@@ -131,7 +136,7 @@ export function useSpells(filters: SpellFilters) {
           if (filters.showKnownOnly && !filters.knownSpellIds.includes(cs.id)) return false
           if (allowedTypes.length === 1 && cs.type !== allowedTypes[0] && cs.type !== 'both') return false
           return true
-        })
+        }) : []
 
         setSpells([...filteredCustom, ...dbSpells])
         setTotal((count ?? 0) + filteredCustom.length)
@@ -156,6 +161,7 @@ export function useSpells(filters: SpellFilters) {
     filters.knownSpellIds.join(','),
     allowedTypesKey,
     customSpells,
+    page,
   ])
 
   return { spells, loading, error, total }

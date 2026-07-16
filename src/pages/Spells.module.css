@@ -1,0 +1,430 @@
+/* ── Page layout ── */
+.pageLayout {
+  display: flex;
+  gap: var(--space-6);
+  align-items: flex-start;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+/* ── Left nav ── */
+.spellNav {
+  width: 200px;
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--space-4);
+  max-height: 95vh;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+@media (min-width: 901px) {
+  .spellNav {
+    position: fixed;
+    top: var(--space-8);
+    z-index: 100;
+  }
+}
+
+.spellNavInner {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.navTitle {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px var(--space-2);
+  font-size: 0.74rem;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  line-height: 1.4;
+  transition: color 0.15s, background 0.15s;
+}
+
+.navBtn:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.navBtnActive {
+  color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.1);
+}
+
+/* ── Main content area ── */
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (min-width: 901px) {
+  .content {
+    margin-left: 264px;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.headerIcon {
+  color: var(--color-accent-gold);
+  flex-shrink: 0;
+}
+
+.header h1 {
+  font-size: 2rem;
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+}
+
+/* Search */
+.searchBar {
+  position: relative;
+  margin-bottom: var(--space-4);
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  padding-left: var(--space-8);
+  padding-right: var(--space-8);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+.searchClear {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.searchClear:hover {
+  color: var(--color-text-primary);
+}
+
+/* ── Filter bar (tipo / escuela) ── */
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.filterSelect {
+  flex: 1;
+  min-width: 140px;
+  padding: var(--space-2);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+/* ── Results + pagination ── */
+.resultsAndPagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.resultsCount {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-6) 0;
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.resultsAndPagination .pagination {
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.paginationBtn {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.paginationBtn:hover:not(:disabled) {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+}
+
+.paginationBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.paginationInfo {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+/* ── Spell cards ── */
+.spellsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.spellCard {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.spellHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.spellName {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+}
+
+.spellBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.badge {
+  display: inline-flex;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.levelBadge {
+  background: rgba(212, 164, 76, 0.15);
+  color: var(--color-accent-gold);
+}
+
+.typeBadge.arcane {
+  background: rgba(155, 89, 182, 0.15);
+  color: #9b59b6;
+}
+
+.typeBadge.divine {
+  background: rgba(52, 152, 219, 0.15);
+  color: #3498db;
+}
+
+.typeBadge.both {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+}
+
+.spellMeta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-2) var(--space-4);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.spellMeta strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.spellDescription {
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+.spellSource {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--color-border);
+}
+
+.noResults {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--color-text-secondary);
+}
+
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  color: var(--color-text-secondary);
+}
+
+.loader {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-accent-gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .pageLayout {
+    flex-direction: column;
+  }
+
+  .spellNav {
+    width: 100%;
+    position: static;
+    max-height: none;
+  }
+
+  .spellNavInner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .navTitle {
+    width: 100%;
+  }
+
+  .navList {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .navBtn {
+    padding: 4px 8px;
+  }
+
+  .spellHeader {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .spellNav {
+    display: none;
+  }
+
+  .header {
+    margin-bottom: var(--space-4);
+  }
+
+  .header h1 {
+    font-size: 1.3rem;
+  }
+}

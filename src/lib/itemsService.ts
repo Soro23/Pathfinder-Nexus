@@ -1,5 +1,13 @@
 import { supabase } from './supabase'
 
+// Unión de los valores de item_type_enum realmente usados en la BD ampliada
+// más los que ya manejaba el editor de Admin (por si quedan filas legacy).
+export const ITEM_TYPES = [
+  'weapon', 'armor', 'shield', 'potion', 'scroll', 'wand', 'staff',
+  'ring', 'rod', 'wondrous', 'mundane', 'ammunition', 'tool', 'other',
+  'alchemical', 'container', 'cursed', 'gear',
+] as const
+
 export interface CatalogItem {
   id: string
   name: string
