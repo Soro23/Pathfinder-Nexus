@@ -5,13 +5,67 @@
  *   - No active feats → all bonuses are 0
  *   - Stacking rules: untyped stacks, dodge stacks, typed (non-dodge) takes highest
  *   - rankCondition: below minRanks uses base value, at/above minRanks uses bonusValue
- *   - Integration with real feat data: dodge, great_fortitude, iron_will,
+ *   - Integration with feat data: dodge, great_fortitude, iron_will,
  *     lightning_reflexes, improved_initiative, toughness, alertness, skill_focus_perception
+ *
+ * getFeatById() (src/data/feats.ts) reads exclusively from srdStore — there is no
+ * static fallback catalog — so the feats these tests depend on are seeded directly
+ * into useSRDStore before each test.
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { resolveModifiers } from '../modifiers'
 import { makeCharacter } from '../../test/fixtures'
+import { useSRDStore } from '../../store/srdStore'
+import type { Feat } from '../../data/feats'
+
+// Solo se modela el subconjunto de cada dote que ejercitan estos tests
+// (bonificador exacto, tipo de stacking y rankCondition cuando aplica).
+const TEST_FEATS: Feat[] = [
+  {
+    id: 'dodge', name: 'Dodge', type: ['combat'], benefit: '+1 dodge bonus to AC.',
+    effects: [{ id: 'dodge-ac', source: 'Dodge', type: 'dodge', target: 'ac_dodge', value: 1 }],
+  },
+  {
+    id: 'great_fortitude', name: 'Great Fortitude', type: ['general'], benefit: '+2 to Fortitude saves.',
+    effects: [{ id: 'gf-fort', source: 'Great Fortitude', type: 'untyped', target: 'save_fort', value: 2 }],
+  },
+  {
+    id: 'iron_will', name: 'Iron Will', type: ['general'], benefit: '+2 to Will saves.',
+    effects: [{ id: 'iw-will', source: 'Iron Will', type: 'untyped', target: 'save_will', value: 2 }],
+  },
+  {
+    id: 'lightning_reflexes', name: 'Lightning Reflexes', type: ['general'], benefit: '+2 to Reflex saves.',
+    effects: [{ id: 'lr-ref', source: 'Lightning Reflexes', type: 'untyped', target: 'save_ref', value: 2 }],
+  },
+  {
+    id: 'improved_initiative', name: 'Improved Initiative', type: ['combat'], benefit: '+4 to initiative.',
+    effects: [{ id: 'ii-init', source: 'Improved Initiative', type: 'untyped', target: 'initiative', value: 4 }],
+  },
+  {
+    id: 'toughness', name: 'Toughness', type: ['general'], benefit: '+3 hit points.',
+    effects: [{ id: 'tg-hp', source: 'Toughness', type: 'untyped', target: 'hp', value: 3 }],
+  },
+  {
+    id: 'alertness', name: 'Alertness', type: ['general'], benefit: '+2 to Perception (+4 if trained with 10+ ranks).',
+    effects: [{
+      id: 'al-perc', source: 'Alertness', type: 'untyped', target: 'skill:perception', value: 2,
+      rankCondition: { skillId: 'perception', minRanks: 10, bonusValue: 4 },
+    }],
+  },
+  {
+    id: 'skill_focus_perception', name: 'Skill Focus (Perception)', type: ['general'],
+    benefit: '+3 to Perception (+6 if trained with 10+ ranks).',
+    effects: [{
+      id: 'sf-perc', source: 'Skill Focus (Perception)', type: 'untyped', target: 'skill:perception', value: 3,
+      rankCondition: { skillId: 'perception', minRanks: 10, bonusValue: 6 },
+    }],
+  },
+]
+
+beforeEach(() => {
+  useSRDStore.setState({ feats: TEST_FEATS })
+})
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
