@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { PawPrint, Search, Skull, Flame, CloudRain, Mountain, TreeDeciduous, Users, Ghost, Sparkles, Bug, ChevronDown, Loader2 } from 'lucide-react'
 import { useMonsters, fetchMonsterDescription } from '../hooks/useMonsters'
+import { usePageTransition } from '../hooks/usePageTransition'
+import { formatCR } from '../lib/formatCR'
 import styles from './Bestiary.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
@@ -66,28 +68,14 @@ export function Bestiary() {
   useEffect(() => {
     if (!loading) setHasLoadedOnce(true)
   }, [loading])
-
-  const getCRString = (cr: number) => {
-    if (cr < 1) return `1/${Math.round(1/cr)}`
-    return cr.toString()
-  }
+  const { isExiting, isEntering, isLoading } = usePageTransition(hasLoadedOnce)
+  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
-  }
-
-  if (loading && !hasLoadedOnce) {
-    return (
-      <div className={`${styles.pageLayout} ${mobile.pageLayout}`}>
-        <div className={styles.loaderContainer}>
-          <div className={styles.loader}></div>
-          <p>Cargando criaturas...</p>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -127,7 +115,7 @@ export function Bestiary() {
 
       {/* ── Left nav ── */}
       <nav className={styles.monsterNav}>
-        <div className={styles.monsterNavInner}>
+        <div className={`${styles.monsterNavInner} ${navClass}`}>
           <p className={styles.navTitle}>Categorías</p>
           <div className={styles.navList}>
             {CATEGORIES.map((cat) => (
@@ -158,7 +146,7 @@ export function Bestiary() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={styles.content}>
+      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
         <header className={styles.header}>
           <div className={styles.headerIcon}>
             <Skull size={28} />
@@ -169,6 +157,13 @@ export function Bestiary() {
           </div>
         </header>
 
+        {isLoading ? (
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader} />
+            <p>Cargando criaturas...</p>
+          </div>
+        ) : (
+        <>
         {/* Search and filters */}
         <div className={styles.searchBar}>
           <Search size={16} className={styles.searchIcon} />
@@ -240,7 +235,7 @@ export function Bestiary() {
               <div className={styles.monsterHeader}>
                 <div className={styles.monsterNameRow}>
                   <h3 className={styles.monsterName}>{monster.name}</h3>
-                  <span className={styles.crBadge}>CR {getCRString(monster.cr)}</span>
+                  <span className={styles.crBadge}>CR {formatCR(monster.cr)}</span>
                 </div>
                 <div className={styles.monsterTypes}>
                   <span className={styles.monsterType}>{monster.size} {monster.type}</span>
@@ -423,6 +418,8 @@ export function Bestiary() {
           <div className={styles.noResults}>
             <p>No se encontraron criaturas con los criterios seleccionados.</p>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>

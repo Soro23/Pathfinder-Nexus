@@ -25,7 +25,7 @@ function mapMonsterRow(r: Record<string, unknown>): Monster {
   return {
     id: r.id as string,
     name: pickLocalized(r.name_es as string | null, r.name as string),
-    cr: r.cr as number,
+    cr: Number(r.cr), // PostgREST puede devolver NUMERIC como string según config
     xp: r.xp as number,
     alignment: r.alignment as string,
     size: r.size as Monster['size'],

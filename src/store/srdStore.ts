@@ -201,7 +201,7 @@ function mapNpcRow(r: Record<string, unknown>): NPC {
   return {
     id: r.id as string,
     name: r.name as string,
-    cr: r.cr as number,
+    cr: Number(r.cr), // PostgREST puede devolver NUMERIC como string según config
     xp: r.xp as number | undefined,
     race: r.race as string | undefined,
     classes: r.classes as string | undefined,

@@ -2,18 +2,24 @@ import { useState } from 'react'
 import { Users, ChevronDown, ChevronUp, Shield } from 'lucide-react'
 import { useSRDStore } from '../store/srdStore'
 import type { NPC } from '../store/srdStore'
+import { usePageTransition } from '../hooks/usePageTransition'
+import { formatCR } from '../lib/formatCR'
 import styles from './NPCs.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
 // ── CR grouping ────────────────────────────────────────────────────────────
+// Los grupos filtran sobre el valor numérico de `cr` (0.17, 0.25, 0.33, 0.5, 1, 2…),
+// nunca sobre el string formateado — así los 111 NPCs con CR fraccionario (< 1)
+// entran en su propio grupo en vez de quedar excluidos.
 
 const CR_GROUPS = [
-  { key: 'cr1-5',   label: 'CR 1–5',   min: 1,   max: 5   },
-  { key: 'cr6-10',  label: 'CR 6–10',  min: 6,   max: 10  },
-  { key: 'cr11-15', label: 'CR 11–15', min: 11,  max: 15  },
-  { key: 'cr16-20', label: 'CR 16–20', min: 16,  max: 20  },
-  { key: 'cr21-25', label: 'CR 21–25', min: 21,  max: 25  },
-  { key: 'cr26',    label: 'CR 26+',   min: 26,  max: 999 },
+  { key: 'cr-fraction', label: 'CR < 1',    min: 0,   max: 1 - Number.EPSILON },
+  { key: 'cr1-5',       label: 'CR 1–5',    min: 1,   max: 5   },
+  { key: 'cr6-10',      label: 'CR 6–10',   min: 6,   max: 10  },
+  { key: 'cr11-15',     label: 'CR 11–15',  min: 11,  max: 15  },
+  { key: 'cr16-20',     label: 'CR 16–20',  min: 16,  max: 20  },
+  { key: 'cr21-25',     label: 'CR 21–25',  min: 21,  max: 25  },
+  { key: 'cr26',        label: 'CR 26+',    min: 26,  max: 999 },
 ]
 
 function crBadgeClass(cr: number): string {
@@ -64,7 +70,7 @@ function NPCCard({ npc }: { npc: NPC }) {
         <div className={styles.cardTitleRow}>
           <span className={styles.npcName}>{npc.name}</span>
           <div className={styles.badges}>
-            <span className={`${styles.crBadge} ${crBadgeClass(npc.cr)}`}>CR {npc.cr}</span>
+            <span className={`${styles.crBadge} ${crBadgeClass(npc.cr)}`}>CR {formatCR(npc.cr)}</span>
             {npc.xp != null && (
               <span className={styles.xpBadge}>{npc.xp.toLocaleString()} XP</span>
             )}
@@ -310,6 +316,8 @@ function NPCCard({ npc }: { npc: NPC }) {
 export function NPCs() {
   const npcs = useSRDStore(s => s.npcs ?? [])
   const loading = useSRDStore(s => s.loading)
+  const { isExiting, isEntering, isLoading } = usePageTransition(!loading)
+  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
 
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
 
@@ -333,10 +341,31 @@ export function NPCs() {
     <div className={styles.pageLayout}>
       {/* ── Sidebar nav ── */}
       <aside className={styles.sideNav}>
-        <div className={styles.sideNavInner}>
-          <div className={styles.navTitle}>NPCs por CR</div>
-          <div className={styles.navList}>
+        <div className={`${styles.sideNavInner} ${navClass}`}>
+          <div className={styles.navTitle}>Filtrar por CR</div>
+          <div className={styles.navFilterList}>
+            <button
+              className={`${styles.navFilterBtn} ${selectedGroup === null ? styles.navFilterBtnActive : ''}`}
+              onClick={() => setSelectedGroup(null)}
+            >
+              <span>Todos</span>
+              <span className={styles.navFilterCount}>{npcs.length}</span>
+            </button>
             {groupedNPCs.map(group => (
+              <button
+                key={group.key}
+                className={`${styles.navFilterBtn} ${selectedGroup === group.key ? styles.navFilterBtnActive : ''}`}
+                onClick={() => setSelectedGroup(group.key)}
+              >
+                <span>{group.label}</span>
+                <span className={styles.navFilterCount}>{group.npcs.length}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.navTitle}>NPCs</div>
+          <div className={styles.navList}>
+            {displayGroups.map(group => (
               <div key={group.key} className={styles.navGroup}>
                 <div className={styles.navGroupLabel}>{group.label}</div>
                 {group.npcs.map(npc => (
@@ -355,7 +384,7 @@ export function NPCs() {
       </aside>
 
       {/* ── Main content ── */}
-      <div className={styles.content}>
+      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
         {/* Mobile category bar */}
         <div className={mobile.mobileCatBar}>
           <div className={mobile.mobileCatSelectWrap}>
@@ -385,11 +414,14 @@ export function NPCs() {
           </div>
         </div>
 
-        {loading && npcs.length === 0 && (
-          <p className={styles.loadingText}>Cargando NPCs…</p>
-        )}
-
-        {!loading && npcs.length === 0 && (
+        {isLoading ? (
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader} />
+            <p>Cargando NPCs...</p>
+          </div>
+        ) : (
+        <>
+        {npcs.length === 0 && (
           <p className={styles.emptyText}>No hay NPCs disponibles aún.</p>
         )}
 
@@ -405,6 +437,8 @@ export function NPCs() {
             </div>
           ))}
         </div>
+        </>
+        )}
       </div>
     </div>
   )
