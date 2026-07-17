@@ -42,17 +42,14 @@
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
+  clip-path: inset(0 100% 0 0);
 }
 
 .navEntering {
-  animation: unfoldReveal 0.8s ease-out;
+  animation: unfoldReveal 0.8s ease-out forwards;
 }
 
 .navExiting {
-  animation: unfoldReveal 0.4s ease-in reverse forwards;
-}
-
-.contentExiting {
   animation: unfoldReveal 0.4s ease-in reverse forwards;
 }
 

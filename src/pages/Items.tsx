@@ -27,6 +27,50 @@ const ITEM_TYPE_LABELS: Record<string, string> = {
   gear: 'Equipo de aventurero',
 }
 
+const WEAPON_HANDED_LABELS: Record<string, string> = {
+  light: 'Ligera',
+  one_handed: 'Una mano',
+  two_handed: 'Dos manos',
+}
+
+const WEAPON_CATEGORY_LABELS: Record<string, string> = {
+  simple: 'Simple',
+  martial: 'Marcial',
+  exotic: 'Exótica',
+}
+
+const COMBAT_TYPE_LABELS: Record<string, string> = {
+  melee: 'Cuerpo a cuerpo',
+  ranged: 'A distancia',
+}
+
+const DAMAGE_TYPE_LABELS: Record<string, string> = {
+  piercing: 'perforante',
+  slashing: 'cortante',
+  bludgeoning: 'contundente',
+}
+
+const ARMOR_CATEGORY_LABELS: Record<string, string> = {
+  light: 'Ligera',
+  medium: 'Media',
+  heavy: 'Pesada',
+}
+
+function translateDamageType(damageType?: string): string | undefined {
+  if (!damageType) return undefined
+  return damageType
+    .split('_or_')
+    .map((part) => DAMAGE_TYPE_LABELS[part] ?? part)
+    .join(' o ')
+}
+
+/** Algunos registros guardan los bonos ya con signo ("+6") y otros como número plano; evita "++6". */
+function formatBonus(value: number | string | undefined | null): string | undefined {
+  if (value === undefined || value === null) return undefined
+  const str = String(value)
+  return /^[+-]/.test(str) ? str : `+${str}`
+}
+
 const PAGE_SIZE = 60
 
 export function Items() {
@@ -109,7 +153,7 @@ export function Items() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
+      <div className={styles.content}>
         <header className={styles.header}>
           <div className={styles.headerIcon}>
             <Backpack size={28} />
@@ -192,6 +236,65 @@ export function Items() {
                 {item.weight !== undefined && <span><strong>Peso:</strong> {item.weight} lb</span>}
                 {item.consumable && <span>Consumible</span>}
               </div>
+
+              {item.data?.weapon && (
+                <div className={styles.itemMeta}>
+                  <span>
+                    <strong>Daño:</strong> {item.data.weapon.damage_medium}
+                    {item.data.weapon.damage_type && ` (${translateDamageType(item.data.weapon.damage_type)})`}
+                  </span>
+                  {item.data.weapon.critical && <span><strong>Crítico:</strong> {item.data.weapon.critical}</span>}
+                  {item.data.weapon.range_increment !== undefined && (
+                    <span><strong>Alcance:</strong> {item.data.weapon.range_increment} pies</span>
+                  )}
+                  {item.data.weapon.combat_type && (
+                    <span><strong>Tipo:</strong> {COMBAT_TYPE_LABELS[item.data.weapon.combat_type] ?? item.data.weapon.combat_type}</span>
+                  )}
+                  {item.data.weapon.category && (
+                    <span><strong>Categoría:</strong> {WEAPON_CATEGORY_LABELS[item.data.weapon.category] ?? item.data.weapon.category}</span>
+                  )}
+                  {item.data.weapon.handed && (
+                    <span><strong>Manejo:</strong> {WEAPON_HANDED_LABELS[item.data.weapon.handed] ?? item.data.weapon.handed}</span>
+                  )}
+                </div>
+              )}
+
+              {item.data?.armor && (
+                <div className={styles.itemMeta}>
+                  {item.data.armor.armor_bonus !== undefined && (
+                    <span><strong>Bonif. CA:</strong> {formatBonus(item.data.armor.armor_bonus)}</span>
+                  )}
+                  {item.data.armor.max_dex_bonus !== undefined && item.data.armor.max_dex_bonus !== null && (
+                    <span><strong>Máx. Des:</strong> {formatBonus(item.data.armor.max_dex_bonus)}</span>
+                  )}
+                  {item.data.armor.armor_check_penalty !== undefined && (
+                    <span><strong>Penal. armadura:</strong> {item.data.armor.armor_check_penalty}</span>
+                  )}
+                  {item.data.armor.arcane_spell_failure !== undefined && (
+                    <span><strong>Fallo arcano:</strong> {item.data.armor.arcane_spell_failure}%</span>
+                  )}
+                  {item.data.armor.category && (
+                    <span><strong>Categoría:</strong> {ARMOR_CATEGORY_LABELS[item.data.armor.category] ?? item.data.armor.category}</span>
+                  )}
+                </div>
+              )}
+
+              {item.data?.shield && (
+                <div className={styles.itemMeta}>
+                  {item.data.shield.shield_bonus !== undefined && (
+                    <span><strong>Bonif. CA:</strong> {formatBonus(item.data.shield.shield_bonus)}</span>
+                  )}
+                  {item.data.shield.max_dex_bonus !== undefined && item.data.shield.max_dex_bonus !== null && (
+                    <span><strong>Máx. Des:</strong> {formatBonus(item.data.shield.max_dex_bonus)}</span>
+                  )}
+                  {item.data.shield.armor_check_penalty !== undefined && (
+                    <span><strong>Penal. armadura:</strong> {item.data.shield.armor_check_penalty}</span>
+                  )}
+                  {item.data.shield.arcane_spell_failure !== undefined && (
+                    <span><strong>Fallo arcano:</strong> {item.data.shield.arcane_spell_failure}%</span>
+                  )}
+                </div>
+              )}
 
               <div className={styles.itemDescription}>
                 {descriptions[item.id] === 'loading' ? (

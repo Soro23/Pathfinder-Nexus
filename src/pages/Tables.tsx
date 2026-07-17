@@ -422,7 +422,7 @@ export function Tables() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
+      <div className={styles.content}>
 
         <header className={styles.header}>
           <LayoutList size={28} className={styles.headerIcon} />

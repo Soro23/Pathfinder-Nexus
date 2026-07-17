@@ -384,7 +384,7 @@ export function NPCs() {
       </aside>
 
       {/* ── Main content ── */}
-      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
+      <div className={styles.content}>
         {/* Mobile category bar */}
         <div className={mobile.mobileCatBar}>
           <div className={mobile.mobileCatSelectWrap}>

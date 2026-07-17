@@ -8,6 +8,39 @@ export const ITEM_TYPES = [
   'alchemical', 'container', 'cursed', 'gear',
 ] as const
 
+export interface WeaponStats {
+  handed?: 'light' | 'one_handed' | 'two_handed'
+  category?: 'simple' | 'martial' | 'exotic'
+  combat_type?: 'melee' | 'ranged'
+  damage_type?: string
+  damage_medium?: string
+  critical?: string
+  range_increment?: number
+}
+
+export interface ArmorStats {
+  category?: 'light' | 'medium' | 'heavy'
+  armor_bonus?: number | string
+  max_dex_bonus?: number | string | null
+  armor_check_penalty?: number | string
+  arcane_spell_failure?: number | string
+  speed_20?: number
+  speed_30?: number
+}
+
+export interface ShieldStats {
+  shield_bonus?: number | string
+  max_dex_bonus?: number | string | null
+  armor_check_penalty?: number | string
+  arcane_spell_failure?: number | string
+}
+
+export interface ItemData {
+  weapon?: WeaponStats
+  armor?: ArmorStats
+  shield?: ShieldStats
+}
+
 export interface CatalogItem {
   id: string
   name: string
@@ -19,6 +52,7 @@ export interface CatalogItem {
   magical: boolean
   consumable: boolean
   description?: string
+  data?: ItemData
 }
 
 export async function searchCatalogItems(query: string): Promise<CatalogItem[]> {

@@ -65,7 +65,7 @@ export function Skills() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
+      <div className={styles.content}>
         <header className={styles.header}>
           <Zap size={28} className={styles.headerIcon} />
           <div>

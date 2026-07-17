@@ -160,7 +160,7 @@ export function Classes() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
+      <div className={styles.content}>
         <header className={styles.pageHeader}>
           <Shield size={28} className={styles.headerIcon} />
           <div>

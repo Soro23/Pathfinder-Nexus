@@ -146,7 +146,7 @@ export function Bestiary() {
       </nav>
 
       {/* ── Main content ── */}
-      <div className={`${styles.content} ${isExiting ? styles.contentExiting : ''}`}>
+      <div className={styles.content}>
         <header className={styles.header}>
           <div className={styles.headerIcon}>
             <Skull size={28} />

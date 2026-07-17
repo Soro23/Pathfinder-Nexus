@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import type { CatalogItem } from '../lib/itemsService'
+import type { CatalogItem, ItemData } from '../lib/itemsService'
 import { pickLocalized } from '../lib/localization'
 import { fetchWithCache } from '../lib/queryCache'
 import { escapeForOrFilter } from '../lib/postgrest'
@@ -14,7 +14,7 @@ export interface ItemFilters {
 const PAGE_SIZE = 60
 
 // Columnas ligeras: se excluye `description`/`description_es`, que se pide aparte al abrir la ficha.
-const LIST_COLUMNS = 'id,name,name_es,item_type,subtype,slot,price_gp,weight,magical,consumable'
+const LIST_COLUMNS = 'id,name,name_es,item_type,subtype,slot,price_gp,weight,magical,consumable,data'
 
 function mapItemListRow(r: Record<string, unknown>): CatalogItem {
   return {
@@ -27,6 +27,7 @@ function mapItemListRow(r: Record<string, unknown>): CatalogItem {
     weight: (r.weight as number) ?? undefined,
     magical: (r.magical as boolean) ?? false,
     consumable: (r.consumable as boolean) ?? false,
+    data: (r.data as ItemData) ?? undefined,
   }
 }
 
