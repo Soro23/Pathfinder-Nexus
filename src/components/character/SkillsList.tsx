@@ -1,25 +1,22 @@
 import { useState, useMemo } from 'react'
 import { ChevronDown, ChevronUp, Lock, Unlock, Plus, Trash2 } from 'lucide-react'
 import { Button } from '../ui'
-import { CLASS_SKILLS, calculateModifier, CharacterClass, useSRDStore } from '../../data'
-import type { MiscBonus } from '../../store'
+import { calculateModifier, CharacterClass, useSRDStore } from '../../data'
+import type { MiscBonus, SkillRank } from '../../store'
+import { computeSkillTotal, isClassSkillForCharacter } from '../../engine'
+import type { ResolvedStats } from '../../engine'
 import styles from './SkillsList.module.css'
-
-interface SkillRank {
-  id: string
-  ranks: number
-  miscBonuses?: MiscBonus[]
-}
 
 interface SkillsListProps {
   ranks: SkillRank[]
   onChange: (ranks: SkillRank[]) => void
   abilities: Record<string, number>
   classes: CharacterClass[]
+  race: string
   level: number
   skillPointsAvailable: number
   equippedArmorAcp?: number
-  featSkillBonuses?: Record<string, number>
+  resolvedStats: ResolvedStats
 }
 
 export function SkillsList({
@@ -27,10 +24,11 @@ export function SkillsList({
   onChange,
   abilities,
   classes,
+  race,
   level,
   skillPointsAvailable,
   equippedArmorAcp = 0,
-  featSkillBonuses = {},
+  resolvedStats,
 }: SkillsListProps) {
   const { skills: SKILLS } = useSRDStore()
   const [showAll, setShowAll] = useState(false)
@@ -39,33 +37,16 @@ export function SkillsList({
   const [newMiscValue, setNewMiscValue] = useState<number>(0)
   const [newMiscDesc, setNewMiscDesc] = useState('')
 
-  const primaryClassId = classes[0]?.id || ''
-  const classSkills = CLASS_SKILLS[primaryClassId] || []
+  // Contexto mínimo para las funciones de cálculo del engine — `ranks` (controlado, en
+  // edición) hace de `skills` en vez de character.skills, que puede estar desactualizado.
+  const calcContext = { abilities, classes, skills: ranks, race }
 
   const skillPointsSpent = ranks.reduce((sum, r) => sum + r.ranks, 0)
-
-  const getMiscTotal = (skillId: string) => {
-    return ranks.find((r) => r.id === skillId)?.miscBonuses?.reduce((s, b) => s + b.value, 0) ?? 0
-  }
 
   const getTotalForSkill = (skillId: string) => {
     const skill = SKILLS.find((s) => s.id === skillId)
     if (!skill) return 0
-
-    const rank = ranks.find((r) => r.id === skillId)?.ranks || 0
-    const abilityMod = calculateModifier(abilities[skill.ability])
-    const isClassSkill = classSkills.includes(skillId)
-    const misc = getMiscTotal(skillId)
-
-    const featBonus = featSkillBonuses[skillId] ?? 0
-    let total = rank + abilityMod + misc + featBonus
-    if (rank > 0 && isClassSkill) {
-      total += 3
-    }
-    if (skill.hasArmorCheckPenalty) {
-      total += equippedArmorAcp
-    }
-    return total
+    return computeSkillTotal(calcContext, skill, resolvedStats, equippedArmorAcp)
   }
 
   const getRanksForSkill = (skillId: string) => {
@@ -127,7 +108,7 @@ export function SkillsList({
       ...skill,
       total: getTotalForSkill(skill.id),
       ranks: getRanksForSkill(skill.id),
-      isClassSkill: classSkills.includes(skill.id),
+      isClassSkill: isClassSkillForCharacter(calcContext, skill.id),
     }))
 
     return skillsWithRanks.sort((a, b) => {
@@ -136,7 +117,8 @@ export function SkillsList({
       }
       return b.total - a.total
     })
-  }, [ranks, abilities, classSkills, level, sortBy])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ranks, abilities, classes, level, sortBy])
 
   const displaySkills = showAll ? sortedSkills : sortedSkills.filter((s) => s.ranks > 0 || s.isClassSkill)
 

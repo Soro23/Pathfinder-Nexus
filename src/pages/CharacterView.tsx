@@ -8,10 +8,10 @@ import {
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
-import { getClassById, getMulticlassStats, SpellLevel, useSRDStore } from '../data'
+import { getClassById, SpellLevel, useSRDStore } from '../data'
 import { getBonusSpells } from '../data/bonusSpells'
 import { resolveClassSkills } from '../data/resolveArchetype'
-import { resolveModifiers } from '../engine'
+import { resolveModifiers, computeCombatStats, computeSkillPointsAvailable, computeSkillTotal, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, computeSpeed } from '../engine'
 import { Card, Button } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker } from '../components/character'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
@@ -103,27 +103,18 @@ export function CharacterView() {
   }
 
   const { abilities } = character
-  const primaryClass = character.classes[0]
-  const classData = getClassById(primaryClass?.id || '')
 
-  const equippedBody = (character.armor ?? []).find((a) => a.equipped && a.type !== 'shield')
-  const effectiveDex = equippedBody
-    ? Math.min(calculateModifier(abilities.dexterity), equippedBody.maxDex ?? 99)
-    : calculateModifier(abilities.dexterity)
-  const ac = 10 + effectiveDex + resolvedStats.acBonuses.armor + resolvedStats.acBonuses.shield + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
-  const acTouch = 10 + effectiveDex + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
-  const acFlat = 10 + resolvedStats.acBonuses.armor + resolvedStats.acBonuses.shield + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection
-  const mcStats = getMulticlassStats(character.classes)
-  const fortitude = mcStats.fortitude + calculateModifier(abilities.constitution) + resolvedStats.saveBonuses.fort
-  const reflex = mcStats.reflex + calculateModifier(abilities.dexterity) + resolvedStats.saveBonuses.ref
-  const will = mcStats.will + calculateModifier(abilities.wisdom) + resolvedStats.saveBonuses.will
-  const bab = mcStats.bab
-  const initiative = calculateModifier(abilities.dexterity) + resolvedStats.initiativeBonus
-  const strMod = calculateModifier(abilities.strength)
-  const cmb = bab + strMod
-  const cmd = 10 + bab + strMod + calculateModifier(abilities.dexterity)
+  const combat = computeCombatStats(character, resolvedStats)
+  const { bab, ac, cmb, cmd, initiative, fortitude, reflex, will } = combat
+  const acTouch = combat.acTouch
+  const acFlat = combat.acFlatFooted
 
-  const hpPercent = Math.max(0, Math.min(100, (character.hp.current / character.hp.max) * 100))
+  const totalWeight = (character.inventory ?? []).reduce((sum, item) => sum + item.weight * item.quantity, 0)
+  const speed = computeSpeed(character, totalWeight)
+
+  // PV máximos efectivos: PV base + bonos del motor (dotes/objetos como Toughness).
+  const effectiveMaxHp = character.hp.max + resolvedStats.hpBonus
+  const hpPercent = Math.max(0, Math.min(100, (character.hp.current / effectiveMaxHp) * 100))
 
   const isCaster = character.classes.some((c) => {
     const cls = getClassById(c.id)
@@ -294,7 +285,7 @@ export function CharacterView() {
                   <>
                     <span className={styles.hpCurrent}>{character.hp.current}</span>
                     <span className={styles.hpSeparator}>/</span>
-                    <span className={styles.hpMax}>{character.hp.max}</span>
+                    <span className={styles.hpMax}>{effectiveMaxHp}</span>
                   </>
                 )}
               </div>
@@ -307,8 +298,8 @@ export function CharacterView() {
               <div className={styles.hpControls}>
                 <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.max(0, character.hp.current - 1) } })}>−1</button>
                 <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.max(0, character.hp.current - 5) } })}>−5</button>
-                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.min(character.hp.max, character.hp.current + 1) } })}>+1</button>
-                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.min(character.hp.max, character.hp.current + 5) } })}>+5</button>
+                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.min(effectiveMaxHp, character.hp.current + 1) } })}>+1</button>
+                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.min(effectiveMaxHp, character.hp.current + 5) } })}>+5</button>
               </div>
             )}
           </div>
@@ -332,7 +323,7 @@ export function CharacterView() {
           </div>
           <div className={styles.quickStat}>
             <Star size={18} />
-            <span className={styles.quickStatValue}>30ft</span>
+            <span className={styles.quickStatValue}>{speed}ft</span>
             <span className={styles.quickStatLabel}>Vel.</span>
           </div>
           <div className={styles.quickStat}>
@@ -455,7 +446,7 @@ export function CharacterView() {
                   { label: 'BAB', val: `+${bab}` },
                   { label: 'CMB', val: `${cmb >= 0 ? '+' : ''}${cmb}` },
                   { label: 'CMD', val: cmd },
-                  { label: 'Velocidad', val: '30 ft' },
+                  { label: 'Velocidad', val: `${speed} ft` },
                 ].map(({ label, val }) => (
                   <div key={label} className={styles.combatStat}>
                     <span className={styles.combatLabel}>{label}</span>
@@ -830,10 +821,11 @@ export function CharacterView() {
                 onChange={(skills) => updateCharacter(character.id, { skills })}
                 abilities={abilities}
                 classes={character.classes}
+                race={character.race}
                 level={character.level}
-                skillPointsAvailable={Math.max(0, (character.level * (classData?.skillPointsPerLevel || 2)) - character.skills.reduce((sum, s) => sum + s.ranks, 0))}
+                skillPointsAvailable={computeSkillPointsAvailable(character, character.skills.reduce((sum, s) => sum + s.ranks, 0))}
                 equippedArmorAcp={equippedArmorAcp}
-                featSkillBonuses={resolvedStats.skillBonuses}
+                resolvedStats={resolvedStats}
               />
             ) : (
               <div className={styles.skillsTable}>
@@ -846,13 +838,8 @@ export function CharacterView() {
                 {SKILLS.map((skill) => {
                   const rankEntry = character.skills.find((s) => s.id === skill.id)
                   const ranks = rankEntry?.ranks ?? 0
-                  const abilityMod = calculateModifier(abilities[skill.ability])
-                  const isClass = classData?.classSkills?.includes(skill.id)
-                  const classBonus = ranks > 0 && isClass ? 3 : 0
-                  const acp = skill.hasArmorCheckPenalty ? equippedArmorAcp : 0
-                  const misc = rankEntry?.miscBonuses?.reduce((s, b) => s + b.value, 0) ?? 0
-                  const featBonus = resolvedStats.skillBonuses?.[skill.id] ?? 0
-                  const total = ranks + abilityMod + classBonus + acp + misc + featBonus
+                  const isClass = isClassSkillForCharacter(character, skill.id)
+                  const total = computeSkillTotal(character, skill, resolvedStats, equippedArmorAcp)
                   return (
                     <div
                       key={skill.id}
@@ -926,8 +913,11 @@ export function CharacterView() {
               weapons={character.weapons || []}
               armor={character.armor ?? []}
               bab={bab}
-              strMod={calculateModifier(abilities.strength)}
-              dexMod={calculateModifier(abilities.dexterity)}
+              strMod={combat.strMod}
+              dexMod={combat.dexMod}
+              sizeMod={combat.sizeMod}
+              ac={ac}
+              resolvedStats={resolvedStats}
               onWeaponsChange={(weapons) => updateCharacter(character.id, { weapons })}
               onArmorChange={(armor) => updateCharacter(character.id, { armor })}
               inventory={character.inventory ?? []}
@@ -951,7 +941,8 @@ export function CharacterView() {
               platinum={character.coins.pp}
               onChangeItems={(inventory) => updateCharacter(character.id, { inventory })}
               onChangeCoins={(coins) => updateCharacter(character.id, { coins })}
-              carryCapacity={(abilities.strength * 10) + (calculateModifier(abilities.strength) * 10)}
+              carryCapacity={getCarryingCapacity(abilities.strength)}
+              encumbrance={getEncumbranceLevel(totalWeight, abilities.strength)}
             />
           </Card>
         )}

@@ -275,6 +275,10 @@ export function mod(score: number): number {
   return Math.floor((score - 10) / 2)
 }
 
+// Modificador de tamaño a CA (Pequeño +1, Mediano +0, Grande -1) — misma tabla estándar
+// que para personajes, restringida a los tres tamaños que usan los compañeros animales.
+const SIZE_AC_MOD: Record<AnimalBaseStats['size'], number> = { P: 1, M: 0, G: -1 }
+
 export function calculateCompanionStats(
   base: AnimalBaseStats,
   companionLevel: number
@@ -293,7 +297,7 @@ export function calculateCompanionStats(
     will: prog.will + mod(base.wis),
     str, dex, con,
     naturalArmor: na,
-    ac: 10 + mod(dex) + na,
+    ac: 10 + mod(dex) + na + SIZE_AC_MOD[base.size],
     maxFeats: prog.feats,
     maxTricks: 3 + prog.bonusTricks,
     skillPoints: prog.skills,

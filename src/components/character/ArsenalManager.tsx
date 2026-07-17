@@ -3,6 +3,8 @@ import { Plus, Trash2, Sword, Shield, Check, Pencil, ChevronDown, ChevronUp, X }
 import { Card, Button, Input } from '../ui'
 import { generateId } from '../../store'
 import type { Weapon, Armor, InventoryItem, EquipmentSlot, CustomSlot } from '../../store'
+import { computeWeaponAttackBonus } from '../../engine'
+import type { ResolvedStats } from '../../engine'
 import styles from './ArsenalManager.module.css'
 
 interface ArsenalManagerProps {
@@ -11,6 +13,9 @@ interface ArsenalManagerProps {
   bab: number
   strMod: number
   dexMod: number
+  sizeMod: number
+  ac: number
+  resolvedStats: ResolvedStats
   onWeaponsChange: (weapons: Weapon[]) => void
   onArmorChange: (armor: Armor[]) => void
   inventory: InventoryItem[]
@@ -45,7 +50,12 @@ const ARMOR_TYPE_LABELS: Record<Armor['type'], string> = {
 }
 
 const DEFAULT_WEAPON = {
-  name: '', attackBonus: 0, damage: '1d6', critical: '×2', range: 'melee', type: 'Cortante', notes: '',
+  name: '', attackBonus: 0, damage: '1d6', critical: '×2', range: 'melee', type: 'Cortante', notes: '', grip: 'one-handed' as const,
+}
+const GRIP_LABELS: Record<NonNullable<Weapon['grip']>, string> = {
+  'one-handed': 'Una mano',
+  'two-handed': 'Dos manos (×1.5 FUE)',
+  'off-hand': 'Mano secundaria (×0.5 FUE)',
 }
 const DEFAULT_ARMOR: Omit<Armor, 'id'> = {
   name: '', type: 'light', acBonus: 1, armorCheckPenalty: 0, maxDex: null,
@@ -53,7 +63,7 @@ const DEFAULT_ARMOR: Omit<Armor, 'id'> = {
 }
 
 export function ArsenalManager({
-  weapons, armor, bab, strMod, dexMod, onWeaponsChange, onArmorChange,
+  weapons, armor, bab, strMod, dexMod, sizeMod, ac, resolvedStats, onWeaponsChange, onArmorChange,
   inventory, equippedSlots, customSlots, onEquippedSlotsChange, onCustomSlotsChange,
 }: ArsenalManagerProps) {
   const [equipadoOpen, setEquipadoOpen] = useState(false)
@@ -62,7 +72,7 @@ export function ArsenalManager({
   const [addingCustomSlot, setAddingCustomSlot] = useState(false)
   const [addingWeapon, setAddingWeapon] = useState(false)
   const [addingArmor, setAddingArmor]   = useState(false)
-  const [newWeapon, setNewWeapon] = useState(DEFAULT_WEAPON)
+  const [newWeapon, setNewWeapon] = useState<Omit<Weapon, 'id'>>(DEFAULT_WEAPON)
   const [newArmor, setNewArmor]   = useState<Omit<Armor, 'id'>>(DEFAULT_ARMOR)
   const [editingWeaponId, setEditingWeaponId] = useState<string | null>(null)
   const [editingWeapon, setEditingWeapon] = useState<Weapon | null>(null)
@@ -93,17 +103,16 @@ export function ArsenalManager({
     setEditingArmor(null)
   }
 
-  // ── AC computation ──
+  // ── AC display (el valor final ya viene calculado por engine/combatStats — ver CharacterView) ──
   const equippedBody   = armor.find((a) => a.equipped && a.type !== 'shield')
   const equippedShield = armor.find((a) => a.equipped && a.type === 'shield')
   const effectiveDex   = equippedBody
     ? Math.min(dexMod, equippedBody.maxDex ?? 99)
     : dexMod
-  const computedAC = 10 + effectiveDex + (equippedBody?.acBonus ?? 0) + (equippedShield?.acBonus ?? 0)
 
   // ── Weapon helpers ──
   const calcAttack = (bonus: number, isRanged: boolean) =>
-    bab + (isRanged ? dexMod : strMod) + bonus
+    computeWeaponAttackBonus(bab, isRanged ? dexMod : strMod, bonus, resolvedStats, sizeMod)
 
   const addWeapon = () => {
     if (!newWeapon.name.trim()) return
@@ -362,6 +371,20 @@ export function ArsenalManager({
                   <option value="ranged">A distancia</option>
                 </select>
               </div>
+              {newWeapon.range === 'melee' && (
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Empuñadura</label>
+                  <select
+                    className={styles.formSelect}
+                    value={newWeapon.grip}
+                    onChange={(e) => setNewWeapon({ ...newWeapon, grip: e.target.value as Weapon['grip'] })}
+                  >
+                    {(Object.keys(GRIP_LABELS) as Array<NonNullable<Weapon['grip']>>).map((g) => (
+                      <option key={g} value={g}>{GRIP_LABELS[g]}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <Input label="Tipo de daño" value={newWeapon.type}
                 onChange={(e) => setNewWeapon({ ...newWeapon, type: e.target.value })}
                 placeholder="Cortante" />
@@ -404,6 +427,20 @@ export function ArsenalManager({
                           <option value="ranged">A distancia</option>
                         </select>
                       </div>
+                      {editingWeapon.range === 'melee' && (
+                        <div className={styles.formField}>
+                          <label className={styles.formLabel}>Empuñadura</label>
+                          <select
+                            className={styles.formSelect}
+                            value={editingWeapon.grip ?? 'one-handed'}
+                            onChange={(e) => setEditingWeapon({ ...editingWeapon, grip: e.target.value as Weapon['grip'] })}
+                          >
+                            {(Object.keys(GRIP_LABELS) as Array<NonNullable<Weapon['grip']>>).map((g) => (
+                              <option key={g} value={g}>{GRIP_LABELS[g]}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
                       <Input label="Tipo de daño" value={editingWeapon.type}
                         onChange={(e) => setEditingWeapon({ ...editingWeapon, type: e.target.value })}/>
                       <Input label="Notas" value={editingWeapon.notes}
@@ -422,7 +459,11 @@ export function ArsenalManager({
                 <div key={w.id} className={styles.weaponRow}>
                   <div className={styles.weaponInfo}>
                     <span className={styles.itemName}>{w.name}</span>
-                    <span className={styles.itemMeta}>{w.type} · {w.range === 'melee' ? 'Cuerpo a cuerpo' : 'A distancia'}{w.notes && ` · ${w.notes}`}</span>
+                    <span className={styles.itemMeta}>
+                      {w.type} · {w.range === 'melee' ? 'Cuerpo a cuerpo' : 'A distancia'}
+                      {w.range === 'melee' && w.grip && w.grip !== 'one-handed' && ` · ${GRIP_LABELS[w.grip]}`}
+                      {w.notes && ` · ${w.notes}`}
+                    </span>
                   </div>
                   <div className={styles.weaponStats}>
                     <div className={styles.statCol}>
@@ -466,7 +507,7 @@ export function ArsenalManager({
 
         {/* Computed AC display */}
         <div className={styles.acDisplay}>
-          <span className={styles.acNumber}>{computedAC}</span>
+          <span className={styles.acNumber}>{ac}</span>
           <span className={styles.acLabel}>CA total</span>
           {equippedBody && (
             <span className={styles.acBreakdown}>

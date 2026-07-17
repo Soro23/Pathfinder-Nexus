@@ -5,8 +5,8 @@ import {
   Swords, Flame, X, Zap, BookOpen, Activity, Power, Pencil, Check
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, StatusEffect, BonusTarget } from '../store'
-import { getClassById, getMulticlassStats, useSRDStore } from '../data'
-import { resolveModifiers } from '../engine'
+import { getClassById, useSRDStore, calculateSpellDC } from '../data'
+import { resolveModifiers, computeCombatStats, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus } from '../engine'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card } from '../components/ui'
 import styles from './PlayMode.module.css'
@@ -88,7 +88,7 @@ const INTERACTIVE_FEATURE_NAMES = new Set([
 ])
 
 export function PlayMode() {
-  const { skills: SKILLS, classes: CLASSES_DATA, getDomainById, getBlessingById } = useSRDStore()
+  const { skills: SKILLS, getDomainById, getBlessingById } = useSRDStore()
   const { id } = useParams<{ id: string }>()
   const character = useCharacterStore((state) => state.getCharacter(id || ''))
   const updateCharacter = useCharacterStore((state) => state.updateCharacter)
@@ -150,40 +150,29 @@ export function PlayMode() {
   }
 
   const { abilities } = character
-  const classData = getClassById(character.classes[0]?.id || '')   // mantener — se usa en hasSpells, concentrationBonus, classSkillIds
-  const mcStats = getMulticlassStats(character.classes)
-  const bab = mcStats.bab
+  const classData = getClassById(character.classes[0]?.id || '')   // mantener — se usa en hasSpells, concentrationBonus
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resolvedStats = useMemo(() => resolveModifiers(character), [character])
+  const combat = computeCombatStats(character, resolvedStats)
+  const { bab, strMod, dexMod, ac, cmb, cmd, initiative } = combat
+  const touchAC = combat.acTouch
+  const flatFootedAC = combat.acFlatFooted
+  const fortSave = combat.fortitude
+  const refSave = combat.reflex
+  const willSave = combat.will
 
-  // maxDex cap requiere leer armor directamente (es un techo, no un bonus aditivo)
-  const equippedArmor = (character.armor ?? []).filter((a) => a.equipped)
-  const armorMaxDex = equippedArmor.reduce((min, a) =>
-    a.maxDex === null ? min : Math.min(min, a.maxDex), Infinity)
-  const dexForAC = Math.min(
-    calculateModifier(abilities.dexterity),
-    armorMaxDex === Infinity ? 99 : armorMaxDex
-  )
+  const equippedArmorAcp = (character.armor ?? [])
+    .filter((a) => a.equipped && a.type !== 'shield')
+    .reduce((sum, a) => sum + (a.armorCheckPenalty ?? 0), 0)
 
-  const strMod = calculateModifier(abilities.strength)
-  const dexMod = calculateModifier(abilities.dexterity)
-
-  const ac = 10 + resolvedStats.acBonuses.armor + resolvedStats.acBonuses.shield + dexForAC + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge + resolvedStats.acBonuses.total
-  const touchAC = 10 + calculateModifier(abilities.dexterity) + resolvedStats.acBonuses.deflection + resolvedStats.acBonuses.dodge
-  const flatFootedAC = 10 + resolvedStats.acBonuses.armor + resolvedStats.acBonuses.shield + resolvedStats.acBonuses.natural + resolvedStats.acBonuses.deflection
+  // PV máximos efectivos: PV base + bonos del motor (dotes/objetos como Toughness).
+  const effectiveMaxHp = character.hp.max + resolvedStats.hpBonus
 
   // Power Attack
   const hasPowerAttack = character.feats.some(f => f.id === 'power-attack')
   const powerAttackPenalty = Math.floor(bab / 4) + 1
   const powerAttackDmgBonus = powerAttackPenalty * 2
-
-  const fortSave = mcStats.fortitude + calculateModifier(abilities.constitution) + resolvedStats.saveBonuses.fort
-  const refSave = mcStats.reflex + calculateModifier(abilities.dexterity) + resolvedStats.saveBonuses.ref
-  const willSave = mcStats.will + calculateModifier(abilities.wisdom) + resolvedStats.saveBonuses.will
-  const cmb = bab + strMod + resolvedStats.cmbBonus
-  const cmd = 10 + bab + strMod + dexMod + resolvedStats.cmdBonus
-  const initiative = dexMod + resolvedStats.initiativeBonus
 
   const statusEffects = character.statusEffects ?? []
 
@@ -221,7 +210,7 @@ export function PlayMode() {
   }
 
   const adjustHP = (amount: number) => {
-    const newHP = Math.max(0, Math.min(character.hp.max, character.hp.current + amount))
+    const newHP = Math.max(0, Math.min(effectiveMaxHp, character.hp.current + amount))
     updateCharacter(character.id, { hp: { ...character.hp, current: newHP } })
   }
 
@@ -247,15 +236,10 @@ export function PlayMode() {
     intelligence: 'INT', wisdom: 'SAB', charisma: 'CAR'
   }
 
-  const classSkillIds = classData?.classSkills ?? CLASSES_DATA.find(c => c.id === character.classes[0]?.id)?.classSkills ?? []
-
   // ── Class feature helpers ──
-  const conMod = calculateModifier(abilities.constitution)
-  const wisMod = calculateModifier(abilities.wisdom)
-  const chaMod = calculateModifier(abilities.charisma)
+  const { conMod, intMod, wisMod, chaMod } = combat
   const classByType = (id: string) => character.classes.find(c => c.id === id)
 
-  const intMod = calculateModifier(abilities.intelligence)
   const barbarianClass = classByType('barbarian')
   const clericClass = classByType('cleric')
   const rogueClass = classByType('rogue')
@@ -331,7 +315,7 @@ export function PlayMode() {
       id: character.id,
       name: character.name,
       initiative: initiative + Math.floor(Math.random() * 20) + 1,
-      hp: { current: character.hp.current, max: character.hp.max },
+      hp: { current: character.hp.current, max: effectiveMaxHp },
       ac: ac,
       isPlayer: true,
     }
@@ -694,20 +678,20 @@ export function PlayMode() {
                 <Minus size={20} />
               </Button>
               <div className={styles.hpValue}>
-                <span className={character.hp.current <= character.hp.max * 0.25 ? styles.critical : ''}>
+                <span className={character.hp.current <= effectiveMaxHp * 0.25 ? styles.critical : ''}>
                   {character.hp.current}
                 </span>
-                <span className={styles.hpMax}>/ {character.hp.max}</span>
+                <span className={styles.hpMax}>/ {effectiveMaxHp}</span>
               </div>
               <Button variant="primary" size="lg" onClick={() => adjustHP(1)}>
                 <Plus size={20} />
               </Button>
             </div>
             <div className={styles.hpControls}>
-              <Button variant="danger" size="sm" onClick={() => adjustHP(-Math.ceil(character.hp.max / 4))}>-1/4</Button>
+              <Button variant="danger" size="sm" onClick={() => adjustHP(-Math.ceil(effectiveMaxHp / 4))}>-1/4</Button>
               <Button variant="secondary" size="sm" onClick={() => adjustHP(-5)}>-5</Button>
               <Button variant="secondary" size="sm" onClick={() => adjustHP(5)}>+5</Button>
-              <Button variant="primary" size="sm" onClick={() => adjustHP(Math.ceil(character.hp.max / 4))}>+1/4</Button>
+              <Button variant="primary" size="sm" onClick={() => adjustHP(Math.ceil(effectiveMaxHp / 4))}>+1/4</Button>
             </div>
           </Card>
 
@@ -806,9 +790,9 @@ export function PlayMode() {
                     character.weapons.map((weapon) => {
                       const isRanged = weapon.range === 'ranged'
                       const paAtkPenalty = (powerAttackActive && !isRanged) ? -powerAttackPenalty : 0
-                      const paDmgBonus = (powerAttackActive && !isRanged) ? powerAttackDmgBonus : 0
-                      const atkBase = bab + (isRanged ? dexMod : strMod) + weapon.attackBonus + resolvedStats.attackBonus + paAtkPenalty
-                      const dmgMod = isRanged ? dexMod : strMod
+                      const paDmgBonus = (powerAttackActive && !isRanged) ? getPowerAttackDamageBonus(powerAttackPenalty, weapon.grip) : 0
+                      const atkBase = computeWeaponAttackBonus(bab, isRanged ? dexMod : strMod, weapon.attackBonus, resolvedStats, combat.sizeMod) + paAtkPenalty
+                      const dmgMod = isRanged ? dexMod : getStrDamageBonus(strMod, weapon.grip)
                       const dmgNotation = addModifierToNotation(weapon.damage, resolvedStats.damageBonus + dmgMod + paDmgBonus)
                       const iterativeOffsets = (() => {
                         const offsets: number[] = []
@@ -857,8 +841,8 @@ export function PlayMode() {
                       {(() => {
                         const paAtkPenalty = powerAttackActive ? -powerAttackPenalty : 0
                         const paDmgBonus = powerAttackActive ? powerAttackDmgBonus : 0
-                        const meleeAtk = bab + strMod + resolvedStats.attackBonus + paAtkPenalty
-                        const rangedAtk = bab + dexMod + resolvedStats.attackBonus
+                        const meleeAtk = computeWeaponAttackBonus(bab, strMod, 0, resolvedStats, combat.sizeMod) + paAtkPenalty
+                        const rangedAtk = computeWeaponAttackBonus(bab, dexMod, 0, resolvedStats, combat.sizeMod)
                         const iterOffsets = (() => {
                           const offsets: number[] = []
                           let cur = bab
@@ -1372,12 +1356,9 @@ export function PlayMode() {
                       .map((skillRank) => {
                         const skillDef = SKILLS.find((s) => s.id === skillRank.id)
                         if (!skillDef) return null
-                        const abilityMod = calculateModifier(abilities[skillDef.ability])
-                        const miscTotal = (skillRank.miscBonuses ?? []).reduce((s, b) => s + b.value, 0)
-                        const isClassSkill = classSkillIds.includes(skillRank.id)
-                        const classBonus = isClassSkill && skillRank.ranks > 0 ? 3 : 0
+                        const isClassSkill = isClassSkillForCharacter(character, skillRank.id)
                         const skillEffectBonus = resolvedStats.skillBonuses[skillRank.id] ?? 0
-                        const total = skillRank.ranks + abilityMod + miscTotal + classBonus + skillEffectBonus
+                        const total = computeSkillTotal(character, skillDef, resolvedStats, equippedArmorAcp)
                         return (
                           <button
                             key={skillRank.id}
@@ -1473,7 +1454,7 @@ export function PlayMode() {
                             <div key={`${spellId}-${idx}`} className={styles.spellRow}>
                               <div className={styles.spellInfo}>
                                 <span className={styles.spellName}>{spell.name}</span>
-                                <span className={styles.spellMeta}>Nv {spell.level} · {spell.school}{spell.level > 0 ? ` · DC ${10 + spell.level + casterAbilityMod}` : ''}</span>
+                                <span className={styles.spellMeta}>Nv {spell.level} · {spell.school}{spell.level > 0 ? ` · DC ${calculateSpellDC(spell.level, casterAbilityMod)}` : ''}</span>
                               </div>
                               <Button
                                 variant="secondary"

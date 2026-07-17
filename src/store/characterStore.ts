@@ -62,6 +62,8 @@ export interface SpellSlot {
   used: number
 }
 
+export type WeaponGrip = 'one-handed' | 'two-handed' | 'off-hand'
+
 export interface Weapon {
   id: string
   name: string
@@ -71,6 +73,9 @@ export interface Weapon {
   range: string
   type: string
   notes: string
+  // Empuñadura cuerpo a cuerpo — afecta al multiplicador de mod. Fuerza en el daño y al
+  // bono de daño de Ataque Poderoso. undefined = una mano (comportamiento previo).
+  grip?: WeaponGrip
 }
 
 export interface AnimalCompanion {

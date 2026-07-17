@@ -1,6 +1,6 @@
 import { Heart, Shield } from 'lucide-react'
-import { calculateModifier } from '../../store'
-import { getClassById, getSaveForLevel, getBABForLevel, useSRDStore } from '../../data'
+import { useSRDStore } from '../../data'
+import { resolveModifiers, computeCombatStats, computeSkillTotal } from '../../engine'
 import type { Character } from '../../store'
 import styles from './PartyCard.module.css'
 
@@ -12,37 +12,24 @@ interface PartyCardProps {
 
 export function PartyCard({ character }: PartyCardProps) {
   const { skills: SKILLS } = useSRDStore()
-  const { abilities } = character
-  const primaryClass = character.classes[0]
-  const classData = getClassById(primaryClass?.id || '')
 
-  const strMod = calculateModifier(abilities.strength)
-  const dexMod = calculateModifier(abilities.dexterity)
-  const bab = getBABForLevel(character.level, classData?.baseAttackBonus || 'poor')
-
-  const equippedBody   = (character.armor ?? []).find((a) => a.equipped && a.type !== 'shield')
-  const equippedShield = (character.armor ?? []).find((a) => a.equipped && a.type === 'shield')
-  const effectiveDex   = equippedBody ? Math.min(dexMod, equippedBody.maxDex ?? 99) : dexMod
-  const ac = 10 + effectiveDex + (equippedBody?.acBonus ?? 0) + (equippedShield?.acBonus ?? 0)
-
-  const fortitude = getSaveForLevel(character.level, classData?.fortitudeSave || 'poor') + calculateModifier(abilities.constitution)
-  const reflex    = getSaveForLevel(character.level, classData?.reflexSave || 'poor') + dexMod
-  const will      = getSaveForLevel(character.level, classData?.willSave || 'poor') + calculateModifier(abilities.wisdom)
+  const resolvedStats = resolveModifiers(character)
+  const combat = computeCombatStats(character, resolvedStats)
+  const { bab, strMod, dexMod, ac, fortitude, reflex, will } = combat
 
   const hpPercent = Math.max(0, Math.min(100, (character.hp.current / character.hp.max) * 100))
   const hpClass = hpPercent > 50 ? styles.hpGood : hpPercent > 25 ? styles.hpWarn : styles.hpDanger
 
   const classStr = character.classes.map((c) => `${c.id} ${c.level}`).join('/')
 
-  const classSkills = classData?.classSkills ?? []
+  const equippedArmorAcp = (character.armor ?? [])
+    .filter((a) => a.equipped && a.type !== 'shield')
+    .reduce((sum, a) => sum + (a.armorCheckPenalty ?? 0), 0)
+
   const keySkills = KEY_SKILL_IDS.map((skillId) => {
     const skill = SKILLS.find((s) => s.id === skillId)
     if (!skill) return null
-    const rankEntry = character.skills.find((s) => s.id === skillId)
-    const ranks = rankEntry?.ranks ?? 0
-    const abilityMod = calculateModifier(abilities[skill.ability])
-    const classBonus = ranks > 0 && classSkills.includes(skillId) ? 3 : 0
-    return { name: skill.name, total: ranks + abilityMod + classBonus }
+    return { name: skill.name, total: computeSkillTotal(character, skill, resolvedStats, equippedArmorAcp) }
   }).filter(Boolean) as { name: string; total: number }[]
 
   return (

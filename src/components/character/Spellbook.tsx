@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, Moon, RefreshCw, BookOpen, Star } from 'lucide-react'
 import { Card, Select } from '../ui'
-import { SPELL_SCHOOLS, SPELL_TYPES, SpellLevel } from '../../data'
+import { SPELL_SCHOOLS, SPELL_TYPES, SpellLevel, calculateSpellDC } from '../../data'
 import { useSpells } from '../../hooks/useSpells'
 import { useSpellsByIds } from '../../hooks/useSpellsByIds'
 import styles from './Spellbook.module.css'
@@ -172,7 +172,7 @@ export function Spellbook({
                       {available}/{max}
                     </span>
                     {level >= 1 && (
-                      <span className={styles.slotDC} title="CD del conjuro">DC {10 + abilityModifier + level}</span>
+                      <span className={styles.slotDC} title="CD del conjuro">DC {calculateSpellDC(level, abilityModifier)}</span>
                     )}
                   </div>
                 )}

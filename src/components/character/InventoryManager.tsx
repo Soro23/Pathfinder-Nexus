@@ -3,6 +3,7 @@ import { Plus, Trash2, Package, Coins, Weight, Search, Loader, Star, FlaskConica
 import { Card, Button, Input } from '../ui'
 import { generateId } from '../../store'
 import type { InventoryItem } from '../../store'
+import type { EncumbranceLevel } from '../../engine'
 import { searchCatalogItems } from '../../lib/itemsService'
 import type { CatalogItem } from '../../lib/itemsService'
 import styles from './InventoryManager.module.css'
@@ -16,9 +17,16 @@ interface InventoryManagerProps {
   onChangeItems: (items: InventoryItem[]) => void
   onChangeCoins: (coins: { pp: number; gp: number; sp: number; cp: number }) => void
   carryCapacity: number
+  encumbrance: EncumbranceLevel
 }
 
 type AddMode = 'manual' | 'catalog'
+
+const ENCUMBRANCE_WARNING: Partial<Record<EncumbranceLevel, string>> = {
+  medium: 'Carga media: velocidad reducida y penalización a Acrobacias/Escapismo/Sigilo/Trepar/Nadar.',
+  heavy: 'Carga pesada: velocidad reducida, penalización a habilidades físicas y a la Clase de Armadura.',
+  overloaded: '¡Carga excesiva! Has superado tu capacidad de carga máxima.',
+}
 
 export function InventoryManager({
   items,
@@ -29,6 +37,7 @@ export function InventoryManager({
   onChangeItems,
   onChangeCoins,
   carryCapacity,
+  encumbrance,
 }: InventoryManagerProps) {
   const [isAdding, setIsAdding] = useState(false)
   const [addMode, setAddMode] = useState<AddMode>('manual')
@@ -45,7 +54,8 @@ export function InventoryManager({
   const [quickGoldAmount, setQuickGoldAmount] = useState('')
 
   const totalWeight = items.reduce((sum, item) => sum + item.weight * item.quantity, 0)
-  const isOverEncumbered = totalWeight > carryCapacity
+  const isOverEncumbered = encumbrance !== 'light'
+  const encumbranceWarning = ENCUMBRANCE_WARNING[encumbrance]
   const totalGoldValue = platinum * 10 + gold + silver * 0.1 + copper * 0.01
 
   const addItem = () => {
@@ -203,8 +213,8 @@ export function InventoryManager({
             style={{ width: `${Math.min(100, (totalWeight / carryCapacity) * 100)}%` }}
           />
         </div>
-        {isOverEncumbered && (
-          <p className={styles.encumberedWarning}>¡Carga excesiva! Velocidad reducida a la mitad.</p>
+        {encumbranceWarning && (
+          <p className={styles.encumberedWarning}>{encumbranceWarning}</p>
         )}
       </div>
 
