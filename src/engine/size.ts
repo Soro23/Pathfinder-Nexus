@@ -41,3 +41,11 @@ export function getCharacterSize(character: { race: string }): CreatureSize {
   const raceData = RACES.find((r) => r.id === character.race?.toLowerCase())
   return raceData?.size ?? 'medium'
 }
+
+// Normaliza un nombre de tamaño en texto libre (ej. "Tiny", "Large" de un statblock
+// importado) a la clave interna de CreatureSize. Por defecto Mediano si no se reconoce.
+export function normalizeSizeString(size: string | null | undefined): CreatureSize {
+  const key = size?.trim().toLowerCase()
+  const valid: CreatureSize[] = ['fine', 'diminutive', 'tiny', 'small', 'medium', 'large', 'huge', 'gargantuan', 'colossal']
+  return (valid as string[]).includes(key ?? '') ? (key as CreatureSize) : 'medium'
+}

@@ -26,6 +26,14 @@
   opacity: 0.45;
 }
 
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .empty h3 {
   font-family: var(--font-display);
   color: var(--color-on-surface);

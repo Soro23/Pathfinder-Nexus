@@ -1,14 +1,12 @@
-import { useState } from 'react'
-import { PlusCircle, Trash2, Heart, Shield, Swords, ChevronDown, ChevronUp } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { PlusCircle, Trash2, Heart, Shield, Swords, ChevronDown, ChevronUp, AlertTriangle, Loader2 } from 'lucide-react'
 import type { AnimalCompanion as AnimalCompanionType } from '../../store'
 import { getModifierString } from '../../store'
-import {
-  ANIMAL_TYPES,
-  COMPANION_PROGRESSION,
-  COMPANION_TRICKS,
-  COMPANION_FEAT_SUGGESTIONS,
-  calculateCompanionStats,
-} from '../../data/animalCompanions'
+import { COMPANION_TRICKS, COMPANION_FEAT_SUGGESTIONS } from '../../data/animalCompanions'
+import { computeCompanionStats } from '../../engine'
+import { useAnimalCompanionCatalog, fetchCompanionDetail } from '../../hooks/useAnimalCompanions'
+import { COMPANION_TYPE_LABELS } from '../../types/animalCompanion'
+import type { CompanionDetail, CompanionListItem, CompanionType } from '../../types/animalCompanion'
 import { Button } from '../ui'
 import styles from './AnimalCompanion.module.css'
 
@@ -18,31 +16,97 @@ interface Props {
   isEditing: boolean
 }
 
-const DEFAULT_ANIMAL_ID = 'wolf'
+function sgn(n: number) { return n >= 0 ? `+${n}` : `${n}` }
 
-function makeDefaultCompanion(): AnimalCompanionType {
-  const base = ANIMAL_TYPES.find(a => a.id === DEFAULT_ANIMAL_ID) ?? ANIMAL_TYPES[0]
-  const computed = calculateCompanionStats(base, 1)
+function makeCompanionFromDetail(detail: CompanionDetail): AnimalCompanionType {
+  const computed = computeCompanionStats(detail, 1)
   return {
     name: '',
-    animalTypeId: DEFAULT_ANIMAL_ID,
+    animalTypeId: detail.id,
     level: 1,
     hp: { current: computed.hd * 4, max: computed.hd * 4 },
     tricks: [],
     feats: [],
     customSpecialAbilities: [],
-    attacks: base.attacks.map(a => ({ name: a.name, bonus: computed.bab, damage: a.damage })),
+    attacks: computed.attacks.map(a => ({ name: a.name, bonus: computed.bab, damage: a.damage })),
     skills: {},
     notes: '',
   }
 }
 
-function sgn(n: number) { return n >= 0 ? `+${n}` : `${n}` }
+/** Selector de especie: filtro de texto + <select> agrupado por tipo de compañero. */
+function SpeciesPicker({
+  catalog, loading, value, onSelect, disabled,
+}: {
+  catalog: CompanionListItem[]
+  loading: boolean
+  value?: string
+  onSelect: (id: string) => void
+  disabled?: boolean
+}) {
+  const [filterText, setFilterText] = useState('')
+
+  const grouped = useMemo(() => {
+    const term = filterText.trim().toLowerCase()
+    const filtered = term ? catalog.filter(c => c.name.toLowerCase().includes(term)) : catalog
+    const types = Object.keys(COMPANION_TYPE_LABELS) as CompanionType[]
+    return types
+      .map(type => [type, filtered.filter(c => c.companionType === type)] as const)
+      .filter(([, items]) => items.length > 0)
+  }, [catalog, filterText])
+
+  return (
+    <div className={styles.typeRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+      <input
+        className={styles.tableInput}
+        placeholder="Buscar especie…"
+        value={filterText}
+        onChange={e => setFilterText(e.target.value)}
+        disabled={loading || disabled}
+      />
+      <select
+        className={styles.typeSelect}
+        value={value ?? ''}
+        disabled={loading || disabled}
+        onChange={e => e.target.value && onSelect(e.target.value)}
+      >
+        <option value="" disabled>{loading ? 'Cargando catálogo…' : 'Selecciona una especie…'}</option>
+        {grouped.map(([type, items]) => (
+          <optgroup key={type} label={COMPANION_TYPE_LABELS[type]}>
+            {items.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </optgroup>
+        ))}
+      </select>
+    </div>
+  )
+}
 
 export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
   const [newAbility, setNewAbility] = useState('')
   const [newFeat, setNewFeat] = useState('')
   const [statsExpanded, setStatsExpanded] = useState(true)
+
+  const { catalog, loading: catalogLoading } = useAnimalCompanionCatalog()
+
+  const [detail, setDetail] = useState<CompanionDetail | undefined>()
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [notFound, setNotFound] = useState(false)
+
+  useEffect(() => {
+    if (!companion) { setDetail(undefined); setNotFound(false); return }
+    let cancelled = false
+    setDetailLoading(true)
+    setNotFound(false)
+    fetchCompanionDetail(companion.animalTypeId)
+      .then(d => {
+        if (cancelled) return
+        setDetail(d)
+        setNotFound(!d)
+      })
+      .catch(() => { if (!cancelled) setNotFound(true) })
+      .finally(() => { if (!cancelled) setDetailLoading(false) })
+    return () => { cancelled = true }
+  }, [companion?.animalTypeId])
 
   if (!companion) {
     return (
@@ -51,10 +115,21 @@ export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
         <h3>Sin Compañero Animal</h3>
         <p>Rangers y Druidas pueden vincular un compañero animal a su causa.</p>
         {isEditing && (
-          <Button variant="primary" onClick={() => onChange(makeDefaultCompanion())}>
-            <PlusCircle size={16} />
-            Vincular Compañero
-          </Button>
+          <div style={{ width: '100%', maxWidth: 360 }}>
+            <SpeciesPicker
+              catalog={catalog}
+              loading={catalogLoading}
+              onSelect={async (id) => {
+                setDetailLoading(true)
+                const d = await fetchCompanionDetail(id)
+                setDetailLoading(false)
+                if (!d) return
+                setDetail(d)
+                onChange(makeCompanionFromDetail(d))
+              }}
+              disabled={detailLoading}
+            />
+          </div>
         )}
       </div>
     )
@@ -62,30 +137,75 @@ export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
 
   const update = (updates: Partial<AnimalCompanionType>) => onChange({ ...companion, ...updates })
 
-  const base = ANIMAL_TYPES.find(a => a.id === companion.animalTypeId) ?? ANIMAL_TYPES[0]
-  const prog = COMPANION_PROGRESSION[Math.min(companion.level - 1, 19)]
-  const computed = calculateCompanionStats(base, companion.level)
+  if (notFound && !detailLoading) {
+    return (
+      <div className={styles.companion}>
+        <div className={styles.empty}>
+          <AlertTriangle size={40} className={styles.emptyIcon} />
+          <h3>Compañero no encontrado</h3>
+          <p>
+            «{companion.animalTypeId}» ya no existe en el catálogo actual. Selecciona una especie
+            de nuevo para recalcular sus estadísticas (se conservan nombre, PV, trucos y dotes).
+          </p>
+          {isEditing && (
+            <div style={{ width: '100%', maxWidth: 360 }}>
+              <SpeciesPicker
+                catalog={catalog}
+                loading={catalogLoading}
+                onSelect={async (id) => {
+                  setDetailLoading(true)
+                  const d = await fetchCompanionDetail(id)
+                  setDetailLoading(false)
+                  if (!d) return
+                  setDetail(d)
+                  const computed = computeCompanionStats(d, companion.level)
+                  update({
+                    animalTypeId: id,
+                    attacks: computed.attacks.map(a => ({ name: a.name, bonus: computed.bab, damage: a.damage })),
+                  })
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
 
-  const maxTricks = 3 + prog.bonusTricks
+  if (detailLoading || !detail) {
+    return (
+      <div className={styles.empty}>
+        <Loader2 size={32} className={`${styles.emptyIcon} ${styles.spinner}`} />
+        <p>Cargando estadísticas del compañero…</p>
+      </div>
+    )
+  }
 
-  // Auto + custom special abilities
-  const autoSpecials = [...prog.special, ...base.specialQualities, ...base.senses]
+  const computed = computeCompanionStats(detail, companion.level)
+  const maxTricks = computed.maxTricks
 
-  const handleAnimalTypeChange = (newId: string) => {
-    const newBase = ANIMAL_TYPES.find(a => a.id === newId) ?? ANIMAL_TYPES[0]
-    const newComputed = calculateCompanionStats(newBase, companion.level)
+  // Rasgos automáticos: progresión por nivel + statblock del catálogo (ya combinados en el motor).
+  const autoSpecials = computed.special
+
+  const handleAnimalTypeChange = async (newId: string) => {
+    setDetailLoading(true)
+    const newDetail = await fetchCompanionDetail(newId)
+    setDetailLoading(false)
+    if (!newDetail) return
+    setDetail(newDetail)
+    const newComputed = computeCompanionStats(newDetail, companion.level)
     update({
       animalTypeId: newId,
-      attacks: newBase.attacks.map(a => ({ name: a.name, bonus: newComputed.bab, damage: a.damage })),
+      attacks: newComputed.attacks.map(a => ({ name: a.name, bonus: newComputed.bab, damage: a.damage })),
     })
   }
 
   const handleLevelChange = (newLevel: number) => {
     const clamped = Math.max(1, Math.min(20, newLevel))
-    const newComputed = calculateCompanionStats(base, clamped)
+    const newComputed = computeCompanionStats(detail, clamped)
     update({
       level: clamped,
-      attacks: companion.attacks.map(a => ({ ...a, bonus: newComputed.bab })),
+      attacks: newComputed.attacks.map(a => ({ name: a.name, bonus: newComputed.bab, damage: a.damage })),
     })
   }
 
@@ -97,12 +217,17 @@ export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
     }
   }
 
+  const abilityEntries: [string, number | undefined][] = [
+    ['FUE', computed.str], ['DES', computed.dex], ['CON', computed.con],
+    ['INT', computed.int], ['SAB', computed.wis], ['CAR', computed.cha],
+  ]
+
   return (
     <div className={styles.companion}>
       {/* ── Header ── */}
       <div className={styles.companionHeader}>
         <div className={styles.companionAvatar}>
-          {companion.name.charAt(0).toUpperCase() || base.name.charAt(0)}
+          {companion.name.charAt(0).toUpperCase() || detail.name.charAt(0)}
         </div>
         <div className={styles.companionInfo}>
           {isEditing ? (
@@ -113,19 +238,16 @@ export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
               placeholder="Nombre del compañero"
             />
           ) : (
-            <h2 className={styles.companionName}>{companion.name || base.name}</h2>
+            <h2 className={styles.companionName}>{companion.name || detail.name}</h2>
           )}
           {isEditing ? (
             <div className={styles.typeRow}>
-              <select
-                className={styles.typeSelect}
+              <SpeciesPicker
+                catalog={catalog}
+                loading={catalogLoading}
                 value={companion.animalTypeId}
-                onChange={e => handleAnimalTypeChange(e.target.value)}
-              >
-                {ANIMAL_TYPES.map(a => (
-                  <option key={a.id} value={a.id}>{a.name} ({a.size})</option>
-                ))}
-              </select>
+                onSelect={handleAnimalTypeChange}
+              />
               <div className={styles.levelRow}>
                 <span className={styles.levelLabel}>Nivel efectivo:</span>
                 <button className={styles.levelBtn} onClick={() => handleLevelChange(companion.level - 1)}>−</button>
@@ -135,7 +257,7 @@ export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
             </div>
           ) : (
             <p className={styles.companionMeta}>
-              {base.name} · Talla {base.size} · Nivel {companion.level} · {base.speed}
+              {detail.name} · Talla {companion.level >= (detail.advancementLevel ?? Infinity) ? detail.sizeAdvanced : detail.sizeStart} · Nivel {companion.level}
             </p>
           )}
         </div>
@@ -230,11 +352,11 @@ export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
             </div>
 
             <div className={styles.abilityGrid}>
-              {([ ['FUE', computed.str], ['DES', computed.dex], ['CON', computed.con], ['INT', base.int], ['SAB', base.wis], ['CAR', base.cha] ] as [string, number][]).map(([label, val]) => (
+              {abilityEntries.map(([label, val]) => (
                 <div key={label} className={styles.abilityBlock}>
                   <span className={styles.abilityAbbr}>{label}</span>
-                  <span className={styles.abilityScore}>{val}</span>
-                  <span className={styles.abilityMod}>{getModifierString(val)}</span>
+                  <span className={styles.abilityScore}>{val ?? '—'}</span>
+                  <span className={styles.abilityMod}>{val !== undefined ? getModifierString(val) : ''}</span>
                 </div>
               ))}
             </div>
@@ -363,7 +485,7 @@ export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
           <h3 className={styles.sectionTitle}>Dotes</h3>
-          <span className={styles.trickCounter}>{companion.feats.length}/{prog.feats}</span>
+          <span className={styles.trickCounter}>{companion.feats.length}/{computed.maxFeats}</span>
         </div>
         {isEditing && (
           <div className={styles.addRow}>
