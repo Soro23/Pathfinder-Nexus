@@ -5,37 +5,57 @@ export interface ResolvedFeature extends ClassFeature {
   status: 'base' | 'replaced' | 'changed' | 'optional' | 'archetype'
 }
 
+export interface ArchetypeConflict {
+  featureName: string
+  atLevel: number
+  archetypeNames: string[]
+}
+
+export function findArchetypeConflicts(archetypes: Archetype[]): ArchetypeConflict[] {
+  const byKey = new Map<string, ArchetypeConflict>()
+
+  for (const archetype of archetypes) {
+    for (const r of archetype.replaces) {
+      const key = `${r.featureName}:${r.atLevel}`
+      const entry = byKey.get(key)
+      if (entry) {
+        entry.archetypeNames.push(archetype.name)
+      } else {
+        byKey.set(key, { featureName: r.featureName, atLevel: r.atLevel, archetypeNames: [archetype.name] })
+      }
+    }
+  }
+
+  return Array.from(byKey.values()).filter((c) => c.archetypeNames.length > 1)
+}
+
 export function resolveClassFeatures(
   classData: ClassData,
-  archetype: Archetype | null,
+  archetypes: Archetype[],
 ): ResolvedFeature[] {
-  if (!archetype) {
+  if (archetypes.length === 0) {
     return classData.features.map((f) => ({ ...f, status: 'base' as const }))
   }
 
-  const replacedNames = new Set(
-    archetype.replaces.map((r) => `${r.featureName}:${r.atLevel}`),
-  )
-  const replacementMap = new Map(
-    archetype.replaces.map((r) => [`${r.featureName}:${r.atLevel}`, r.type]),
-  )
+  const replacementByKey = new Map<string, Archetype['replaces'][number]>()
+  for (const archetype of archetypes) {
+    for (const r of archetype.replaces) {
+      replacementByKey.set(`${r.featureName}:${r.atLevel}`, r)
+    }
+  }
 
   const baseResolved: ResolvedFeature[] = classData.features.map((f) => {
-    const key = `${f.name}:${f.level}`
-    if (replacedNames.has(key)) {
-      const type = replacementMap.get(key)!
-      return {
-        ...f,
-        status: type === 'replaces' ? 'replaced' : type === 'changes' ? 'changed' : 'optional',
-      }
+    const replacement = replacementByKey.get(`${f.name}:${f.level}`)
+    if (!replacement) return { ...f, status: 'base' }
+    return {
+      ...f,
+      status: replacement.type === 'replaces' ? 'replaced' : replacement.type === 'changes' ? 'changed' : 'optional',
     }
-    return { ...f, status: 'base' }
   })
 
-  const archetypeFeatures: ResolvedFeature[] = archetype.features.map((f) => ({
-    ...f,
-    status: 'archetype' as const,
-  }))
+  const archetypeFeatures: ResolvedFeature[] = archetypes.flatMap((archetype) =>
+    archetype.features.map((f) => ({ ...f, status: 'archetype' as const })),
+  )
 
   return [...baseResolved, ...archetypeFeatures].sort(
     (a, b) => a.level - b.level || a.name.localeCompare(b.name),
@@ -44,14 +64,18 @@ export function resolveClassFeatures(
 
 export function resolveClassSkills(
   classData: ClassData,
-  archetype: Archetype | null,
+  archetypes: Archetype[],
 ): string[] {
-  if (!archetype) return classData.classSkills
+  if (archetypes.length === 0) return classData.classSkills
 
   const skills = new Set(classData.classSkills)
 
-  for (const s of archetype.classSkillsAdded ?? []) skills.add(s)
-  for (const s of archetype.classSkillsRemoved ?? []) skills.delete(s)
+  for (const archetype of archetypes) {
+    for (const s of archetype.classSkillsAdded ?? []) skills.add(s)
+  }
+  for (const archetype of archetypes) {
+    for (const s of archetype.classSkillsRemoved ?? []) skills.delete(s)
+  }
 
   return Array.from(skills)
 }

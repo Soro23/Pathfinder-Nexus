@@ -8,7 +8,7 @@ import styles from './ClassProgressionTable.module.css'
 interface ClassProgressionTableProps {
   classData: ClassData
   currentLevel: number
-  archetype?: Archetype
+  archetypes?: Archetype[]
 }
 
 const STATUS_LABEL: Record<ResolvedFeature['status'], string | null> = {
@@ -27,22 +27,22 @@ const STATUS_CLASS: Record<ResolvedFeature['status'], string | null> = {
   archetype: 'featureBadgeArchetype',
 }
 
-export function ClassProgressionTable({ classData, currentLevel, archetype }: ClassProgressionTableProps) {
+export function ClassProgressionTable({ classData, currentLevel, archetypes = [] }: ClassProgressionTableProps) {
   const isCaster = classData.magicType !== null
 
-  const spellTable = archetype?.spellsPerDayOverride ?? classData.spellsPerDay
+  const spellTable = archetypes.find((a) => a.spellsPerDayOverride)?.spellsPerDayOverride ?? classData.spellsPerDay
 
   const spellCols = spellTable
     ? Math.max(...spellTable.map((row) => row.length))
     : 0
 
-  const allFeatures = resolveClassFeatures(classData, archetype ?? null)
+  const allFeatures = resolveClassFeatures(classData, archetypes)
 
   return (
     <div className={styles.wrapper}>
-      {archetype && (
+      {archetypes.length > 0 && (
         <div className={styles.archetypeBanner}>
-          Arquetipo activo: <strong>{archetype.name}</strong>
+          Arquetipos activos: <strong>{archetypes.map((a) => a.name).join(', ')}</strong>
         </div>
       )}
       <div className={styles.scrollArea}>

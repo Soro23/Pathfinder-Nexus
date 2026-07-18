@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 export interface CharacterClass {
   id: string
   level: number
-  archetypeId?: string
+  archetypeIds?: string[]
 }
 
 export interface InventoryItem {
@@ -207,6 +207,11 @@ export const useCharacterStore = create<CharacterStore>()((set, get) => ({
       const characters = data.map((row) => {
         const c = { ...row.data as Character, id: row.id }
         c.feats = (c.feats ?? []).map((f) => typeof f === 'string' ? { id: f } : f)
+        c.classes = c.classes.map((cls) => {
+          const legacyId = (cls as CharacterClass & { archetypeId?: string }).archetypeId
+          if (cls.archetypeIds) return cls
+          return { ...cls, archetypeIds: legacyId ? [legacyId] : [] }
+        })
         if (c.companion) {
           c.companion.tricks = c.companion.tricks ?? []
           c.companion.feats = c.companion.feats ?? []

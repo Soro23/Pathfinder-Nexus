@@ -467,7 +467,9 @@ export function CharacterView() {
                     <div className={styles.classLevelEditor}>
                       {character.classes.map((cc) => {
                         const cd = getClassById(cc.id)
-                        const currentArchetype = cc.archetypeId ? getArchetypeById(cc.archetypeId) : undefined
+                        const currentArchetypes = (cc.archetypeIds ?? [])
+                          .map((id) => getArchetypeById(id))
+                          .filter((a): a is NonNullable<typeof a> => a !== undefined)
                         return (
                           <div key={cc.id} className={styles.classLevelRow}>
                             <span className={styles.classLevelName}>{cd?.name ?? cc.id}</span>
@@ -497,25 +499,25 @@ export function CharacterView() {
                             <div className={styles.archetypeEditRow}>
                               <ArchetypeSelector
                                 classId={cc.id}
-                                value={cc.archetypeId}
-                                onChange={(newArchId) => {
+                                value={cc.archetypeIds ?? []}
+                                onChange={(newArchIds) => {
                                   const newClasses = character.classes.map((c) =>
-                                    c.id === cc.id ? { ...c, archetypeId: newArchId } : c
+                                    c.id === cc.id ? { ...c, archetypeIds: newArchIds } : c
                                   )
                                   updateCharacter(character.id, { classes: newClasses })
                                 }}
                               />
-                              {cc.archetypeId && cd && currentArchetype && (
+                              {currentArchetypes.length > 0 && cd && (
                                 <button
                                   className={styles.recalcBtn}
                                   onClick={() => {
-                                    const resolvedSkills = resolveClassSkills(cd, currentArchetype)
+                                    const resolvedSkills = resolveClassSkills(cd, currentArchetypes)
                                     const updatedSkills = character.skills.filter((sk) =>
                                       resolvedSkills.includes(sk.id) || (sk.ranks ?? 0) > 0
                                     )
                                     updateCharacter(character.id, { skills: updatedSkills })
                                   }}
-                                  title="Actualiza habilidades de clase según el arquetipo"
+                                  title="Actualiza habilidades de clase según los arquetipos"
                                 >
                                   Recalcular
                                 </button>
@@ -548,7 +550,9 @@ export function CharacterView() {
                     <ClassProgressionTable
                       classData={activeClassData}
                       currentLevel={activeClassEntry.level}
-                      archetype={activeClassEntry.archetypeId ? getArchetypeById(activeClassEntry.archetypeId) : undefined}
+                      archetypes={(activeClassEntry.archetypeIds ?? [])
+                        .map((id) => getArchetypeById(id))
+                        .filter((a): a is NonNullable<typeof a> => a !== undefined)}
                     />
                   )}
                 </Card>

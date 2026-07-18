@@ -1,11 +1,12 @@
 import { useSRDStore } from '../../store/srdStore'
 import type { Archetype, ReplacementType } from '../../data/archetypes'
+import { findArchetypeConflicts } from '../../data/resolveArchetype'
 import styles from './ArchetypeSelector.module.css'
 
 interface Props {
   classId: string
-  value: string | undefined
-  onChange: (id: string | undefined) => void
+  value: string[]
+  onChange: (ids: string[]) => void
 }
 
 const TYPE_LABEL: Record<ReplacementType, string> = {
@@ -28,44 +29,70 @@ function ReplacementBadge({ type }: { type: ReplacementType }) {
   )
 }
 
+function ArchetypeDetail({ archetype }: { archetype: Archetype }) {
+  return (
+    <div className={styles.detail}>
+      <p className={styles.desc}>{archetype.description}</p>
+      {archetype.replaces.length > 0 && (
+        <ul className={styles.replaceList}>
+          {archetype.replaces.map((r, i) => (
+            <li key={i} className={styles.replaceItem}>
+              <ReplacementBadge type={r.type} />
+              <span className={styles.featureName}>{r.featureName}</span>
+              <span className={styles.atLevel}>nv {r.atLevel}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 export function ArchetypeSelector({ classId, value, onChange }: Props) {
   const getArchetypesByClass = useSRDStore((s) => s.getArchetypesByClass)
   const options = getArchetypesByClass(classId)
 
   if (options.length === 0) return null
 
-  const selected: Archetype | undefined = options.find((a) => a.id === value)
+  const selected = options.filter((a) => value.includes(a.id))
+  const conflicts = findArchetypeConflicts(selected)
+
+  const toggle = (id: string) => {
+    onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id])
+  }
 
   return (
     <div className={styles.root}>
-      <label className={styles.label}>Arquetipo</label>
-      <select
-        className={styles.select}
-        value={value ?? ''}
-        onChange={(e) => onChange(e.target.value || undefined)}
-      >
-        <option value="">Sin arquetipo</option>
+      <label className={styles.label}>Arquetipos</label>
+      <div className={styles.checkList}>
         {options.map((a) => (
-          <option key={a.id} value={a.id}>{a.name}</option>
+          <label key={a.id} className={styles.checkItem}>
+            <input
+              type="checkbox"
+              checked={value.includes(a.id)}
+              onChange={() => toggle(a.id)}
+            />
+            {a.name}
+          </label>
         ))}
-      </select>
+      </div>
 
-      {selected && (
-        <div className={styles.detail}>
-          <p className={styles.desc}>{selected.description}</p>
-          {selected.replaces.length > 0 && (
-            <ul className={styles.replaceList}>
-              {selected.replaces.map((r, i) => (
-                <li key={i} className={styles.replaceItem}>
-                  <ReplacementBadge type={r.type} />
-                  <span className={styles.featureName}>{r.featureName}</span>
-                  <span className={styles.atLevel}>nv {r.atLevel}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+      {conflicts.length > 0 && (
+        <div className={styles.conflictWarning}>
+          <strong>Conflicto:</strong> más de un arquetipo seleccionado modifica la misma característica.
+          <ul className={styles.conflictList}>
+            {conflicts.map((c, i) => (
+              <li key={i}>
+                {c.featureName} (nv {c.atLevel}): {c.archetypeNames.join(', ')}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
+
+      {selected.map((a) => (
+        <ArchetypeDetail key={a.id} archetype={a} />
+      ))}
     </div>
   )
 }
