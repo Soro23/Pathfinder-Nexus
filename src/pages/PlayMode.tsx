@@ -7,6 +7,7 @@ import {
 import { useCharacterStore, calculateModifier, getModifierString, StatusEffect, BonusTarget } from '../store'
 import { getClassById, useSRDStore, calculateSpellDC } from '../data'
 import { resolveModifiers, computeCombatStats, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus } from '../engine'
+import { buildArchetypesByClassId } from '../data/resolveArchetype'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card } from '../components/ui'
 import styles from './PlayMode.module.css'
@@ -88,7 +89,7 @@ const INTERACTIVE_FEATURE_NAMES = new Set([
 ])
 
 export function PlayMode() {
-  const { skills: SKILLS, getDomainById, getBlessingById } = useSRDStore()
+  const { skills: SKILLS, getDomainById, getBlessingById, getArchetypeById } = useSRDStore()
   const { id } = useParams<{ id: string }>()
   const character = useCharacterStore((state) => state.getCharacter(id || ''))
   const updateCharacter = useCharacterStore((state) => state.updateCharacter)
@@ -154,6 +155,7 @@ export function PlayMode() {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resolvedStats = useMemo(() => resolveModifiers(character), [character])
+  const archetypesByClassId = buildArchetypesByClassId(character.classes, getArchetypeById)
   const combat = computeCombatStats(character, resolvedStats)
   const { bab, strMod, dexMod, ac, cmb, cmd, initiative } = combat
   const touchAC = combat.acTouch
@@ -1356,9 +1358,9 @@ export function PlayMode() {
                       .map((skillRank) => {
                         const skillDef = SKILLS.find((s) => s.id === skillRank.id)
                         if (!skillDef) return null
-                        const isClassSkill = isClassSkillForCharacter(character, skillRank.id)
+                        const isClassSkill = isClassSkillForCharacter({ ...character, archetypesByClassId }, skillRank.id)
                         const skillEffectBonus = resolvedStats.skillBonuses[skillRank.id] ?? 0
-                        const total = computeSkillTotal(character, skillDef, resolvedStats, equippedArmorAcp)
+                        const total = computeSkillTotal({ ...character, archetypesByClassId }, skillDef, resolvedStats, equippedArmorAcp)
                         return (
                           <button
                             key={skillRank.id}

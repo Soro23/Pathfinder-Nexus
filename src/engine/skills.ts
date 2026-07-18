@@ -2,6 +2,8 @@ import type { CharacterClass, SkillRank } from '../store/characterStore'
 import { calculateModifier } from '../store/characterStore'
 import { getClassById } from '../data/classes'
 import type { Skill } from '../data/skills'
+import type { Archetype } from '../data/archetypes'
+import { resolveClassSkills } from '../data/resolveArchetype'
 import { getCharacterSize, getSizeSkillModifier } from './size'
 import type { ResolvedStats } from './types'
 
@@ -13,6 +15,10 @@ export interface SkillCalcContext {
   classes: CharacterClass[]
   skills: SkillRank[]
   race: string
+  // Arquetipos resueltos por classId — opcional porque requiere el catálogo de useSRDStore(),
+  // no disponible en el propio Character. Sin esto, las habilidades de clase añadidas/quitadas
+  // por arquetipo no se reflejan en el bono de +3.
+  archetypesByClassId?: Record<string, Archetype[]>
 }
 
 // Puntos de habilidad totales ganados: por cada clase, (base de la clase + mod. Int,
@@ -29,9 +35,15 @@ export function computeSkillPointsAvailable(character: SkillCalcContext, spentRa
   return Math.max(0, total - spentRanks)
 }
 
-// Una habilidad es "de clase" si lo es para cualquiera de las clases del personaje (multiclase).
+// Una habilidad es "de clase" si lo es para cualquiera de las clases del personaje (multiclase),
+// considerando las habilidades de clase añadidas/quitadas por los arquetipos activos.
 export function isClassSkillForCharacter(character: SkillCalcContext, skillId: string): boolean {
-  return character.classes.some((cc) => getClassById(cc.id)?.classSkills?.includes(skillId))
+  return character.classes.some((cc) => {
+    const classData = getClassById(cc.id)
+    if (!classData) return false
+    const archetypes = character.archetypesByClassId?.[cc.id] ?? []
+    return resolveClassSkills(classData, archetypes).includes(skillId)
+  })
 }
 
 // Bono total de una habilidad: rangos + mod. característica + bono de clase (+3 si tiene al

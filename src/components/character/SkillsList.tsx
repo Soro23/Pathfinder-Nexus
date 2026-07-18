@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { ChevronDown, ChevronUp, Lock, Unlock, Plus, Trash2 } from 'lucide-react'
 import { Button } from '../ui'
 import { calculateModifier, CharacterClass, useSRDStore } from '../../data'
+import type { Archetype } from '../../data/archetypes'
 import type { MiscBonus, SkillRank } from '../../store'
 import { computeSkillTotal, isClassSkillForCharacter } from '../../engine'
 import type { ResolvedStats } from '../../engine'
@@ -17,6 +18,7 @@ interface SkillsListProps {
   skillPointsAvailable: number
   equippedArmorAcp?: number
   resolvedStats: ResolvedStats
+  archetypesByClassId?: Record<string, Archetype[]>
 }
 
 export function SkillsList({
@@ -29,6 +31,7 @@ export function SkillsList({
   skillPointsAvailable,
   equippedArmorAcp = 0,
   resolvedStats,
+  archetypesByClassId,
 }: SkillsListProps) {
   const { skills: SKILLS } = useSRDStore()
   const [showAll, setShowAll] = useState(false)
@@ -39,7 +42,7 @@ export function SkillsList({
 
   // Contexto mínimo para las funciones de cálculo del engine — `ranks` (controlado, en
   // edición) hace de `skills` en vez de character.skills, que puede estar desactualizado.
-  const calcContext = { abilities, classes, skills: ranks, race }
+  const calcContext = { abilities, classes, skills: ranks, race, archetypesByClassId }
 
   const skillPointsSpent = ranks.reduce((sum, r) => sum + r.ranks, 0)
 

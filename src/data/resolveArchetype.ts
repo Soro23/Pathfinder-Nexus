@@ -79,3 +79,16 @@ export function resolveClassSkills(
 
   return Array.from(skills)
 }
+
+export function buildArchetypesByClassId(
+  classes: { id: string; archetypeIds?: string[] }[],
+  getArchetypeById: (id: string) => Archetype | undefined,
+): Record<string, Archetype[]> {
+  const map: Record<string, Archetype[]> = {}
+  for (const cc of classes) {
+    map[cc.id] = (cc.archetypeIds ?? [])
+      .map((id) => getArchetypeById(id))
+      .filter((a): a is Archetype => a !== undefined)
+  }
+  return map
+}

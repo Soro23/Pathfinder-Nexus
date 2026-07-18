@@ -1,6 +1,7 @@
 import { Heart, Shield } from 'lucide-react'
 import { useSRDStore } from '../../data'
 import { resolveModifiers, computeCombatStats, computeSkillTotal } from '../../engine'
+import { buildArchetypesByClassId } from '../../data/resolveArchetype'
 import type { Character } from '../../store'
 import styles from './PartyCard.module.css'
 
@@ -11,9 +12,10 @@ interface PartyCardProps {
 }
 
 export function PartyCard({ character }: PartyCardProps) {
-  const { skills: SKILLS } = useSRDStore()
+  const { skills: SKILLS, getArchetypeById } = useSRDStore()
 
   const resolvedStats = resolveModifiers(character)
+  const archetypesByClassId = buildArchetypesByClassId(character.classes, getArchetypeById)
   const combat = computeCombatStats(character, resolvedStats)
   const { bab, strMod, dexMod, ac, fortitude, reflex, will } = combat
 
@@ -29,7 +31,7 @@ export function PartyCard({ character }: PartyCardProps) {
   const keySkills = KEY_SKILL_IDS.map((skillId) => {
     const skill = SKILLS.find((s) => s.id === skillId)
     if (!skill) return null
-    return { name: skill.name, total: computeSkillTotal(character, skill, resolvedStats, equippedArmorAcp) }
+    return { name: skill.name, total: computeSkillTotal({ ...character, archetypesByClassId }, skill, resolvedStats, equippedArmorAcp) }
   }).filter(Boolean) as { name: string; total: number }[]
 
   return (

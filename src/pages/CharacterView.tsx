@@ -10,7 +10,7 @@ import { useCharacterStore, calculateModifier, getModifierString, generateId } f
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
 import { getClassById, SpellLevel, useSRDStore } from '../data'
 import { getBonusSpells } from '../data/bonusSpells'
-import { resolveClassSkills } from '../data/resolveArchetype'
+import { resolveClassSkills, buildArchetypesByClassId } from '../data/resolveArchetype'
 import { resolveModifiers, computeCombatStats, computeSkillPointsAvailable, computeSkillTotal, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, computeSpeed } from '../engine'
 import { Card, Button } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker } from '../components/character'
@@ -86,6 +86,11 @@ export function CharacterView() {
       hpBonus: 0, speedBonus: 0, cmbBonus: 0, cmdBonus: 0, allModifiers: [],
     },
     [character]
+  )
+
+  const archetypesByClassId = useMemo(
+    () => character ? buildArchetypesByClassId(character.classes, getArchetypeById) : {},
+    [character, getArchetypeById]
   )
 
   if (!character) {
@@ -467,9 +472,7 @@ export function CharacterView() {
                     <div className={styles.classLevelEditor}>
                       {character.classes.map((cc) => {
                         const cd = getClassById(cc.id)
-                        const currentArchetypes = (cc.archetypeIds ?? [])
-                          .map((id) => getArchetypeById(id))
-                          .filter((a): a is NonNullable<typeof a> => a !== undefined)
+                        const currentArchetypes = archetypesByClassId[cc.id] ?? []
                         return (
                           <div key={cc.id} className={styles.classLevelRow}>
                             <span className={styles.classLevelName}>{cd?.name ?? cc.id}</span>
@@ -550,9 +553,7 @@ export function CharacterView() {
                     <ClassProgressionTable
                       classData={activeClassData}
                       currentLevel={activeClassEntry.level}
-                      archetypes={(activeClassEntry.archetypeIds ?? [])
-                        .map((id) => getArchetypeById(id))
-                        .filter((a): a is NonNullable<typeof a> => a !== undefined)}
+                      archetypes={archetypesByClassId[activeClassEntry.id] ?? []}
                     />
                   )}
                 </Card>
@@ -830,6 +831,7 @@ export function CharacterView() {
                 skillPointsAvailable={computeSkillPointsAvailable(character, character.skills.reduce((sum, s) => sum + s.ranks, 0))}
                 equippedArmorAcp={equippedArmorAcp}
                 resolvedStats={resolvedStats}
+                archetypesByClassId={archetypesByClassId}
               />
             ) : (
               <div className={styles.skillsTable}>
@@ -842,8 +844,8 @@ export function CharacterView() {
                 {SKILLS.map((skill) => {
                   const rankEntry = character.skills.find((s) => s.id === skill.id)
                   const ranks = rankEntry?.ranks ?? 0
-                  const isClass = isClassSkillForCharacter(character, skill.id)
-                  const total = computeSkillTotal(character, skill, resolvedStats, equippedArmorAcp)
+                  const isClass = isClassSkillForCharacter({ ...character, archetypesByClassId }, skill.id)
+                  const total = computeSkillTotal({ ...character, archetypesByClassId }, skill, resolvedStats, equippedArmorAcp)
                   return (
                     <div
                       key={skill.id}
