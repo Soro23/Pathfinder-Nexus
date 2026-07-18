@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Shield, ChevronDown, ChevronUp } from 'lucide-react'
 import { CLASSES, getBABForLevel, getSaveForLevel } from '../data/classes'
 import { usePageTransition } from '../hooks/usePageTransition'
@@ -33,6 +34,8 @@ const GROUPED_CLASSES = [
   { key: 'acg',   label: SOURCE_LABEL.acg,   classes: sortedByName(CLASSES.filter(c => c.source === 'acg')) },
   { key: 'other', label: SOURCE_LABEL.other, classes: sortedByName(CLASSES.filter(c => c.source === 'other')) },
 ].filter(g => g.classes.length > 0)
+
+const FIRST_CLASS_ID = GROUPED_CLASSES[0].classes[0].id
 
 function ProgressionTable({ cls }: { cls: typeof CLASSES[0] }) {
   const [open, setOpen] = useState(false)
@@ -112,9 +115,13 @@ function SpellsTable({ cls }: { cls: typeof CLASSES[0] }) {
 export function Classes() {
   const { isExiting, isEntering, isLoading } = usePageTransition(true)
   const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+  const { classId } = useParams<{ classId: string }>()
+  const navigate = useNavigate()
 
-  function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const cls = classId ? CLASSES.find(c => c.id === classId) : undefined
+
+  if (!cls) {
+    return <Navigate to={`/classes/${FIRST_CLASS_ID}`} replace />
   }
 
   return (
@@ -126,10 +133,9 @@ export function Classes() {
           <Shield size={15} className={mobile.mobileCatIcon} />
           <select
             className={mobile.mobileCatSelect}
-            defaultValue=""
-            onChange={e => { scrollTo(e.target.value); (e.target as HTMLSelectElement).value = '' }}
+            value={cls.id}
+            onChange={e => navigate(`/classes/${e.target.value}`)}
           >
-            <option value="" disabled>Ir a clase…</option>
             {GROUPED_CLASSES.map(g => (
               <optgroup key={g.key} label={g.label}>
                 {g.classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -149,9 +155,13 @@ export function Classes() {
               <div key={g.key} className={styles.navGroup}>
                 <span className={styles.navGroupLabel}>{g.label}</span>
                 {g.classes.map(c => (
-                  <button key={c.id} className={styles.navBtn} onClick={() => scrollTo(c.id)}>
+                  <Link
+                    key={c.id}
+                    to={`/classes/${c.id}`}
+                    className={`${styles.navBtn} ${c.id === cls.id ? styles.navBtnActive : ''}`}
+                  >
                     {c.name}
-                  </button>
+                  </Link>
                 ))}
               </div>
             ))}
@@ -176,114 +186,105 @@ export function Classes() {
           </div>
         ) : (
         <div className={styles.classList}>
-          {GROUPED_CLASSES.map(g => (
-            <div key={g.key} className={styles.sourceGroup}>
-              <div className={styles.sourceHeader}>
-                <span className={styles.sourceLabel}>{g.label}</span>
-              </div>
-              {g.classes.map(cls => (
-            <div key={cls.id} id={cls.id} className={styles.classCard}>
+          <div key={cls.id} className={styles.classCard}>
 
-              {/* Card header */}
-              <div className={styles.cardHeader}>
-                <div className={styles.cardTitleRow}>
-                  <h2 className={styles.className}>{cls.name}</h2>
-                  <span className={styles.hitDieBadge}>d{cls.hitDie}</span>
-                </div>
-                <p className={styles.classDesc}>{cls.description}</p>
+            {/* Card header */}
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitleRow}>
+                <h2 className={styles.className}>{cls.name}</h2>
+                <span className={styles.hitDieBadge}>d{cls.hitDie}</span>
               </div>
+              <p className={styles.classDesc}>{cls.description}</p>
+            </div>
 
-              {/* Stats row */}
-              <div className={styles.statsRow}>
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>BBA</span>
-                  <span className={styles.statVal}>{BAB_LABEL[cls.baseAttackBonus]}</span>
-                </div>
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Fortaleza</span>
-                  <span className={styles.statVal}>{SAVE_LABEL[cls.fortitudeSave]}</span>
-                </div>
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Reflejos</span>
-                  <span className={styles.statVal}>{SAVE_LABEL[cls.reflexSave]}</span>
-                </div>
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Voluntad</span>
-                  <span className={styles.statVal}>{SAVE_LABEL[cls.willSave]}</span>
-                </div>
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Hab./nivel</span>
-                  <span className={styles.statVal}>{cls.skillPointsPerLevel} + INT</span>
-                </div>
-                {cls.casterAbility && (
-                  <div className={styles.statItem}>
-                    <span className={styles.statLabel}>Magia</span>
-                    <span className={styles.statVal}>{ABILITY_ABBR[cls.casterAbility]}</span>
-                  </div>
-                )}
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Oro inicial</span>
-                  <span className={styles.statVal}>{cls.startingGoldDice} po</span>
-                </div>
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Alineamiento</span>
-                  <span className={styles.statVal}>{cls.alignment.join(', ')}</span>
-                </div>
+            {/* Stats row */}
+            <div className={styles.statsRow}>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>BBA</span>
+                <span className={styles.statVal}>{BAB_LABEL[cls.baseAttackBonus]}</span>
               </div>
-
-              {/* Proficiencies */}
-              {cls.proficiencies && (
-                <div className={styles.cardSection}>
-                  <p className={styles.sectionTitle}>Competencias</p>
-                  <div className={styles.proficiencies}>
-                    <div className={styles.profRow}>
-                      <span className={styles.profLabel}>Armas</span>
-                      <span className={styles.profVal}>{cls.proficiencies.weapons}</span>
-                    </div>
-                    <div className={styles.profRow}>
-                      <span className={styles.profLabel}>Armadura</span>
-                      <span className={styles.profVal}>{cls.proficiencies.armor}</span>
-                    </div>
-                  </div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Fortaleza</span>
+                <span className={styles.statVal}>{SAVE_LABEL[cls.fortitudeSave]}</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Reflejos</span>
+                <span className={styles.statVal}>{SAVE_LABEL[cls.reflexSave]}</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Voluntad</span>
+                <span className={styles.statVal}>{SAVE_LABEL[cls.willSave]}</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Hab./nivel</span>
+                <span className={styles.statVal}>{cls.skillPointsPerLevel} + INT</span>
+              </div>
+              {cls.casterAbility && (
+                <div className={styles.statItem}>
+                  <span className={styles.statLabel}>Magia</span>
+                  <span className={styles.statVal}>{ABILITY_ABBR[cls.casterAbility]}</span>
                 </div>
               )}
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Oro inicial</span>
+                <span className={styles.statVal}>{cls.startingGoldDice} po</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Alineamiento</span>
+                <span className={styles.statVal}>{cls.alignment.join(', ')}</span>
+              </div>
+            </div>
 
-              {/* Features */}
+            {/* Proficiencies */}
+            {cls.proficiencies && (
               <div className={styles.cardSection}>
-                <p className={styles.sectionTitle}>Características de Clase</p>
-                <div className={styles.featureTable}>
-                  {cls.features.map(f => (
-                    <div key={`${f.name}-${f.level}`} className={styles.featureRow}>
-                      <span className={styles.featureLevel}>Nv {f.level}</span>
-                      <div className={styles.featureBody}>
-                        <span className={styles.featureName}>{f.name}</span>
-                        <span className={styles.featureDesc}>{f.description}</span>
-                      </div>
+                <p className={styles.sectionTitle}>Competencias</p>
+                <div className={styles.proficiencies}>
+                  <div className={styles.profRow}>
+                    <span className={styles.profLabel}>Armas</span>
+                    <span className={styles.profVal}>{cls.proficiencies.weapons}</span>
+                  </div>
+                  <div className={styles.profRow}>
+                    <span className={styles.profLabel}>Armadura</span>
+                    <span className={styles.profVal}>{cls.proficiencies.armor}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Features */}
+            <div className={styles.cardSection}>
+              <p className={styles.sectionTitle}>Características de Clase</p>
+              <div className={styles.featureTable}>
+                {cls.features.map(f => (
+                  <div key={`${f.name}-${f.level}`} className={styles.featureRow}>
+                    <span className={styles.featureLevel}>Nv {f.level}</span>
+                    <div className={styles.featureBody}>
+                      <span className={styles.featureName}>{f.name}</span>
+                      <span className={styles.featureDesc}>{f.description}</span>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
+            </div>
 
-              {/* Class skills */}
-              <div className={styles.cardSection}>
-                <p className={styles.sectionTitle}>Habilidades de Clase</p>
-                <div className={styles.skillPills}>
-                  {cls.classSkills.map(s => (
-                    <span key={s} className={styles.skillPill}>{s.replace(/_/g, ' ')}</span>
-                  ))}
-                </div>
+            {/* Class skills */}
+            <div className={styles.cardSection}>
+              <p className={styles.sectionTitle}>Habilidades de Clase</p>
+              <div className={styles.skillPills}>
+                {cls.classSkills.map(s => (
+                  <span key={s} className={styles.skillPill}>{s.replace(/_/g, ' ')}</span>
+                ))}
               </div>
-
-              {/* Spells per day */}
-              <SpellsTable cls={cls} />
-
-              {/* Progression table (collapsible) */}
-              <ProgressionTable cls={cls} />
-
             </div>
-              ))}
-            </div>
-          ))}
+
+            {/* Spells per day */}
+            <SpellsTable cls={cls} />
+
+            {/* Progression table (collapsible) */}
+            <ProgressionTable cls={cls} />
+
+          </div>
         </div>
         )}
       </div>

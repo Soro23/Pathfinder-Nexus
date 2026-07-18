@@ -58,7 +58,9 @@ function App() {
               <Route path="feats" element={<Feats />} />
               <Route path="bestiary" element={<Bestiary />} />
               <Route path="classes" element={<Classes />} />
+              <Route path="classes/:classId" element={<Classes />} />
               <Route path="races" element={<Races />} />
+              <Route path="races/:raceId" element={<Races />} />
               <Route path="npcs" element={<NPCs />} />
               <Route path="campaigns" element={<CampaignList />} />
               <Route path="campaigns/new" element={<CampaignNew />} />

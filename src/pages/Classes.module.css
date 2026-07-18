@@ -113,6 +113,16 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
+.navBtnActive {
+  color: var(--color-accent-gold);
+  background: rgba(212, 164, 76, 0.08);
+  font-weight: 600;
+}
+
+.navBtnActive:hover {
+  color: var(--color-accent-gold);
+}
+
 /* ── Main content ── */
 .content {
   flex: 1;

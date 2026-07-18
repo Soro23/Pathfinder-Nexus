@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Globe, ChevronDown } from 'lucide-react'
 import { useSRDStore } from '../store/srdStore'
 import styles from './Classes.module.css'
@@ -12,11 +13,24 @@ const ABILITY_ABBR: Record<string, string> = {
 export function Races() {
   const races = useSRDStore(s => s.races)
   const fetchAll = useSRDStore(s => s.fetchAll)
+  const { raceId } = useParams<{ raceId: string }>()
+  const navigate = useNavigate()
 
   useEffect(() => { fetchAll() }, [fetchAll])
 
-  function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  if (races.length === 0) {
+    return (
+      <div className={styles.loaderContainer}>
+        <div className={styles.loader} />
+        <p>Cargando razas...</p>
+      </div>
+    )
+  }
+
+  const race = raceId ? races.find(r => r.id === raceId) : undefined
+
+  if (!race) {
+    return <Navigate to={`/races/${races[0].id}`} replace />
   }
 
   return (
@@ -28,10 +42,9 @@ export function Races() {
           <Globe size={15} className={mobile.mobileCatIcon} />
           <select
             className={mobile.mobileCatSelect}
-            defaultValue=""
-            onChange={e => { scrollTo(e.target.value); (e.target as HTMLSelectElement).value = '' }}
+            value={race.id}
+            onChange={e => navigate(`/races/${e.target.value}`)}
           >
-            <option value="" disabled>Ir a raza…</option>
             {races.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
           </select>
           <ChevronDown size={15} className={mobile.mobileCatChevron} />
@@ -44,9 +57,13 @@ export function Races() {
           <p className={styles.navTitle}>Razas</p>
           <div className={styles.navList}>
             {races.map(r => (
-              <button key={r.id} className={styles.navBtn} onClick={() => scrollTo(r.id)}>
+              <Link
+                key={r.id}
+                to={`/races/${r.id}`}
+                className={`${styles.navBtn} ${r.id === race.id ? styles.navBtnActive : ''}`}
+              >
                 {r.label}
-              </button>
+              </Link>
             ))}
           </div>
         </div>
@@ -63,76 +80,74 @@ export function Races() {
         </header>
 
         <div className={styles.classList}>
-          {races.map(race => (
-            <div key={race.id} id={race.id} className={styles.classCard}>
+          <div key={race.id} className={styles.classCard}>
 
-              {/* Card header */}
-              <div className={styles.cardHeader}>
-                <div className={styles.cardTitleRow}>
-                  <h2 className={styles.className}>{race.label}</h2>
-                  <div className={styles.raceMeta}>
-                    <span className={styles.raceTag}>{race.size === 'small' ? 'Pequeño' : 'Mediano'}</span>
-                    <span className={styles.raceTag}>{race.speed} pies</span>
-                  </div>
+            {/* Card header */}
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitleRow}>
+                <h2 className={styles.className}>{race.label}</h2>
+                <div className={styles.raceMeta}>
+                  <span className={styles.raceTag}>{race.size === 'small' ? 'Pequeño' : 'Mediano'}</span>
+                  <span className={styles.raceTag}>{race.speed} pies</span>
                 </div>
-                <p className={styles.classDesc}>{race.desc}</p>
               </div>
+              <p className={styles.classDesc}>{race.desc}</p>
+            </div>
 
-              {/* Stats row */}
-              <div className={styles.statsRow}>
+            {/* Stats row */}
+            <div className={styles.statsRow}>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Bonificadores</span>
+                <span className={styles.statVal}>{race.bonusDesc}</span>
+              </div>
+              {race.favoredClass && (
                 <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Bonificadores</span>
-                  <span className={styles.statVal}>{race.bonusDesc}</span>
+                  <span className={styles.statLabel}>Clase Favorita</span>
+                  <span className={styles.statVal}>{race.favoredClass === 'any' ? 'Cualquiera' : race.favoredClass}</span>
                 </div>
-                {race.favoredClass && (
-                  <div className={styles.statItem}>
-                    <span className={styles.statLabel}>Clase Favorita</span>
-                    <span className={styles.statVal}>{race.favoredClass === 'any' ? 'Cualquiera' : race.favoredClass}</span>
-                  </div>
-                )}
-              </div>
+              )}
+            </div>
 
-              {/* Racial traits */}
+            {/* Racial traits */}
+            <div className={styles.cardSection}>
+              <p className={styles.sectionTitle}>Rasgos Raciales</p>
+              <div className={styles.featureTable}>
+                {race.traits.map(t => (
+                  <div key={t.name} className={styles.featureRow}>
+                    <div className={styles.featureBody}>
+                      <span className={styles.featureName}>{t.name}</span>
+                      <span className={styles.featureDesc}>{t.description}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Subraces */}
+            {race.subraces && race.subraces.length > 0 && (
               <div className={styles.cardSection}>
-                <p className={styles.sectionTitle}>Rasgos Raciales</p>
-                <div className={styles.featureTable}>
-                  {race.traits.map(t => (
-                    <div key={t.name} className={styles.featureRow}>
-                      <div className={styles.featureBody}>
-                        <span className={styles.featureName}>{t.name}</span>
-                        <span className={styles.featureDesc}>{t.description}</span>
-                      </div>
+                <p className={styles.sectionTitle}>Subrazas</p>
+                <div className={styles.subraceGrid}>
+                  {race.subraces.map(sub => (
+                    <div key={sub.id} className={styles.subraceCard}>
+                      <p className={styles.subraceName}>{sub.label}</p>
+                      <p className={styles.subraceBonus}>
+                        {Object.entries(sub.bonuses)
+                          .map(([k, v]) => `${v! > 0 ? '+' : ''}${v} ${ABILITY_ABBR[k] ?? k}`)
+                          .join(', ')}
+                      </p>
+                      {sub.traits.map(t => (
+                        <p key={t.name} className={styles.subraceTraitRow}>
+                          <strong>{t.name}: </strong>{t.description}
+                        </p>
+                      ))}
                     </div>
                   ))}
                 </div>
               </div>
+            )}
 
-              {/* Subraces */}
-              {race.subraces && race.subraces.length > 0 && (
-                <div className={styles.cardSection}>
-                  <p className={styles.sectionTitle}>Subrazas</p>
-                  <div className={styles.subraceGrid}>
-                    {race.subraces.map(sub => (
-                      <div key={sub.id} className={styles.subraceCard}>
-                        <p className={styles.subraceName}>{sub.label}</p>
-                        <p className={styles.subraceBonus}>
-                          {Object.entries(sub.bonuses)
-                            .map(([k, v]) => `${v! > 0 ? '+' : ''}${v} ${ABILITY_ABBR[k] ?? k}`)
-                            .join(', ')}
-                        </p>
-                        {sub.traits.map(t => (
-                          <p key={t.name} className={styles.subraceTraitRow}>
-                            <strong>{t.name}: </strong>{t.description}
-                          </p>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
