@@ -238,37 +238,44 @@
   width: 100%;
 }
 
-/* ── Archetype list ── */
-.archetypeList {
+/* ── Archetype chips ── */
+.archetypeChips {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: var(--space-2);
-  background: var(--color-surface-container);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
 }
 
-.archetypeItem {
+.archetypeChip {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-body-md);
-  color: var(--color-on-surface);
-  cursor: pointer;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full, 999px);
+  background: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+  font-size: var(--text-body-sm, var(--text-body-md));
+  font-weight: 500;
 }
 
-.archetypeItem input {
-  cursor: pointer;
-}
-
-.archetypeItemDisabled {
+.archetypeChipLocked {
+  background: var(--color-surface-container-high);
   color: var(--color-on-surface-variant);
-  opacity: 0.55;
-  cursor: not-allowed;
 }
 
-.archetypeItemDisabled input {
-  cursor: not-allowed;
+.archetypeChipRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.archetypeChipRemove:hover {
+  opacity: 1;
 }
 
 .archetypeHint {

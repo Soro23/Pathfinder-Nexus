@@ -176,39 +176,69 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
         </div>
 
         {/* Archetype Section */}
-        {classArchetypeOptions.length > 0 && (
-          <div className={styles.section}>
-            <p className={styles.sectionLabel}>Arquetipos</p>
-            <div className={styles.archetypeList}>
-              {classArchetypeOptions.map((a) => {
-                const isLocked = existingArchetypeIds.includes(a.id)
-                const isSelected = isLocked || newArchetypeIds.includes(a.id)
-                const blockReason = isSelected ? null : archetypeBlockReason(a)
-                return (
-                  <label
-                    key={a.id}
-                    className={`${styles.archetypeItem} ${blockReason ? styles.archetypeItemDisabled : ''}`}
-                    title={blockReason ?? (isLocked ? 'Ya elegido en niveles anteriores' : undefined)}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      disabled={isLocked || !!blockReason}
-                      onChange={() => toggleArchetype(a.id)}
-                    />
-                    {a.name}
-                    {isLocked && <span className={styles.mono}> (ya elegido)</span>}
-                  </label>
+        {classArchetypeOptions.length > 0 && (() => {
+          const addableArchetypes = classArchetypeOptions.filter(
+            (a) => !existingArchetypeIds.includes(a.id) && !newArchetypeIds.includes(a.id) && !archetypeBlockReason(a)
+          )
+          const hasBlockedArchetypes = addableArchetypes.length + selectedArchetypes.length < classArchetypeOptions.length
+          return (
+            <div className={styles.section}>
+              <p className={styles.sectionLabel}>Arquetipos</p>
+
+              {selectedArchetypes.length > 0 && (
+                <div className={styles.archetypeChips}>
+                  {selectedArchetypes.map((a) => {
+                    const isLocked = existingArchetypeIds.includes(a.id)
+                    return (
+                      <span
+                        key={a.id}
+                        className={`${styles.archetypeChip} ${isLocked ? styles.archetypeChipLocked : ''}`}
+                        title={isLocked ? 'Ya elegido en niveles anteriores' : undefined}
+                      >
+                        {a.name}
+                        {!isLocked && (
+                          <button
+                            type="button"
+                            className={styles.archetypeChipRemove}
+                            onClick={() => toggleArchetype(a.id)}
+                            aria-label={`Quitar ${a.name}`}
+                          >
+                            <X size={12} />
+                          </button>
+                        )}
+                      </span>
+                    )
+                  })}
+                </div>
+              )}
+
+              {addableArchetypes.length > 0 ? (
+                <select
+                  className={styles.newClassSelect}
+                  value=""
+                  onChange={(e) => { if (e.target.value) toggleArchetype(e.target.value) }}
+                >
+                  <option value="">+ Añadir arquetipo…</option>
+                  {addableArchetypes.map((a) => (
+                    <option key={a.id} value={a.id}>{a.name}</option>
+                  ))}
+                </select>
+              ) : (
+                selectedArchetypes.length === 0 && (
+                  <p className={styles.archetypeHint}>No hay arquetipos disponibles para añadir.</p>
                 )
-              })}
+              )}
+
+              {hasBlockedArchetypes && (
+                <p className={styles.archetypeHint}>
+                  {attainedLevel > 0
+                    ? `Algunos arquetipos no aparecen: modifican características de nivel ${attainedLevel} o anterior, ya obtenidas, o entran en conflicto con los ya elegidos.`
+                    : 'Algunos arquetipos no aparecen: entran en conflicto con los ya elegidos.'}
+                </p>
+              )}
             </div>
-            {attainedLevel > 0 && (
-              <p className={styles.archetypeHint}>
-                Solo puedes añadir arquetipos que no modifiquen características de nivel {attainedLevel} o anterior, ya obtenidas.
-              </p>
-            )}
-          </div>
-        )}
+          )
+        })()}
 
         {/* Hit Die Section */}
         <div className={styles.section}>
