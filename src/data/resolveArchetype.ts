@@ -63,6 +63,16 @@ export function findConflictingArchetype(option: Archetype, selected: Archetype[
   return null
 }
 
+// Un arquetipo solo puede añadirse a una clase ya en progreso si ninguno de sus reemplazos
+// toca un nivel ya jugado: la elección de arquetipo se hace "cuando se selecciona la clase"
+// (nivel 1), así que tocar ese nivel o cualquiera anterior al actual implicaría reconstruir
+// retroactivamente el personaje, algo que solo el DJ puede autorizar (Adapting Existing
+// Characters, PF1e). Un `atLevel` nulo se trata como nivel 1 porque el SRD scrapeado no
+// siempre declara el nivel en rasgos implícitos de nivel 1 (ver comentario de conflictTokens).
+export function archetypeAffectsAttainedLevel(archetype: Archetype, attainedLevel: number): boolean {
+  return archetype.replaces.some((r) => (r.atLevel ?? 1) <= attainedLevel)
+}
+
 export function findArchetypeConflicts(archetypes: Archetype[]): ArchetypeConflict[] {
   const conflicts: ArchetypeConflict[] = []
   for (let i = 0; i < archetypes.length; i++) {

@@ -3,6 +3,9 @@ import { X, Dice6 } from 'lucide-react'
 import type { Character, CharacterClass } from '../../store'
 import { calculateModifier } from '../../store'
 import { getClassById, CLASSES } from '../../data'
+import { useSRDStore } from '../../store/srdStore'
+import { archetypeAffectsAttainedLevel, findConflictingArchetype, resolveClassFeatures } from '../../data/resolveArchetype'
+import type { Archetype } from '../../data/archetypes'
 import { Button } from '../ui'
 import styles from './LevelUpModal.module.css'
 
@@ -35,12 +38,59 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
   const [hpMode, setHpMode] = useState<HpMode>('roll')
   const [rolledValue, setRolledValue] = useState<number | null>(null)
   const [manualValue, setManualValue] = useState<number>(1)
+  const [newArchetypeIds, setNewArchetypeIds] = useState<string[]>([])
+
+  const getArchetypesByClass = useSRDStore((s) => s.getArchetypesByClass)
 
   const resolvedClassData = getClassById(classChoice.classId)
   const hitDie            = resolvedClassData?.hitDie ?? 8
   const skillPointsGained = resolvedClassData
     ? Math.max(1, resolvedClassData.skillPointsPerLevel + intMod)
     : null
+
+  // Nivel de la clase elegida (no el nivel de personaje) que se alcanza al confirmar:
+  // para una clase existente es su nivel actual + 1; para una clase nueva, siempre 1.
+  const existingClassEntry = classChoice.type === 'existing'
+    ? character.classes.find((c) => c.id === classChoice.classId)
+    : undefined
+  const attainedLevel = existingClassEntry?.level ?? 0
+  const newClassLevel = attainedLevel + 1
+
+  const existingArchetypeIds = existingClassEntry?.archetypeIds ?? []
+  const classArchetypeOptions = resolvedClassData ? getArchetypesByClass(resolvedClassData.id) : []
+  const selectedArchetypes = classArchetypeOptions.filter(
+    (a) => existingArchetypeIds.includes(a.id) || newArchetypeIds.includes(a.id)
+  )
+
+  const changeClassChoice = (choice: ClassChoice) => {
+    setClassChoice(choice)
+    setRolledValue(null)
+    setNewArchetypeIds([])
+  }
+
+  const archetypeBlockReason = (option: Archetype): string | null => {
+    const clashing = findConflictingArchetype(option, selectedArchetypes)
+    if (clashing) return `Incompatible con "${clashing.name}": ambos modifican la misma característica`
+    if (attainedLevel > 0 && archetypeAffectsAttainedLevel(option, attainedLevel)) {
+      return `Modifica una característica de nivel ${attainedLevel} o anterior, ya obtenida: requiere reconstrucción retroactiva aprobada por el DJ`
+    }
+    return null
+  }
+
+  const toggleArchetype = (id: string) => {
+    if (existingArchetypeIds.includes(id)) return
+    if (newArchetypeIds.includes(id)) {
+      setNewArchetypeIds(newArchetypeIds.filter((v) => v !== id))
+      return
+    }
+    const option = classArchetypeOptions.find((a) => a.id === id)
+    if (option && archetypeBlockReason(option)) return
+    setNewArchetypeIds([...newArchetypeIds, id])
+  }
+
+  const featuresAtNewLevel = resolvedClassData
+    ? resolveClassFeatures(resolvedClassData, selectedArchetypes).filter((f) => f.level === newClassLevel)
+    : []
 
   const handleRoll = () => {
     const result = Math.floor(Math.random() * hitDie) + 1
@@ -57,10 +107,12 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
     let newClassLevels: CharacterClass[]
     if (classChoice.type === 'existing') {
       newClassLevels = character.classes.map((c) =>
-        c.id === classChoice.classId ? { ...c, level: c.level + 1 } : c
+        c.id === classChoice.classId
+          ? { ...c, level: c.level + 1, archetypeIds: [...(c.archetypeIds ?? []), ...newArchetypeIds] }
+          : c
       )
     } else {
-      newClassLevels = [...character.classes, { id: classChoice.classId, level: 1 }]
+      newClassLevels = [...character.classes, { id: classChoice.classId, level: 1, archetypeIds: newArchetypeIds }]
     }
     onConfirm({ newLevel, newClassLevels, hpGained, hpRolled: hpMode === 'roll' ? rolledValue : null })
   }
@@ -87,7 +139,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
                 <button
                   key={cc.id}
                   className={`${styles.modeBtn} ${isSelected ? styles.modeBtnActive : ''}`}
-                  onClick={() => { setClassChoice({ type: 'existing', classId: cc.id }); setRolledValue(null) }}
+                  onClick={() => changeClassChoice({ type: 'existing', classId: cc.id })}
                 >
                   {cd?.name ?? cc.id}
                   <span className={styles.mono}> Nv {cc.level}</span>
@@ -109,8 +161,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
               value={classChoice.type === 'new' ? classChoice.classId : ''}
               onChange={(e) => {
                 if (e.target.value) {
-                  setClassChoice({ type: 'new', classId: e.target.value })
-                  setRolledValue(null)
+                  changeClassChoice({ type: 'new', classId: e.target.value })
                 }
               }}
             >
@@ -123,6 +174,41 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
             </select>
           )}
         </div>
+
+        {/* Archetype Section */}
+        {classArchetypeOptions.length > 0 && (
+          <div className={styles.section}>
+            <p className={styles.sectionLabel}>Arquetipos</p>
+            <div className={styles.archetypeList}>
+              {classArchetypeOptions.map((a) => {
+                const isLocked = existingArchetypeIds.includes(a.id)
+                const isSelected = isLocked || newArchetypeIds.includes(a.id)
+                const blockReason = isSelected ? null : archetypeBlockReason(a)
+                return (
+                  <label
+                    key={a.id}
+                    className={`${styles.archetypeItem} ${blockReason ? styles.archetypeItemDisabled : ''}`}
+                    title={blockReason ?? (isLocked ? 'Ya elegido en niveles anteriores' : undefined)}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      disabled={isLocked || !!blockReason}
+                      onChange={() => toggleArchetype(a.id)}
+                    />
+                    {a.name}
+                    {isLocked && <span className={styles.mono}> (ya elegido)</span>}
+                  </label>
+                )
+              })}
+            </div>
+            {attainedLevel > 0 && (
+              <p className={styles.archetypeHint}>
+                Solo puedes añadir arquetipos que no modifiquen características de nivel {attainedLevel} o anterior, ya obtenidas.
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Hit Die Section */}
         <div className={styles.section}>
@@ -206,6 +292,27 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
             )}
           </ul>
         </div>
+
+        {/* Class Features Section */}
+        {featuresAtNewLevel.length > 0 && (
+          <div className={styles.section}>
+            <p className={styles.sectionLabel}>
+              {resolvedClassData?.name} — características de nivel {newClassLevel}
+            </p>
+            <ul className={styles.infoList}>
+              {featuresAtNewLevel
+                .filter((f) => f.status !== 'replaced')
+                .map((f, i) => (
+                  <li key={i} className={styles.infoItem}>
+                    <strong>{f.name}</strong>
+                    {f.status === 'changed' && <span className={styles.mono}> (modificada por arquetipo)</span>}
+                    {f.status === 'optional' && <span className={styles.mono}> (opcional por arquetipo)</span>}
+                    {f.status === 'archetype' && <span className={styles.mono}> (arquetipo)</span>}
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
 
         {/* Confirm */}
         <div className={styles.modalFooter}>

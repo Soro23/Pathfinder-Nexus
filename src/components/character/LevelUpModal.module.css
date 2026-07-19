@@ -238,6 +238,44 @@
   width: 100%;
 }
 
+/* ── Archetype list ── */
+.archetypeList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--color-surface-container);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.archetypeItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  cursor: pointer;
+}
+
+.archetypeItem input {
+  cursor: pointer;
+}
+
+.archetypeItemDisabled {
+  color: var(--color-on-surface-variant);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.archetypeItemDisabled input {
+  cursor: not-allowed;
+}
+
+.archetypeHint {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+}
+
 /* ── Footer ── */
 .modalFooter {
   display: flex;
