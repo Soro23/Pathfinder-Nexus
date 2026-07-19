@@ -4,7 +4,9 @@ export type ReplacementType = 'replaces' | 'changes' | 'optional'
 
 export interface ArchetypeReplacement {
   featureName: string
-  atLevel: number
+  // Puede venir sin nivel: la página SRD de origen no siempre declara "at Nth level"
+  // (típico en competencias de armas o rasgos de nivel 1 implícitos).
+  atLevel: number | null
   type: ReplacementType
 }
 

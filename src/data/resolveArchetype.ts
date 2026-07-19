@@ -1,5 +1,5 @@
 import type { ClassData, ClassFeature } from './classes'
-import type { Archetype } from './archetypes'
+import type { Archetype, ArchetypeReplacement } from './archetypes'
 
 export interface ResolvedFeature extends ClassFeature {
   status: 'base' | 'replaced' | 'changed' | 'optional' | 'archetype'
@@ -7,26 +7,80 @@ export interface ResolvedFeature extends ClassFeature {
 
 export interface ArchetypeConflict {
   featureName: string
-  atLevel: number
-  archetypeNames: string[]
+  atLevel: number | null
+  archetypeNames: [string, string]
+}
+
+// El texto de `featureName` viene scrapeado de la página SRD tal cual (en inglés, sin
+// normalizar) y no es una clave: dos arquetipos pueden referirse a la misma característica
+// con redacciones distintas — p.ej. Spellslinger dice "arcane bond" y Iounmancer dice
+// "wizard's arcane bond". Por eso el emparejamiento se hace por solapamiento de palabras
+// significativas en vez de por igualdad de texto.
+const CONFLICT_STOPWORDS = new Set([
+  'the', 'a', 'an', 'and', 'but', 'of', 'in', 'on', 'at', 'his', 'her',
+  'its', 'their', 'it', 'them', 'this', 'that', 'gains', 'places', 'class',
+])
+
+function conflictTokens(featureName: string): Set<string> {
+  const normalized = featureName
+    .toLowerCase()
+    .replace(/[’']/g, '')
+    .replace(/\(.*?\)/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, ' ')
+  return new Set(
+    normalized.split(/\s+/).filter((w) => w.length > 2 && !CONFLICT_STOPWORDS.has(w)),
+  )
+}
+
+function featureNamesOverlap(a: string, b: string): boolean {
+  const tokensA = conflictTokens(a)
+  const tokensB = conflictTokens(b)
+  if (tokensA.size === 0 || tokensB.size === 0) return false
+
+  let shared = 0
+  for (const t of tokensA) if (tokensB.has(t)) shared++
+
+  if (tokensA.size === 1 && tokensB.size === 1) return shared === 1
+  return shared >= 2
+}
+
+// Dos reemplazos entran en conflicto si nombran la misma característica de clase. El nivel
+// solo descarta el conflicto cuando ambos lo declaran explícitamente y difieren (p.ej. "dote
+// de bono de nivel 5" vs "de nivel 10" — franjas distintas de un mismo tipo de rasgo); si
+// alguno es null (frecuente, ver Archetype.replaces) no se puede usar para distinguir.
+export function replacementsConflict(a: ArchetypeReplacement, b: ArchetypeReplacement): boolean {
+  if (a.atLevel != null && b.atLevel != null && a.atLevel !== b.atLevel) return false
+  return featureNamesOverlap(a.featureName, b.featureName)
+}
+
+export function findConflictingArchetype(option: Archetype, selected: Archetype[]): Archetype | null {
+  for (const other of selected) {
+    if (other.id === option.id) continue
+    for (const r of option.replaces) {
+      if (other.replaces.some((or) => replacementsConflict(r, or))) return other
+    }
+  }
+  return null
 }
 
 export function findArchetypeConflicts(archetypes: Archetype[]): ArchetypeConflict[] {
-  const byKey = new Map<string, ArchetypeConflict>()
-
-  for (const archetype of archetypes) {
-    for (const r of archetype.replaces) {
-      const key = `${r.featureName}:${r.atLevel}`
-      const entry = byKey.get(key)
-      if (entry) {
-        entry.archetypeNames.push(archetype.name)
-      } else {
-        byKey.set(key, { featureName: r.featureName, atLevel: r.atLevel, archetypeNames: [archetype.name] })
+  const conflicts: ArchetypeConflict[] = []
+  for (let i = 0; i < archetypes.length; i++) {
+    for (let j = i + 1; j < archetypes.length; j++) {
+      for (const ra of archetypes[i].replaces) {
+        for (const rb of archetypes[j].replaces) {
+          if (replacementsConflict(ra, rb)) {
+            conflicts.push({
+              featureName: ra.featureName,
+              atLevel: ra.atLevel,
+              archetypeNames: [archetypes[i].name, archetypes[j].name],
+            })
+          }
+        }
       }
     }
   }
-
-  return Array.from(byKey.values()).filter((c) => c.archetypeNames.length > 1)
+  return conflicts
 }
 
 export function resolveClassFeatures(

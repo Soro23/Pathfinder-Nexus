@@ -1576,7 +1576,7 @@ function ArchetypesEditor() {
   const addReplacement = () =>
     setForm((f) => ({ ...f, replaces: [...f.replaces, { featureName: '', atLevel: 1, type: 'replaces' as ReplacementType }] }))
 
-  const updateReplacement = (i: number, key: string, value: string | number) =>
+  const updateReplacement = (i: number, key: string, value: string | number | null) =>
     setForm((f) => ({ ...f, replaces: f.replaces.map((r, idx) => idx === i ? { ...r, [key]: value } : r) }))
 
   const removeReplacement = (i: number) =>
@@ -1645,7 +1645,7 @@ function ArchetypesEditor() {
           {form.replaces.map((r, i) => (
             <div key={i} className={styles.replacementRow}>
               <input className={styles.inputMd} placeholder="Nombre de la caracteristica" value={r.featureName} onChange={(e) => updateReplacement(i, 'featureName', e.target.value)} />
-              <input className={styles.inputSm} type="number" min={1} max={20} value={r.atLevel} onChange={(e) => updateReplacement(i, 'atLevel', parseInt(e.target.value) || 1)} />
+              <input className={styles.inputSm} type="number" min={1} max={20} value={r.atLevel ?? ''} onChange={(e) => updateReplacement(i, 'atLevel', e.target.value ? parseInt(e.target.value) : null)} />
               <select className={styles.inputSm} value={r.type} onChange={(e) => updateReplacement(i, 'type', e.target.value)}>
                 <option value="replaces">Reemplaza</option>
                 <option value="changes">Modifica</option>

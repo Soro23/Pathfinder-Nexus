@@ -1,6 +1,6 @@
 import { useSRDStore } from '../../store/srdStore'
 import type { Archetype, ReplacementType } from '../../data/archetypes'
-import { findArchetypeConflicts } from '../../data/resolveArchetype'
+import { findArchetypeConflicts, findConflictingArchetype } from '../../data/resolveArchetype'
 import styles from './ArchetypeSelector.module.css'
 
 interface Props {
@@ -29,15 +29,9 @@ function ReplacementBadge({ type }: { type: ReplacementType }) {
   )
 }
 
-function findConflictReason(option: Archetype, selected: Archetype[]): string | null {
-  for (const s of selected) {
-    if (s.id === option.id) continue
-    for (const r of option.replaces) {
-      const clash = s.replaces.find((sr) => sr.featureName === r.featureName && sr.atLevel === r.atLevel)
-      if (clash) return `Incompatible con "${s.name}": ambos modifican "${r.featureName}" (nv ${r.atLevel})`
-    }
-  }
-  return null
+function conflictReasonFor(option: Archetype, selected: Archetype[]): string | null {
+  const clashing = findConflictingArchetype(option, selected)
+  return clashing ? `Incompatible con "${clashing.name}": ambos modifican la misma característica` : null
 }
 
 function ArchetypeDetail({ archetype }: { archetype: Archetype }) {
@@ -50,7 +44,7 @@ function ArchetypeDetail({ archetype }: { archetype: Archetype }) {
             <li key={i} className={styles.replaceItem}>
               <ReplacementBadge type={r.type} />
               <span className={styles.featureName}>{r.featureName}</span>
-              <span className={styles.atLevel}>nv {r.atLevel}</span>
+              <span className={styles.atLevel}>{r.atLevel !== null ? `nv ${r.atLevel}` : '—'}</span>
             </li>
           ))}
         </ul>
@@ -74,7 +68,7 @@ export function ArchetypeSelector({ classId, value, onChange }: Props) {
       return
     }
     const option = options.find((a) => a.id === id)
-    if (option && findConflictReason(option, selected)) return
+    if (option && conflictReasonFor(option, selected)) return
     onChange([...value, id])
   }
 
@@ -84,7 +78,7 @@ export function ArchetypeSelector({ classId, value, onChange }: Props) {
       <div className={styles.checkList}>
         {options.map((a) => {
           const isSelected = value.includes(a.id)
-          const conflictReason = isSelected ? null : findConflictReason(a, selected)
+          const conflictReason = isSelected ? null : conflictReasonFor(a, selected)
           return (
             <label
               key={a.id}
@@ -109,7 +103,7 @@ export function ArchetypeSelector({ classId, value, onChange }: Props) {
           <ul className={styles.conflictList}>
             {conflicts.map((c, i) => (
               <li key={i}>
-                {c.featureName} (nv {c.atLevel}): {c.archetypeNames.join(', ')}
+                {c.featureName} ({c.atLevel !== null ? `nv ${c.atLevel}` : 'sin nivel'}): {c.archetypeNames.join(', ')}
               </li>
             ))}
           </ul>
