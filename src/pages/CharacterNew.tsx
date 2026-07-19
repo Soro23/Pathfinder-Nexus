@@ -571,8 +571,13 @@ export function CharacterNew() {
                           type="number"
                           className={styles.freeInput}
                           value={value}
-                          min={0}
-                          onChange={(e) => updateForm(attr, Math.max(3, +e.target.value || 10))}
+                          onChange={(e) => {
+                            const rawValue = e.target.value
+                            if (rawValue === '') return
+                            const parsedValue = Number(rawValue)
+                            if (Number.isNaN(parsedValue)) return
+                            updateForm(attr, parsedValue)
+                          }}
                         />
                       )}
 
