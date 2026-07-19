@@ -1,0 +1,353 @@
+[
+  {
+    "slug": "barbarian",
+    "name": "Barbarian",
+    "group": "core",
+    "hit_die": "d12",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 25
+  },
+  {
+    "slug": "bard",
+    "name": "Bard",
+    "group": "core",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 28
+  },
+  {
+    "slug": "cleric",
+    "name": "Cleric",
+    "group": "core",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 28
+  },
+  {
+    "slug": "druid",
+    "name": "Druid",
+    "group": "core",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 34
+  },
+  {
+    "slug": "fighter",
+    "name": "Fighter",
+    "group": "core",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 31
+  },
+  {
+    "slug": "monk",
+    "name": "Monk",
+    "group": "core",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 29
+  },
+  {
+    "slug": "paladin",
+    "name": "Paladin",
+    "group": "core",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 23
+  },
+  {
+    "slug": "ranger",
+    "name": "Ranger",
+    "group": "core",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 35
+  },
+  {
+    "slug": "rogue",
+    "name": "Rogue",
+    "group": "core",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 37
+  },
+  {
+    "slug": "sorcerer",
+    "name": "Sorcerer",
+    "group": "core",
+    "hit_die": "d6",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 36
+  },
+  {
+    "slug": "wizard",
+    "name": "Wizard",
+    "group": "core",
+    "hit_die": "d6",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 26
+  },
+  {
+    "slug": "alchemist",
+    "name": "Alchemist",
+    "group": "base",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 24
+  },
+  {
+    "slug": "cavalier",
+    "name": "Cavalier",
+    "group": "base",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 0
+  },
+  {
+    "slug": "gunslinger",
+    "name": "Gunslinger",
+    "group": "base",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 20
+  },
+  {
+    "slug": "inquisitor",
+    "name": "Inquisitor",
+    "group": "base",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "magus",
+    "name": "Magus",
+    "group": "base",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "omdura",
+    "name": "Omdura",
+    "group": "base",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "oracle",
+    "name": "Oracle",
+    "group": "base",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 31
+  },
+  {
+    "slug": "shifter",
+    "name": "Shifter",
+    "group": "base",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 0
+  },
+  {
+    "slug": "summoner",
+    "name": "Summoner",
+    "group": "base",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "vigilante",
+    "name": "Vigilante",
+    "group": "base",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 7
+  },
+  {
+    "slug": "witch",
+    "name": "Witch",
+    "group": "base",
+    "hit_die": "d6",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "arcanist",
+    "name": "Arcanist",
+    "group": "hybrid",
+    "hit_die": "d6",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "bloodrager",
+    "name": "Bloodrager",
+    "group": "hybrid",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "brawler",
+    "name": "Brawler",
+    "group": "hybrid",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 0
+  },
+  {
+    "slug": "hunter",
+    "name": "Hunter",
+    "group": "hybrid",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "investigator",
+    "name": "Investigator",
+    "group": "hybrid",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "shaman",
+    "name": "Shaman",
+    "group": "hybrid",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "skald",
+    "name": "Skald",
+    "group": "hybrid",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "slayer",
+    "name": "Slayer",
+    "group": "hybrid",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 0
+  },
+  {
+    "slug": "swashbuckler",
+    "name": "Swashbuckler",
+    "group": "hybrid",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 0
+  },
+  {
+    "slug": "warpriest",
+    "name": "Warpriest",
+    "group": "hybrid",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  },
+  {
+    "slug": "antipaladin",
+    "name": "Antipaladin",
+    "group": "alternate",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 1
+  },
+  {
+    "slug": "ninja",
+    "name": "Ninja",
+    "group": "alternate",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 0
+  },
+  {
+    "slug": "samurai",
+    "name": "Samurai",
+    "group": "alternate",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 0
+  },
+  {
+    "slug": "barbarian-unchained",
+    "name": "Unchained Barbarian",
+    "group": "unchained",
+    "hit_die": "d12",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 0
+  },
+  {
+    "slug": "monk-unchained",
+    "name": "Unchained Monk",
+    "group": "unchained",
+    "hit_die": "d10",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 0
+  },
+  {
+    "slug": "rogue-unchained",
+    "name": "Unchained Rogue",
+    "group": "unchained",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": false,
+    "fcb_count": 0
+  },
+  {
+    "slug": "summoner-unchained",
+    "name": "Unchained Summoner",
+    "group": "unchained",
+    "hit_die": "d8",
+    "levels": 20,
+    "has_spells": true,
+    "fcb_count": 0
+  }
+]

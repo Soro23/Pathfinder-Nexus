@@ -1,0 +1,290 @@
+{
+  "slug": "shifter",
+  "name": "Shifter",
+  "group": "base",
+  "hit_die": "d10",
+  "alignment": "Any neutral",
+  "starting_wealth": "3d6x10 gp (average 105 gp).",
+  "skill_ranks_per_level": 4,
+  "class_skills": [
+    {
+      "skill": "Acrobatics",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Climb",
+      "ability": "Str"
+    },
+    {
+      "skill": "Craft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Fly",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Handle Animal",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Knowledge (nature)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Perception",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Profession",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Ride",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Stealth",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Survival",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Swim",
+      "ability": "Str"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 2,
+      "ref": 2,
+      "will": 0,
+      "special": [
+        "Shifter aspect",
+        "shifter claws",
+        "wild empathy"
+      ]
+    },
+    {
+      "level": 2,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 3,
+      "ref": 3,
+      "will": 0,
+      "special": [
+        "Defensive instinct",
+        "track"
+      ]
+    },
+    {
+      "level": 3,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 3,
+      "ref": 3,
+      "will": 1,
+      "special": [
+        "Shifter claws increase",
+        "woodland stride"
+      ]
+    },
+    {
+      "level": 4,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "special": [
+        "Defensive instinct (+1)",
+        "wild shape"
+      ]
+    },
+    {
+      "level": 5,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "special": [
+        "Second aspect",
+        "trackless step"
+      ]
+    },
+    {
+      "level": 6,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "special": [
+        "Shifter's fury"
+      ]
+    },
+    {
+      "level": 7,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "special": [
+        "Shifter claws increase"
+      ]
+    },
+    {
+      "level": 8,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 6,
+      "ref": 6,
+      "will": 2,
+      "special": [
+        "Defensive instinct (+2)"
+      ]
+    },
+    {
+      "level": 9,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 3,
+      "special": [
+        "Chimeric aspect"
+      ]
+    },
+    {
+      "level": 10,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "special": [
+        "Third aspect"
+      ]
+    },
+    {
+      "level": 11,
+      "bab": "+11/+6/+1",
+      "bab_first": 11,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "special": [
+        "Shifter claws increase"
+      ]
+    },
+    {
+      "level": 12,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "special": [
+        "Defensive instinct (+3)"
+      ]
+    },
+    {
+      "level": 13,
+      "bab": "+13/+8/+3",
+      "bab_first": 13,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "special": [
+        "Shifter claws increase"
+      ]
+    },
+    {
+      "level": 14,
+      "bab": "+14/+9/+4",
+      "bab_first": 14,
+      "fort": 9,
+      "ref": 9,
+      "will": 4,
+      "special": [
+        "Greater chimeric aspect"
+      ]
+    },
+    {
+      "level": 15,
+      "bab": "+15/+10/+5",
+      "bab_first": 15,
+      "fort": 9,
+      "ref": 9,
+      "will": 5,
+      "special": [
+        "Fourth aspect"
+      ]
+    },
+    {
+      "level": 16,
+      "bab": "+16/+11/+6/+1",
+      "bab_first": 16,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "special": [
+        "Defensive instinct (+4)"
+      ]
+    },
+    {
+      "level": 17,
+      "bab": "+17/+12/+7/+2",
+      "bab_first": 17,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "special": [
+        "Shifter claws increase"
+      ]
+    },
+    {
+      "level": 18,
+      "bab": "+18/+13/+8/+3",
+      "bab_first": 18,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "special": [
+        "A thousand faces",
+        "timeless body"
+      ]
+    },
+    {
+      "level": 19,
+      "bab": "+19/+14/+9/+4",
+      "bab_first": 19,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "special": [
+        "Shifter claws increase"
+      ]
+    },
+    {
+      "level": 20,
+      "bab": "+20/+15/+10/+5",
+      "bab_first": 20,
+      "fort": 12,
+      "ref": 12,
+      "will": 6,
+      "special": [
+        "Defensive instinct (+5)",
+        "final aspect"
+      ]
+    }
+  ],
+  "favored_class_bonuses": []
+}

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { normalizeCharacter } from './characterMigration'
 
 export interface CharacterClass {
   id: string
@@ -126,6 +127,38 @@ export interface CharacterFeat {
   specification?: string
 }
 
+export type AbilityKey = 'strength' | 'dexterity' | 'constitution' | 'intelligence' | 'wisdom' | 'charisma'
+
+export type HpGainMode = 'roll' | 'average' | 'manual'
+
+export type FavoredClassChoice = 'hp' | 'skill' | 'racial'
+
+// Registro de las decisiones tomadas en UNA subida de nivel. La hoja de personaje sigue
+// derivándose de los totales agregados en `Character` (classes[].level, hp.max, skills[].ranks…);
+// `levelHistory` no los sustituye, los complementa como bitácora para poder mostrar/auditar
+// qué pasó en cada nivel y aplicar el pipeline guiado (orden, validaciones, clase predilecta).
+// Los personajes creados antes de esta funcionalidad no tienen entradas para sus niveles ya
+// vividos (no se fabrica historial retroactivo); `levelHistory` empieza a registrar desde la
+// primera subida de nivel posterior a la migración.
+export interface LevelChoice {
+  characterLevel: number
+  classId: string
+  classLevel: number
+  archetypeIds: string[]
+  hpMode: HpGainMode
+  hpRolled: number | null
+  hpGained: number
+  abilityIncrease?: AbilityKey
+  featIds: string[]
+  favoredClassChoice?: FavoredClassChoice
+  skillRanksSpent: Record<string, number>
+  spellsLearned?: string[]
+  spellsExchanged?: { removed: string; added: string }[]
+  inferred?: boolean
+  source?: 'creation' | 'level-up' | 'retroactive' | 'manual-correction'
+  createdAt: string
+}
+
 export interface Condition {
   id: string
   label: string
@@ -180,6 +213,9 @@ export interface Character {
   selectedDomains?: string[]
   selectedBlessings?: string[]
   channelType?: 'positive' | 'negative'
+  favoredClassId?: string
+  levelHistory?: LevelChoice[]
+  negativeLevels?: number
   createdAt: string
   updatedAt: string
 }
@@ -204,22 +240,7 @@ export const useCharacterStore = create<CharacterStore>()((set, get) => ({
     if (error) {
       console.warn('[characterStore] fetchCharacters failed:', error.message)
     } else if (data) {
-      const characters = data.map((row) => {
-        const c = { ...row.data as Character, id: row.id }
-        c.feats = (c.feats ?? []).map((f) => typeof f === 'string' ? { id: f } : f)
-        c.classes = c.classes.map((cls) => {
-          const legacyId = (cls as CharacterClass & { archetypeId?: string }).archetypeId
-          if (cls.archetypeIds) return cls
-          return { ...cls, archetypeIds: legacyId ? [legacyId] : [] }
-        })
-        if (c.companion) {
-          c.companion.tricks = c.companion.tricks ?? []
-          c.companion.feats = c.companion.feats ?? []
-          c.companion.customSpecialAbilities = c.companion.customSpecialAbilities ?? []
-          c.companion.attacks = c.companion.attacks ?? []
-        }
-        return c
-      })
+      const characters = data.map((row) => normalizeCharacter({ ...row.data as Character, id: row.id }))
       set({ characters })
     }
     set({ loading: false })
@@ -236,14 +257,14 @@ export const useCharacterStore = create<CharacterStore>()((set, get) => ({
     if (error) {
       console.warn('[characterStore] addCharacter failed:', error.message)
     } else if (data) {
-      set((state) => ({ characters: [...state.characters, { ...character, id: data.id }] }))
+      set((state) => ({ characters: [...state.characters, normalizeCharacter({ ...character, id: data.id })] }))
     }
   },
 
   updateCharacter: async (id, updates) => {
     const existing = get().characters.find((c) => c.id === id)
     if (!existing) return
-    const merged = { ...existing, ...updates, updatedAt: new Date().toISOString() }
+    const merged = normalizeCharacter({ ...existing, ...updates, updatedAt: new Date().toISOString() })
     const { error } = await supabase
       .from('characters')
       .update({ data: merged })

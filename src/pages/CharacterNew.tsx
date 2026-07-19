@@ -178,6 +178,7 @@ export function CharacterNew() {
 
   const [startingGold, setStartingGold] = useState(0)
   const [selectedArchetypeIds, setSelectedArchetypeIds] = useState<string[]>([])
+  const [isFavoredClass, setIsFavoredClass] = useState(true)
 
   // ── Accordion open state (exclusive - only one open at a time) ──
   const [openRaceGroup, setOpenRaceGroup] = useState<string>('Razas Principales')
@@ -293,6 +294,21 @@ export function CharacterNew() {
       armor: [],
       coins: { pp: 0, gp: startingGold, sp: 0, cp: 0 },
       notes: '',
+      favoredClassId: isFavoredClass ? form.class : undefined,
+      negativeLevels: 0,
+      levelHistory: [{
+        characterLevel: 1,
+        classId: form.class,
+        classLevel: 1,
+        archetypeIds: selectedArchetypeIds,
+        hpMode: 'manual' as const,
+        hpRolled: null,
+        hpGained: startingHp,
+        featIds: [],
+        skillRanksSpent: {},
+        source: 'creation' as const,
+        createdAt: new Date().toISOString(),
+      }],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
@@ -468,6 +484,17 @@ export function CharacterNew() {
                     onChange={setSelectedArchetypeIds}
                   />
                 </div>
+              )}
+
+              {form.class && (
+                <label className={styles.nameLabel} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input
+                    type="checkbox"
+                    checked={isFavoredClass}
+                    onChange={(e) => setIsFavoredClass(e.target.checked)}
+                  />
+                  Clase predilecta (favored class) — al subir en esta clase podrás elegir +1 PG, +1 punto de habilidad, u opción racial
+                </label>
               )}
 
               <div className={styles.stepActions}>

@@ -4,14 +4,13 @@ import {
   ArrowLeft, Play, Edit2, Trash2,
   Sword, Shield, Scroll, Package, Star,
   Heart, Eye, PlusCircle, X, PawPrint, BookOpen, Download,
-  Zap, TrendingUp, Power, Pencil, Check
+  Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
 import { getClassById, SpellLevel, useSRDStore } from '../data'
-import { getBonusSpells } from '../data/bonusSpells'
 import { resolveClassSkills, buildArchetypesByClassId } from '../data/resolveArchetype'
-import { resolveModifiers, computeCombatStats, computeSkillPointsAvailable, computeSkillTotal, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, computeSpeed } from '../engine'
+import { resolveModifiers, canLevelUpFromXp, computeCombatStats, computeEffectiveMaxHp, computeSkillPointsAvailable, computeSkillTotal, getExpectedFeatCount, getXpToNextLevel, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, computeSpeed, computeSyncedSpellSlots, validateProgressionAgainstCharacter } from '../engine'
 import { Card, Button } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker } from '../components/character'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
@@ -20,26 +19,12 @@ import styles from './CharacterView.module.css'
 
 type Tab = 'combat' | 'skills' | 'feats' | 'weapons' | 'inventory' | 'spells' | 'notes' | 'companion'
 
-function computeSyncedSlots(
-  classes: Array<{ id: string; level: number }>,
-  abilities: Record<string, number>,
-  currentSlots: Record<number, { max: number; used: number }>
-): Record<number, { max: number; used: number }> | null {
-  const casterClass = classes.find((c) => getClassById(c.id)?.spellsPerDay !== undefined)
-  if (!casterClass) return null
-  const cd = getClassById(casterClass.id)
-  if (!cd?.spellsPerDay || !cd.casterAbility) return null
-  const row = cd.spellsPerDay[casterClass.level - 1] ?? []
-  const bonusPerLevel = getBonusSpells(abilities[cd.casterAbility])
-  const newSlots: Record<number, { max: number; used: number }> = {}
-  row.forEach((base, spellLevel) => {
-    if (base !== undefined && base > 0) {
-      const total = base + (bonusPerLevel[spellLevel] ?? 0)
-      const prev = currentSlots[spellLevel]
-      newSlots[spellLevel] = { max: total, used: prev ? Math.min(prev.used, total) : 0 }
-    }
-  })
-  return Object.keys(newSlots).length > 0 ? newSlots : null
+type CharacterNotification = {
+  id: string
+  title: string
+  detail: string
+  severity: 'warning' | 'info'
+  tab: Tab
 }
 
 const ABILITY_ABBR: Record<string, string> = {
@@ -58,6 +43,10 @@ export function CharacterView() {
   const [activeTab, setActiveTab] = useState<Tab>('combat')
   const [isEditing, setIsEditing] = useState(false)
   const [showLevelUp, setShowLevelUp] = useState(false)
+  // Fuera del flujo normal: cambia el nivel de una clase sin otorgar PG, puntos de
+  // habilidad, dotes ni aumentos de característica. Solo para corregir errores de ficha,
+  // por eso queda oculto tras un toggle explícito en vez de estar siempre a mano.
+  const [manualCorrectionMode, setManualCorrectionMode] = useState(false)
   const [newEffectName, setNewEffectName] = useState('')
   const [newEffectDesc, setNewEffectDesc] = useState('')
   const [newEffectDuration, setNewEffectDuration] = useState('')
@@ -118,7 +107,7 @@ export function CharacterView() {
   const speed = computeSpeed(character, totalWeight)
 
   // PV máximos efectivos: PV base + bonos del motor (dotes/objetos como Toughness).
-  const effectiveMaxHp = character.hp.max + resolvedStats.hpBonus
+  const effectiveMaxHp = computeEffectiveMaxHp(character, resolvedStats)
   const hpPercent = Math.max(0, Math.min(100, (character.hp.current / effectiveMaxHp) * 100))
 
   const isCaster = character.classes.some((c) => {
@@ -137,6 +126,145 @@ export function CharacterView() {
   const equippedArmorAcp = (character.armor ?? [])
     .filter((a) => a.equipped && a.type !== 'shield')
     .reduce((sum, a) => sum + (a.armorCheckPenalty ?? 0), 0)
+
+  const spentSkillRanks = character.skills.reduce((sum, s) => sum + s.ranks, 0)
+  const skillPointsAvailable = computeSkillPointsAvailable(character, spentSkillRanks)
+  const expectedFeats = getExpectedFeatCount(character.level, character.classes)
+  const xpToNextLevel = getXpToNextLevel(character.level, character.xp)
+  const inferredHistoryCount = (character.levelHistory ?? []).filter((choice) => choice.inferred).length
+  const progressionMismatches = validateProgressionAgainstCharacter(character)
+
+  const notifications: CharacterNotification[] = []
+  const totalClassLevels = character.classes.reduce((sum, c) => sum + c.level, 0)
+  const selectedDomains = character.selectedDomains ?? []
+  const selectedBlessings = character.selectedBlessings ?? []
+
+  if (!character.name.trim()) {
+    notifications.push({
+      id: 'missing-name',
+      title: 'Falta el nombre',
+      detail: 'Completa el nombre del personaje.',
+      severity: 'warning',
+      tab: 'combat',
+    })
+  }
+
+  if (!character.race.trim()) {
+    notifications.push({
+      id: 'missing-race',
+      title: 'Falta la raza',
+      detail: 'Indica la raza para cerrar los datos basicos.',
+      severity: 'warning',
+      tab: 'combat',
+    })
+  }
+
+  if (character.classes.length === 0 || totalClassLevels !== character.level) {
+    notifications.push({
+      id: 'class-levels',
+      title: 'Niveles de clase desajustados',
+      detail: `La suma de clases es ${totalClassLevels} y el nivel del personaje es ${character.level}.`,
+      severity: 'warning',
+      tab: 'combat',
+    })
+  }
+
+  if (progressionMismatches.length > 0) {
+    notifications.push({
+      id: 'level-history-mismatch',
+      title: 'Historial de niveles desajustado',
+      detail: 'La progresion nivel a nivel no coincide con los totales actuales de la ficha.',
+      severity: 'warning',
+      tab: 'combat',
+    })
+  } else if (inferredHistoryCount > 0) {
+    notifications.push({
+      id: 'level-history-inferred',
+      title: 'Historial retroactivo inferido',
+      detail: `${inferredHistoryCount} nivel(es) fueron reconstruidos desde los totales guardados.`,
+      severity: 'info',
+      tab: 'combat',
+    })
+  }
+
+  if (canLevelUpFromXp(character.level, character.xp)) {
+    notifications.push({
+      id: 'xp-level-up',
+      title: 'XP suficiente para subir',
+      detail: `Tienes ${character.xp} XP. Usa el flujo guiado de subida de nivel.`,
+      severity: 'info',
+      tab: 'combat',
+    })
+  }
+
+  if (character.feats.length < expectedFeats) {
+    const missing = expectedFeats - character.feats.length
+    notifications.push({
+      id: 'missing-feats',
+      title: missing === 1 ? 'Falta elegir 1 dote' : `Faltan elegir ${missing} dotes`,
+      detail: `${character.feats.length}/${expectedFeats} dotes seleccionadas.`,
+      severity: 'warning',
+      tab: 'feats',
+    })
+  }
+
+  if (skillPointsAvailable > 0) {
+    notifications.push({
+      id: 'skill-points',
+      title: skillPointsAvailable === 1 ? 'Queda 1 punto de habilidad' : `Quedan ${skillPointsAvailable} puntos de habilidad`,
+      detail: 'Asigna los rangos pendientes en la lista de habilidades.',
+      severity: 'info',
+      tab: 'skills',
+    })
+  }
+
+  const skillsOverCap = character.skills
+    .filter((s) => s.ranks > character.level)
+    .map((s) => SKILLS.find((skill) => skill.id === s.id)?.name ?? s.id)
+
+  if (skillsOverCap.length > 0) {
+    notifications.push({
+      id: 'skills-over-cap',
+      title: 'Hay rangos por encima del limite',
+      detail: skillsOverCap.slice(0, 3).join(', '),
+      severity: 'warning',
+      tab: 'skills',
+    })
+  }
+
+  if (character.classes.some((c) => c.id === 'cleric')) {
+    if (selectedDomains.length < 2) {
+      notifications.push({
+        id: 'cleric-domains',
+        title: 'Faltan dominios de clerigo',
+        detail: `${selectedDomains.length}/2 dominios seleccionados.`,
+        severity: 'warning',
+        tab: 'combat',
+      })
+    }
+
+    if (!character.channelType) {
+      notifications.push({
+        id: 'channel-type',
+        title: 'Falta canal de energia',
+        detail: 'Elige si canaliza energia positiva o negativa.',
+        severity: 'info',
+        tab: 'combat',
+      })
+    }
+  }
+
+  if (character.classes.some((c) => c.id === 'warpriest') && selectedBlessings.length < 2) {
+    notifications.push({
+      id: 'warpriest-blessings',
+      title: 'Faltan bendiciones',
+      detail: `${selectedBlessings.length}/2 bendiciones seleccionadas.`,
+      severity: 'warning',
+      tab: 'combat',
+    })
+  }
+
+  const warningCount = notifications.filter((n) => n.severity === 'warning').length
 
   const handleDelete = () => {
     if (confirm(`¿Estás seguro de eliminar a ${character.name}?`)) {
@@ -256,6 +384,50 @@ export function CharacterView() {
         </div>
       </header>
 
+      <section className={`${styles.notificationPanel} ${notifications.length === 0 ? styles.notificationPanelClear : ''}`}>
+        <div className={styles.notificationSummary}>
+          <div className={styles.notificationIcon}>
+            {notifications.length === 0 ? <Check size={18} /> : <Bell size={18} />}
+          </div>
+          <div>
+            <h2 className={styles.notificationTitle}>
+              {notifications.length === 0
+                ? 'Ficha completa'
+                : `${notifications.length} ${notifications.length === 1 ? 'pendiente' : 'pendientes'} por revisar`}
+            </h2>
+            <p className={styles.notificationSubtitle}>
+              {notifications.length === 0
+                ? 'No hay dotes, habilidades ni rasgos de clase pendientes.'
+                : warningCount > 0
+                ? `${warningCount} requieren atencion antes de dar la ficha por cerrada.`
+                : 'Solo quedan ajustes informativos de la ficha.'}
+            </p>
+          </div>
+        </div>
+
+        {notifications.length > 0 && (
+          <div className={styles.notificationList}>
+            {notifications.map((notice) => (
+              <button
+                key={notice.id}
+                type="button"
+                className={`${styles.notificationItem} ${notice.severity === 'warning' ? styles.notificationWarning : styles.notificationInfo}`}
+                onClick={() => {
+                  setActiveTab(notice.tab)
+                  setIsEditing(true)
+                }}
+              >
+                <AlertTriangle size={16} />
+                <span className={styles.notificationText}>
+                  <strong>{notice.title}</strong>
+                  <span>{notice.detail}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
       {/* ── HP Banner ── */}
       <div className={styles.hpBanner}>
         <Card padding="md" className={styles.hpCardLarge}>
@@ -333,8 +505,19 @@ export function CharacterView() {
           </div>
           <div className={styles.quickStat}>
             <TrendingUp size={18} />
-            <span className={styles.quickStatValue}>{character.xp}</span>
+            {isEditing ? (
+              <input
+                className={styles.quickStatInput}
+                type="number"
+                min={0}
+                value={character.xp}
+                onChange={(e) => updateCharacter(character.id, { xp: Math.max(0, parseInt(e.target.value) || 0) })}
+              />
+            ) : (
+              <span className={styles.quickStatValue}>{character.xp}</span>
+            )}
             <span className={styles.quickStatLabel}>XP</span>
+            {xpToNextLevel !== null && <span className={styles.quickStatSub}>faltan {xpToNextLevel}</span>}
           </div>
         </div>
       </div>
@@ -359,19 +542,23 @@ export function CharacterView() {
           character={character}
           onClose={() => setShowLevelUp(false)}
           onConfirm={(updates: LevelUpUpdates) => {
-            const syncedSlots = computeSyncedSlots(
+            const syncedSlots = computeSyncedSpellSlots(
               updates.newClassLevels,
-              character.abilities,
+              updates.newAbilities,
               character.spellSlots ?? {}
             )
             updateCharacter(character.id, {
               level: updates.newLevel,
               classes: updates.newClassLevels,
+              abilities: updates.newAbilities,
+              skills: updates.newSkills,
+              feats: updates.newFeats,
               hp: {
                 ...character.hp,
                 max: character.hp.max + updates.hpGained,
                 current: character.hp.current + updates.hpGained,
               },
+              levelHistory: [...(character.levelHistory ?? []), updates.levelChoice],
               ...(syncedSlots && { spellSlots: syncedSlots }),
             })
             setShowLevelUp(false)
@@ -470,6 +657,35 @@ export function CharacterView() {
                   <h3 className={styles.sectionTitle}>Progresión de Clase</h3>
                   {isEditing ? (
                     <div className={styles.classLevelEditor}>
+                      <div className={styles.manualCorrectionBar}>
+                        <label className={styles.manualCorrectionToggle}>
+                          Clase predilecta:
+                          <select
+                            value={character.favoredClassId ?? ''}
+                            onChange={(e) => updateCharacter(character.id, { favoredClassId: e.target.value || undefined })}
+                          >
+                            <option value="">Ninguna</option>
+                            {character.classes.map((cc) => (
+                              <option key={cc.id} value={cc.id}>{getClassById(cc.id)?.name ?? cc.id}</option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+                      <div className={styles.manualCorrectionBar}>
+                        <label className={styles.manualCorrectionToggle}>
+                          <input
+                            type="checkbox"
+                            checked={manualCorrectionMode}
+                            onChange={(e) => setManualCorrectionMode(e.target.checked)}
+                          />
+                          Corrección manual de nivel
+                        </label>
+                        {manualCorrectionMode && (
+                          <span className={styles.manualCorrectionWarning}>
+                            No otorga PG, puntos de habilidad, dotes ni aumentos de característica. Usa «Subir de nivel» para el flujo normal.
+                          </span>
+                        )}
+                      </div>
                       {character.classes.map((cc) => {
                         const cd = getClassById(cc.id)
                         const currentArchetypes = archetypesByClassId[cc.id] ?? []
@@ -487,7 +703,7 @@ export function CharacterView() {
                                   const newTotal = newClasses.reduce((s, c) => s + c.level, 0)
                                   updateCharacter(character.id, { classes: newClasses, level: newTotal })
                                 }}
-                                disabled={cc.level <= 1 && character.classes.length === 1}
+                                disabled={!manualCorrectionMode || (cc.level <= 1 && character.classes.length === 1)}
                               >−</button>
                               <span className={styles.classLevelValue}>{cc.level}</span>
                               <button
@@ -497,6 +713,7 @@ export function CharacterView() {
                                   const newTotal = newClasses.reduce((s, c) => s + c.level, 0)
                                   updateCharacter(character.id, { classes: newClasses, level: newTotal })
                                 }}
+                                disabled={!manualCorrectionMode}
                               >+</button>
                             </div>
                             <div className={styles.archetypeEditRow}>
@@ -615,6 +832,24 @@ export function CharacterView() {
                   <PlusCircle size={15} />
                   Añadir
                 </button>
+              </div>
+              <div className={styles.negativeLevelsRow}>
+                <div>
+                  <span className={styles.effectName}>Niveles negativos</span>
+                  <span className={styles.effectDesc}>-1 a ataques, salvaciones, habilidades, CMB/CMD e iniciativa; -5 PV max. por nivel.</span>
+                </div>
+                {isEditing ? (
+                  <input
+                    className={styles.effectValueInput}
+                    type="number"
+                    min={0}
+                    max={20}
+                    value={character.negativeLevels ?? 0}
+                    onChange={(e) => updateCharacter(character.id, { negativeLevels: Math.max(0, Math.min(20, parseInt(e.target.value) || 0)) })}
+                  />
+                ) : (
+                  <span className={styles.effectBonusNeg}>{character.negativeLevels ?? 0}</span>
+                )}
               </div>
               {showEffectForm && (
                 <div className={styles.effectForm}>
@@ -872,12 +1107,12 @@ export function CharacterView() {
         {activeTab === 'feats' && (
           <Card padding="md">
             <div className={styles.sectionHeaderRow}>
-              <h3 className={styles.sectionTitle}>Dotes ({character.feats.length}/{Math.ceil(character.level / 2)})</h3>
+              <h3 className={styles.sectionTitle}>Dotes ({character.feats.length}/{expectedFeats})</h3>
             </div>
             {isEditing ? (
               <FeatsSelector
                 selectedFeats={character.feats}
-                maxFeats={Math.ceil(character.level / 2)}
+                maxFeats={expectedFeats}
                 onAdd={(featId, specification) => {
                   updateCharacter(character.id, { feats: [...character.feats, { id: featId, specification }] })
                 }}
@@ -924,6 +1159,7 @@ export function CharacterView() {
               sizeMod={combat.sizeMod}
               ac={ac}
               resolvedStats={resolvedStats}
+              negativeLevelPenalty={combat.negativeLevelPenalty}
               onWeaponsChange={(weapons) => updateCharacter(character.id, { weapons })}
               onArmorChange={(armor) => updateCharacter(character.id, { armor })}
               inventory={character.inventory ?? []}
@@ -963,6 +1199,7 @@ export function CharacterView() {
               spellSlots={character.spellSlots || {}}
               abilityModifier={calculateModifier(abilities[casterAbility])}
               classIds={character.classes.map((c) => c.id)}
+              classes={character.classes}
               onToggleKnown={(spellId) => {
                 const newSpells = character.spells.includes(spellId)
                   ? character.spells.filter((s) => s !== spellId)
@@ -998,7 +1235,7 @@ export function CharacterView() {
                 })
               }}
               onSyncSlots={() => {
-                const syncedSlots = computeSyncedSlots(
+                const syncedSlots = computeSyncedSpellSlots(
                   character.classes,
                   character.abilities,
                   character.spellSlots ?? {}

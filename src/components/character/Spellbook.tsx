@@ -1,10 +1,27 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, Moon, RefreshCw, BookOpen, Star } from 'lucide-react'
 import { Card, Select } from '../ui'
-import { SPELL_SCHOOLS, SPELL_TYPES, SpellLevel, calculateSpellDC } from '../../data'
+import { SPELL_SCHOOLS, SPELL_TYPES, SpellLevel, calculateSpellDC, getClassById } from '../../data'
 import { useSpells } from '../../hooks/useSpells'
 import { useSpellsByIds } from '../../hooks/useSpellsByIds'
 import styles from './Spellbook.module.css'
+
+// Tope de conjuros conocidos por nivel de conjuro, sumando la tabla `spellsKnown` de cada
+// clase lanzadora espontánea (hechicero, bardo…) según SU propio nivel de clase. Las clases
+// preparadoras de lista completa (clérigo, druida…) no tienen `spellsKnown` y no imponen
+// tope aquí — conocen toda su lista, solo limitadas por lo que preparan cada día.
+// Nota de arquitectura: igual que los slots, `knownSpells` es un único pool por nivel de
+// conjuro, no uno por clase — en multiclase con dos lanzadores espontáneos esto suma sus
+// topes en vez de mantenerlos separados por lista de conjuros.
+function getKnownSpellCap(classes: { id: string; level: number }[], spellLevel: number): number | null {
+  let cap: number | null = null
+  for (const c of classes) {
+    const row = getClassById(c.id)?.spellsKnown?.[c.level - 1]
+    const val = row?.[spellLevel]
+    if (val !== undefined) cap = (cap ?? 0) + val
+  }
+  return cap
+}
 
 interface SpellSlot {
   max: number
@@ -41,6 +58,7 @@ interface SpellbookProps {
   spellSlots: Record<SpellLevel, SpellSlot>
   abilityModifier: number
   classIds: string[]
+  classes?: { id: string; level: number }[]
   isEditing?: boolean
   onToggleKnown: (spellId: string) => void
   onTogglePrepared?: (spellId: string) => void
@@ -56,6 +74,7 @@ export function Spellbook({
   spellSlots,
   abilityModifier,
   classIds,
+  classes = [],
   isEditing,
   onToggleKnown,
   onTogglePrepared,
@@ -77,6 +96,9 @@ export function Spellbook({
   const isPreparedCaster = classIds.some(id => PREPARED_CASTER_IDS.includes(id))
 
   const { spells: preparedSpellData } = useSpellsByIds(preparedSpells)
+  const { spells: knownSpellData } = useSpellsByIds(knownSpells)
+  const knownCountAtLevel = (level: number) =>
+    Object.values(knownSpellData).filter((s) => s.level === level).length
 
   const { spells, loading, total } = useSpells({
     search,
@@ -318,6 +340,8 @@ export function Spellbook({
             const isExpanded = expandedSpell === spell.id
             const slotsForLevel = spellSlots[spell.level as SpellLevel]
             const preparedCount = preparedSpells.filter(id => id === spell.id).length
+            const knownCap = getKnownSpellCap(classes, spell.level)
+            const knownCapReached = !isKnown && knownCap !== null && knownCountAtLevel(spell.level) >= knownCap
 
             return (
               <Card
@@ -332,8 +356,11 @@ export function Spellbook({
                 >
                   <button
                     className={`${styles.knowBtn} ${isKnown ? styles.isKnown : ''}`}
+                    disabled={knownCapReached}
+                    title={knownCapReached ? `Tope de conjuros conocidos de nivel ${spell.level} alcanzado (${knownCap})` : undefined}
                     onClick={(e) => {
                       e.stopPropagation()
+                      if (knownCapReached) return
                       onToggleKnown(spell.id)
                     }}
                   >

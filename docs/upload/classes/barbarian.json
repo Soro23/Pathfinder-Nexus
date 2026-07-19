@@ -1,0 +1,434 @@
+{
+  "slug": "barbarian",
+  "name": "Barbarian",
+  "group": "core",
+  "hit_die": "d12",
+  "alignment": "Any non-lawful",
+  "starting_wealth": "3d6 × 10 gp (average 105 gp.)",
+  "skill_ranks_per_level": 4,
+  "class_skills": [
+    {
+      "skill": "Acrobatics",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Climb",
+      "ability": "Str"
+    },
+    {
+      "skill": "Craft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Handle Animal",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Intimidate",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Knowledge (nature)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Perception",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Ride",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Survival",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Swim",
+      "ability": "Str"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 2,
+      "ref": 0,
+      "will": 0,
+      "special": [
+        "Fast movement",
+        "rage"
+      ]
+    },
+    {
+      "level": 2,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 3,
+      "ref": 0,
+      "will": 0,
+      "special": [
+        "Rage power",
+        "uncanny dodge"
+      ]
+    },
+    {
+      "level": 3,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 3,
+      "ref": 1,
+      "will": 1,
+      "special": [
+        "Trap sense +1"
+      ]
+    },
+    {
+      "level": 4,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 4,
+      "ref": 1,
+      "will": 1,
+      "special": [
+        "Rage power"
+      ]
+    },
+    {
+      "level": 5,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 4,
+      "ref": 1,
+      "will": 1,
+      "special": [
+        "Improved uncanny dodge"
+      ]
+    },
+    {
+      "level": 6,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 5,
+      "ref": 2,
+      "will": 2,
+      "special": [
+        "Rage power",
+        "trap sense +2"
+      ]
+    },
+    {
+      "level": 7,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 5,
+      "ref": 2,
+      "will": 2,
+      "special": [
+        "Damage reduction 1/-"
+      ]
+    },
+    {
+      "level": 8,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 6,
+      "ref": 2,
+      "will": 2,
+      "special": [
+        "Rage power"
+      ]
+    },
+    {
+      "level": 9,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 6,
+      "ref": 3,
+      "will": 3,
+      "special": [
+        "Trap sense +3"
+      ]
+    },
+    {
+      "level": 10,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 7,
+      "ref": 3,
+      "will": 3,
+      "special": [
+        "Damage reduction 2/-",
+        "rage power"
+      ]
+    },
+    {
+      "level": 11,
+      "bab": "+11/+6/+1",
+      "bab_first": 11,
+      "fort": 7,
+      "ref": 3,
+      "will": 3,
+      "special": [
+        "Greater rage"
+      ]
+    },
+    {
+      "level": 12,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 8,
+      "ref": 4,
+      "will": 4,
+      "special": [
+        "Rage power",
+        "trap sense +4"
+      ]
+    },
+    {
+      "level": 13,
+      "bab": "+13/+8/+3",
+      "bab_first": 13,
+      "fort": 8,
+      "ref": 4,
+      "will": 4,
+      "special": [
+        "Damage reduction 3/-"
+      ]
+    },
+    {
+      "level": 14,
+      "bab": "+14/+9/+4",
+      "bab_first": 14,
+      "fort": 9,
+      "ref": 4,
+      "will": 4,
+      "special": [
+        "Indomitable will",
+        "rage power"
+      ]
+    },
+    {
+      "level": 15,
+      "bab": "+15/+10/+5",
+      "bab_first": 15,
+      "fort": 9,
+      "ref": 5,
+      "will": 5,
+      "special": [
+        "Trap sense +5"
+      ]
+    },
+    {
+      "level": 16,
+      "bab": "+16/+11/+6/+1",
+      "bab_first": 16,
+      "fort": 10,
+      "ref": 5,
+      "will": 5,
+      "special": [
+        "Damage reduction 4/-",
+        "rage power"
+      ]
+    },
+    {
+      "level": 17,
+      "bab": "+17/+12/+7/+2",
+      "bab_first": 17,
+      "fort": 10,
+      "ref": 5,
+      "will": 5,
+      "special": [
+        "Tireless rage"
+      ]
+    },
+    {
+      "level": 18,
+      "bab": "+18/+13/+8/+3",
+      "bab_first": 18,
+      "fort": 11,
+      "ref": 6,
+      "will": 6,
+      "special": [
+        "Rage power",
+        "trap sense +6"
+      ]
+    },
+    {
+      "level": 19,
+      "bab": "+19/+14/+9/+4",
+      "bab_first": 19,
+      "fort": 11,
+      "ref": 6,
+      "will": 6,
+      "special": [
+        "Damage reduction 5/-"
+      ]
+    },
+    {
+      "level": 20,
+      "bab": "+20/+15/+10/+5",
+      "bab_first": 20,
+      "fort": 12,
+      "ref": 6,
+      "will": 6,
+      "special": [
+        "Mighty rage",
+        "rage power"
+      ]
+    }
+  ],
+  "favored_class_bonuses": [
+    {
+      "race": "Dwarf",
+      "bonus": "Add 1 to the dwarf's total number of rage rounds per day.",
+      "source": "APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Elf",
+      "bonus": "Add 1 to the elf's base speed. In combat this has no effect unless the elf has selected this reward 5 times (or another increment of 5); a speed of 34 feet is effectively the same as a speed of 30 feet, for example. This bonus stacks with a class's fast movement feature and applies only under the same conditions as that ability.",
+      "source": "APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Gnome",
+      "bonus": "Add a +½ bonus to the barbarian's trap sense.",
+      "source": "ARG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Half-Elf",
+      "bonus": "Add ¼ to the bonus on Reflex saves and dodge bonus to AC against attacks made by traps granted by trap sense.",
+      "source": "ARG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Half-Orc",
+      "bonus": "Add 1 to the half-orc's total number of rage rounds per day.",
+      "source": "APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Halfling",
+      "bonus": "Add a +½ bonus to trap sense or +⅓ to the bonus from the surprise accuracy rage power.",
+      "source": "ARG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Human",
+      "bonus": "Add a +½ bonus to trap sense or +⅓ to the bonus from the superstition rage power.",
+      "source": "APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Goblin",
+      "bonus": "Add +½ on critical hit confirmation rolls for attacks made with unarmed strikes or natural weapons (maximum bonus of +4). This bonus does not stack with Critical Focus.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Kobold",
+      "bonus": "While you are raging, your racial natural attacks deal +¼ point of damage.",
+      "source": "KoG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Orc",
+      "bonus": "Add +1 to the barbarian's total number of rage rounds per day.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Ratfolk",
+      "bonus": "When raging, add +¼ to the barbarian's swarming trait's flanking bonus on attack rolls.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Strix",
+      "bonus": "Add +1 to the barbarian's total number of rage rounds per day.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Tengu",
+      "bonus": "Add +⅓ to the bonus from the superstition rage power.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Android",
+      "bonus": "Add +1/4 bonus to the barbarian's nanite surge when raging.",
+      "source": "JBE:BoHR:AFCO",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Catfolk",
+      "bonus": "Add +2.5 feet to the distance the barbarian can charge or run through rough terrain. (This option has no effect unless the barbarian has selected it twice possesses increments evenly divisible by 5; a distance of 12.5 feet is effectively the same as a distance of 10 feet, for example.)",
+      "source": "JBE:BoHR:AFCO",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Changeling",
+      "bonus": "Add +1/4 to melee damage rolls while raging.",
+      "source": "JBE:BoHR:AFCO",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Dhampir",
+      "bonus": "Add +¼ to the damage of a bite attack.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Drow",
+      "bonus": "The duration of the guarded stand rage power increases by +⅓ round.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Duergar",
+      "bonus": "Add +1 to the barbarian's total number of rage rounds per day.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Fetchling",
+      "bonus": "Add +1 foot to the barbarian's base speed. In combat this option has no effect unless the barbarian has selected it give times (or another increment of five). This bonus stacks with the barbarian's fast movement feature and applies under the same conditions as that feature.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Hobgoblin",
+      "bonus": "Add +⅙ the number of attacks of opportunity per round. This does not stack with the Combat Reflexes feat.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Tiefling",
+      "bonus": "Add +⅙ to the barbarian's damage reduction ability. The barbarian must be 7th level before selecting this ability. This does not stack with the increased damage reduction rage power.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Wayang",
+      "bonus": "Add a +½ bonus to the barbarian‘s trap sense.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Asterion",
+      "bonus": "+1 ft. fast movement. (+5 feet fast movement for every five times you select this option.)",
+      "source": "RGG:HHO",
+      "publisher_group": "Rogue Genius Games"
+    },
+    {
+      "race": "Lapith",
+      "bonus": "Reduce AC penalty when raging by ⅕, to a maximum reduction of 2. (AC penalty is reduced by 1 for every five times you select this option.)",
+      "source": "RGG:HHO",
+      "publisher_group": "Rogue Genius Games"
+    }
+  ]
+}

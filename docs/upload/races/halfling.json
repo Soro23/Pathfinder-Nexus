@@ -1,0 +1,388 @@
+{
+  "slug": "halfling",
+  "name": "Halflings",
+  "ability_modifiers": {
+    "Str": -2,
+    "Dex": 2,
+    "Cha": 2
+  },
+  "ability_modifier_choice": null,
+  "size": "Small",
+  "type": "Humanoid (halfling)",
+  "base_speed": 20,
+  "languages": "Halflings begin play speaking Common and Halfling. Halflings with high Intelligence scores can choose from the following: Dwarven, Elven, Gnome, and Goblin. See the Linguistics skill page for more information about these languages.",
+  "standard_traits": [
+    {
+      "name": "Ability Score Modifiers",
+      "text": "Halflings are nimble and strong-willed, but their small stature makes them weaker than other races. They gain +2 Dexterity, +2 Charisma, and -2 Strength."
+    },
+    {
+      "name": "Size",
+      "text": "Halflings are Small creatures and gain a +1 size bonus to their AC, a +1 size bonus on attack rolls, a -1 penalty to their CMB and CMD, and a +4 size bonus on Stealth checks."
+    },
+    {
+      "name": "Type",
+      "text": "Halflings are humanoids with the Halfling subtype."
+    },
+    {
+      "name": "Base Speed (Slow Speed",
+      "text": "): Halflings have a base speed of 20 feet."
+    },
+    {
+      "name": "Languages",
+      "text": "Halflings begin play speaking Common and Halfling. Halflings with high Intelligence scores can choose from the following: Dwarven, Elven, Gnome, and Goblin. See the Linguistics skill page for more information about these languages."
+    },
+    {
+      "name": "Fearless",
+      "text": "Halflings receive a +2 racial bonus on all saving throws against fear. This bonus stacks with the bonus granted by halfling luck."
+    },
+    {
+      "name": "Halfling Luck",
+      "text": "Halflings receive a +1 racial bonus on all saving throws."
+    },
+    {
+      "name": "Sure-Footed",
+      "text": "Halflings receive a +2 racial bonus on Acrobatics and Climb checks."
+    },
+    {
+      "name": "Weapon Familiarity",
+      "text": "Halflings are proficient with slings and treat any weapon with the word “halfling” in its name as a martial weapon."
+    },
+    {
+      "name": "Keen Senses",
+      "text": "Halflings receive a +2 racial bonus on Perception checks."
+    }
+  ],
+  "alternate_traits": [
+    {
+      "name": "Adaptable Luck",
+      "text": "Some halflings have greater control over their innate luck. This ability gives them more options for how they can apply their good fortune from day to day, but also narrows its scope. Three times per day, a halfling can gain a +2 luck bonus on an ability check, attack roll, saving throw, or skill check. If halflings choose to use the ability before they make the roll or check, they gain the full +2 bonus; if they choose to do so afterward, they only gain a +1 bonus. Using adaptive luck in this way is not an action. This racial trait replaces halfling luck."
+    },
+    {
+      "name": "Acquisitive",
+      "text": "Halflings with this trait receive a +2 racial bonus on Appraise checks. This bonus increases to +4 when used to determine the most valuable item visible in a treasure hoard. This racial trait replaces keen senses. Source PZO1135"
+    },
+    {
+      "name": "Attentive",
+      "text": "Halflings with this trait receive a +2 racial bonus on Sense Motive checks. This bonus increases to +4 to notice when someone is enchanted or possessed. This racial trait replaces keen senses. Source PZO1135"
+    },
+    {
+      "name": "Behind the Veil (1 RP)",
+      "text": "Characters with this trait gain a +2 bonus on Bluff and Sleight of Hand checks while benefiting from concealment or cover. Halflings can take this trait in place of weapon familiarity. Source PZO9466"
+    },
+    {
+      "name": "Blessed",
+      "text": "Halflings with this trait receive a +2 racial bonus on saving throws against curse effects and hexes. This bonus stacks with the bonus granted by halfling luck. This racial trait replaces fearless. Source PZO1135"
+    },
+    {
+      "name": "Caretaker",
+      "text": "Humans often entrust halfling families with the care of children and animals, a task that has helped them develop keen insight. Such halflings gain a +2 racial bonus on Sense Motive checks. In addition, when they acquire an animal companion, bonded mount, cohort, or familiar, that creature gains a +2 bonus to one ability score of the character's choice. This racial trait replaces halfling luck, sure-footed, and weapon familiarity. Source PZO9280"
+    },
+    {
+      "name": "Craven",
+      "text": "While most halflings are fearless, some are skittish, making them particularly alert. Halflings with this racial trait gain a +1 bonus on initiative checks and a +1 bonus on attack rolls when flanking. They take a -2 penalty on saves against fear effects and gain no benefit from morale bonuses on such saves. When affected by a fear effect, their base speed increases by 10 feet and they gain a +1 dodge bonus to Armor Class. This racial trait replaces fearless and halfling luck."
+    },
+    {
+      "name": "Creepy Doll",
+      "text": "Glassy eyes and porcelain skin make some halflings look more like dolls than living creatures. If they cease moving and pretend to be a doll while they aren't being observed, they can use the Stealth skill without cover or concealment. A successful Stealth check still allows other creatures to notice the halfling; they just believe the halfling is a doll, similar to the freeze universal monster ability (without being able to take 20). In addition, they take no size penalty on Intimidate checks against larger humanoids. The racial trait replaces keen senses and sure-footed. Source PZO1135"
+    },
+    {
+      "name": "Danger Detection",
+      "text": "Halflings with this racial trait gain a +4 racial bonus on Perception checks to notice a creature using Stealth, as well as Perception checks to notice a weapon being drawn or a hidden trap (or similar signs of danger, subject to the GM's discretion). This replaces keen senses. PPC:HftF"
+    },
+    {
+      "name": "Deep Jungle",
+      "text": "Some reclusive halfling tribes flourish in tropical locales. These halflings begin play speaking only Halfling (in addition to any additional languages gained from having a high Intelligence score), rather than Common and Halfling. They gain a +2 racial bonus on Survival checks and are proficient with blowguns. In addition, they have the poison use ability (they never risk poisoning themselves accidentally). This racial trait alters halflings' languages and replaces sure-footed and weapon familiarity. Source PZO1135"
+    },
+    {
+      "name": "Dimdweller (2 RP)",
+      "text": "Whenever characters with this trait benefit from concealment or full concealment due to darkness or dim light, they gain a +2 racial bonus on Intimidate, Perception, and Stealth checks. Halflings can take this trait in place of weapon familiarity. Source PZO9466"
+    },
+    {
+      "name": "Driven Worker",
+      "text": "Many halfling families have developed techniques to accomplish work faster and more efficiently, whether to contribute to the community or to please overbearing masters. These halflings gain a +4 racial bonus on checks with one Craft, Perform, or Profession skill. This racial trait replaces sure-footed. Source PZO9280"
+    },
+    {
+      "name": "Dusksight (2 RP)",
+      "text": "When making ranged attacks, characters with this trait can reroll the miss chance granted by cover to any target in dim light, and take the better of the two rolls. The miss chance for total concealment applies normally. Halflings can take this trait in place of keen senses. Source PZO9466"
+    },
+    {
+      "name": "Evasive Nomad",
+      "text": "Halflings with this racial trait gain a +2 racial bonus on Reflex saves, but they take a -2 penalty on saving throws against fear effects. This replaces fearless. PPC:HftF"
+    },
+    {
+      "name": "Festive",
+      "text": "Once per day, a halfling with this racial trait can grant an ally within 60 feet a +2 luck bonus on one skill check as a free action; this bonus can be applied after the ally's check result is determined. This replaces sure-footed. PPC:HftF"
+    },
+    {
+      "name": "Fey Magic (2 RP)",
+      "text": "The character has a mystic connection to one terrain type, selected from the ranger's favored terrain list. The character selects three 0-level druid spells and one 1st-level druid spell. If the character has a Charisma score of 11 or higher, when in the selected terrain, she gains these spells as spell-like abilities that can be cast once per day. The caster level for these effects is equal to the user's character level. The DC for the spell-like abilities is equal to 10 + the spell's level + the user's Charisma modifier. These spells are treated as being from a fey source for the purposes of the druid's resist nature's lure class feature and similar abilities. This trait replaces keen senses. Source : PZO9456"
+    },
+    {
+      "name": "Fey-Quickened",
+      "text": "You gain Run as a bonus feat and a +2 racial bonus on initiative checks. This racial trait replaces fearless and keen senses. Source PZO9480"
+    },
+    {
+      "name": "Fey Thoughts (1 RP)",
+      "text": "Select two of the following skills: Acrobatics, Bluff, Climb, Diplomacy, Disguise, Escape Artist, Fly, Knowledge (nature), Perception, Perform, Sense Motive, Sleight of Hand, Stealth, Swim, or Use Magic Device. The selected skills are always class skills for the character. This trait replaces fearless. Source : PZO9456"
+    },
+    {
+      "name": "Fleet of Foot",
+      "text": "Some halflings are quicker than their kin but less cautious. Halflings with this racial trait move at normal speed and have a base speed of 30 feet. This racial trait replaces slow speed and sure-footed."
+    },
+    {
+      "name": "Halfling Jinx",
+      "text": "Halflings with this racial trait gain the ability to curse another creature with bad luck at will as a standard action. This curse has a range of 30 feet, and you must be able to see the target and have line of effect to it. The target gets a Will saving throw to resist this jinx (DC = 10 + 1/2 your level + your Charisma modifier). If your target makes this saving throw, it is immune to your jinx ability for 24 hours. A jinxed creature takes a -1 penalty on all saving throws. This jinx lasts for 24 hours or until you attempt to use your jinx again. A jinx is a supernatural ability, is not mind-affecting, does not allow spell resistance, and can affect any kind of creature not immune to luck effects. This replaces halfling luck."
+    },
+    {
+      "name": "Human Shadow",
+      "text": "Halflings seem to pop up wherever humans are found, in part because they actively support and move with human explorers, settlers, and travelers without drawing attention to themselves. These halflings can use Stealth to hide behind creatures at least one size category larger than themselves, without any other source of concealment or cover. As long as the halflings are within 30 feet of a human, they gain a +2 racial bonus on Sleight of Hand checks and Stealth checks. This racial trait replaces keen senses and sure-footed. Source PZO9280"
+    },
+    {
+      "name": "Ingratiating",
+      "text": "Halflings often survive at the whims of larger, more aggressive races. Because of this, they go out of their way to make themselves more useful, or at least entertaining, to larger folk. Halflings with this racial trait gain a +2 bonus on skill checks for a single Perform skill of their choice, and Perform is always a class skill for them. They also gain a +2 bonus on Craft and Profession checks. This racial trait replaces keen senses and sure-footed."
+    },
+    {
+      "name": "Irrepressible",
+      "text": "Halflings with this trait receive a +2 racial bonus on saving throws against dominate and possession effects. This bonus stacks with the bonus granted by halfling luck. This racial trait replaces fearless. Source PZO1135"
+    },
+    {
+      "name": "Joyous Companion (2 RP)",
+      "text": "Halflings enjoy the companionship of copper dragons and other lighthearted representatives of dragonkind and learn to share the joyousness of that bond with others. When halflings with this trait cast spells or use spell-like abilities of the abjuration school or with the emotion descriptor, they can confer a +1 morale bonus on saves versus fear on all adjacent allies for a number of rounds equal to the spell's level. This trait replaces fearless and weapon familiarity. Source PZO9470"
+    },
+    {
+      "name": "Low Blow",
+      "text": "Some halflings train extensively in the art of attacking larger creatures. Halflings with this racial trait gain a +1 bonus on critical confirmation rolls against opponents larger than themselves. This racial trait replaces keen senses."
+    },
+    {
+      "name": "Luckbringer (2 RP)",
+      "text": "Halflings with this trait learn to share their luck with others much in the way a gold dragon can imbue objects with good fortune. Once per day as a standard action, a halfling with this trait can confer good luck on a single non-magical token (such as a button or a ring). Any creature carrying this token gains a +1 luck bonus on Will saves. This effect lasts for 1 hour. This trait replaces lucky. Source PZO9470"
+    },
+    {
+      "name": "Outrider",
+      "text": "Some halflings specialize in mounted combat. Halflings with this racial trait gain a +2 bonus on Handle Animal and Ride checks. This racial trait replaces sure-footed."
+    },
+    {
+      "name": "Polyglot",
+      "text": "Some halflings, especially those who spend a lot of time traveling, develop a talent for learning new languages. These halflings gain a +2 racial bonus on Linguistics checks, and it is always a class skill for them. Halflings with this racial trait also begin play with the ability to speak Common, Halfling, and any one other language of their choice (except for secret languages, such as Druidic) in addition to bonus languages due to high Intelligence. They still gain the normal list of halfling bonus languages. This racial trait replaces keen senses and alters the halfling language racial trait."
+    },
+    {
+      "name": "Practicality",
+      "text": "Halflings value hard work and common sense. Halflings with this racial trait gain a +2 bonus on any one Craft or Profession skill, as well as on Sense Motive checks and saves against illusions. This racial trait replaces fearless and sure-footed."
+    },
+    {
+      "name": "Resourceful",
+      "text": "Halflings with this trait do not take any penalties for using improvised weapons. This trait counts as the Catch Off-Guard or Throw Anything feats for the purpose of qualifying for feats. This racial trait replaces sure-footed and weapon familiarity. Source PZO1135"
+    },
+    {
+      "name": "Secretive Survivor",
+      "text": "Halflings from poor and desperate communities, most often in big cities, must take what they need without getting caught in order to survive. They gain a +2 racial bonus on Bluff and Stealth checks. This racial trait replaces sure-footed. Source PZO9280"
+    },
+    {
+      "name": "Shadowhunter (2 RP)",
+      "text": "Characters with this trait deal 50% weapon damage to incorporeal creatures when using non-magical weapons (including natural and unarmed attacks), as if using magic weapons. They also gain a +2 bonus on saving throws to remove negative levels, and recover physical ability damage from attacks by undead creatures at a rate of 2 points per ability score per day (rather than the normal 1 point per ability score per day). Halflings can take this trait in place of weapon familiarity. Source PZO9466"
+    },
+    {
+      "name": "Shadowplay (1 RP)",
+      "text": "Characters with this trait cast spells with the darkness, light, or shadow descriptor at +1 caster level. Halflings can take this trait in place of weapon familiarity. Source PZO9466"
+    },
+    {
+      "name": "Shiftless",
+      "text": "Halflings have a reputation for larceny and guile-and sometimes it's well deserved. Halflings with this racial trait gain a +2 racial bonus on Bluff and Sleight of Hand checks, and Sleight of Hand is always a class skill for them. This racial trait replaces sure-footed."
+    },
+    {
+      "name": "Skulker",
+      "text": "Oppressed halflings train from a young age to take advantage of times when their oppressors ignore them. Such halflings gain a +1 racial bonus on attacks against foes who are denied their Dexterity bonus to AC. This racial trait replaces fearless and weapon familiarity. Source PZO9280"
+    },
+    {
+      "name": "Small Quarter Ally",
+      "text": "A halfling with this racial trait grants herself and all allies of the same size category within 60 feet a +1 luck bonus on saving throws against fear effects. This replaces fearless. PPC:HftF"
+    },
+    {
+      "name": "Swift as Shadows",
+      "text": "Halflings possess incredible stealth even while moving through obstructed areas. Halflings with this racial trait reduce the penalty for using Stealth while moving by 5, and reduce the Stealth check penalty for sniping by 10. This racial trait replaces sure-footed."
+    },
+    {
+      "name": "Underfoot",
+      "text": "Halflings must train hard to effectively fight bigger opponents. Halflings with this racial trait gain a +1 dodge bonus to AC against foes larger than themselves and a +1 bonus on Reflex saving throws to avoid trample attacks. This racial trait replaces halfling luck."
+    },
+    {
+      "name": "Underfoot Dodger",
+      "text": "City-dwelling halflings do not treat crowd squares as difficult terrain and they gain a +5 bonus on Acrobatics checks to move through the spaces of larger foes. This racial trait replaces fearless and weapon familiarity. PPC:HotS"
+    },
+    {
+      "name": "Unfettered",
+      "text": "Former slips liberated from slavery train to ensure they will never be slaves again. They gain a +4 racial bonus on Escape Artist checks and a +2 racial bonus on saving throws against effects that cause the entangled condition, to CMD against grapples, and on combat maneuver checks to escape a grapple. This racial trait replaces halfling luck and keen senses. Source PZO9280"
+    },
+    {
+      "name": "Unlucky Halfling",
+      "text": "These halflings take a -1 penalty on saving throws but also gain a +1 racial bonus to the caster level and save DC of all curse spells and spell-like abilities. In addition, such halflings can use ill omen as a spell-like ability once per day. This racial trait replaces halfling luck. Source PZO9280"
+    },
+    {
+      "name": "Wanderlust",
+      "text": "Halflings love travel and maps. Halflings with this racial trait receive a +2 bonus on Knowledge (geography) and Survival checks. When casting spells or using abilities that provide or enhance movement, halflings treat their caster level as +1 higher than normal. This racial trait replaces fearless and halfling luck."
+    },
+    {
+      "name": "Warslinger",
+      "text": "Halflings are experts at the use of the sling. Halflings with this racial trait can reload a sling as a free action. Reloading a sling still requires two hands and provokes attacks of opportunity. This racial trait replaces sure-footed."
+    }
+  ],
+  "favored_class_options": [
+    {
+      "class": "Alchemist",
+      "bonus": "Add one extract formula from the alchemist's list to the alchemist's formula book. This formula must be at least one level below the highest formula level the alchemist can create."
+    },
+    {
+      "class": "Arcanist",
+      "bonus": "Gain 1/6 of a new arcanist exploit."
+    },
+    {
+      "class": "Barbarian",
+      "bonus": "Add a +1/2 bonus to trap sense or +1/3 to the bonus from the surprise accuracy rage power."
+    },
+    {
+      "class": "Barbarian",
+      "bonus": "Add 1 foot to the range increment of thrown weapons the barbarian wields. This option has no effect unless the barbarian has selected it 5 times (or another increment of 5). Source PZO1135"
+    },
+    {
+      "class": "Bard",
+      "bonus": "Add +1/2 on Bluff checks to pass secret messages, +1/2 on Diplomacy checks to gather information, and +1/2 on Disguise checks to appear as an elven, half-elven, or human child."
+    },
+    {
+      "class": "Bloodrager",
+      "bonus": "Gain a +1/4 dodge bonus to AC while bloodraging against creatures at least one size category larger than the bloodrager."
+    },
+    {
+      "class": "Brawler",
+      "bonus": "Gain a +1 bonus to the brawler's CMD when resisting a grapple or overrun combat maneuver."
+    },
+    {
+      "class": "Cavalier",
+      "bonus": "Add +1/2 to the cavalier's effective class level for the purposes of determining the damage he deals when making an attack of opportunity against a challenged foe."
+    },
+    {
+      "class": "Cavalier",
+      "bonus": "The cavalier's mount gains a +1/2 bonus on saving throws against fear effects. If the cavalier ever replaces his mount, the new mount gains this bonus. Source PZO1135"
+    },
+    {
+      "class": "Cleric",
+      "bonus": "Select one domain power granted at 1st level that is normally usable a number of times per day equal to 3 + the cleric's Wisdom modifier. The cleric adds +1/2 to the number of uses per day of that domain power."
+    },
+    {
+      "class": "Druid",
+      "bonus": "Add a +1/4 luck bonus on the saving throws of the druid's animal companion."
+    },
+    {
+      "class": "Fighter",
+      "bonus": "Add +1 to the Fighter's CMD when resisting a trip or grapple attempt."
+    },
+    {
+      "class": "Gunslinger",
+      "bonus": "Add +1/4 to the dodge bonus to AC granted by the nimble class feature (maximum +2) or +1/4 to the AC bonus gained when using the gunslinger's dodge deed."
+    },
+    {
+      "class": "Hunter",
+      "bonus": "The hunter's animal companion gains a +1/4 luck bonus on saving throws. If the hunter replaces her animal companion, the new animal companion gains this bonus."
+    },
+    {
+      "class": "Inquisitor",
+      "bonus": "Add +1/4 to the number of times per day that an inquisitor can change her most recent teamwork feat."
+    },
+    {
+      "class": "Investigator",
+      "bonus": "Add one extract formula from the investigator's list to his formula book. This formula must be at least 1 formula level below the highest level the investigator can create."
+    },
+    {
+      "class": "Kineticist",
+      "bonus": "Increase the capacity of the kineticist's internal buffer by 1/6 point. Source : PRG:OA"
+    },
+    {
+      "class": "Magus",
+      "bonus": "The magus gains 1/6 of a new magus arcana."
+    },
+    {
+      "class": "Medium",
+      "bonus": "Increase the bonus the medium gains from its seance boon by 1/3 point. This doesn't increase the bonus allies gain from shared seance. Source : PRG:OA"
+    },
+    {
+      "class": "Mesmerist",
+      "bonus": "Increase the number of mesmerist tricks the mesmerist can use per day by 1/3. Source : PRG:OA"
+    },
+    {
+      "class": "Monk",
+      "bonus": "Add +1 to the monk's CMD when resisting a grapple and +1/2 to the number of stunning attacks he can attempt per day."
+    },
+    {
+      "class": "Monk",
+      "bonus": "Gain a +1/4 bonus to CMD against trip and on damage rolls against prone targets that add the monk's Strength modifier. Source PZO1135"
+    },
+    {
+      "class": "Occultist",
+      "bonus": "Add 1/2 point of mental focus per day. Source : PRG:OA"
+    },
+    {
+      "class": "Oracle",
+      "bonus": "Add +1/2 to the oracle's level for the purpose of determining the effects of the oracle's curse ability."
+    },
+    {
+      "class": "Paladin",
+      "bonus": "Add +1/2 hit point to the paladin's lay on hands ability (whether using it to heal or harm)."
+    },
+    {
+      "class": "Psychic",
+      "bonus": "The psychic treats her Charisma bonus as 1/3 point higher for the purpose of determining the number of uses or rounds per day of her discipline powers. Source : PRG:OA"
+    },
+    {
+      "class": "Ranger",
+      "bonus": "Add a +1/4 dodge bonus to Armor Class against the ranger's favored enemies."
+    },
+    {
+      "class": "Rogue",
+      "bonus": "Choose a weapon from the following list: sling, dagger, or any weapon with “halfling” in its name. Add a +1/2 bonus on critical hit confirmation rolls with that weapon (maximum bonus +4). This bonus does not stack with Critical Focus."
+    },
+    {
+      "class": "Shaman",
+      "bonus": "Add 1/2 to the shaman's effective class level for the purpose of determining her spirit animal's natural armor adjustment, Intelligence, and special abilities."
+    },
+    {
+      "class": "Skald",
+      "bonus": "Choose a weapon from the following list: dagger, sling, or any weapon with the word “halfling” in its name. Add a +1/2 bonus on critical hit confirmation rolls with that weapon (maximum bonus +4). This bonus doesn't stack with those gained through Critical Focus and similar effects."
+    },
+    {
+      "class": "Slayer",
+      "bonus": "Add a +1/4 dodge bonus to Armor Class against the slayer's studied target."
+    },
+    {
+      "class": "Sorcerer",
+      "bonus": "Select one bloodline power at 1st level that is normally usable a number of times per day equal to 3 + the sorcerer's Charisma modifier. The sorcerer adds +1/2 to the number of uses per day of that bloodline power."
+    },
+    {
+      "class": "Spiritualist",
+      "bonus": "Add 1/4 to the number of rounds that the spiritualist's incorporeal phantom can be out of sight and line of effect before being sent back to the Ethereal Plane. Source : PRG:OA"
+    },
+    {
+      "class": "Summoner",
+      "bonus": "Add +1 skill rank to the summoner's eidolon."
+    },
+    {
+      "class": "Swashbuckler",
+      "bonus": "Increase the number of times the swashbuckler can use charmed life by 1/4."
+    },
+    {
+      "class": "Vigilante",
+      "bonus": "Gain 1/6 of a new social talent. Source PZO1134"
+    },
+    {
+      "class": "Warpriest",
+      "bonus": "Add 1/4 to the warpriest's effective level when determining the damage of his sacred weapon."
+    },
+    {
+      "class": "Witch",
+      "bonus": "Add +1/4 to the witch's caster level when determining the effects of the spells granted to her by her patron."
+    },
+    {
+      "class": "Wizard",
+      "bonus": "Add +1/2 to the wizard's effective class level for the purposes of determining his familiar's natural armor adjustment, Intelligence, and special abilities."
+    }
+  ]
+}

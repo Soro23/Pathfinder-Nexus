@@ -1,0 +1,559 @@
+{
+  "slug": "alchemist",
+  "name": "Alchemist",
+  "group": "base",
+  "hit_die": "d8",
+  "alignment": "Any",
+  "starting_wealth": "3d6 × 10 gp (average 105gp.)",
+  "skill_ranks_per_level": 4,
+  "class_skills": [
+    {
+      "skill": "Appraise",
+      "ability": "Int"
+    },
+    {
+      "skill": "Craft (any)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Disable Device",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Fly",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Heal",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Knowledge (arcana)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Knowledge (nature)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Perception",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Profession",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Sleight of Hand",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Spellcraft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Survival",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Use Magic Device",
+      "ability": "Cha"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+0",
+      "bab_first": 0,
+      "fort": 2,
+      "ref": 2,
+      "will": 0,
+      "special": [
+        "Alchemy",
+        "bomb 1d6",
+        "brew potion",
+        "mutagen",
+        "throw anything"
+      ],
+      "spells_per_day": {
+        "1": "1"
+      }
+    },
+    {
+      "level": 2,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 3,
+      "ref": 3,
+      "will": 0,
+      "special": [
+        "Discovery",
+        "poison resistance +2",
+        "poison use"
+      ],
+      "spells_per_day": {
+        "1": "2"
+      }
+    },
+    {
+      "level": 3,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 3,
+      "ref": 3,
+      "will": 1,
+      "special": [
+        "Bomb 2d6",
+        "swift alchemy"
+      ],
+      "spells_per_day": {
+        "1": "3"
+      }
+    },
+    {
+      "level": 4,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "special": [
+        "Discovery"
+      ],
+      "spells_per_day": {
+        "1": "3",
+        "2": "1"
+      }
+    },
+    {
+      "level": 5,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "special": [
+        "Bomb 3d6",
+        "poison resistance +4"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "2"
+      }
+    },
+    {
+      "level": 6,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "special": [
+        "Discovery",
+        "swift poisoning"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "3"
+      }
+    },
+    {
+      "level": 7,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "special": [
+        "Bomb 4d6"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "3",
+        "3": "1"
+      }
+    },
+    {
+      "level": 8,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 6,
+      "ref": 6,
+      "will": 2,
+      "special": [
+        "Discovery",
+        "poison resistance +6"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "4",
+        "3": "2"
+      }
+    },
+    {
+      "level": 9,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 6,
+      "ref": 6,
+      "will": 3,
+      "special": [
+        "Bomb 5d6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "4",
+        "3": "3"
+      }
+    },
+    {
+      "level": 10,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "special": [
+        "Discovery",
+        "poison immunity"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "4",
+        "3": "3",
+        "4": "1"
+      }
+    },
+    {
+      "level": 11,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "special": [
+        "Bomb 6d6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "4",
+        "3": "4",
+        "4": "2"
+      }
+    },
+    {
+      "level": 12,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "special": [
+        "Discovery"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "4",
+        "4": "3"
+      }
+    },
+    {
+      "level": 13,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "special": [
+        "Bomb 7d6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "4",
+        "4": "3",
+        "5": "1"
+      }
+    },
+    {
+      "level": 14,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 9,
+      "ref": 9,
+      "will": 4,
+      "special": [
+        "Discovery",
+        "persistent mutagen"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "4",
+        "4": "4",
+        "5": "2"
+      }
+    },
+    {
+      "level": 15,
+      "bab": "+11/+6/+1",
+      "bab_first": 11,
+      "fort": 9,
+      "ref": 9,
+      "will": 5,
+      "special": [
+        "Bomb 8d6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "4",
+        "5": "3"
+      }
+    },
+    {
+      "level": 16,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "special": [
+        "Discovery"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "4",
+        "5": "3",
+        "6": "1"
+      }
+    },
+    {
+      "level": 17,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "special": [
+        "Bomb 9d6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "4",
+        "5": "4",
+        "6": "2"
+      }
+    },
+    {
+      "level": 18,
+      "bab": "+13/+8/+3",
+      "bab_first": 13,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "special": [
+        "Discovery",
+        "instant alchemy"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "5",
+        "5": "4",
+        "6": "3"
+      }
+    },
+    {
+      "level": 19,
+      "bab": "+14/+9/+4",
+      "bab_first": 14,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "special": [
+        "Bomb 10d6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "5",
+        "5": "5",
+        "6": "4"
+      }
+    },
+    {
+      "level": 20,
+      "bab": "+15/+10/+5",
+      "bab_first": 15,
+      "fort": 12,
+      "ref": 12,
+      "will": 6,
+      "special": [
+        "Grand Discovery"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "5",
+        "5": "5",
+        "6": "5"
+      }
+    }
+  ],
+  "favored_class_bonuses": [
+    {
+      "race": "Dwarf",
+      "bonus": "Add +¼ to the alchemist's natural armor bonus when using the character's mutagen.",
+      "source": "ARG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Elf",
+      "bonus": "Add one extract formula from the alchemist's list to the character's formulae book. This formula must be at least one level lower than the highest-level formula the alchemist can create.",
+      "source": "ARG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Gnome",
+      "bonus": "Add +½ to the number of bombs per day the alchemist can create.",
+      "source": "PRG:APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Half-Elf",
+      "bonus": "Add +1 foot to the range increment of the alchemist's thrown splash weapons (including the alchemist's bombs). This option has no effect unless the alchemist has selected it 5 times (or another increment of 5).",
+      "source": "ARG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Half-Orc",
+      "bonus": "Add +½ to bomb damage.",
+      "source": "PRG:APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Halfling",
+      "bonus": "Add one extract formula from the alchemist's list to the character's formulae book. This formula must be at least one level lower than the highest-level formula the alchemist can create.",
+      "source": "ARG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Human",
+      "bonus": "Add one extract formula from the alchemist's list to the character's formulae book. This formula must be at least one level below the highest formulae level the alchemist can create.",
+      "source": "PRG:APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Dhampir",
+      "bonus": "Add +10 minutes to the duration of the alchemist's mutagens.",
+      "source": "PRG:ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Drow",
+      "bonus": "Add +10 minutes to the duration of the alchemist's mutagens.",
+      "source": "PRG:ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Goblin",
+      "bonus": "The alchemist gains fire resistance 1. Each time this reward is selected, increase fire resistance by +1. This fire resistance does not stack with fire resistance gained from other sources.",
+      "source": "PRG:ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Grippli",
+      "bonus": "Add +¼ to the number of toxic skin uses per day.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Hobgoblin",
+      "bonus": "Add +½ to the number of bombs per day the alchemist can create.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Ifrit",
+      "bonus": "Add +½ to the alchemist's bomb damage.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Kobold",
+      "bonus": "Add +½ to the number of bombs per day the alchemist can create.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Nagaji",
+      "bonus": "Add +1 on Craft (alchemy) checks to craft poison and +1/3 on the DCs of poisons the alchemist creates.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Orc",
+      "bonus": "Add +10 minutes to the duration of the alchemist's mutagens.",
+      "source": "PRG:ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Ratfolk",
+      "bonus": "The alchemist gains +1/6 of a new discovery.",
+      "source": "PRG:ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Svirfneblin",
+      "bonus": "Add one extract formula from the alchemist's list to the character's formulae book. This formula must be at least one level below the highest formulae level the alchemist can create.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Tiefling",
+      "bonus": "Add +½ to the alchemist's bomb damage.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Vanara",
+      "bonus": "Add +½ to the alchemist's bomb damage.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Duergar",
+      "bonus": "Add +½ to the alchemist's acid bomb damage.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Fetchling",
+      "bonus": "Add +½ to either cold or electricity resistance (to a maximum increase of +10).",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Wayang",
+      "bonus": "Add +½ to the alchemist's frost bomb damage.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Asterion",
+      "bonus": "+¼ alchemical bonus to Strength when using a mutagen. (+1 to Strength for every 4 times you select this option.)",
+      "source": "RGG:HHO",
+      "publisher_group": "Rogue Genius Games"
+    }
+  ]
+}

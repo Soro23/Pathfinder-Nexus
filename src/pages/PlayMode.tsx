@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, StatusEffect, BonusTarget } from '../store'
 import { getClassById, useSRDStore, calculateSpellDC } from '../data'
-import { resolveModifiers, computeCombatStats, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus } from '../engine'
+import { resolveModifiers, computeCombatStats, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets } from '../engine'
 import { buildArchetypesByClassId } from '../data/resolveArchetype'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card } from '../components/ui'
@@ -796,13 +796,7 @@ export function PlayMode() {
                       const atkBase = computeWeaponAttackBonus(bab, isRanged ? dexMod : strMod, weapon.attackBonus, resolvedStats, combat.sizeMod) + paAtkPenalty
                       const dmgMod = isRanged ? dexMod : getStrDamageBonus(strMod, weapon.grip)
                       const dmgNotation = addModifierToNotation(weapon.damage, resolvedStats.damageBonus + dmgMod + paDmgBonus)
-                      const iterativeOffsets = (() => {
-                        const offsets: number[] = []
-                        let cur = bab
-                        while (cur > 0 && offsets.length < 4) { offsets.push(bab - cur); cur -= 5 }
-                        if (offsets.length === 0) offsets.push(0)
-                        return offsets
-                      })()
+                      const iterativeOffsets = getIterativeAttackOffsets(bab)
                       return (
                         <div key={weapon.id} className={styles.weaponRow}>
                           <div className={styles.weaponInfo}>
@@ -845,13 +839,7 @@ export function PlayMode() {
                         const paDmgBonus = powerAttackActive ? powerAttackDmgBonus : 0
                         const meleeAtk = computeWeaponAttackBonus(bab, strMod, 0, resolvedStats, combat.sizeMod) + paAtkPenalty
                         const rangedAtk = computeWeaponAttackBonus(bab, dexMod, 0, resolvedStats, combat.sizeMod)
-                        const iterOffsets = (() => {
-                          const offsets: number[] = []
-                          let cur = bab
-                          while (cur > 0 && offsets.length < 4) { offsets.push(bab - cur); cur -= 5 }
-                          if (offsets.length === 0) offsets.push(0)
-                          return offsets
-                        })()
+                        const iterOffsets = getIterativeAttackOffsets(bab)
                         return (
                           <>
                             {iterOffsets.map((offset, i) => {

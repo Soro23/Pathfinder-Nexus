@@ -1,0 +1,433 @@
+{
+  "slug": "witch",
+  "name": "Witch",
+  "group": "base",
+  "hit_die": "d6",
+  "alignment": "Any",
+  "starting_wealth": "3d6 × 10 gp (average 105 gp.)",
+  "skill_ranks_per_level": 2,
+  "class_skills": [
+    {
+      "skill": "Craft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Fly",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Heal",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Intimidate",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Knowledge (arcana)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Knowledge (history)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Knowledge (nature)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Knowledge (planes)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Profession",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Spellcraft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Use Magic Device",
+      "ability": "Cha"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+0",
+      "bab_first": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 2,
+      "special": [
+        "Cantrips",
+        "hex",
+        "patron spells",
+        "witch's familiar"
+      ],
+      "spells_per_day": {
+        "0": "3",
+        "1": "1"
+      }
+    },
+    {
+      "level": 2,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 3,
+      "special": [
+        "Hex"
+      ],
+      "spells_per_day": {
+        "0": "4",
+        "1": "2"
+      }
+    },
+    {
+      "level": 3,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 3,
+      "special": [],
+      "spells_per_day": {
+        "0": "4",
+        "1": "2",
+        "2": "1"
+      }
+    },
+    {
+      "level": 4,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "special": [
+        "Hex"
+      ],
+      "spells_per_day": {
+        "0": "4",
+        "1": "3",
+        "2": "2"
+      }
+    },
+    {
+      "level": 5,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "special": [],
+      "spells_per_day": {
+        "0": "4",
+        "1": "3",
+        "2": "2",
+        "3": "1"
+      }
+    },
+    {
+      "level": 6,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "special": [
+        "Hex"
+      ],
+      "spells_per_day": {
+        "0": "4",
+        "1": "3",
+        "2": "3",
+        "3": "2"
+      }
+    },
+    {
+      "level": 7,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "special": [],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "3",
+        "3": "2",
+        "4": "1"
+      }
+    },
+    {
+      "level": 8,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 6,
+      "special": [
+        "Hex"
+      ],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "3",
+        "3": "3",
+        "4": "2"
+      }
+    },
+    {
+      "level": 9,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 6,
+      "special": [],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "3",
+        "4": "2",
+        "5": "1"
+      }
+    },
+    {
+      "level": 10,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "special": [
+        "Hex",
+        "major hex"
+      ],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "3",
+        "4": "3",
+        "5": "2"
+      }
+    },
+    {
+      "level": 11,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "special": [],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "4",
+        "4": "3",
+        "5": "2",
+        "6": "1"
+      }
+    },
+    {
+      "level": 12,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "special": [
+        "Hex"
+      ],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "4",
+        "4": "3",
+        "5": "3",
+        "6": "2"
+      }
+    },
+    {
+      "level": 13,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "special": [],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "4",
+        "4": "4",
+        "5": "3",
+        "6": "2",
+        "7": "1"
+      }
+    },
+    {
+      "level": 14,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 9,
+      "special": [
+        "Hex"
+      ],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "4",
+        "4": "4",
+        "5": "3",
+        "6": "3",
+        "7": "2"
+      }
+    },
+    {
+      "level": 15,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 9,
+      "special": [],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "4",
+        "4": "4",
+        "5": "4",
+        "6": "3",
+        "7": "2",
+        "8": "1"
+      }
+    },
+    {
+      "level": 16,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "special": [
+        "Hex"
+      ],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "4",
+        "4": "4",
+        "5": "4",
+        "6": "3",
+        "7": "3",
+        "8": "2"
+      }
+    },
+    {
+      "level": 17,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "special": [],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "4",
+        "4": "4",
+        "5": "4",
+        "6": "4",
+        "7": "3",
+        "8": "2",
+        "9": "1"
+      }
+    },
+    {
+      "level": 18,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "special": [
+        "Hex",
+        "grand hex"
+      ],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "4",
+        "4": "4",
+        "5": "4",
+        "6": "4",
+        "7": "3",
+        "8": "3",
+        "9": "2"
+      }
+    },
+    {
+      "level": 19,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "special": [],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "4",
+        "4": "4",
+        "5": "4",
+        "6": "4",
+        "7": "4",
+        "8": "3",
+        "9": "3"
+      }
+    },
+    {
+      "level": 20,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 6,
+      "ref": 6,
+      "will": 12,
+      "special": [
+        "Hex"
+      ],
+      "spells_per_day": {
+        "0": "4",
+        "1": "4",
+        "2": "4",
+        "3": "4",
+        "4": "4",
+        "5": "4",
+        "6": "4",
+        "7": "4",
+        "8": "4",
+        "9": "4"
+      }
+    }
+  ],
+  "favored_class_bonuses": []
+}

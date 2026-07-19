@@ -1,0 +1,377 @@
+{
+  "slug": "vigilante",
+  "name": "Vigilante",
+  "group": "base",
+  "hit_die": "d8",
+  "alignment": "Any",
+  "starting_wealth": "5d6 × 10 (average 175 gp).",
+  "skill_ranks_per_level": 6,
+  "class_skills": [
+    {
+      "skill": "Acrobatics",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Appraise",
+      "ability": "Int"
+    },
+    {
+      "skill": "Bluff",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Climb",
+      "ability": "Str"
+    },
+    {
+      "skill": "Craft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Diplomacy",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Disable Device",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Disguise",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Escape Artist",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Intimidate",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Knowledge (dungeoneering)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Knowledge (engineering)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Knowledge (local)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Perception",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Perform",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Profession",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Ride",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Sense Motive",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Sleight of Hand",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Stealth",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Survival",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Swim",
+      "ability": "Str"
+    },
+    {
+      "skill": "Use Magic Device",
+      "ability": "Cha"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+0",
+      "bab_first": 0,
+      "fort": 0,
+      "ref": 2,
+      "will": 2,
+      "special": [
+        "Dual identity",
+        "seamless guise",
+        "social talent",
+        "vigilante specialization"
+      ]
+    },
+    {
+      "level": 2,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 0,
+      "ref": 3,
+      "will": 3,
+      "special": [
+        "Vigilante talent"
+      ]
+    },
+    {
+      "level": 3,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 1,
+      "ref": 3,
+      "will": 3,
+      "special": [
+        "Social talent",
+        "unshakable"
+      ]
+    },
+    {
+      "level": 4,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 4,
+      "special": [
+        "Vigilante talent"
+      ]
+    },
+    {
+      "level": 5,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 4,
+      "special": [
+        "Social talent",
+        "startling appearance"
+      ]
+    },
+    {
+      "level": 6,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 2,
+      "ref": 5,
+      "will": 5,
+      "special": [
+        "Vigilante talent"
+      ]
+    },
+    {
+      "level": 7,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 2,
+      "ref": 5,
+      "will": 5,
+      "special": [
+        "Social talent"
+      ]
+    },
+    {
+      "level": 8,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 2,
+      "ref": 6,
+      "will": 6,
+      "special": [
+        "Vigilante talent"
+      ]
+    },
+    {
+      "level": 9,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 3,
+      "ref": 6,
+      "will": 6,
+      "special": [
+        "Social talent"
+      ]
+    },
+    {
+      "level": 10,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 3,
+      "ref": 7,
+      "will": 7,
+      "special": [
+        "Vigilante talent"
+      ]
+    },
+    {
+      "level": 11,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 3,
+      "ref": 7,
+      "will": 7,
+      "special": [
+        "Frightening appearance",
+        "social talent"
+      ]
+    },
+    {
+      "level": 12,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 8,
+      "special": [
+        "Vigilante talent"
+      ]
+    },
+    {
+      "level": 13,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 8,
+      "special": [
+        "Social talent"
+      ]
+    },
+    {
+      "level": 14,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 4,
+      "ref": 9,
+      "will": 9,
+      "special": [
+        "Vigilante talent"
+      ]
+    },
+    {
+      "level": 15,
+      "bab": "+11/+6/+1",
+      "bab_first": 11,
+      "fort": 5,
+      "ref": 9,
+      "will": 9,
+      "special": [
+        "Social talent"
+      ]
+    },
+    {
+      "level": 16,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 10,
+      "special": [
+        "Vigilante talent"
+      ]
+    },
+    {
+      "level": 17,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 10,
+      "special": [
+        "Social talent",
+        "stunning appearance"
+      ]
+    },
+    {
+      "level": 18,
+      "bab": "+13/+8/+3",
+      "bab_first": 13,
+      "fort": 6,
+      "ref": 11,
+      "will": 11,
+      "special": [
+        "Vigilante talent"
+      ]
+    },
+    {
+      "level": 19,
+      "bab": "+14/+9/+4",
+      "bab_first": 14,
+      "fort": 6,
+      "ref": 11,
+      "will": 11,
+      "special": [
+        "Social talent"
+      ]
+    },
+    {
+      "level": 20,
+      "bab": "+15/+10/+5",
+      "bab_first": 15,
+      "fort": 6,
+      "ref": 12,
+      "will": 12,
+      "special": [
+        "Vengeance strike",
+        "vigilante talent"
+      ]
+    }
+  ],
+  "favored_class_bonuses": [
+    {
+      "race": "Dwarf",
+      "bonus": "Increase the bonus from social grace on Craft skills by +1/2.",
+      "source": "PZO1134",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Elf",
+      "bonus": "Gain +1/3 on all Acrobatics, Climb, and Stealth checks in forested areas.",
+      "source": "PZO1134",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Gnome",
+      "bonus": "Gain +1/2 on Bluff checks when attempting to tell a lie that would be true from the point of view of the vigilante's current identity.",
+      "source": "PZO1134",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Half-Elf",
+      "bonus": "Gain +1/2 on the Disguise bonus from seamless guise.",
+      "source": "",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Half-Orc",
+      "bonus": "Add 1/2 to the DC increase from unshakable.",
+      "source": "",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Halfling",
+      "bonus": "Gain 1/6 of a new social talent.",
+      "source": "",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Human",
+      "bonus": "Gain +1/2 on the Disguise bonus provided by seamless guise.",
+      "source": "",
+      "publisher_group": "Core Races"
+    }
+  ]
+}

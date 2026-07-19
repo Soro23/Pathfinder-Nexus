@@ -1,12 +1,25 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { X, Dice6 } from 'lucide-react'
-import type { Character, CharacterClass } from '../../store'
+import type {
+  Character, CharacterClass, CharacterFeat, SkillRank,
+  AbilityKey, HpGainMode, FavoredClassChoice, LevelChoice,
+} from '../../store'
 import { calculateModifier } from '../../store'
-import { getClassById, CLASSES } from '../../data'
+import { getClassById, CLASSES, getMulticlassStats } from '../../data'
 import { useSRDStore } from '../../store/srdStore'
-import { archetypeAffectsAttainedLevel, findConflictingArchetype, resolveClassFeatures } from '../../data/resolveArchetype'
+import {
+  archetypeAffectsAttainedLevel, findConflictingArchetype, resolveClassFeatures, buildArchetypesByClassId,
+} from '../../data/resolveArchetype'
 import type { Archetype } from '../../data/archetypes'
+import {
+  computeSkillPointsAvailable, isAbilityIncreaseLevel, isGenericFeatLevel, computeHpGain,
+  isAlignmentAllowedForClass, checkFeatPrerequisites, FAVORED_CLASS_LABELS,
+  getBonusFeatSlotsForClassLevel, getFavoredClassHpBonus, getFavoredClassSkillBonus, resolveModifiers,
+} from '../../engine'
+import type { BonusFeatSlot } from '../../engine'
 import { Button } from '../ui'
+import { SkillsList } from './SkillsList'
+import { FeatsSelector } from './FeatsSelector'
 import styles from './LevelUpModal.module.css'
 
 export interface LevelUpUpdates {
@@ -14,6 +27,11 @@ export interface LevelUpUpdates {
   newClassLevels: CharacterClass[]
   hpGained: number
   hpRolled: number | null
+  hpMode: HpGainMode
+  newAbilities: Character['abilities']
+  newSkills: SkillRank[]
+  newFeats: CharacterFeat[]
+  levelChoice: LevelChoice
 }
 
 interface LevelUpModalProps {
@@ -22,51 +40,91 @@ interface LevelUpModalProps {
   onClose: () => void
 }
 
-type HpMode = 'roll' | 'manual'
 type ClassChoice = { type: 'existing'; classId: string } | { type: 'new'; classId: string }
+
+const ABILITY_LABELS: Record<AbilityKey, string> = {
+  strength: 'FUE', dexterity: 'DES', constitution: 'CON',
+  intelligence: 'INT', wisdom: 'SAB', charisma: 'CAR',
+}
 
 export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProps) {
   const newLevel = character.level + 1
   const conMod = calculateModifier(character.abilities.constitution)
-  const intMod = calculateModifier(character.abilities.intelligence)
 
+  const { getArchetypesByClass, getArchetypeById, feats: allFeats } = useSRDStore()
+
+  // ── 1. Clase ────────────────────────────────────────────────────────────────────────
   const [classChoice, setClassChoice] = useState<ClassChoice>({
     type: 'existing',
     classId: character.classes[0].id,
   })
   const [showNewClassPicker, setShowNewClassPicker] = useState(false)
-  const [hpMode, setHpMode] = useState<HpMode>('roll')
-  const [rolledValue, setRolledValue] = useState<number | null>(null)
-  const [manualValue, setManualValue] = useState<number>(1)
   const [newArchetypeIds, setNewArchetypeIds] = useState<string[]>([])
 
-  const getArchetypesByClass = useSRDStore((s) => s.getArchetypesByClass)
+  // ── 2. Puntos de golpe ──────────────────────────────────────────────────────────────
+  const [hpMode, setHpMode] = useState<HpGainMode>('average')
+  const [rolledValue, setRolledValue] = useState<number | null>(null)
+  const [manualValue, setManualValue] = useState<number>(1)
+
+  // ── 4. Aumento de característica (niveles 4/8/12/16/20) ─────────────────────────────
+  const [abilityIncrease, setAbilityIncrease] = useState<AbilityKey | null>(null)
+  const abilityIncreaseRequired = isAbilityIncreaseLevel(newLevel)
+
+  // ── 5. Puntos de habilidad ───────────────────────────────────────────────────────────
+  const [pendingSkills, setPendingSkills] = useState<SkillRank[]>(character.skills)
+
+  // ── 6. Dote ───────────────────────────────────────────────────────────────────────────
+  const [pendingFeats, setPendingFeats] = useState<CharacterFeat[]>([])
+
+  // ── 7. Clase predilecta ──────────────────────────────────────────────────────────────
+  const [favoredClassChoice, setFavoredClassChoice] = useState<FavoredClassChoice | undefined>(undefined)
+
+  const resolvedStats = useMemo(() => resolveModifiers(character), [character])
 
   const resolvedClassData = getClassById(classChoice.classId)
-  const hitDie            = resolvedClassData?.hitDie ?? 8
-  const skillPointsGained = resolvedClassData
-    ? Math.max(1, resolvedClassData.skillPointsPerLevel + intMod)
-    : null
+  const hitDie = resolvedClassData?.hitDie ?? 8
 
-  // Nivel de la clase elegida (no el nivel de personaje) que se alcanza al confirmar:
-  // para una clase existente es su nivel actual + 1; para una clase nueva, siempre 1.
   const existingClassEntry = classChoice.type === 'existing'
     ? character.classes.find((c) => c.id === classChoice.classId)
     : undefined
   const attainedLevel = existingClassEntry?.level ?? 0
   const newClassLevel = attainedLevel + 1
+  const genericFeatSlots: BonusFeatSlot[] = isGenericFeatLevel(newLevel) ? [{ id: `character-${newLevel}`, label: 'Dote de personaje' }] : []
+  const bonusFeatSlots = getBonusFeatSlotsForClassLevel(classChoice.classId, newClassLevel)
+  const featSlots = [...genericFeatSlots, ...bonusFeatSlots]
+  const featSlotsRequired = featSlots.length
 
+  const isFavoredClassLevel = character.favoredClassId !== undefined && character.favoredClassId === classChoice.classId
+
+  const resetPerClassState = () => {
+    setRolledValue(null)
+    setNewArchetypeIds([])
+    setPendingSkills(character.skills)
+    setPendingFeats([])
+    setFavoredClassChoice(undefined)
+  }
+
+  const changeClassChoice = (choice: ClassChoice) => {
+    setClassChoice(choice)
+    resetPerClassState()
+  }
+
+  // ── Validación de alineamiento (V-01/V-02) ──────────────────────────────────────────
+  // Clases nuevas incompatibles con el alineamiento actual se filtran del selector; una
+  // clase ya en progreso que deja de cumplir su restricción (p.ej. el alineamiento cambió
+  // en otro momento) no bloquea la subida — pasa a "ex-clase" (no se pierden niveles).
+  const eligibleNewClasses = CLASSES.filter(
+    (cd) => !character.classes.some((c) => c.id === cd.id) && isAlignmentAllowedForClass(character.alignment, cd)
+  )
+  const existingClassAlignmentWarning = classChoice.type === 'existing' && resolvedClassData
+    && !isAlignmentAllowedForClass(character.alignment, resolvedClassData)
+
+  // ── Arquetipos ───────────────────────────────────────────────────────────────────────
   const existingArchetypeIds = existingClassEntry?.archetypeIds ?? []
   const classArchetypeOptions = resolvedClassData ? getArchetypesByClass(resolvedClassData.id) : []
   const selectedArchetypes = classArchetypeOptions.filter(
     (a) => existingArchetypeIds.includes(a.id) || newArchetypeIds.includes(a.id)
   )
-
-  const changeClassChoice = (choice: ClassChoice) => {
-    setClassChoice(choice)
-    setRolledValue(null)
-    setNewArchetypeIds([])
-  }
 
   const archetypeBlockReason = (option: Archetype): string | null => {
     const clashing = findConflictingArchetype(option, selectedArchetypes)
@@ -92,29 +150,116 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
     ? resolveClassFeatures(resolvedClassData, selectedArchetypes).filter((f) => f.level === newClassLevel)
     : []
 
+  // ── PG ───────────────────────────────────────────────────────────────────────────────
   const handleRoll = () => {
-    const result = Math.floor(Math.random() * hitDie) + 1
-    setRolledValue(result)
+    setRolledValue(Math.floor(Math.random() * hitDie) + 1)
   }
 
-  const activeRoll = hpMode === 'roll' ? rolledValue : manualValue
-  const hpGained = activeRoll !== null ? Math.max(1, activeRoll + conMod) : null
+  const favoredHpBonus = getFavoredClassHpBonus(isFavoredClassLevel ? favoredClassChoice : undefined)
+  const baseHpGained = computeHpGain(hpMode, hitDie, conMod, hpMode === 'roll' ? rolledValue : manualValue)
+  const hpGained = baseHpGained !== null ? baseHpGained + favoredHpBonus : null
 
-  const canConfirm = hpGained !== null
+  // ── BAB / salvaciones (recálculo informativo, §5) ───────────────────────────────────
+  const prospectiveClasses: CharacterClass[] = classChoice.type === 'existing'
+    ? character.classes.map((c) => c.id === classChoice.classId ? { ...c, level: c.level + 1 } : c)
+    : [...character.classes, { id: classChoice.classId, level: 1 }]
+  const currentStats = getMulticlassStats(character.classes)
+  const nextStats = getMulticlassStats(prospectiveClasses)
+
+  // ── Característica efectiva y puntos de habilidad ───────────────────────────────────
+  const effectiveAbilities = abilityIncrease
+    ? { ...character.abilities, [abilityIncrease]: character.abilities[abilityIncrease] + 1 }
+    : character.abilities
+
+  const prospectiveClassesWithArchetypes = classChoice.type === 'existing'
+    ? character.classes.map((c) => c.id === classChoice.classId
+      ? { ...c, archetypeIds: [...(c.archetypeIds ?? []), ...newArchetypeIds] }
+      : c)
+    : [...character.classes, { id: classChoice.classId, archetypeIds: newArchetypeIds }]
+  const archetypesByClassId = buildArchetypesByClassId(prospectiveClassesWithArchetypes, getArchetypeById)
+
+  const spentRanksTotal = pendingSkills.reduce((sum, r) => sum + r.ranks, 0)
+  const favoredSkillBonus = getFavoredClassSkillBonus(isFavoredClassLevel ? favoredClassChoice : undefined)
+  const skillPointBudget = computeSkillPointsAvailable(
+    { abilities: effectiveAbilities, classes: prospectiveClasses, skills: pendingSkills, race: character.race, archetypesByClassId },
+    0,
+  ) + favoredSkillBonus
+  const skillPointsAvailable = skillPointBudget - spentRanksTotal
+
+  // ── Dote: prerrequisitos de mejor esfuerzo (V-05) ───────────────────────────────────
+  const pendingFeatChecks = pendingFeats
+    .map((selected) => {
+      const feat = allFeats.find((f) => f.id === selected.id)
+      return feat
+        ? { feat, check: checkFeatPrerequisites(feat, { bab: nextStats.bab, abilities: effectiveAbilities, featIds: character.feats.map((f) => f.id) }, allFeats) }
+        : null
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+
+  const combinedSelectedFeats: CharacterFeat[] = [...character.feats, ...pendingFeats]
+
+  const validationMessages = [
+    hpGained === null ? 'Resuelve los puntos de golpe.' : null,
+    abilityIncreaseRequired && abilityIncrease === null ? 'Elige el aumento de caracteristica.' : null,
+    skillPointsAvailable < 0 ? `Has gastado ${Math.abs(skillPointsAvailable)} punto(s) de habilidad de mas.` : null,
+    pendingFeats.length < featSlotsRequired ? `Elige ${featSlotsRequired - pendingFeats.length} dote(s) pendiente(s) de este nivel.` : null,
+    pendingFeatChecks.some(({ check }) => !check.met) ? 'Una dote elegida no cumple sus prerrequisitos reconocidos.' : null,
+    isFavoredClassLevel && favoredClassChoice === undefined ? 'Elige el beneficio de clase predilecta.' : null,
+  ].filter((message): message is string => Boolean(message))
+
+  const canConfirm = validationMessages.length === 0
 
   const handleConfirm = () => {
-    if (hpGained === null) return
-    let newClassLevels: CharacterClass[]
-    if (classChoice.type === 'existing') {
-      newClassLevels = character.classes.map((c) =>
+    if (!canConfirm || hpGained === null) return
+
+    const newClassLevels: CharacterClass[] = classChoice.type === 'existing'
+      ? character.classes.map((c) =>
         c.id === classChoice.classId
           ? { ...c, level: c.level + 1, archetypeIds: [...(c.archetypeIds ?? []), ...newArchetypeIds] }
           : c
       )
-    } else {
-      newClassLevels = [...character.classes, { id: classChoice.classId, level: 1, archetypeIds: newArchetypeIds }]
+      : [...character.classes, { id: classChoice.classId, level: 1, archetypeIds: newArchetypeIds }]
+
+    const newAbilities = abilityIncrease
+      ? { ...character.abilities, [abilityIncrease]: character.abilities[abilityIncrease] + 1 }
+      : character.abilities
+
+    const newFeats: CharacterFeat[] = [...character.feats, ...pendingFeats]
+
+    const skillRanksSpent: Record<string, number> = {}
+    for (const rank of pendingSkills) {
+      const before = character.skills.find((s) => s.id === rank.id)?.ranks ?? 0
+      const delta = rank.ranks - before
+      if (delta > 0) skillRanksSpent[rank.id] = delta
     }
-    onConfirm({ newLevel, newClassLevels, hpGained, hpRolled: hpMode === 'roll' ? rolledValue : null })
+
+    const levelChoice: LevelChoice = {
+      characterLevel: newLevel,
+      classId: classChoice.classId,
+      classLevel: newClassLevel,
+      archetypeIds: newArchetypeIds,
+      hpMode,
+      hpRolled: hpMode === 'roll' ? rolledValue : null,
+      hpGained,
+      abilityIncrease: abilityIncrease ?? undefined,
+      featIds: pendingFeats.map((feat) => feat.id),
+      favoredClassChoice: isFavoredClassLevel ? favoredClassChoice : undefined,
+      skillRanksSpent,
+      source: 'level-up',
+      createdAt: new Date().toISOString(),
+    }
+
+    onConfirm({
+      newLevel,
+      newClassLevels,
+      hpGained,
+      hpRolled: hpMode === 'roll' ? rolledValue : null,
+      hpMode,
+      newAbilities,
+      newSkills: pendingSkills,
+      newFeats,
+      levelChoice,
+    })
   }
 
   return (
@@ -128,7 +273,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
           </button>
         </div>
 
-        {/* Class Choice Section */}
+        {/* 1 · Clase */}
         <div className={styles.section}>
           <p className={styles.sectionLabel}>Clase a subir</p>
           <div className={styles.classChoiceList}>
@@ -166,12 +311,15 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
               }}
             >
               <option value="">Elige clase…</option>
-              {CLASSES
-                .filter((cd) => !character.classes.some((c) => c.id === cd.id))
-                .map((cd) => (
-                  <option key={cd.id} value={cd.id}>{cd.name}</option>
-                ))}
+              {eligibleNewClasses.map((cd) => (
+                <option key={cd.id} value={cd.id}>{cd.name}</option>
+              ))}
             </select>
+          )}
+          {existingClassAlignmentWarning && (
+            <p className={styles.warningText}>
+              Tu alineamiento actual ya no encaja con las restricciones de {resolvedClassData?.name}. No pierdes niveles, pero tu DJ puede tratarla como «ex-clase» y restringir el uso de ciertos rasgos.
+            </p>
           )}
         </div>
 
@@ -240,12 +388,17 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
           )
         })()}
 
-        {/* Hit Die Section */}
+        {/* 2 · Puntos de golpe */}
         <div className={styles.section}>
           <p className={styles.sectionLabel}>Dado de golpe: d{hitDie}</p>
 
-          {/* Mode toggle */}
           <div className={styles.modeToggle}>
+            <button
+              className={`${styles.modeBtn} ${hpMode === 'average' ? styles.modeBtnActive : ''}`}
+              onClick={() => setHpMode('average')}
+            >
+              Media (+{Math.floor(hitDie / 2) + 1})
+            </button>
             <button
               className={`${styles.modeBtn} ${hpMode === 'roll' ? styles.modeBtnActive : ''}`}
               onClick={() => setHpMode('roll')}
@@ -261,7 +414,6 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
             </button>
           </div>
 
-          {/* Roll mode */}
           {hpMode === 'roll' && (
             <div className={styles.rollArea}>
               <button className={styles.rollBtn} onClick={handleRoll}>
@@ -274,7 +426,6 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
             </div>
           )}
 
-          {/* Manual mode */}
           {hpMode === 'manual' && (
             <div className={styles.manualArea}>
               <input
@@ -288,10 +439,10 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
             </div>
           )}
 
-          {/* Con modifier and total */}
           <div className={styles.hpSummary}>
             <span className={styles.hpDetail}>
               Modificador CON: <span className={styles.mono}>{conMod >= 0 ? '+' : ''}{conMod}</span>
+              {favoredHpBonus > 0 && <span className={styles.mono}> · Clase predilecta: +{favoredHpBonus}</span>}
             </span>
             {hpGained !== null && (
               <span className={styles.hpTotal}>
@@ -301,27 +452,113 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
           </div>
         </div>
 
-        {/* Info Section */}
+        {/* 3 · BAB y salvaciones (recálculo informativo) */}
         <div className={styles.section}>
-          <p className={styles.sectionLabel}>Al subir de nivel</p>
+          <p className={styles.sectionLabel}>Ataque base y salvaciones</p>
           <ul className={styles.infoList}>
-            {skillPointsGained !== null && (
-              <li className={styles.infoItem}>
-                Puntos de habilidad: <strong>+{skillPointsGained} puntos disponibles</strong>
-              </li>
-            )}
-            {newLevel % 2 === 1 && (
-              <li className={styles.infoItem}>
-                Puedes elegir una nueva dote
-              </li>
-            )}
-            {newLevel % 4 === 0 && (
-              <li className={styles.infoItem}>
-                Puedes aumentar una puntuación de característica en +1
-              </li>
-            )}
+            <li className={styles.infoItem}>
+              BAB: <span className={styles.mono}>+{currentStats.bab} → +{nextStats.bab}</span>
+            </li>
+            <li className={styles.infoItem}>
+              Fort/Ref/Vol: <span className={styles.mono}>
+                {currentStats.fortitude}/{currentStats.reflex}/{currentStats.will} → {nextStats.fortitude}/{nextStats.reflex}/{nextStats.will}
+              </span>
+            </li>
           </ul>
         </div>
+
+        {/* 4 · Aumento de característica */}
+        {abilityIncreaseRequired && (
+          <div className={styles.section}>
+            <p className={styles.sectionLabel}>Aumento de característica (+1)</p>
+            <div className={styles.modeToggle}>
+              {(Object.keys(ABILITY_LABELS) as AbilityKey[]).map((key) => (
+                <button
+                  key={key}
+                  className={`${styles.modeBtn} ${abilityIncrease === key ? styles.modeBtnActive : ''}`}
+                  onClick={() => setAbilityIncrease(key)}
+                >
+                  {ABILITY_LABELS[key]} <span className={styles.mono}>{character.abilities[key]}{abilityIncrease === key ? ` → ${character.abilities[key] + 1}` : ''}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 5 · Puntos de habilidad */}
+        <div className={styles.section}>
+          <p className={styles.sectionLabel}>
+            Puntos de habilidad <span className={styles.mono}>({skillPointsAvailable} disponibles)</span>
+          </p>
+          <SkillsList
+            ranks={pendingSkills}
+            onChange={setPendingSkills}
+            abilities={effectiveAbilities}
+            classes={prospectiveClasses}
+            race={character.race}
+            level={newLevel}
+            skillPointsAvailable={skillPointsAvailable}
+            archetypesByClassId={archetypesByClassId}
+            resolvedStats={resolvedStats}
+          />
+        </div>
+
+        {/* 6 · Dote */}
+        {featSlotsRequired > 0 && (
+          <div className={styles.section}>
+            <p className={styles.sectionLabel}>
+              Dotes de este nivel <span className={styles.mono}>({pendingFeats.length}/{featSlotsRequired})</span>
+            </p>
+            <ul className={styles.infoList}>
+              {featSlots.map((slot) => (
+                <li key={slot.id} className={styles.infoItem}>
+                  {slot.label}{slot.allowedTypes ? <span className={styles.mono}> ({slot.allowedTypes.join(', ')})</span> : null}
+                </li>
+              ))}
+            </ul>
+            {pendingFeatChecks.filter(({ check }) => !check.met).map(({ feat, check }) => (
+              <p key={feat.id} className={styles.warningText}>
+                {feat.name}: {check.unmetReasons.join('; ')}
+              </p>
+            ))}
+            <FeatsSelector
+              selectedFeats={combinedSelectedFeats}
+              maxFeats={character.feats.length + featSlotsRequired}
+              onAdd={(featId, specification) => {
+                if (pendingFeats.length >= featSlotsRequired) return
+                setPendingFeats([...pendingFeats, { id: featId, specification }])
+              }}
+              onRemove={(index) => {
+                if (index >= character.feats.length) {
+                  setPendingFeats(pendingFeats.filter((_, i) => i !== index - character.feats.length))
+                }
+              }}
+            />
+          </div>
+        )}
+
+        {/* 7 · Clase predilecta */}
+        {isFavoredClassLevel && (
+          <div className={styles.section}>
+            <p className={styles.sectionLabel}>Clase predilecta — {resolvedClassData?.name}</p>
+            <div className={styles.modeToggle}>
+              {(['hp', 'skill', 'racial'] as const).map((opt) => (
+                <button
+                  key={opt}
+                  className={`${styles.modeBtn} ${favoredClassChoice === opt ? styles.modeBtnActive : ''}`}
+                  onClick={() => setFavoredClassChoice(opt)}
+                >
+                  {FAVORED_CLASS_LABELS[opt]}
+                </button>
+              ))}
+            </div>
+            {favoredClassChoice === 'racial' && (
+              <p className={styles.archetypeHint}>
+                Sin catálogo de opciones raciales alternativas todavía: anota el efecto elegido en las notas del personaje.
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Class Features Section */}
         {featuresAtNewLevel.length > 0 && (
@@ -344,7 +581,22 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
           </div>
         )}
 
+        {/* 8 · Conjuros */}
+        {resolvedClassData?.spellsPerDay && (
+          <div className={styles.section}>
+            <p className={styles.sectionLabel}>Conjuros</p>
+            <p className={styles.archetypeHint}>Los espacios de conjuro se sincronizan automáticamente con la tabla de {resolvedClassData.name} al confirmar.</p>
+          </div>
+        )}
+
         {/* Confirm */}
+        {validationMessages.length > 0 && (
+          <div className={styles.validationBox}>
+            {validationMessages.map((message) => (
+              <p key={message}>{message}</p>
+            ))}
+          </div>
+        )}
         <div className={styles.modalFooter}>
           <Button variant="ghost" onClick={onClose}>Cancelar</Button>
           <Button variant="primary" onClick={handleConfirm} disabled={!canConfirm}>

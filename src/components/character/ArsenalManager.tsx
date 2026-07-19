@@ -3,7 +3,7 @@ import { Plus, Trash2, Sword, Shield, Check, Pencil, ChevronDown, ChevronUp, X }
 import { Card, Button, Input } from '../ui'
 import { generateId } from '../../store'
 import type { Weapon, Armor, InventoryItem, EquipmentSlot, CustomSlot } from '../../store'
-import { computeWeaponAttackBonus } from '../../engine'
+import { computeWeaponAttackBonus, getIterativeAttackOffsets } from '../../engine'
 import type { ResolvedStats } from '../../engine'
 import styles from './ArsenalManager.module.css'
 
@@ -16,6 +16,7 @@ interface ArsenalManagerProps {
   sizeMod: number
   ac: number
   resolvedStats: ResolvedStats
+  negativeLevelPenalty?: number
   onWeaponsChange: (weapons: Weapon[]) => void
   onArmorChange: (armor: Armor[]) => void
   inventory: InventoryItem[]
@@ -63,7 +64,7 @@ const DEFAULT_ARMOR: Omit<Armor, 'id'> = {
 }
 
 export function ArsenalManager({
-  weapons, armor, bab, strMod, dexMod, sizeMod, ac, resolvedStats, onWeaponsChange, onArmorChange,
+  weapons, armor, bab, strMod, dexMod, sizeMod, ac, resolvedStats, negativeLevelPenalty = 0, onWeaponsChange, onArmorChange,
   inventory, equippedSlots, customSlots, onEquippedSlotsChange, onCustomSlotsChange,
 }: ArsenalManagerProps) {
   const [equipadoOpen, setEquipadoOpen] = useState(false)
@@ -112,7 +113,7 @@ export function ArsenalManager({
 
   // ── Weapon helpers ──
   const calcAttack = (bonus: number, isRanged: boolean) =>
-    computeWeaponAttackBonus(bab, isRanged ? dexMod : strMod, bonus, resolvedStats, sizeMod)
+    computeWeaponAttackBonus(bab, isRanged ? dexMod : strMod, bonus, resolvedStats, sizeMod, negativeLevelPenalty)
 
   const addWeapon = () => {
     if (!newWeapon.name.trim()) return
@@ -455,6 +456,10 @@ export function ArsenalManager({
               }
               const isRanged = w.range === 'ranged'
               const total = calcAttack(w.attackBonus, isRanged)
+              const iterativeAtk = getIterativeAttackOffsets(bab)
+                .map((offset) => total - offset)
+                .map((v) => v >= 0 ? `+${v}` : `${v}`)
+                .join('/')
               return (
                 <div key={w.id} className={styles.weaponRow}>
                   <div className={styles.weaponInfo}>
@@ -468,7 +473,7 @@ export function ArsenalManager({
                   <div className={styles.weaponStats}>
                     <div className={styles.statCol}>
                       <span className={styles.statLbl}>ATA</span>
-                      <span className={styles.statVal}>{total >= 0 ? '+' : ''}{total}</span>
+                      <span className={styles.statVal}>{iterativeAtk}</span>
                     </div>
                     <div className={styles.statCol}>
                       <span className={styles.statLbl}>Daño</span>
