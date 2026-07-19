@@ -1,0 +1,331 @@
+{
+  "slug": "ninja",
+  "name": "Ninja",
+  "group": "alternate",
+  "hit_die": "d8",
+  "alignment": "Any",
+  "starting_wealth": "4d6 × 10 gp (average 140 gp.)",
+  "skill_ranks_per_level": 8,
+  "class_skills": [
+    {
+      "skill": "Acrobatics",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Appraise",
+      "ability": "Int"
+    },
+    {
+      "skill": "Bluff",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Climb",
+      "ability": "Str"
+    },
+    {
+      "skill": "Craft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Diplomacy",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Disable Device",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Disguise",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Escape Artist",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Intimidate",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Knowledge (local)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Knowledge (nobility)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Linguistics",
+      "ability": "Int"
+    },
+    {
+      "skill": "Perception",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Perform",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Profession",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Sense Motive",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Sleight of Hand",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Stealth",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Swim",
+      "ability": "Str"
+    },
+    {
+      "skill": "Use Magic Device",
+      "ability": "Cha"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+0",
+      "bab_first": 0,
+      "fort": 0,
+      "ref": 2,
+      "will": 0,
+      "special": [
+        "Poison use",
+        "sneak attack +1d6"
+      ]
+    },
+    {
+      "level": 2,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 0,
+      "ref": 3,
+      "will": 0,
+      "special": [
+        "_Ki_ pool",
+        "ninja trick"
+      ]
+    },
+    {
+      "level": 3,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 1,
+      "ref": 3,
+      "will": 1,
+      "special": [
+        "No trace +1",
+        "sneak attack +2d6"
+      ]
+    },
+    {
+      "level": 4,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 1,
+      "special": [
+        "Ninja trick",
+        "uncanny dodge"
+      ]
+    },
+    {
+      "level": 5,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 1,
+      "special": [
+        "Sneak attack +3d6"
+      ]
+    },
+    {
+      "level": 6,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 2,
+      "ref": 5,
+      "will": 2,
+      "special": [
+        "Light steps",
+        "ninja trick",
+        "no trace +2"
+      ]
+    },
+    {
+      "level": 7,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 2,
+      "ref": 5,
+      "will": 2,
+      "special": [
+        "Sneak attack +4d6"
+      ]
+    },
+    {
+      "level": 8,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 2,
+      "ref": 6,
+      "will": 2,
+      "special": [
+        "Improved uncanny dodge",
+        "ninja trick"
+      ]
+    },
+    {
+      "level": 9,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 3,
+      "ref": 6,
+      "will": 3,
+      "special": [
+        "No trace +3",
+        "sneak attack +5d6"
+      ]
+    },
+    {
+      "level": 10,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 3,
+      "ref": 7,
+      "will": 3,
+      "special": [
+        "Master tricks",
+        "ninja trick"
+      ]
+    },
+    {
+      "level": 11,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 3,
+      "ref": 7,
+      "will": 3,
+      "special": [
+        "Sneak attack +6d6"
+      ]
+    },
+    {
+      "level": 12,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 4,
+      "special": [
+        "Ninja trick",
+        "no trace +4"
+      ]
+    },
+    {
+      "level": 13,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 4,
+      "special": [
+        "Sneak attack +7d6"
+      ]
+    },
+    {
+      "level": 14,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 4,
+      "ref": 9,
+      "will": 4,
+      "special": [
+        "Ninja trick"
+      ]
+    },
+    {
+      "level": 15,
+      "bab": "+11/+6/+1",
+      "bab_first": 11,
+      "fort": 5,
+      "ref": 9,
+      "will": 5,
+      "special": [
+        "No trace +5",
+        "sneak attack +8d6"
+      ]
+    },
+    {
+      "level": 16,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 5,
+      "special": [
+        "Ninja trick"
+      ]
+    },
+    {
+      "level": 17,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 5,
+      "special": [
+        "Sneak attack +9d6"
+      ]
+    },
+    {
+      "level": 18,
+      "bab": "+13/+8/+3",
+      "bab_first": 13,
+      "fort": 6,
+      "ref": 11,
+      "will": 6,
+      "special": [
+        "Ninja trick",
+        "no trace +6"
+      ]
+    },
+    {
+      "level": 19,
+      "bab": "+14/+9/+4",
+      "bab_first": 14,
+      "fort": 6,
+      "ref": 11,
+      "will": 6,
+      "special": [
+        "Sneak attack +10d6"
+      ]
+    },
+    {
+      "level": 20,
+      "bab": "+15/+10/+5",
+      "bab_first": 15,
+      "fort": 6,
+      "ref": 12,
+      "will": 6,
+      "special": [
+        "Hidden master",
+        "ninja trick"
+      ]
+    }
+  ],
+  "favored_class_bonuses": []
+}

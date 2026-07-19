@@ -33,6 +33,7 @@ export function makeCharacter(overrides: Partial<Character> = {}): Character {
     armor: [],
     coins: { pp: 0, gp: 0, sp: 0, cp: 0 },
     notes: '',
+    negativeLevels: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...overrides,

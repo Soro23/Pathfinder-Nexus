@@ -1,0 +1,503 @@
+{
+  "slug": "paladin",
+  "name": "Paladin",
+  "group": "core",
+  "hit_die": "d10",
+  "alignment": "Lawful good",
+  "starting_wealth": "5d6 × 10 gp (average 175 gp.)",
+  "skill_ranks_per_level": 2,
+  "class_skills": [
+    {
+      "skill": "Craft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Diplomacy",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Handle Animal",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Heal",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Knowledge (nobility)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Knowledge (religion)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Profession",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Ride",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Sense Motive",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Spellcraft",
+      "ability": "Int"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 2,
+      "ref": 0,
+      "will": 2,
+      "special": [
+        "Aura of good",
+        "detect evil",
+        "smite evil 1/day"
+      ]
+    },
+    {
+      "level": 2,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 3,
+      "ref": 0,
+      "will": 3,
+      "special": [
+        "Divine grace",
+        "lay on hands"
+      ]
+    },
+    {
+      "level": 3,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 3,
+      "ref": 1,
+      "will": 3,
+      "special": [
+        "Aura of courage",
+        "divine health",
+        "mercy"
+      ]
+    },
+    {
+      "level": 4,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "special": [
+        "Channel positive energy",
+        "smite evil 2/day"
+      ],
+      "spells_per_day": {
+        "1": "0"
+      }
+    },
+    {
+      "level": 5,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "special": [
+        "Divine bond"
+      ],
+      "spells_per_day": {
+        "1": "1"
+      }
+    },
+    {
+      "level": 6,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "special": [
+        "Mercy"
+      ],
+      "spells_per_day": {
+        "1": "1"
+      }
+    },
+    {
+      "level": 7,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "special": [
+        "Smite evil 3/day"
+      ],
+      "spells_per_day": {
+        "1": "1",
+        "2": "0"
+      }
+    },
+    {
+      "level": 8,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 6,
+      "ref": 2,
+      "will": 6,
+      "special": [
+        "Aura of resolve"
+      ],
+      "spells_per_day": {
+        "1": "1",
+        "2": "1"
+      }
+    },
+    {
+      "level": 9,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 6,
+      "ref": 3,
+      "will": 6,
+      "special": [
+        "Mercy"
+      ],
+      "spells_per_day": {
+        "1": "2",
+        "2": "1"
+      }
+    },
+    {
+      "level": 10,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "special": [
+        "Smite evil 4/day"
+      ],
+      "spells_per_day": {
+        "1": "2",
+        "2": "1",
+        "3": "0"
+      }
+    },
+    {
+      "level": 11,
+      "bab": "+11/+6/+1",
+      "bab_first": 11,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "special": [
+        "Aura of justice"
+      ],
+      "spells_per_day": {
+        "1": "2",
+        "2": "1",
+        "3": "1"
+      }
+    },
+    {
+      "level": 12,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "special": [
+        "Mercy"
+      ],
+      "spells_per_day": {
+        "1": "2",
+        "2": "2",
+        "3": "1"
+      }
+    },
+    {
+      "level": 13,
+      "bab": "+13/+8/+3",
+      "bab_first": 13,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "special": [
+        "Smite evil 5/day"
+      ],
+      "spells_per_day": {
+        "1": "3",
+        "2": "2",
+        "3": "1",
+        "4": "0"
+      }
+    },
+    {
+      "level": 14,
+      "bab": "+14/+9/+4",
+      "bab_first": 14,
+      "fort": 9,
+      "ref": 4,
+      "will": 9,
+      "special": [
+        "Aura of faith"
+      ],
+      "spells_per_day": {
+        "1": "3",
+        "2": "2",
+        "3": "1",
+        "4": "1"
+      }
+    },
+    {
+      "level": 15,
+      "bab": "+15/+10/+5",
+      "bab_first": 15,
+      "fort": 9,
+      "ref": 5,
+      "will": 9,
+      "special": [
+        "Mercy"
+      ],
+      "spells_per_day": {
+        "1": "3",
+        "2": "2",
+        "3": "2",
+        "4": "1"
+      }
+    },
+    {
+      "level": 16,
+      "bab": "+16/+11/+6/+1",
+      "bab_first": 16,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "special": [
+        "Smite evil 6/day"
+      ],
+      "spells_per_day": {
+        "1": "3",
+        "2": "3",
+        "3": "2",
+        "4": "1"
+      }
+    },
+    {
+      "level": 17,
+      "bab": "+17/+12/+7/+2",
+      "bab_first": 17,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "special": [
+        "Aura of righteousness"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "3",
+        "3": "2",
+        "4": "1"
+      }
+    },
+    {
+      "level": 18,
+      "bab": "+18/+13/+8/+3",
+      "bab_first": 18,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "special": [
+        "Mercy"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "3",
+        "3": "2",
+        "4": "2"
+      }
+    },
+    {
+      "level": 19,
+      "bab": "+19/+14/+9/+4",
+      "bab_first": 19,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "special": [
+        "Smite evil 7/day"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "3",
+        "3": "3",
+        "4": "2"
+      }
+    },
+    {
+      "level": 20,
+      "bab": "+20/+15/+10/+5",
+      "bab_first": 20,
+      "fort": 12,
+      "ref": 6,
+      "will": 12,
+      "special": [
+        "Holy champion"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "4",
+        "3": "3",
+        "4": "3"
+      }
+    }
+  ],
+  "favored_class_bonuses": [
+    {
+      "race": "Dwarf",
+      "bonus": "Add a +1 bonus on concentration checks when casting paladin spells.",
+      "source": "PRG:APG",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Elf",
+      "bonus": "Add +½ hit point to the paladin's lay on hands ability (whether using it to heal or harm).",
+      "source": "PRG:ARG",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Gnome",
+      "bonus": "Add +½ hit point to the paladin's lay on hands ability (whether using it to heal or harm).",
+      "source": "PRG:ARG",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Half-Elf",
+      "bonus": "Add +1 foot to the size of all the paladin's aura class features. This option has no effect unless the paladin has selected it 5 times (or another increment of 5); an aura of 14 feet is effectively the same as a 10-foot aura, for example.",
+      "source": "PRG:ARG",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Half-Orc",
+      "bonus": "Add +1/3 on critical hit confirmation rolls made while using smite evil (maximum bonus of +5). This bonus does not stack with Critical Focus.",
+      "source": "PRG:ARG",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Halfling",
+      "bonus": "Add +½ hp to the paladin's lay on hands ability (whether using it to heal or harm).",
+      "source": "PRG:APG",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Human",
+      "bonus": "Add +1 to the paladin's energy resistance to one kind of energy (maximum +10).",
+      "source": "PRG:APG",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Aasimar",
+      "bonus": "Add +1/6 to the morale bonus on saving throws provided by the paladin's auras.",
+      "source": "PRG:ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Kobold",
+      "bonus": "Add +¼ to the deflection bonus granted by your smite evil ability.",
+      "source": "KoG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Oread",
+      "bonus": "Add +¼ to the bonus the paladin grants her allies with her aura of courage and aura of resolve special abilities.",
+      "source": "PRG:ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Tiefling",
+      "bonus": "Add +1 to the amount of damage the paladin heals with lay on hands, but only when the paladin uses that ability on herself.",
+      "source": "PRG:ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Android",
+      "bonus": "Add +1/2 hit point to the paladin's lay on hands ability (whether using it to heal or harm).",
+      "source": "JBE:BoHR:AFCO",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Catfolk",
+      "bonus": "Add +1/6 to the morale bonus on saving throws provided by the paladin's auras.",
+      "source": "JBE:BoHR:AFCO",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Changeling",
+      "bonus": "The paladin gains +1/6 of a new mercy.",
+      "source": "JBE:BoHR:AFCO",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Dhampir",
+      "bonus": "Add a +? bonus on saving throws against death effects.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Drow",
+      "bonus": "The paladin adds +¼ to the number of mercies he can use.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Duergar",
+      "bonus": "Add +½ point of acid damage to the paladin's lay on hands ability when used to deal damage.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Fetchling",
+      "bonus": "Add +1 to the paladin's cold resistance (to a maximum increase of 10).",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Hobgoblin",
+      "bonus": "Add a +½ circumstance bonus on critical hit confirmation rolls with a weapon of the paladin's choice (maximum bonus +4). This bonus does not stack with Critical Focus.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Orc",
+      "bonus": "Add +? on critical hit confirmation rolls made while using smite evil (maximum bonus of +5). This bonus does not stack with Critical Focus.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Ratfolk",
+      "bonus": "Add +5 minutes to the amount of time before a condition returns when using one of your mercies (to a maximum of 1 additional hour).",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Wayang",
+      "bonus": "Add +? on critical hit confirmation rolls made while using smite evil (maximum bonus of +5). This bonus does not stack with Critical Focus.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Lapith",
+      "bonus": "Add +¼ AC bonus against a foe you are targeting with smite evil.",
+      "source": "RGG:HHO",
+      "publisher_group": "Rogue Genius Games"
+    }
+  ]
+}

@@ -1,0 +1,449 @@
+{
+  "slug": "investigator",
+  "name": "Investigator",
+  "group": "hybrid",
+  "hit_die": "d8",
+  "alignment": "Any",
+  "starting_wealth": "3d6 × 10 gp (average 105 gp.)",
+  "skill_ranks_per_level": 6,
+  "class_skills": [
+    {
+      "skill": "Acrobatics",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Appraise",
+      "ability": "Int"
+    },
+    {
+      "skill": "Bluff",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Climb",
+      "ability": "Str"
+    },
+    {
+      "skill": "Craft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Diplomacy",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Disable Device",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Disguise",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Escape Artist",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Heal",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Intimidate",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Knowledge (all)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Linguistics",
+      "ability": "Int"
+    },
+    {
+      "skill": "Perception",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Perform",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Profession",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Sense Motive",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Sleight of Hand",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Spellcraft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Stealth",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Use Magic Device",
+      "ability": "Cha"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+0",
+      "bab_first": 0,
+      "fort": 0,
+      "ref": 2,
+      "will": 2,
+      "special": [
+        "Alchemy",
+        "inspiration",
+        "trapfinding"
+      ],
+      "spells_per_day": {
+        "1": "1"
+      }
+    },
+    {
+      "level": 2,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 0,
+      "ref": 3,
+      "will": 3,
+      "special": [
+        "Poison lore",
+        "poison resistance +2"
+      ],
+      "spells_per_day": {
+        "1": "2"
+      }
+    },
+    {
+      "level": 3,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 1,
+      "ref": 3,
+      "will": 3,
+      "special": [
+        "Investigator talent",
+        "keen recollection",
+        "trap sense +1"
+      ],
+      "spells_per_day": {
+        "1": "3"
+      }
+    },
+    {
+      "level": 4,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 4,
+      "special": [
+        "Studied combat",
+        "studied strike +1d6",
+        "swift alchemy"
+      ],
+      "spells_per_day": {
+        "1": "3",
+        "2": "1"
+      }
+    },
+    {
+      "level": 5,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 4,
+      "special": [
+        "Investigator talent",
+        "poison resistance +4"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "2"
+      }
+    },
+    {
+      "level": 6,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 2,
+      "ref": 5,
+      "will": 5,
+      "special": [
+        "Studied strike +2d6",
+        "trap sense +2"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "3"
+      }
+    },
+    {
+      "level": 7,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 2,
+      "ref": 5,
+      "will": 5,
+      "special": [
+        "Investigator talent"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "3",
+        "3": "1"
+      }
+    },
+    {
+      "level": 8,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 2,
+      "ref": 6,
+      "will": 6,
+      "special": [
+        "Poison resistance +6",
+        "studied strike +3d6"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "4",
+        "3": "2"
+      }
+    },
+    {
+      "level": 9,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 3,
+      "ref": 6,
+      "will": 6,
+      "special": [
+        "Investigator talent",
+        "trap sense +3"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "4",
+        "3": "3"
+      }
+    },
+    {
+      "level": 10,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 3,
+      "ref": 7,
+      "will": 7,
+      "special": [
+        "Studied strike +4d6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "4",
+        "3": "3",
+        "4": "1"
+      }
+    },
+    {
+      "level": 11,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 3,
+      "ref": 7,
+      "will": 7,
+      "special": [
+        "Investigator talent",
+        "poison immunity"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "4",
+        "3": "4",
+        "4": "2"
+      }
+    },
+    {
+      "level": 12,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 8,
+      "special": [
+        "Studied strike +5d6",
+        "trap sense +4"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "4",
+        "4": "3"
+      }
+    },
+    {
+      "level": 13,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 8,
+      "special": [
+        "Investigator talent"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "4",
+        "4": "3",
+        "5": "1"
+      }
+    },
+    {
+      "level": 14,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 4,
+      "ref": 9,
+      "will": 9,
+      "special": [
+        "Studied strike +6d6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "4",
+        "4": "4",
+        "5": "2"
+      }
+    },
+    {
+      "level": 15,
+      "bab": "+11/+6/+1",
+      "bab_first": 11,
+      "fort": 5,
+      "ref": 9,
+      "will": 9,
+      "special": [
+        "Investigator talent",
+        "trap sense +5"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "4",
+        "5": "3"
+      }
+    },
+    {
+      "level": 16,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 10,
+      "special": [
+        "Studied strike +7d6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "4",
+        "5": "3",
+        "6": "1"
+      }
+    },
+    {
+      "level": 17,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 10,
+      "special": [
+        "Investigator talent"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "4",
+        "5": "4",
+        "6": "2"
+      }
+    },
+    {
+      "level": 18,
+      "bab": "+13/+8/+3",
+      "bab_first": 13,
+      "fort": 6,
+      "ref": 11,
+      "will": 11,
+      "special": [
+        "Studied strike +8d6",
+        "trap sense +6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "5",
+        "5": "4",
+        "6": "3"
+      }
+    },
+    {
+      "level": 19,
+      "bab": "+14/+9/+4",
+      "bab_first": 14,
+      "fort": 6,
+      "ref": 11,
+      "will": 11,
+      "special": [
+        "Investigator talent"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "5",
+        "5": "5",
+        "6": "4"
+      }
+    },
+    {
+      "level": 20,
+      "bab": "+15/+10/+5",
+      "bab_first": 15,
+      "fort": 6,
+      "ref": 12,
+      "will": 12,
+      "special": [
+        "Studied strike +9d6",
+        "true inspiration"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "5",
+        "5": "5",
+        "6": "5"
+      }
+    }
+  ],
+  "favored_class_bonuses": []
+}

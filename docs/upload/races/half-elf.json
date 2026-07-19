@@ -1,0 +1,388 @@
+{
+  "slug": "half-elf",
+  "name": "Half-elves",
+  "ability_modifiers": {},
+  "ability_modifier_choice": 2,
+  "size": "Medium",
+  "type": "Humanoid (human, elf)",
+  "base_speed": 30,
+  "languages": "Half-elves begin play speaking Common and Elven. Half-elves with high Intelligence scores can choose any languages they want (except secret languages, such as Druidic). See the Linguistics skill page for more information about these languages.",
+  "standard_traits": [
+    {
+      "name": "Ability Score Modifiers",
+      "text": "Half-elf characters gain a +2 bonus to one ability score of their choice at creation to represent their varied nature."
+    },
+    {
+      "name": "Type",
+      "text": "Half-elves are humanoid creatures with both the human and the elf subtypes."
+    },
+    {
+      "name": "Size",
+      "text": "Half-elves are Medium creatures and have no bonuses or penalties due to their size."
+    },
+    {
+      "name": "Base Speed",
+      "text": "Half-elves have a base speed of 30 feet."
+    },
+    {
+      "name": "Languages",
+      "text": "Half-elves begin play speaking Common and Elven. Half-elves with high Intelligence scores can choose any languages they want (except secret languages, such as Druidic). See the Linguistics skill page for more information about these languages."
+    },
+    {
+      "name": "Elven Immunities",
+      "text": "Half-elves are immune to magic sleep effects and gain a +2 racial saving throw bonus against enchantment spells and effects."
+    },
+    {
+      "name": "Adaptability",
+      "text": "Half-elves receive Skill Focus as a bonus feat at 1st level."
+    },
+    {
+      "name": "Keen Senses",
+      "text": "Half-elves receive a +2 racial bonus on Perception checks."
+    },
+    {
+      "name": "Low-Light Vision",
+      "text": "Half-elves can see twice as far as humans in conditions of dim light."
+    },
+    {
+      "name": "Elf Blood",
+      "text": "Half-elves count as both elves and humans for any effect related to race."
+    },
+    {
+      "name": "Multitalented",
+      "text": "Half-elves choose two favored classes at first level and gain +1 hit point or +1 skill point whenever they take a level in either one of those classes."
+    }
+  ],
+  "alternate_traits": [
+    {
+      "name": "Alert for Betrayal",
+      "text": "You gain a +2 racial bonus on saves against illusion spells and effects. Perception and Sense Motive are class skills for you. This racial trait replaces adaptability. Source PZO9480"
+    },
+    {
+      "name": "Ancestral Arms",
+      "text": "Some half-elves receive training in an unusual weapon. Half-elves with this racial trait receive Exotic Weapon Proficiency or Martial Weapon Proficiency with one weapon as a bonus feat at 1st level. This racial trait replaces the adaptability racial trait."
+    },
+    {
+      "name": "Arcane Training",
+      "text": "Half-elves occasionally seek tutoring to help them master the magic in their blood. Half-elves with this racial trait have only one favored class, and it must be an arcane spellcasting class. They can use spell trigger and spell completion items for their favored class as if one level higher (or as a 1st-level character if they have no levels in that class). This racial trait replaces the multitalented racial trait."
+    },
+    {
+      "name": "Behind the Veil (1 RP)",
+      "text": "Characters with this trait gain a +2 bonus on Bluff and Sleight of Hand checks while benefiting from concealment or cover. Half-elves can take this trait in place of low-light vision. Source PZO9466"
+    },
+    {
+      "name": "Blended View (2 RP)",
+      "text": "Prerequisite(s) : low-light vision. Half-drow whose non-drow parent had low-light vision might be blessed with a legacy of versatile senses. Characters with this trait keep their low-light vision but also gain darkvision to a distance of 60 feet. Half-elves can take this trait in place of multitalented. Source PZO9466"
+    },
+    {
+      "name": "Child of the Sea (from Coastal Regions)",
+      "text": "[BOG] Half-elves from a coastal region with this racial trait gain a +4 racial bonus on Swim checks as well as on Profession (sailor) and Wisdom checks to pilot a sea vessel. They also have an innate sense of direction and can never get lost at sea. This racial trait replaces the low-light vision and keen senses racial traits."
+    },
+    {
+      "name": "Cold-Honed (from Arctic Region)",
+      "text": "[BOG] Half-elves from arctic regions with this racial trait can move through natural snow and ice at their normal speed and gain a +4 racial bonus on Fortitude saves to avoid nonlethal damage from cold environments. This racial trait replaces the elven immunities racial trait."
+    },
+    {
+      "name": "Dimdweller (2 RP)",
+      "text": "Whenever characters with this trait benefit from concealment or full concealment due to darkness or dim light, they gain a +2 racial bonus on Intimidate, Perception, and Stealth checks. Half-elves can take this trait in place of adaptability. Source PZO9466"
+    },
+    {
+      "name": "Disregarded (? RP)",
+      "text": "Half-elves with this trait practice magical techniques to conceal their fey features from casual scrutiny. These half-elves treat their caster level as 1 higher when casting illusion spells. Half-elves with a Charisma score of 11 or higher also gain the following spell-like abilities 1/day- _guidance_ , _innocence_ , _lullaby_ , and _mage hand_. The caster level for these effects is equal to the half-elf 's level. The DC for these spells is equal to 10 + the spell's level + the half-elf 's Charisma modifier. This racial trait replaces keen senses."
+    },
+    {
+      "name": "Dragon Soul (4 RP)",
+      "text": "Some half-elves have forsaken a part of their lineage by embracing a more distant connection to dragons. Half-elves with this trait choose to count as either elves or humans for any effect regarding race. Additionally, half-elves with this trait also count as dragons for the purposes of effects targeting creatures by type (such as a ranger's favored enemy and bane weapons, but not for prerequisites), and gain a +2 racial bonus on all saving throws against fear, sleep and paralysis effects. This trait replaces adaptability, elf blood, and elven immunities. Source PZO9480"
+    },
+    {
+      "name": "Dreamer",
+      "text": "Half-elves with this trait gain a +2 racial saving throw bonus against illusion spells and effects. In addition, when entering a dreamscape in a lucid body, a half-elf with this racial trait treats her Charisma score as 2 points higher for the purpose of effects related to the Dimension of Dreams. This racial trait replaces elven immunities. Source PZO1135"
+    },
+    {
+      "name": "Drow-Blooded",
+      "text": "Some half-elves born of drow parents exhibit more drow traits than others-particularly many of the physical features of the drow-and have darkvision 60 feet and light blindness. This racial trait replaces the low-light vision racial trait."
+    },
+    {
+      "name": "Drow Heritage",
+      "text": "Half-elves with this trait count as drow for the purposes of any effect related to race, including prerequisites. This racial trait replaces the ability to choose any language as a bonus language, instead limiting the character to the bonus languages offered to drow. Source PZO9466"
+    },
+    {
+      "name": "Drow Magic",
+      "text": "A few half-elves with drow ancestry exhibit the innate magic of that race. Half-elves with this trait have drow blood somewhere in their background, and can cast dancing lights, darkness, and faerie fire each once per day, using the half-elf's character level as the caster level for these spell-like abilities. This racial trait replaces the adaptability and multitalented racial traits."
+    },
+    {
+      "name": "Drow-Trained",
+      "text": "Characters with this trait are proficient with the hand crossbow, rapier, and shortsword. This racial trait replaces the adaptability racial trait. Source PCS:DR"
+    },
+    {
+      "name": "Dual Minded",
+      "text": "The mixed ancestry of some half-elves makes them resistant to mental attacks. Half-elves with this racial trait gain a +2 bonus on all Will saving throws. This racial trait replaces the adaptability racial trait."
+    },
+    {
+      "name": "Dusksight (2 RP)",
+      "text": "When making ranged attacks, characters with this trait can reroll the miss chance granted by cover to any target in dim light, and take the better of the two rolls. The miss chance for total concealment applies normally. Half-elves can take this trait in place of keen senses. Source PZO9466"
+    },
+    {
+      "name": "Elf-Scorned",
+      "text": "Many half-elves, especially half-drow, are rejected by their elven parents and feel nothing but hatred and fear toward their inhuman ancestors. They gain a +1 racial bonus on attack rolls and a +2 dodge bonus to AC against elves. This racial trait replaces elven immunities and multitalented. Source PCS:ISR"
+    },
+    {
+      "name": "Eye for Opportunity",
+      "text": "Constantly facing the rough edges of two societies, some half-elves develop a knack for finding overlooked opportunities. They gain a +1 racial bonus on attacks of opportunity. This racial trait replaces adaptability and keen senses. Source PCS:ISR"
+    },
+    {
+      "name": "Fey Magic (2 RP)",
+      "text": "The character has a mystic connection to one terrain type, selected from the ranger's favored terrain list. The character selects three 0-level druid spells and one 1st-level druid spell. If the character has a Charisma score of 11 or higher, when in the selected terrain, she gains these spells as spell-like abilities that can be cast once per day. The caster level for these effects is equal to the user's character level. The DC for the spell-like abilities is equal to 10 + the spell's level + the user's Charisma modifier. These spells are treated as being from a fey source for the purposes of the druid's resist nature's lure class feature and similar abilities. This trait replaces keen senses. Source : PZO9456"
+    },
+    {
+      "name": "Fey Thoughts (1 RP)",
+      "text": "Select two of the following skills: Acrobatics, Bluff, Climb, Diplomacy, Disguise, Escape Artist, Fly, Knowledge (nature), Perception, Perform, Sense Motive, Sleight of Hand, Stealth, Swim, or Use Magic Device. The selected skills are always class skills for the character. This trait replaces multitalented. Source : PZO9456"
+    },
+    {
+      "name": "Inspire Imitation",
+      "text": "Whenever a half-elf succeeds at a skill check, she can inspire imitators as a swift action. Any ally within 30 feet who witnesses the successful check and attempts the same check within the next minute gains a +2 bonus on the check as if from the aid another action. This racial trait replaces skilled. PPC:HotS"
+    },
+    {
+      "name": "Integrated",
+      "text": "Many half-elves are skilled in the art of ingratiating themselves into a community as if they were natives. Half-elves with this racial trait gain a +1 bonus on Bluff, Disguise, and Knowledge (local) checks. This racial trait replaces the adaptability racial trait."
+    },
+    {
+      "name": "Jungle Affinity (from a Jungle)",
+      "text": "[BOG] Half-elves from a jungle with this racial trait gain a +4 racial bonus on Stealth checks while within jungle terrain, and can move through natural difficult terrain at their normal speed while within jungle. This racial trait replaces the multi-talented racial trait."
+    },
+    {
+      "name": "Kindred-Raised",
+      "text": "While most think of people with one human and one elven parent when they think of half-elves, some half-elves are raised by two half-elven parents. Such half-elves feel less like outsiders, making them more confident, but less adaptable without the exposure to a human parent. They gain a +2 bonus to Charisma and one other ability score of their choice. This racial trait replaces the half-elf's usual racial ability score modifiers, as well as adaptability, elven immunities, keen senses, and multitalented. Source PCS:ISR"
+    },
+    {
+      "name": "Mismatched",
+      "text": "Rather than having bodily and facial features that are a blend of elven and human, or tending towards one parent or the other, a rare few half-elves have a strange combination of features. They have noticeable mismatched eyes and ears, as well as uneven limbs. Half-elves with this trait take a -2 penalty on Reflex saves but receive a +4 racial bonus on initiative checks. This racial trait replaces keen senses and low-light vision. Source PZO1135"
+    },
+    {
+      "name": "Mordant Envoy (from Mountainous Terrain)",
+      "text": "[BOG] Half-elves from mountainous regions add +1 to the caster level of any transmutation spells they cast. Spireborn with a Charisma score of 11 or higher also gain the following spell-like abilities: 1/day-comprehend languages, detect secret doors, erase, read magic. The caster level for these effects is equal to the user's character level. This racial trait replaces the adaptability racial trait."
+    },
+    {
+      "name": "Multidisciplined",
+      "text": "Born to two races, half-elves have a knack for combining different magical traditions. If a half-elf with this racial trait has spellcasting abilities from at least two different classes, the effects of spells she casts from all her classes are calculated as though her caster level were 1 level higher, to a maximum of her character level. This racial trait replaces multitalented. Source PZO1135"
+    },
+    {
+      "name": "Poison Minion (4 RP)",
+      "text": "Drow sometimes augment their slaves and frontline warriors by making them toxic, causing their bodies to internally produce mawbane poison (see below). The resulting poisonous creature makes a potent weapon in the effort to discourage neighboring monsters. Any creature that hits such a character with a bite attack is immediately exposed to its poison. The save DC for this poison is equal to 10 + 1/2 the character's Hit Dice + the character's Constitution modifier. Mawbane Poison -ingested; save Fortitude as above; frequency 1/round for 4 rounds; effect 1d2 Constitution damage; cure 1 save. Half-elves can take this trait in place of elven immunities and keen senses. Source PZO9466"
+    },
+    {
+      "name": "Reflexive Improvisation",
+      "text": "Half-elves raised among elves often stumble unprepared into each new stage of life because their elven relatives are unaccustomed to the speed of their maturation. They gain a +2 racial bonus on untrained skill checks. This racial trait replaces adaptability and multitalented. Source PCS:ISR"
+    },
+    {
+      "name": "Round Ears",
+      "text": "Sometimes half-elves are born with no obvious elven features. Their parents may even be humans with only faint traces of elven blood. They gain the human's skilled racial trait. In addition, they receive a +4 racial bonus on Disguise checks to appear human. This racial trait replaces adaptability, keen senses, and low-light vision. Source PZO1135"
+    },
+    {
+      "name": "Sea Legs",
+      "text": "Many half-elves find their way onto the water early in their youth, whether they live with trader families, work as smugglers, or plunder alongside pirates. These half-elves receive a +2 racial bonus on Swim checks, as well as a +4 racial bonus on Acrobatics checks to move on narrow or slippery surfaces, and on Climb checks on docks and ships. This racial trait replaces adaptability. Source PCS:ISR"
+    },
+    {
+      "name": "Shadowhunter (2 RP)",
+      "text": "Characters with this trait deal 50% weapon damage to incorporeal creatures when using non-magical weapons (including natural and unarmed attacks), as if using magic weapons. They also gain a +2 bonus on saving throws to remove negative levels, and recover physical ability damage from attacks by undead creatures at a rate of 2 points per ability score per day (rather than the normal 1 point per ability score per day). Half-elves can take this trait in place of elven immunities. Source PZO9466"
+    },
+    {
+      "name": "Sure Step (2 RP)",
+      "text": "Adventurers can spend their whole careers in the alleys and sewers of large cities or the tunnels of the Underworld. Characters with this trait suffer no movement penalties when blinded or moving in darkness. Half-elves can take this trait in place of keen senses. Source PZO9466"
+    },
+    {
+      "name": "Sociable",
+      "text": "Half-elves are skilled at charming others and recovering from faux pas. If half-elves with this racial trait attempt to change a creature's attitude with a Diplomacy check and fail by 5 or more, they can try to influence the creature a second time even if 24 hours have not passed. This racial trait replaces the adaptability racial trait."
+    },
+    {
+      "name": "Sophisticate",
+      "text": "Half-elves who strive to embody the culture in which they live develop a keen instinct for the ebb and flow of fashions, fads, and political trends. They gain a +2 racial bonus on Knowledge (history) and Knowledge (local) checks and can use those skills untrained even for checks with a DC of 10 or more. This racial trait replaces elven immunities. Source PCS:ISR"
+    },
+    {
+      "name": "Starchild",
+      "text": "Some half-elves descend from elves who are not from this world, but rather visitors from another world, plane, or dimension. Half-elves with this trait gain Psychic Sensitivity as a bonus feat at 1st level. This racial trait replaces adaptability. Source PZO1135"
+    },
+    {
+      "name": "Thinblood Resilience (from the Underdark)",
+      "text": "[BOG] Half-elves from the underdark with this racial trait are accustomed to torture at the hands of their drow forebears, and gain a +2 racial bonus on Fortitude saves against poison and disease, including magical diseases. Darkborn also gain the poison use ability and never risk accidentally poisoning themselves. This racial trait replaces the elven immunities racial trait."
+    },
+    {
+      "name": "Underworld Guide (2 RP)",
+      "text": "Those who brave the lightless tunnels below the world's surface learn to identify the dangerous phenomena that characterize the Underworld. Characters with this trait gain a +2 bonus on initiative checks, and on saves against traps and hazards when underground (from a lifetime of dodging accursed pools, cave-ins, and green slime). Half-elves can take this trait in place of keen senses. Source PZO9466"
+    },
+    {
+      "name": "Voice in the Darkness (2 RP)",
+      "text": "Prerequisite(s) : Charisma 13+. Characters who practice coercion and intimidation in the Underworld or on the Shadow Plane learn to do so in dim light or no light at all. As long as they are in dim light or darker conditions, characters with this trait gain a +2 bonus on Intimidate and Stealth checks. Half-elves can take this trait in place of adaptability. Source PZO9466"
+    },
+    {
+      "name": "Wary",
+      "text": "Many half-elves have spent their long lives moving from place to place, often driven out by the hostility of others. Such experiences have made them wary of others' motivations. Half-elves with this trait gain a +1 racial bonus on Sense Motive and Bluff checks. This racial trait replaces the keen senses racial trait."
+    },
+    {
+      "name": "Water Child",
+      "text": "Some half-elves are born of elves adapted to life on or near the water. These half-elves gain a +4 racial bonus on Swim checks, can always take 10 while swimming, and may choose Aquan as a bonus language. This racial trait replaces the adaptability and multitalented racial traits."
+    },
+    {
+      "name": "Weapon Familiarity",
+      "text": "Half-elves raised among elves often feel pitied and mistrusted by their longer-lived kin, and yet they receive training in elf weapons. They gain the elf ‘s weapon familiarity trait. This racial trait replaces adaptability. Source PCS:ISR"
+    }
+  ],
+  "favored_class_options": [
+    {
+      "class": "Alchemist",
+      "bonus": "Add +1 foot to the range increment of the alchemist's thrown splash weapons (including the alchemist's bombs). This option has no effect unless the alchemist has selected it 5 times (or another increment of 5); a range increment of 24 feet is effectively the same as a range increment of 20 feet, for example."
+    },
+    {
+      "class": "Arcanist",
+      "bonus": "When casting arcanist enchantment spells, add 1/3 to the effective caster level, but only for the purpose of determining duration."
+    },
+    {
+      "class": "Barbarian",
+      "bonus": "Add +1/4 to the bonus on Reflex saves and dodge bonus to AC against attacks made by traps granted by trap sense."
+    },
+    {
+      "class": "Bard",
+      "bonus": "Add +1 to the bard's total number of bardic performance rounds per day."
+    },
+    {
+      "class": "Bloodrager",
+      "bonus": "Increase the bonus gained from blood sanctuary by 1/4."
+    },
+    {
+      "class": "Brawler",
+      "bonus": "Add 1 to the brawler's CMD when she's resisting a trip or overrun combat maneuver."
+    },
+    {
+      "class": "Cavalier",
+      "bonus": "Add +1 foot to the cavalier's mount's base speed. This option has no effect unless the cavalier has selected it 5 times (or another increment of 5); a speed of 54 feet is effectively a speed of 50 feet, for example. If the cavalier ever replaces his mount, the new companion gains this base speed bonus."
+    },
+    {
+      "class": "Cleric",
+      "bonus": "Add +1/3 to the amount of damage dealt or damage healed when the cleric uses channel energy."
+    },
+    {
+      "class": "Cleric",
+      "bonus": "Add a +1/4 bonus on caster level checks to remove afflictions (curses, diseases, poisons, etc.). Source PZO1135"
+    },
+    {
+      "class": "Druid",
+      "bonus": "Select one cleric domain power at 1st level that is normally usable a number of times per day equal to 3 + the druid's Wisdom modifier. The druid adds +1/2 to the number of uses per day of that domain power. For druids whose nature bond gives them an animal companion, add +1 skill rank to the animal companion. If the druid ever replaces her animal companion, the new companion gains these bonus skill ranks."
+    },
+    {
+      "class": "Fighter",
+      "bonus": "Add +1 to the fighter's CMD when resisting a disarm or overrun combat maneuver."
+    },
+    {
+      "class": "Gunslinger",
+      "bonus": "Add +1/4 to the number of grit points in the gunslinger's grit pool."
+    },
+    {
+      "class": "Hunter",
+      "bonus": "Add 1 foot to the hunter's companion's base speed. In combat, this has an effect only for every five increases in base speed."
+    },
+    {
+      "class": "Inquisitor",
+      "bonus": "Add +1/4 to the number of times per day the inquisitor can change her most recent teamwork feat."
+    },
+    {
+      "class": "Investigator",
+      "bonus": "Gain a +1/4 bonus on all inspiration rolls."
+    },
+    {
+      "class": "Kineticist",
+      "bonus": "Gain a +1/4 bonus on damage rolls that apply the kineticist's elemental overflow bonus. Source : PRG:OA"
+    },
+    {
+      "class": "Magus",
+      "bonus": "Add +1/4 to the magus's arcane pool."
+    },
+    {
+      "class": "Medium",
+      "bonus": "Gain a +1/3 bonus on all skill checks using occult skill unlocks. Source : PRG:OA"
+    },
+    {
+      "class": "Mesmerist",
+      "bonus": "When casting mesmerist enchantment spells, add 1/2 to the effective caster level of the spell, but only to determine the spell's duration. Source : PRG:OA"
+    },
+    {
+      "class": "Monk",
+      "bonus": "Add +1/2 on Escape Artist checks and on Acrobatics checks to cross narrow surfaces."
+    },
+    {
+      "class": "Occultist",
+      "bonus": "Gain a +1/2 bonus on Spellcraft checks to identify the properties of magic items and a +1/2 bonus on Use Magic Device checks to emulate a race. Source : PRG:OA"
+    },
+    {
+      "class": "Oracle",
+      "bonus": "Add one spell known from the oracle spell list. This spell must be at least one level below the highest spell level the oracle can cast."
+    },
+    {
+      "class": "Oracle",
+      "bonus": "Select one revelation normally usable a number of times per day equal to 3 + the oracle's Charisma modifier. Add 1/2 to the number of uses per day of that revelation. Source PZO1135"
+    },
+    {
+      "class": "Paladin",
+      "bonus": "Add +1 foot to the size of all the paladin's aura class features. This option has no effect unless the paladin has selected it 5 times (or another increment of 5); an aura of 14 feet is effectively the same as a 10-foot aura, for example."
+    },
+    {
+      "class": "Psychic",
+      "bonus": "Gain 1/6 of a new phrenic amplification. Source : PRG:OA"
+    },
+    {
+      "class": "Ranger",
+      "bonus": "Add +1 skill rank to the ranger's animal companion. If the ranger ever replaces his companion, the new companion gains these bonus skill ranks."
+    },
+    {
+      "class": "Ranger",
+      "bonus": "The duration of the ranger's companion bond increases by 1 round. Source PZO1135"
+    },
+    {
+      "class": "Rogue",
+      "bonus": "Add a +1/2 bonus on Bluff checks to feint and Diplomacy checks to gather information."
+    },
+    {
+      "class": "Shaman",
+      "bonus": "Add one spell from the cleric spell list that isn't on the shaman spell list to the list of spells the shaman knows. This spell must be at least 1 level below the highest spell level the shaman can cast."
+    },
+    {
+      "class": "Skald",
+      "bonus": "Increase the skald's total number of raging song rounds per day by 1."
+    },
+    {
+      "class": "Slayer",
+      "bonus": "Gain a +1/2 bonus on Bluff checks to feint and Diplomacy checks to gain information."
+    },
+    {
+      "class": "Sorcerer",
+      "bonus": "Select one bloodline power at 1st level that is normally usable a number of times per day equal to 3 + the sorcerer's Charisma modifier. The sorcerer adds +1/2 to the number of uses per day of that bloodline power."
+    },
+    {
+      "class": "Spiritualist",
+      "bonus": "Add 1 skill rank to the spiritualist's phantom. Source : PRG:OA"
+    },
+    {
+      "class": "Summoner",
+      "bonus": "Add +1/4 to the eidolon's evolution pool."
+    },
+    {
+      "class": "Swashbuckler",
+      "bonus": "Increase the number of times per day the swashbuckler can use charmed life by 1/4."
+    },
+    {
+      "class": "Vigilante",
+      "bonus": "Gain +1/2 on the Disguise bonus from seamless guise. Source PZO1134"
+    },
+    {
+      "class": "Warpriest",
+      "bonus": "Gain a +1/3 bonus on the damage dealt or healed with the warpriest's channel energy ability."
+    },
+    {
+      "class": "Witch",
+      "bonus": "Add one spell from the witch spell list to the witch's familiar. This spell must be at least one level below the highest spell level she can cast. If the witch ever replaces her familiar, the new familiar knows these bonus spells."
+    },
+    {
+      "class": "Wizard",
+      "bonus": "When casting wizard enchantment spells, add +1/3 to the effective caster level of the spell, but only to determine the spell's duration."
+    }
+  ]
+}

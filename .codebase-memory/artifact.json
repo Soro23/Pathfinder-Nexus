@@ -1,0 +1,11 @@
+{
+    "schema_version": 2,
+    "commit": "a7e431e88e4e7bb84b3f1109c84225a72a8f77f9",
+    "indexed_at": "2026-07-19T21:24:27Z",
+    "project": "Pathfinder-Nexus",
+    "nodes": 1354,
+    "edges": 3130,
+    "original_size": 3801088,
+    "compressed_size": 373439,
+    "compression_level": 3
+}

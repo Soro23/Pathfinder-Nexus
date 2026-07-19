@@ -1,0 +1,303 @@
+{
+  "slug": "brawler",
+  "name": "Brawler",
+  "group": "hybrid",
+  "hit_die": "d10",
+  "alignment": "Any",
+  "starting_wealth": "3d6 × 10 gp (average 105 gp.)",
+  "skill_ranks_per_level": 4,
+  "class_skills": [
+    {
+      "skill": "Acrobatics",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Climb",
+      "ability": "Str"
+    },
+    {
+      "skill": "Craft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Escape Artist",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Handle Animal",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Intimidate",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Knowledge (dungeoneering)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Knowledge (local)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Perception",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Profession",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Ride",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Sense Motive",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Swim",
+      "ability": "Str"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 2,
+      "ref": 2,
+      "will": 0,
+      "special": [
+        "Brawler's cunning",
+        "martial flexibility",
+        "martial training",
+        "unarmed strike"
+      ]
+    },
+    {
+      "level": 2,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 3,
+      "ref": 3,
+      "will": 0,
+      "special": [
+        "Bonus combat feat",
+        "brawler's flurry (Two-Weapon Fighting)"
+      ]
+    },
+    {
+      "level": 3,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 3,
+      "ref": 3,
+      "will": 1,
+      "special": [
+        "Maneuver training 1"
+      ]
+    },
+    {
+      "level": 4,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "special": [
+        "AC bonus +1",
+        "knockout 1/day"
+      ]
+    },
+    {
+      "level": 5,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "special": [
+        "Bonus combat feat",
+        "brawler's strike (magic)",
+        "close weapon mastery"
+      ]
+    },
+    {
+      "level": 6,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "special": [
+        "Martial flexibility (swift action)"
+      ]
+    },
+    {
+      "level": 7,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "special": [
+        "Maneuver training 2"
+      ]
+    },
+    {
+      "level": 8,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 6,
+      "ref": 6,
+      "will": 2,
+      "special": [
+        "Bonus combat feat",
+        "brawler's flurry (Improved Two-Weapon Fighting)"
+      ]
+    },
+    {
+      "level": 9,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 3,
+      "special": [
+        "AC Bonus +2",
+        "brawler's strike (cold iron and silver)"
+      ]
+    },
+    {
+      "level": 10,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "special": [
+        "Martial flexibility (free action)",
+        "knockout 2/day"
+      ]
+    },
+    {
+      "level": 11,
+      "bab": "+11/+6/+1",
+      "bab_first": 11,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "special": [
+        "Bonus combat feat",
+        "Maneuver training 3"
+      ]
+    },
+    {
+      "level": 12,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "special": [
+        "Brawler's strike (alignment)",
+        "martial flexibility (immediate action)"
+      ]
+    },
+    {
+      "level": 13,
+      "bab": "+13/+8/+3",
+      "bab_first": 13,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "special": [
+        "AC bonus +3"
+      ]
+    },
+    {
+      "level": 14,
+      "bab": "+14/+9/+4",
+      "bab_first": 14,
+      "fort": 9,
+      "ref": 9,
+      "will": 4,
+      "special": [
+        "Bonus combat feat"
+      ]
+    },
+    {
+      "level": 15,
+      "bab": "+15/+10/+5",
+      "bab_first": 15,
+      "fort": 9,
+      "ref": 9,
+      "will": 5,
+      "special": [
+        "Brawler's flurry (Greater Two-Weapon Fighting)",
+        "Maneuver training 4"
+      ]
+    },
+    {
+      "level": 16,
+      "bab": "+16/+11/+6/+1",
+      "bab_first": 16,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "special": [
+        "Awesome blow",
+        "knockout 3/day"
+      ]
+    },
+    {
+      "level": 17,
+      "bab": "+17/+12/+7/+2",
+      "bab_first": 17,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "special": [
+        "Bonus combat feat",
+        "brawler's strike (adamantine)"
+      ]
+    },
+    {
+      "level": 18,
+      "bab": "+18/+13/+8/+3",
+      "bab_first": 18,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "special": [
+        "AC bonus +4"
+      ]
+    },
+    {
+      "level": 19,
+      "bab": "+19/+14/+9/+4",
+      "bab_first": 19,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "special": [
+        "Maneuver training 5"
+      ]
+    },
+    {
+      "level": 20,
+      "bab": "+20/+15/+10/+5",
+      "bab_first": 20,
+      "fort": 12,
+      "ref": 12,
+      "will": 6,
+      "special": [
+        "Bonus combat feat",
+        "improved awesome blow",
+        "martial flexibility (any number)"
+      ]
+    }
+  ],
+  "favored_class_bonuses": []
+}

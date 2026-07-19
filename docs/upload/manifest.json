@@ -1,0 +1,22 @@
+{
+  "generated": "2026-07-19",
+  "source": "d20pfsrd scrape (data/site)",
+  "classes": {
+    "count": 39,
+    "groups": [
+      "alternate",
+      "base",
+      "core",
+      "hybrid",
+      "unchained"
+    ]
+  },
+  "races": {
+    "count": 7
+  },
+  "feats": {
+    "count": 3278,
+    "with_prerequisites": 1405,
+    "prerequisites_parsed": 1402
+  }
+}

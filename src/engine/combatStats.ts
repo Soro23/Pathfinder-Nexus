@@ -22,6 +22,15 @@ export interface CombatStats {
   cmb: number
   cmd: number
   initiative: number
+  negativeLevelPenalty: number
+}
+
+export function getNegativeLevelPenalty(character: Pick<Character, 'negativeLevels'>): number {
+  return Math.max(0, character.negativeLevels ?? 0)
+}
+
+export function computeEffectiveMaxHp(character: Character, resolvedStats: ResolvedStats): number {
+  return Math.max(1, character.hp.max + resolvedStats.hpBonus - getNegativeLevelPenalty(character) * 5)
 }
 
 // Dex efectiva para CA: topada por el maxDex de la armadura corporal equipada.
@@ -46,6 +55,7 @@ export function computeCombatStats(character: Character, resolvedStats: Resolved
 
   const mcStats = getMulticlassStats(character.classes)
   const bab = mcStats.bab
+  const negativeLevelPenalty = getNegativeLevelPenalty(character)
 
   const size = getCharacterSize(character)
   const sizeMod = getSizeACModifier(size)     // se usa también para ataque
@@ -61,14 +71,14 @@ export function computeCombatStats(character: Character, resolvedStats: Resolved
   const acTouch = 10 + dexForAC + deflection + dodge + sizeMod + acMisc
   const acFlatFooted = 10 + armor + shield + natural + deflection + sizeMod + acMisc
 
-  const fortitude = mcStats.fortitude + conMod + resolvedStats.saveBonuses.fort
-  const reflex = mcStats.reflex + dexMod + resolvedStats.saveBonuses.ref
-  const will = mcStats.will + wisMod + resolvedStats.saveBonuses.will
+  const fortitude = mcStats.fortitude + conMod + resolvedStats.saveBonuses.fort - negativeLevelPenalty
+  const reflex = mcStats.reflex + dexMod + resolvedStats.saveBonuses.ref - negativeLevelPenalty
+  const will = mcStats.will + wisMod + resolvedStats.saveBonuses.will - negativeLevelPenalty
 
-  const cmb = bab + strMod + sizeCmbMod + resolvedStats.cmbBonus
-  const cmd = 10 + bab + strMod + dexMod + sizeCmbMod + resolvedStats.cmdBonus
+  const cmb = bab + strMod + sizeCmbMod + resolvedStats.cmbBonus - negativeLevelPenalty
+  const cmd = 10 + bab + strMod + dexMod + sizeCmbMod + resolvedStats.cmdBonus - negativeLevelPenalty
 
-  const initiative = dexMod + resolvedStats.initiativeBonus
+  const initiative = dexMod + resolvedStats.initiativeBonus - negativeLevelPenalty
 
   return {
     bab, strMod, dexMod, conMod, intMod, wisMod, chaMod, sizeMod,
@@ -76,6 +86,7 @@ export function computeCombatStats(character: Character, resolvedStats: Resolved
     fortitude, reflex, will,
     cmb, cmd,
     initiative,
+    negativeLevelPenalty,
   }
 }
 
@@ -88,6 +99,18 @@ export function computeWeaponAttackBonus(
   weaponBonus: number,
   resolvedStats: ResolvedStats,
   sizeMod = 0,
+  negativeLevelPenalty = 0,
 ): number {
-  return bab + abilityMod + weaponBonus + resolvedStats.attackBonus + sizeMod
+  return bab + abilityMod + weaponBonus + resolvedStats.attackBonus + sizeMod - negativeLevelPenalty
+}
+
+// Ataques iterativos: a partir de BAB +6 se gana un ataque adicional cada +5 de BAB
+// (hasta 4 ataques a BAB +16), cada uno a −5 acumulativo respecto al anterior. Devuelve
+// los descuentos a restar del bono de ataque principal (0 para el primer ataque).
+export function getIterativeAttackOffsets(bab: number): number[] {
+  const offsets: number[] = [0]
+  for (let threshold = 6; threshold <= bab && offsets.length < 4; threshold += 5) {
+    offsets.push(offsets.length * 5)
+  }
+  return offsets
 }

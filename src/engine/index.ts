@@ -1,13 +1,30 @@
 export { resolveModifiers } from './modifiers'
-export { computeCombatStats, computeWeaponAttackBonus } from './combatStats'
+export { computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus, getIterativeAttackOffsets, getNegativeLevelPenalty } from './combatStats'
 export { getCharacterSize, getSizeACModifier, getSizeCMBModifier, getSizeSkillModifier, normalizeSizeString } from './size'
 export { computeSkillPointsAvailable, computeSkillTotal, isClassSkillForCharacter } from './skills'
 export { getStrDamageBonus, getPowerAttackDamageBonus } from './weapon'
 export { getCarryingCapacity, getCarryingCapacityTiers, getEncumbranceLevel } from './carryingCapacity'
 export type { CarryingCapacityTiers, EncumbranceLevel } from './carryingCapacity'
 export { computeSpeed } from './speed'
+export { canLevelUpFromXp, getNextLevelXp, getXpThresholdForLevel, getXpToNextLevel, XP_MEDIUM_TRACK } from './xp'
 export { computeCompanionStats } from './companion'
 export type { ComputedCompanionStats, ComputedCompanionAttack } from './companion'
+export { computeSyncedSpellSlots } from './spellSlots'
+export type { SyncedSpellSlot, SyncedSpellSlots } from './spellSlots'
+export {
+  deriveClassesFromLevelHistory,
+  deriveFeatsFromLevelHistory,
+  deriveProgressionFromLevelHistory,
+  deriveSkillRanksFromLevelHistory,
+  validateProgressionAgainstCharacter,
+} from './characterProgression'
+export type { DerivedProgression, ProgressionMismatch } from './characterProgression'
+export {
+  ABILITY_INCREASE_LEVELS, isAbilityIncreaseLevel, isGenericFeatLevel, computeHpGain,
+  isAlignmentAllowedForClass, getAlignmentLabel, checkFeatPrerequisites,
+  FAVORED_CLASS_LABELS, getBonusFeatSlotsForClassLevel, getExpectedFeatCount, getFavoredClassHpBonus, getFavoredClassSkillBonus,
+} from './levelProgression'
+export type { BonusFeatSlot, FeatPrereqContext, FeatPrereqCheck } from './levelProgression'
 export type { Modifier, ModifierTarget, ModifierType, ResolvedStats } from './types'
 export type { CombatStats } from './combatStats'
 export type { CreatureSize } from './size'

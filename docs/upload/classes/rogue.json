@@ -1,0 +1,553 @@
+{
+  "slug": "rogue",
+  "name": "Rogue",
+  "group": "core",
+  "hit_die": "d8",
+  "alignment": "Any",
+  "starting_wealth": "4d6 × 10 gp (average 140 gp.)",
+  "skill_ranks_per_level": 8,
+  "class_skills": [
+    {
+      "skill": "Acrobatics",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Appraise",
+      "ability": "Int"
+    },
+    {
+      "skill": "Bluff",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Climb",
+      "ability": "Str"
+    },
+    {
+      "skill": "Craft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Diplomacy",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Disable Device",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Disguise",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Escape Artist",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Intimidate",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Knowledge (dungeoneering)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Knowledge (local)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Linguistics",
+      "ability": "Int"
+    },
+    {
+      "skill": "Perception",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Perform",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Profession",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Sense Motive",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Sleight of Hand",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Stealth",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Swim",
+      "ability": "Str"
+    },
+    {
+      "skill": "Use Magic Device",
+      "ability": "Cha"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+0",
+      "bab_first": 0,
+      "fort": 0,
+      "ref": 2,
+      "will": 0,
+      "special": [
+        "Sneak attack +1d6",
+        "trapfinding"
+      ]
+    },
+    {
+      "level": 2,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 0,
+      "ref": 3,
+      "will": 0,
+      "special": [
+        "Evasion",
+        "rogue talent"
+      ]
+    },
+    {
+      "level": 3,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 1,
+      "ref": 3,
+      "will": 1,
+      "special": [
+        "Sneak attack +2d6",
+        "trap sense +1"
+      ]
+    },
+    {
+      "level": 4,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 1,
+      "special": [
+        "Rogue talent",
+        "uncanny dodge"
+      ]
+    },
+    {
+      "level": 5,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 1,
+      "special": [
+        "Sneak attack +3d6"
+      ]
+    },
+    {
+      "level": 6,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 2,
+      "ref": 5,
+      "will": 2,
+      "special": [
+        "Rogue talent",
+        "trap sense +2"
+      ]
+    },
+    {
+      "level": 7,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 2,
+      "ref": 5,
+      "will": 2,
+      "special": [
+        "Sneak attack +4d6"
+      ]
+    },
+    {
+      "level": 8,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 2,
+      "ref": 6,
+      "will": 2,
+      "special": [
+        "Improved uncanny dodge",
+        "rogue talent"
+      ]
+    },
+    {
+      "level": 9,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 3,
+      "ref": 6,
+      "will": 3,
+      "special": [
+        "Sneak attack +5d6",
+        "trap sense +3"
+      ]
+    },
+    {
+      "level": 10,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 3,
+      "ref": 7,
+      "will": 3,
+      "special": [
+        "Advanced talents",
+        "rogue talent"
+      ]
+    },
+    {
+      "level": 11,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 3,
+      "ref": 7,
+      "will": 3,
+      "special": [
+        "Sneak attack +6d6"
+      ]
+    },
+    {
+      "level": 12,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 4,
+      "special": [
+        "Rogue talent",
+        "trap sense +4"
+      ]
+    },
+    {
+      "level": 13,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 4,
+      "special": [
+        "Sneak attack +7d6"
+      ]
+    },
+    {
+      "level": 14,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 4,
+      "ref": 9,
+      "will": 4,
+      "special": [
+        "Rogue talent"
+      ]
+    },
+    {
+      "level": 15,
+      "bab": "+11/+6/+1",
+      "bab_first": 11,
+      "fort": 5,
+      "ref": 9,
+      "will": 5,
+      "special": [
+        "Sneak attack +8d6",
+        "trap sense +5"
+      ]
+    },
+    {
+      "level": 16,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 5,
+      "special": [
+        "Rogue talent"
+      ]
+    },
+    {
+      "level": 17,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 5,
+      "special": [
+        "Sneak attack +9d6"
+      ]
+    },
+    {
+      "level": 18,
+      "bab": "+13/+8/+3",
+      "bab_first": 13,
+      "fort": 6,
+      "ref": 11,
+      "will": 6,
+      "special": [
+        "Rogue talent",
+        "trap sense +6"
+      ]
+    },
+    {
+      "level": 19,
+      "bab": "+14/+9/+4",
+      "bab_first": 14,
+      "fort": 6,
+      "ref": 11,
+      "will": 6,
+      "special": [
+        "Sneak attack +10d6"
+      ]
+    },
+    {
+      "level": 20,
+      "bab": "+15/+10/+5",
+      "bab_first": 15,
+      "fort": 6,
+      "ref": 12,
+      "will": 6,
+      "special": [
+        "Master strike",
+        "rogue talent"
+      ]
+    }
+  ],
+  "favored_class_bonuses": [
+    {
+      "race": "Dwarf",
+      "bonus": "Add a +½ bonus on Disable Device checks regarding stone traps and a +½ bonus to trap sense regarding stone traps.",
+      "source": "PZO1115",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Elf",
+      "bonus": "Add +1 to the number of times per day the rogue can cast a cantrip or 1st-level spell gained from the minor magic or major magic talent. The number of times this bonus is selected for the major magic talent cannot exceed the number of times it is selected for the minor magic talent. The rogue must possess the associated rogue talent to select these options.",
+      "source": "PZO1121",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Gnome",
+      "bonus": "Add a +1 bonus on Disable Device and Use Magic Device checks related to glyphs, symbols, scrolls, and other magical writings each time they gain a level of rogue.",
+      "source": "PZO1115",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Half-Elf",
+      "bonus": "Add a +½ bonus on Bluff checks to feint and Diplomacy checks to gather information.",
+      "source": "PZO1115",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Half-Orc",
+      "bonus": "Add +1/3 on critical hit confirmation rolls made while using sneak attack (maximum bonus of +5). This bonus does not stack with Critical Focus.",
+      "source": "PZO1121",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Halfling",
+      "bonus": "Choose a weapon from the following list: sling, dagger, or any weapon with “halfling” in its name. Add a +½ circumstance bonus on critical hit confirmation rolls with that weapon (maximum bonus of +4). This bonus does not stack with Critical Focus.",
+      "source": "PZO1115",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Human",
+      "bonus": "Gain +1/6 of a new rogue talent.",
+      "source": "PZO1115",
+      "publisher_group": "Paizo"
+    },
+    {
+      "race": "Catfolk",
+      "bonus": "Add a +½ bonus on Bluff checks to feint and Sleight of Hand checks to pickpocket.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Changeling",
+      "bonus": "The rogue gains +1/6 of a new rogue talent.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Dhampir",
+      "bonus": "Add a +½ bonus on Stealth checks and Perception checks made in dim light or darkness.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Drow",
+      "bonus": "Add a +½ bonus on Bluff checks to feint and pass secret messages.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Fetchling",
+      "bonus": "Add a +½ bonus on Stealth and Sleight of Hand checks made while in dim light or darkness.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Gillman",
+      "bonus": "The rogue gains +1/6 of a new rogue talent.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Goblin",
+      "bonus": "Add a +1 bonus on the rogue's sneak attack damage rolls during the surprise round or before the target has acted in combat.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Grippli",
+      "bonus": "Add a +½ bonus on Perception checks while in a forest or swamp.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Hobgoblin",
+      "bonus": "Reduce the penalty for not being proficient with one weapon by 1. When the non-proficiency penalty for a weapon becomes 0 because of this ability, the rogue is treated as having the appropriate Martial or Exotic Weapon Proficiency feat for that weapon.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Ifrit",
+      "bonus": "Add a +½ bonus on Acrobatics checks to jump and a +½ bonus on Intimidate checks to demoralize enemies.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Kitsune",
+      "bonus": "The rogue gains +1/6 of a new rogue talent.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Kobold",
+      "bonus": "Add +½ to the rogue's trap sense bonus to AC.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Ratfolk",
+      "bonus": "Add a +½ bonus on Escape Artist checks.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Samsaran",
+      "bonus": "The rogue gains +1/6 of a new rogue talent.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Sylph",
+      "bonus": "Add a +½ bonus on Acrobatics checks to jump and a +½ bonus on Sense Motive checks.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Tengu",
+      "bonus": "Choose a weapon from those listed under the tengu's swordtrained ability. Add a +½ bonus on critical hit confirmation rolls with that weapon (maximum bonus +4). This bonus does not stack with Critical Focus.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Tiefling",
+      "bonus": "Add +½ to sneak attack damage dealt to creatures with the outsider type.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Vanara",
+      "bonus": "The rogue gains +1/6 of a new rogue talent.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Vishkanya",
+      "bonus": "Add +1 to the rogue's CMD when resisting a grapple or reposition attempt.",
+      "source": "PZO1121",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Android",
+      "bonus": "Add +1/3 to the rogue's initiative when able to act in the surprise round (maximum bonus of +5). This bonus does not stack with Improved Initiative.",
+      "source": "JBE:BoHR:AFCO",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Drow",
+      "bonus": "Add a +½ bonus on Bluff checks to feint and pass secret messages.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Duergar",
+      "bonus": "Add a +½ bonus on Bluff checks to feint and Intimidate checks.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Fetchling",
+      "bonus": "Add a +½ bonus on Stealth and Sleight of Hand checks made while in dim light or darkness.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Hobgoblin",
+      "bonus": "Reduce the penalty for not being proficient with one weapon by 1. When the non-proficiency penalty for a weapon becomes 0 because of this ability, the rogue is treated as having the appropriate Martial or Exotic Weapon Proficiency feat for that weapon.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Orc",
+      "bonus": "Add +½ to damage rolls when the rogue is at or below 0 hit points.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Ratfolk",
+      "bonus": "Add a +½ bonus on Escape Artist and Slight of Hand checks.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Tiefling",
+      "bonus": "Add +½ to sneak attack damage dealt to creatures with the outsider type.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Wayang",
+      "bonus": "Add +1 to the rogue's CMD when resisting a disarm or steal attempt.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Lapith",
+      "bonus": "Add +1 ft. to the maximum range you can use sneak attack. (+5 feet to maximum sneak attack range for every five times you select this option.)",
+      "source": "RGG:HHO",
+      "publisher_group": "Rogue Genius Games"
+    },
+    {
+      "race": "Piper",
+      "bonus": "Add +½ level to all Sense Motive and Use Magic Device checks. (+1 to these checks for every two times you select this option.)",
+      "source": "RGG:HHO",
+      "publisher_group": "Rogue Genius Games"
+    }
+  ]
+}

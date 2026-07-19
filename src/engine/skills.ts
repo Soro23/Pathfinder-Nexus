@@ -15,6 +15,7 @@ export interface SkillCalcContext {
   classes: CharacterClass[]
   skills: SkillRank[]
   race: string
+  negativeLevels?: number
   // Arquetipos resueltos por classId — opcional porque requiere el catálogo de useSRDStore(),
   // no disponible en el propio Character. Sin esto, las habilidades de clase añadidas/quitadas
   // por arquetipo no se reflejan en el bono de +3.
@@ -65,6 +66,7 @@ export function computeSkillTotal(
   const misc = rankEntry?.miscBonuses?.reduce((s, b) => s + b.value, 0) ?? 0
   const featBonus = resolvedStats.skillBonuses?.[skill.id] ?? 0
   const sizeMod = getSizeSkillModifier(getCharacterSize(character), skill.id)
+  const negativeLevelPenalty = Math.max(0, character.negativeLevels ?? 0)
 
-  return ranks + abilityMod + classBonus + acp + misc + featBonus + sizeMod
+  return ranks + abilityMod + classBonus + acp + misc + featBonus + sizeMod - negativeLevelPenalty
 }

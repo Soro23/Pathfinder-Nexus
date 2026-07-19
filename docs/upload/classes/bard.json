@@ -1,0 +1,604 @@
+{
+  "slug": "bard",
+  "name": "Bard",
+  "group": "core",
+  "hit_die": "d8",
+  "alignment": "Any",
+  "starting_wealth": "3d6 × 10 gp (average 105 gp.)",
+  "skill_ranks_per_level": 6,
+  "class_skills": [
+    {
+      "skill": "Acrobatics",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Appraise",
+      "ability": "Int"
+    },
+    {
+      "skill": "Bluff",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Climb",
+      "ability": "Str"
+    },
+    {
+      "skill": "Craft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Diplomacy",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Disguise",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Escape Artist",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Intimidate",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Knowledge (all)",
+      "ability": "Int"
+    },
+    {
+      "skill": "Linguistics",
+      "ability": "Int"
+    },
+    {
+      "skill": "Perception",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Perform",
+      "ability": "Cha"
+    },
+    {
+      "skill": "Profession",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Sense Motive",
+      "ability": "Wis"
+    },
+    {
+      "skill": "Sleight of Hand",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Spellcraft",
+      "ability": "Int"
+    },
+    {
+      "skill": "Stealth",
+      "ability": "Dex"
+    },
+    {
+      "skill": "Use Magic Device",
+      "ability": "Cha"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "bab": "+0",
+      "bab_first": 0,
+      "fort": 0,
+      "ref": 2,
+      "will": 2,
+      "special": [
+        "Bardic knowledge",
+        "bardic performance",
+        "cantrips",
+        "countersong",
+        "distraction",
+        "fascinate",
+        "inspire courage +1"
+      ],
+      "spells_per_day": {
+        "1": "1"
+      }
+    },
+    {
+      "level": 2,
+      "bab": "+1",
+      "bab_first": 1,
+      "fort": 0,
+      "ref": 3,
+      "will": 3,
+      "special": [
+        "Versatile performance",
+        "well-versed"
+      ],
+      "spells_per_day": {
+        "1": "2"
+      }
+    },
+    {
+      "level": 3,
+      "bab": "+2",
+      "bab_first": 2,
+      "fort": 1,
+      "ref": 3,
+      "will": 3,
+      "special": [
+        "Inspire competence +2"
+      ],
+      "spells_per_day": {
+        "1": "3"
+      }
+    },
+    {
+      "level": 4,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 4,
+      "special": [],
+      "spells_per_day": {
+        "1": "3",
+        "2": "1"
+      }
+    },
+    {
+      "level": 5,
+      "bab": "+3",
+      "bab_first": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 4,
+      "special": [
+        "Inspire courage +2",
+        "lore master 1/day"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "2"
+      }
+    },
+    {
+      "level": 6,
+      "bab": "+4",
+      "bab_first": 4,
+      "fort": 2,
+      "ref": 5,
+      "will": 5,
+      "special": [
+        "Suggestion",
+        "versatile performance"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "3"
+      }
+    },
+    {
+      "level": 7,
+      "bab": "+5",
+      "bab_first": 5,
+      "fort": 2,
+      "ref": 5,
+      "will": 5,
+      "special": [
+        "Inspire competence +3"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "3",
+        "3": "1"
+      }
+    },
+    {
+      "level": 8,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 2,
+      "ref": 6,
+      "will": 6,
+      "special": [
+        "Dirge of doom"
+      ],
+      "spells_per_day": {
+        "1": "4",
+        "2": "4",
+        "3": "2"
+      }
+    },
+    {
+      "level": 9,
+      "bab": "+6/+1",
+      "bab_first": 6,
+      "fort": 3,
+      "ref": 6,
+      "will": 6,
+      "special": [
+        "Inspire greatness"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "4",
+        "3": "3"
+      }
+    },
+    {
+      "level": 10,
+      "bab": "+7/+2",
+      "bab_first": 7,
+      "fort": 3,
+      "ref": 7,
+      "will": 7,
+      "special": [
+        "Jack-of-all-trades",
+        "versatile performance"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "4",
+        "3": "3",
+        "4": "1"
+      }
+    },
+    {
+      "level": 11,
+      "bab": "+8/+3",
+      "bab_first": 8,
+      "fort": 3,
+      "ref": 7,
+      "will": 7,
+      "special": [
+        "Inspire competence +4",
+        "inspire courage +3",
+        "lore master 2/day"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "4",
+        "3": "4",
+        "4": "2"
+      }
+    },
+    {
+      "level": 12,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 8,
+      "special": [
+        "Soothing performance"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "4",
+        "4": "3"
+      }
+    },
+    {
+      "level": 13,
+      "bab": "+9/+4",
+      "bab_first": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 8,
+      "special": [],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "4",
+        "4": "3",
+        "5": "1"
+      }
+    },
+    {
+      "level": 14,
+      "bab": "+10/+5",
+      "bab_first": 10,
+      "fort": 4,
+      "ref": 9,
+      "will": 9,
+      "special": [
+        "Frightening tune",
+        "versatile performance"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "4",
+        "4": "4",
+        "5": "2"
+      }
+    },
+    {
+      "level": 15,
+      "bab": "+11/+6/+1",
+      "bab_first": 11,
+      "fort": 5,
+      "ref": 9,
+      "will": 9,
+      "special": [
+        "Inspire competence +5",
+        "inspire heroics"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "4",
+        "5": "3"
+      }
+    },
+    {
+      "level": 16,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 10,
+      "special": [],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "4",
+        "5": "3",
+        "6": "1"
+      }
+    },
+    {
+      "level": 17,
+      "bab": "+12/+7/+2",
+      "bab_first": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 10,
+      "special": [
+        "Inspire courage +4",
+        "lore master 3/day"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "4",
+        "5": "4",
+        "6": "2"
+      }
+    },
+    {
+      "level": 18,
+      "bab": "+13/+8/+3",
+      "bab_first": 13,
+      "fort": 6,
+      "ref": 11,
+      "will": 11,
+      "special": [
+        "Mass suggestion",
+        "versatile performance"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "5",
+        "5": "4",
+        "6": "3"
+      }
+    },
+    {
+      "level": 19,
+      "bab": "+14/+9/+4",
+      "bab_first": 14,
+      "fort": 6,
+      "ref": 11,
+      "will": 11,
+      "special": [
+        "Inspire competence +6"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "5",
+        "5": "5",
+        "6": "4"
+      }
+    },
+    {
+      "level": 20,
+      "bab": "+15/+10/+5",
+      "bab_first": 15,
+      "fort": 6,
+      "ref": 12,
+      "will": 12,
+      "special": [
+        "Deadly performance"
+      ],
+      "spells_per_day": {
+        "1": "5",
+        "2": "5",
+        "3": "5",
+        "4": "5",
+        "5": "5",
+        "6": "5"
+      }
+    }
+  ],
+  "favored_class_bonuses": [
+    {
+      "race": "Dwarves",
+      "bonus": "Reduce arcane spell failure chance for casting bard spells when wearing medium armor by +1%. Once the total reaches 10%, the bard also receives Medium Armor Proficiency, if he does not already possess it.",
+      "source": "ARG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Elves",
+      "bonus": "Add +1 to the elf's CMD when resisting a disarm or sunder attempt.",
+      "source": "APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Gnomes",
+      "bonus": "Add +1 to the gnome's total number of bardic performance rounds per day.",
+      "source": "APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Half-Elves",
+      "bonus": "Add +1 to the half-elf's total number of bardic performance rounds per day.",
+      "source": "APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Half-Orcs",
+      "bonus": "Add +1 to the bard's total number of bardic performance rounds per day.",
+      "source": "ARG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Halflings",
+      "bonus": "Add +½ on Bluff checks to pass secret messages, +½ on Diplomacy checks to gather information, and +½ on Disguise checks to appear as an elven, half-elven, or human child.",
+      "source": "ARG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Humans",
+      "bonus": "Add one spell known from the bard spell list. This spell must be at least one level below the highest spell level the bard can cast.",
+      "source": "APG",
+      "publisher_group": "Core Races"
+    },
+    {
+      "race": "Aasimar",
+      "bonus": "Choose one bardic performance; treat the bard as +? level higher when determining the effects of that performance.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Catfolk",
+      "bonus": "Add +½ to the bard's bardic knowledge bonus.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Goblin",
+      "bonus": "Add +1 to the bard's total number of bardic performance rounds per day.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Ifrit",
+      "bonus": "Add +? to the number of people the bard can affect with the fascinate bardic performance.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Kitsune",
+      "bonus": "Add a +½ bonus on Bluff checks to lie and a +½ bonus on Diplomacy checks to gather information.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Kobold",
+      "bonus": "Treat the bard's level as +½ level higher for the purpose of determining the effect of the fascinate bardic performance.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Oread",
+      "bonus": "Add +5 feet to the range of one of the bard's bardic performances (max +30 feet to any one performance).",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Undine",
+      "bonus": "Add a +1 bonus on Perform checks to use the countersong bardic performance against creatures with the aquatic or water subtypes.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Vishkanyas",
+      "bonus": "Add +1 to the bard's total number of bardic performance rounds per day.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Wayangs",
+      "bonus": "Add one spell known from the wizard's illusion school spell list. This spell must be at least one level below the highest spell level the bard can cast. The spell is treated as being one level higher, unless it is also on the bard spell list.",
+      "source": "ARG",
+      "publisher_group": "Other Races"
+    },
+    {
+      "race": "Android",
+      "bonus": "Add a +1/3 bonus to all untrained Knowledge checks.",
+      "source": "JBE:BoHR:AFCO",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Changeling",
+      "bonus": "Add +1/3 to the DC of one bardic performance.",
+      "source": "JBE:BoHR:AFCO",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Dhampir",
+      "bonus": "Add a +? bonus to the DC of the _fascinate_ ability.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Drow",
+      "bonus": "Add one spell known to the bard spell list. This spell must be at least one level below the highest spell level the bard can cast.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Duergar",
+      "bonus": "Reduce Arcane spell failure chance for casting bard spells when wearing medium armor by +1%. Once the total reduction in chance reaches 10%, the bard also received Medium Armor Proficiency, if he does not already possess it.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Fetchling",
+      "bonus": "Add +? to the number of people the bard can affect with the _fascinate_ bardic performance.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Hobgoblin",
+      "bonus": "Reduce the penalty for not being proficient with one weapon by 1. When the nonproficiency penalty for a weapon becomes 0 because of this ability, the bard is treated as having the appropriate Martial or Exotic Weapon Proficiency feat for that weapon.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Orc",
+      "bonus": "The bard gain a +? bonus to his inspire competence ability.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Ratfolk",
+      "bonus": "Add a +1 bonus concentration checks when casting bard spells within 5 feet of an ally.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Tiefling",
+      "bonus": "Treat the bard as +½ level higher when determining the duration of a _suggestion_ bardic performance.",
+      "source": "JBE:BoHRC",
+      "publisher_group": "Jon Brazer Enterprises"
+    },
+    {
+      "race": "Piper",
+      "bonus": "Gain the ability to add metamagic to bard spells without increasing casting time ? times/day. (One use of this ability per day for every three times you select this option.)",
+      "source": "RGG:HHO",
+      "publisher_group": "Rogue Genius Games"
+    }
+  ]
+}

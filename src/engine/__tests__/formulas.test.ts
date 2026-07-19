@@ -11,6 +11,7 @@ import { computeSkillPointsAvailable, computeSkillTotal, isClassSkillForCharacte
 import { getStrDamageBonus, getPowerAttackDamageBonus } from '../weapon'
 import { getCarryingCapacity, getCarryingCapacityTiers, getEncumbranceLevel } from '../carryingCapacity'
 import { computeSpeed } from '../speed'
+import { computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus } from '../combatStats'
 import type { ResolvedStats } from '../types'
 
 const EMPTY_RESOLVED: ResolvedStats = {
@@ -114,6 +115,41 @@ describe('skills.ts — total de habilidad', () => {
     const c = makeCharacter({ classes: [{ id: 'fighter', level: 1 }, { id: 'rogue', level: 1 }] })
     expect(isClassSkillForCharacter(c, 'stealth')).toBe(true) // de clase para rogue, no para fighter
     expect(isClassSkillForCharacter(c, 'knowledge_planes')).toBe(false)
+  })
+
+  it('aplica penalizacion de niveles negativos a las habilidades', () => {
+    const c = makeCharacter({
+      classes: [{ id: 'fighter', level: 1 }],
+      skills: [{ id: 'climb', ranks: 1 }],
+      negativeLevels: 2,
+    })
+    expect(computeSkillTotal(c, climbSkill, EMPTY_RESOLVED, 0)).toBe(2)
+  })
+})
+
+describe('negative levels', () => {
+  it('penaliza salvaciones, CMB/CMD, iniciativa y ataques', () => {
+    const c = makeCharacter({
+      classes: [{ id: 'fighter', level: 1 }],
+      negativeLevels: 1,
+    })
+    const combat = computeCombatStats(c, EMPTY_RESOLVED)
+
+    expect(combat.fortitude).toBe(1)
+    expect(combat.reflex).toBe(-1)
+    expect(combat.will).toBe(-1)
+    expect(combat.cmb).toBe(0)
+    expect(combat.cmd).toBe(10)
+    expect(combat.initiative).toBe(-1)
+    expect(computeWeaponAttackBonus(combat.bab, combat.strMod, 0, EMPTY_RESOLVED, combat.sizeMod, combat.negativeLevelPenalty)).toBe(0)
+  })
+
+  it('reduce los PV maximos efectivos en 5 por nivel negativo', () => {
+    const c = makeCharacter({
+      hp: { current: 20, max: 20, temp: 0 },
+      negativeLevels: 2,
+    })
+    expect(computeEffectiveMaxHp(c, EMPTY_RESOLVED)).toBe(10)
   })
 })
 
