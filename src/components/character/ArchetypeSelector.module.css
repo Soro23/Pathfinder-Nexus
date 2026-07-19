@@ -36,6 +36,16 @@
   accent-color: var(--color-accent-gold);
 }
 
+.checkItemDisabled {
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkItemDisabled input {
+  cursor: not-allowed;
+}
+
 .conflictWarning {
   background: rgba(220, 80, 80, 0.1);
   border: 1px solid rgba(220, 80, 80, 0.35);

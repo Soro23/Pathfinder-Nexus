@@ -29,6 +29,17 @@ function ReplacementBadge({ type }: { type: ReplacementType }) {
   )
 }
 
+function findConflictReason(option: Archetype, selected: Archetype[]): string | null {
+  for (const s of selected) {
+    if (s.id === option.id) continue
+    for (const r of option.replaces) {
+      const clash = s.replaces.find((sr) => sr.featureName === r.featureName && sr.atLevel === r.atLevel)
+      if (clash) return `Incompatible con "${s.name}": ambos modifican "${r.featureName}" (nv ${r.atLevel})`
+    }
+  }
+  return null
+}
+
 function ArchetypeDetail({ archetype }: { archetype: Archetype }) {
   return (
     <div className={styles.detail}>
@@ -58,23 +69,38 @@ export function ArchetypeSelector({ classId, value, onChange }: Props) {
   const conflicts = findArchetypeConflicts(selected)
 
   const toggle = (id: string) => {
-    onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id])
+    if (value.includes(id)) {
+      onChange(value.filter((v) => v !== id))
+      return
+    }
+    const option = options.find((a) => a.id === id)
+    if (option && findConflictReason(option, selected)) return
+    onChange([...value, id])
   }
 
   return (
     <div className={styles.root}>
       <label className={styles.label}>Arquetipos</label>
       <div className={styles.checkList}>
-        {options.map((a) => (
-          <label key={a.id} className={styles.checkItem}>
-            <input
-              type="checkbox"
-              checked={value.includes(a.id)}
-              onChange={() => toggle(a.id)}
-            />
-            {a.name}
-          </label>
-        ))}
+        {options.map((a) => {
+          const isSelected = value.includes(a.id)
+          const conflictReason = isSelected ? null : findConflictReason(a, selected)
+          return (
+            <label
+              key={a.id}
+              className={`${styles.checkItem} ${conflictReason ? styles.checkItemDisabled : ''}`}
+              title={conflictReason ?? undefined}
+            >
+              <input
+                type="checkbox"
+                checked={isSelected}
+                disabled={!!conflictReason}
+                onChange={() => toggle(a.id)}
+              />
+              {a.name}
+            </label>
+          )
+        })}
       </div>
 
       {conflicts.length > 0 && (
