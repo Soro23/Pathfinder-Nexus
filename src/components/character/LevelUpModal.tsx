@@ -60,6 +60,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
   })
   const [showNewClassPicker, setShowNewClassPicker] = useState(false)
   const [newArchetypeIds, setNewArchetypeIds] = useState<string[]>([])
+  const [archetypeSearch, setArchetypeSearch] = useState('')
 
   // ── 2. Puntos de golpe ──────────────────────────────────────────────────────────────
   const [hpMode, setHpMode] = useState<HpGainMode>('average')
@@ -99,6 +100,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
   const resetPerClassState = () => {
     setRolledValue(null)
     setNewArchetypeIds([])
+    setArchetypeSearch('')
     setPendingSkills(character.skills)
     setPendingFeats([])
     setFavoredClassChoice(undefined)
@@ -328,6 +330,14 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
           const addableArchetypes = classArchetypeOptions.filter(
             (a) => !existingArchetypeIds.includes(a.id) && !newArchetypeIds.includes(a.id) && !archetypeBlockReason(a)
           )
+          const normalizedArchetypeSearch = archetypeSearch.trim().toLowerCase()
+          const filteredAddableArchetypes = normalizedArchetypeSearch
+            ? addableArchetypes.filter((a) => (
+              a.name.toLowerCase().includes(normalizedArchetypeSearch) ||
+              a.id.toLowerCase().includes(normalizedArchetypeSearch) ||
+              a.description.toLowerCase().includes(normalizedArchetypeSearch)
+            ))
+            : addableArchetypes
           const hasBlockedArchetypes = addableArchetypes.length + selectedArchetypes.length < classArchetypeOptions.length
           return (
             <div className={styles.section}>
@@ -361,16 +371,31 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
               )}
 
               {addableArchetypes.length > 0 ? (
-                <select
-                  className={styles.newClassSelect}
-                  value=""
-                  onChange={(e) => { if (e.target.value) toggleArchetype(e.target.value) }}
-                >
-                  <option value="">+ Añadir arquetipo…</option>
-                  {addableArchetypes.map((a) => (
-                    <option key={a.id} value={a.id}>{a.name}</option>
-                  ))}
-                </select>
+                <>
+                  <input
+                    className={styles.searchInput}
+                    type="search"
+                    value={archetypeSearch}
+                    onChange={(e) => setArchetypeSearch(e.target.value)}
+                    placeholder="Buscar arquetipo..."
+                  />
+                  <div className={styles.archetypeOptionList}>
+                    {filteredAddableArchetypes.map((a) => (
+                      <button
+                        key={a.id}
+                        type="button"
+                        className={styles.archetypeOption}
+                        onClick={() => toggleArchetype(a.id)}
+                      >
+                        <span>{a.name}</span>
+                        <small>{a.description}</small>
+                      </button>
+                    ))}
+                    {filteredAddableArchetypes.length === 0 && (
+                      <p className={styles.archetypeHint}>No hay arquetipos con ese filtro.</p>
+                    )}
+                  </div>
+                </>
               ) : (
                 selectedArchetypes.length === 0 && (
                   <p className={styles.archetypeHint}>No hay arquetipos disponibles para añadir.</p>

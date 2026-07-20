@@ -36,6 +36,7 @@ export function SkillsList({
   const { skills: SKILLS } = useSRDStore()
   const [showAll, setShowAll] = useState(false)
   const [sortBy, setSortBy] = useState<'name' | 'total'>('name')
+  const [search, setSearch] = useState('')
   const [openMiscPanel, setOpenMiscPanel] = useState<string | null>(null)
   const [newMiscValue, setNewMiscValue] = useState<number>(0)
   const [newMiscDesc, setNewMiscDesc] = useState('')
@@ -123,7 +124,11 @@ export function SkillsList({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ranks, abilities, classes, level, sortBy])
 
-  const displaySkills = showAll ? sortedSkills : sortedSkills.filter((s) => s.ranks > 0 || s.isClassSkill)
+  const visibleSkills = showAll ? sortedSkills : sortedSkills.filter((s) => s.ranks > 0 || s.isClassSkill)
+  const normalizedSearch = search.trim().toLowerCase()
+  const displaySkills = normalizedSearch
+    ? visibleSkills.filter((s) => s.name.toLowerCase().includes(normalizedSearch) || s.id.toLowerCase().includes(normalizedSearch))
+    : visibleSkills
 
   return (
     <div className={styles.container}>
@@ -156,6 +161,14 @@ export function SkillsList({
           </Button>
         </div>
       </div>
+
+      <input
+        className={styles.search}
+        type="search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Buscar habilidad..."
+      />
 
       <div className={styles.legend}>
         <span><span className={styles.classSkillDot}></span> Skill de clase (+3 si tiene rango)</span>
