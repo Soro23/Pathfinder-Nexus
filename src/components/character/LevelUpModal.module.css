@@ -66,6 +66,12 @@
 }
 
 /* ── Sections ── */
+.sectionsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
 .section {
   display: flex;
   flex-direction: column;
@@ -385,4 +391,22 @@
   z-index: 2;
   padding-bottom: var(--space-1);
   background: var(--color-surface-container-low);
+}
+
+/* ── Desktop: modal más ancho con secciones en dos columnas ── */
+@media (min-width: 901px) {
+  .modal {
+    max-width: min(1100px, calc(100vw - var(--space-8)));
+  }
+
+  .sectionsGrid {
+    display: block;
+    column-count: 2;
+    column-gap: var(--space-6);
+    row-gap: var(--space-5);
+  }
+
+  .sectionsGrid > .section {
+    break-inside: avoid;
+  }
 }

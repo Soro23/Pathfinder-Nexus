@@ -275,6 +275,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
           </button>
         </div>
 
+        <div className={styles.sectionsGrid}>
         {/* 1 · Clase */}
         <div className={styles.section}>
           <p className={styles.sectionLabel}>Clase a subir</p>
@@ -613,6 +614,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
             <p className={styles.archetypeHint}>Los espacios de conjuro se sincronizan automáticamente con la tabla de {resolvedClassData.name} al confirmar.</p>
           </div>
         )}
+        </div>
 
         {/* Confirm */}
         {validationMessages.length > 0 && (
