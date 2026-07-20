@@ -1,5 +1,6 @@
 import { LayoutList, ChevronDown } from 'lucide-react'
 import { BONUS_SPELL_TABLE } from '../data/bonusSpells'
+import { XP_SLOW_TRACK, XP_MEDIUM_TRACK, XP_FAST_TRACK } from '../engine'
 import { usePageTransition } from '../hooks/usePageTransition'
 import styles from './Tables.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
@@ -246,28 +247,14 @@ const TYPICAL_DCS = [
   { difficulty: 'Imposible',     dc: 40, example: 'Desafiar las leyes naturales' },
 ]
 
-const XP_TABLE = [
-  { level:  1, slow:          '0', medium:          '0', fast:          '0' },
-  { level:  2, slow:      '2.000', medium:      '1.300', fast:      '1.000' },
-  { level:  3, slow:      '5.000', medium:      '3.300', fast:      '3.000' },
-  { level:  4, slow:      '9.000', medium:      '6.000', fast:      '6.000' },
-  { level:  5, slow:     '15.000', medium:     '10.000', fast:     '10.000' },
-  { level:  6, slow:     '23.000', medium:     '15.000', fast:     '15.000' },
-  { level:  7, slow:     '35.000', medium:     '23.000', fast:     '23.000' },
-  { level:  8, slow:     '51.000', medium:     '34.000', fast:     '34.000' },
-  { level:  9, slow:     '75.000', medium:     '50.000', fast:     '50.000' },
-  { level: 10, slow:    '105.000', medium:     '71.000', fast:     '71.000' },
-  { level: 11, slow:    '155.000', medium:    '105.000', fast:    '105.000' },
-  { level: 12, slow:    '220.000', medium:    '145.000', fast:    '145.000' },
-  { level: 13, slow:    '315.000', medium:    '210.000', fast:    '210.000' },
-  { level: 14, slow:    '445.000', medium:    '295.000', fast:    '295.000' },
-  { level: 15, slow:    '635.000', medium:    '425.000', fast:    '425.000' },
-  { level: 16, slow:    '890.000', medium:    '600.000', fast:    '600.000' },
-  { level: 17, slow:  '1.300.000', medium:    '850.000', fast:    '850.000' },
-  { level: 18, slow:  '1.800.000', medium:  '1.200.000', fast:  '1.200.000' },
-  { level: 19, slow:  '2.550.000', medium:  '1.700.000', fast:  '1.700.000' },
-  { level: 20, slow:  '3.600.000', medium:  '2.400.000', fast:  '2.400.000' },
-]
+const formatXp = (value: number) => value.toLocaleString('es-ES')
+
+const XP_TABLE = XP_MEDIUM_TRACK.map((_, i) => ({
+  level: i + 1,
+  slow: formatXp(XP_SLOW_TRACK[i]),
+  medium: formatXp(XP_MEDIUM_TRACK[i]),
+  fast: formatXp(XP_FAST_TRACK[i]),
+}))
 
 const WBL_TABLE = [
   { level:  1, wbl:         '—' },

@@ -173,6 +173,8 @@ export interface TemporaryEffect {
   active?: boolean
 }
 
+export type XpProgressionSpeed = 'slow' | 'medium' | 'fast'
+
 export interface Character {
   id: string
   name: string
@@ -180,6 +182,7 @@ export interface Character {
   classes: CharacterClass[]
   level: number
   xp: number
+  xpProgression?: XpProgressionSpeed
   alignment: string
   abilities: {
     strength: number

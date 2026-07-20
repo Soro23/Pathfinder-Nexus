@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, ChevronRight, ChevronDown, Check, Lightbulb, Dice6 } from 'lucide-react'
 import { Button, Card } from '../components/ui'
 import { useCharacterStore, generateId, calculateModifier } from '../store'
+import type { XpProgressionSpeed } from '../store'
 import { getClassById } from '../data'
 import { useSRDStore } from '../store/srdStore'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
@@ -82,6 +83,12 @@ const CLASS_GROUPS: { label: string; classes: { value: string; label: string; ro
 
 // Flat array for class lookups
 const CLASSES = CLASS_GROUPS.flatMap((g) => g.classes)
+
+const XP_SPEEDS: { value: XpProgressionSpeed; label: string; desc: string }[] = [
+  { value: 'slow', label: 'Lenta', desc: 'Campañas largas, subidas de nivel poco frecuentes.' },
+  { value: 'medium', label: 'Normal', desc: 'Ritmo estándar de progresión.' },
+  { value: 'fast', label: 'Rápida', desc: 'Subidas de nivel frecuentes, ideal para one-shots.' },
+]
 
 const ALIGNMENTS = [
   { value: 'lg', label: 'Legal Bueno' },
@@ -173,6 +180,7 @@ export function CharacterNew() {
     race: '',
     class: '',
     alignment: 'ng',
+    xpProgression: 'medium' as XpProgressionSpeed,
     ...DEFAULT_ABILITIES,
   })
 
@@ -275,6 +283,7 @@ export function CharacterNew() {
       classes: [{ id: form.class, level: 1, archetypeIds: selectedArchetypeIds }],
       level: 1,
       xp: 0,
+      xpProgression: form.xpProgression,
       alignment: form.alignment,
       abilities: {
         strength: form.strength,
@@ -474,6 +483,23 @@ export function CharacterNew() {
                     <option key={a.value} value={a.value}>{a.label}</option>
                   ))}
                 </select>
+              </div>
+
+              <div className={styles.alignmentRow}>
+                <label className={styles.nameLabel}>Velocidad de Progresión (XP)</label>
+                <div className={styles.methodChips}>
+                  {XP_SPEEDS.map((s) => (
+                    <button
+                      key={s.value}
+                      type="button"
+                      className={`${styles.methodChip} ${form.xpProgression === s.value ? styles.methodChipActive : ''}`}
+                      onClick={() => updateForm('xpProgression', s.value)}
+                      title={s.desc}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {form.class && (
@@ -699,6 +725,8 @@ export function CharacterNew() {
                     </p>
                     <p className={styles.summaryAlign}>
                       {ALIGNMENTS.find((a) => a.value === form.alignment)?.label}
+                      {' · XP '}
+                      {XP_SPEEDS.find((s) => s.value === form.xpProgression)?.label}
                     </p>
                   </div>
                 </div>

@@ -10,7 +10,7 @@ import { useCharacterStore, calculateModifier, getModifierString, generateId } f
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
 import { getClassById, SpellLevel, useSRDStore } from '../data'
 import { resolveClassSkills, buildArchetypesByClassId } from '../data/resolveArchetype'
-import { resolveModifiers, canLevelUpFromXp, computeCombatStats, computeEffectiveMaxHp, computeSkillPointsAvailable, computeSkillTotal, getExpectedFeatCount, getXpToNextLevel, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, computeSpeed, computeSyncedSpellSlots, validateProgressionAgainstCharacter } from '../engine'
+import { resolveModifiers, canLevelUpFromXp, computeCombatStats, computeEffectiveMaxHp, computeSkillPointsAvailable, computeSkillTotal, getExpectedFeatCount, getXpToNextLevel, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, computeSpeed, computeSyncedSpellSlots, validateProgressionAgainstCharacter, XP_SPEED_LABELS } from '../engine'
 import { Card, Button } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker } from '../components/character'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
@@ -110,6 +110,8 @@ export function CharacterView() {
   const effectiveMaxHp = computeEffectiveMaxHp(character, resolvedStats)
   const hpPercent = Math.max(0, Math.min(100, (character.hp.current / effectiveMaxHp) * 100))
 
+  const xpSpeed = character.xpProgression ?? 'medium'
+
   const isCaster = character.classes.some((c) => {
     const cls = getClassById(c.id)
     return cls?.magicType !== null && cls?.magicType !== undefined
@@ -130,7 +132,7 @@ export function CharacterView() {
   const spentSkillRanks = character.skills.reduce((sum, s) => sum + s.ranks, 0)
   const skillPointsAvailable = computeSkillPointsAvailable(character, spentSkillRanks)
   const expectedFeats = getExpectedFeatCount(character.level, character.classes)
-  const xpToNextLevel = getXpToNextLevel(character.level, character.xp)
+  const xpToNextLevel = getXpToNextLevel(character.level, character.xp, xpSpeed)
   const inferredHistoryCount = (character.levelHistory ?? []).filter((choice) => choice.inferred).length
   const progressionMismatches = validateProgressionAgainstCharacter(character)
 
@@ -362,7 +364,13 @@ export function CharacterView() {
               </Button>
             </Link>
             {!isEditing && (
-              <Button variant="secondary" onClick={() => setShowLevelUp(true)}>
+              <Button
+                variant={canLevelUpFromXp(character.level, character.xp, xpSpeed) ? 'primary' : 'secondary'}
+                onClick={() => setShowLevelUp(true)}
+                title={xpToNextLevel !== null
+                  ? `Faltan ${xpToNextLevel.toLocaleString('es-ES')} XP para el siguiente nivel — Progresión ${XP_SPEED_LABELS[xpSpeed]}`
+                  : 'Nivel máximo alcanzado'}
+              >
                 <TrendingUp size={18} />
                 Subir de nivel
               </Button>
@@ -503,7 +511,12 @@ export function CharacterView() {
             <span className={styles.quickStatValue}>{speed}ft</span>
             <span className={styles.quickStatLabel}>Vel.</span>
           </div>
-          <div className={styles.quickStat}>
+          <div
+            className={styles.quickStat}
+            title={xpToNextLevel !== null
+              ? `Faltan ${xpToNextLevel.toLocaleString('es-ES')} XP para el siguiente nivel — Progresión ${XP_SPEED_LABELS[xpSpeed]}`
+              : `Nivel máximo — Progresión ${XP_SPEED_LABELS[xpSpeed]}`}
+          >
             <TrendingUp size={18} />
             {isEditing ? (
               <input
@@ -514,10 +527,10 @@ export function CharacterView() {
                 onChange={(e) => updateCharacter(character.id, { xp: Math.max(0, parseInt(e.target.value) || 0) })}
               />
             ) : (
-              <span className={styles.quickStatValue}>{character.xp}</span>
+              <span className={styles.quickStatValue}>{character.xp.toLocaleString('es-ES')}</span>
             )}
             <span className={styles.quickStatLabel}>XP</span>
-            {xpToNextLevel !== null && <span className={styles.quickStatSub}>faltan {xpToNextLevel}</span>}
+            {xpToNextLevel !== null && <span className={styles.quickStatSub}>faltan {xpToNextLevel.toLocaleString('es-ES')}</span>}
           </div>
         </div>
       </div>
