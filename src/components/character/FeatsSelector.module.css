@@ -50,8 +50,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--space-3);
-  max-height: 500px;
+  max-height: min(500px, 52vh);
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--space-1);
 }
 
@@ -217,6 +218,6 @@
 
   .list {
     grid-template-columns: 1fr;
-    max-height: none;
+    max-height: min(460px, 52vh);
   }
 }

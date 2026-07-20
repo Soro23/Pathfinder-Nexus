@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useSRDStore } from '../../store/srdStore'
 import type { Archetype, ReplacementType } from '../../data/archetypes'
 import { findArchetypeConflicts, findConflictingArchetype } from '../../data/resolveArchetype'
@@ -55,12 +56,21 @@ function ArchetypeDetail({ archetype }: { archetype: Archetype }) {
 
 export function ArchetypeSelector({ classId, value, onChange }: Props) {
   const getArchetypesByClass = useSRDStore((s) => s.getArchetypesByClass)
+  const [search, setSearch] = useState('')
   const options = getArchetypesByClass(classId)
 
   if (options.length === 0) return null
 
   const selected = options.filter((a) => value.includes(a.id))
   const conflicts = findArchetypeConflicts(selected)
+  const normalizedSearch = search.trim().toLowerCase()
+  const filteredOptions = normalizedSearch
+    ? options.filter((a) => (
+      a.name.toLowerCase().includes(normalizedSearch) ||
+      a.id.toLowerCase().includes(normalizedSearch) ||
+      a.description.toLowerCase().includes(normalizedSearch)
+    ))
+    : options
 
   const toggle = (id: string) => {
     if (value.includes(id)) {
@@ -75,8 +85,15 @@ export function ArchetypeSelector({ classId, value, onChange }: Props) {
   return (
     <div className={styles.root}>
       <label className={styles.label}>Arquetipos</label>
+      <input
+        className={styles.search}
+        type="search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Buscar arquetipo..."
+      />
       <div className={styles.checkList}>
-        {options.map((a) => {
+        {filteredOptions.map((a) => {
           const isSelected = value.includes(a.id)
           const conflictReason = isSelected ? null : conflictReasonFor(a, selected)
           return (
@@ -95,6 +112,9 @@ export function ArchetypeSelector({ classId, value, onChange }: Props) {
             </label>
           )
         })}
+        {filteredOptions.length === 0 && (
+          <p className={styles.emptyState}>No hay arquetipos con ese filtro.</p>
+        )}
       </div>
 
       {conflicts.length > 0 && (
