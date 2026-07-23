@@ -6,6 +6,7 @@ import {
   Search as SearchIcon,
 } from 'lucide-react'
 import { useSRDStore } from '../../store/srdStore'
+import { useHomebrewStore } from '../../store/homebrewStore'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../hooks/useTheme'
 import { PageLoader } from './PageLoader'
@@ -36,9 +37,11 @@ export function Layout() {
   const { signOut } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
   const fetchAll = useSRDStore((s) => s.fetchAll)
+  const fetchHomebrew = useHomebrewStore((s) => s.fetch)
   const [compendiumOpen, setCompendiumOpen] = useState(false)
 
   useEffect(() => { fetchAll() }, [fetchAll])
+  useEffect(() => { fetchHomebrew() }, [fetchHomebrew])
   useEffect(() => { setCompendiumOpen(false) }, [location.pathname])
 
   function isActive(path: string, exact: boolean) {

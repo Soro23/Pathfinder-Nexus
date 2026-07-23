@@ -8,6 +8,8 @@ export interface Skill {
   uses?: string[]
   typicalDCs?: { dc: number; example: string }[]
   notes?: string[]
+  /** Editorial: undefined = Paizo (oficial), con valor = contenido de terceros (p.ej. homebrew). */
+  source?: string
 }
 
 export const SKILLS: Skill[] = [

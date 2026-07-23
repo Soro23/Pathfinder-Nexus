@@ -9,23 +9,30 @@ export type { CharacterClass } from '../store/characterStore'
 export { SPELL_SCHOOLS, SPELL_DESCRIPTORS, SPELL_TYPES, calculateSpellDC } from './spells'
 export type { Spell, SpellLevel } from './spells'
 
-// Hooks that merge static SRD data with homebrew content
-import { SKILLS } from './skills'
-import { CLASSES } from './classes'
-import { RACES } from './races'
+// Hooks that merge SRD data (estático u oficial vía Supabase) con el contenido homebrew
+// del usuario, marcando cada item homebrew con su propia categoría (`source`).
+import { useSRDStore } from '../store/srdStore'
 import { useHomebrewStore } from '../store/homebrewStore'
 
 export function useAllSkills() {
+  const official = useSRDStore(s => s.skills)
   const brew = useHomebrewStore(s => s.skills)
-  return [...SKILLS, ...brew]
+  return [...official, ...brew.map(s => ({ ...s, source: s.source ?? 'Homebrew' }))]
 }
 export function useAllClasses() {
+  const official = useSRDStore(s => s.classes)
   const brew = useHomebrewStore(s => s.classes)
-  return [...CLASSES, ...brew]
+  return [...official, ...brew.map(c => ({ ...c, source: c.source ?? 'homebrew' as const }))]
 }
 export function useAllRaces() {
+  const official = useSRDStore(s => s.races)
   const brew = useHomebrewStore(s => s.races)
-  return [...RACES, ...brew]
+  return [...official, ...brew.map(r => ({ ...r, source: r.source ?? 'Homebrew' }))]
+}
+export function useAllFeats() {
+  const official = useSRDStore(s => s.feats)
+  const brew = useHomebrewStore(s => s.feats)
+  return [...official, ...brew.map(f => ({ ...f, source: f.source ?? 'Homebrew' }))]
 }
 
 export { DOMAINS, getDomainById } from './domains'

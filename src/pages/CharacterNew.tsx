@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, ChevronRight, ChevronDown, Check, Lightbulb, Dice6 } from 'lucide-react'
-import { Button, Card } from '../components/ui'
+import { Button, Card, HomebrewBadge } from '../components/ui'
 import { useCharacterStore, generateId, calculateModifier } from '../store'
 import type { XpProgressionSpeed } from '../store'
 import { getClassById } from '../data'
 import { useSRDStore } from '../store/srdStore'
+import { useHomebrewStore } from '../store/homebrewStore'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
 import styles from './CharacterNew.module.css'
 
@@ -80,9 +81,6 @@ const CLASS_GROUPS: { label: string; classes: { value: string; label: string; ro
     ],
   },
 ]
-
-// Flat array for class lookups
-const CLASSES = CLASS_GROUPS.flatMap((g) => g.classes)
 
 const XP_SPEEDS: { value: XpProgressionSpeed; label: string; desc: string }[] = [
   { value: 'slow', label: 'Lenta', desc: 'Campañas largas, subidas de nivel poco frecuentes.' },
@@ -165,6 +163,8 @@ export function CharacterNew() {
   const addCharacter = useCharacterStore((state) => state.addCharacter)
   const storeRaces = useSRDStore(s => s.races)
   const fetchAll = useSRDStore(s => s.fetchAll)
+  const homebrewRaces = useHomebrewStore(s => s.races)
+  const homebrewClasses = useHomebrewStore(s => s.classes)
 
   useEffect(() => { fetchAll() }, [fetchAll])
 
@@ -172,7 +172,24 @@ export function CharacterNew() {
     { label: 'Razas Principales', races: storeRaces.filter(r => CORE_RACES.includes(r.id)) },
     { label: 'Razas Destacadas', races: storeRaces.filter(r => !CORE_RACES.includes(r.id) && !UNCOMMON_RACES.includes(r.id)) },
     { label: 'Razas Poco Comunes', races: storeRaces.filter(r => UNCOMMON_RACES.includes(r.id)) },
+    ...(homebrewRaces.length > 0
+      ? [{ label: 'Razas Homebrew', races: homebrewRaces.map(r => ({ ...r, source: r.source ?? 'Homebrew' })) }]
+      : []),
   ]
+
+  const ALL_CLASS_GROUPS = [
+    ...CLASS_GROUPS,
+    ...(homebrewClasses.length > 0
+      ? [{
+        label: 'Clases Homebrew',
+        classes: homebrewClasses.map(c => ({
+          value: c.id, label: c.name, role: 'Homebrew', desc: c.description || '—', hitDie: `d${c.hitDie}`,
+        })),
+      }]
+      : []),
+  ]
+  const ALL_CLASSES = ALL_CLASS_GROUPS.flatMap((g) => g.classes)
+
   const [step, setStep] = useState<Step>('race')
 
   const [form, setForm] = useState({
@@ -262,8 +279,8 @@ export function CharacterNew() {
   }
 
   // ── Submit ──
-  const selectedRace = storeRaces.find((r) => r.id === form.race)
-  const selectedClass = CLASSES.find((c) => c.value === form.class)
+  const selectedRace = RACE_GROUPS.flatMap((g) => g.races).find((r) => r.id === form.race)
+  const selectedClass = ALL_CLASSES.find((c) => c.value === form.class)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -407,6 +424,7 @@ export function CharacterNew() {
                               onClick={() => updateForm('race', race.id)}
                             >
                               <span className={styles.raceName}>{race.label}</span>
+                              {race.source === 'Homebrew' && <HomebrewBadge />}
                               <span className={styles.raceBonus}>{race.bonusDesc}</span>
                               {form.race === race.id && <Check size={16} className={styles.selectedCheck} />}
                             </button>
@@ -442,7 +460,7 @@ export function CharacterNew() {
               <p className={styles.stepDesc}>Tu clase define tu rol y habilidades durante la aventura.</p>
 
               <div className={styles.accordionList}>
-                {CLASS_GROUPS.map((group) => {
+                {ALL_CLASS_GROUPS.map((group) => {
                   const isOpen = openClassGroup === group.label
                   const groupHasSelected = group.classes.some((c) => c.value === form.class)
                   return (

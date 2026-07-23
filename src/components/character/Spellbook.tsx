@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, Moon, RefreshCw, BookOpen, Star } from 'lucide-react'
-import { Card, Select } from '../ui'
+import { Card, Select, HomebrewBadge } from '../ui'
 import { SPELL_SCHOOLS, SPELL_TYPES, SpellLevel, calculateSpellDC, getClassById } from '../../data'
 import { useSpells } from '../../hooks/useSpells'
 import { useSpellsByIds } from '../../hooks/useSpellsByIds'
@@ -384,6 +384,7 @@ export function Spellbook({
                   )}
                   <div className={styles.spellInfo}>
                     <span className={styles.spellName}>{spell.name}</span>
+                    {spell.source === 'Homebrew' && <HomebrewBadge />}
                     <span className={styles.spellMeta}>
                       {spell.school} {spell.descriptor && `(${spell.descriptor})`}
                     </span>

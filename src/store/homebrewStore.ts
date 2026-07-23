@@ -104,3 +104,6 @@ export const useHomebrewStore = create<HomebrewStore>()((set, get) => ({
     }))
   },
 }))
+
+// Non-hook accessor for use outside React (engine, lookups por id)
+export const homebrewStore = useHomebrewStore

@@ -5,7 +5,7 @@ import type {
   AbilityKey, HpGainMode, FavoredClassChoice, LevelChoice,
 } from '../../store'
 import { calculateModifier } from '../../store'
-import { getClassById, CLASSES, getMulticlassStats } from '../../data'
+import { getClassById, useAllClasses, useAllFeats, getMulticlassStats } from '../../data'
 import { useSRDStore } from '../../store/srdStore'
 import {
   archetypeAffectsAttainedLevel, findConflictingArchetype, resolveClassFeatures, buildArchetypesByClassId,
@@ -117,7 +117,9 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
   const newLevel = character.level + 1
   const conMod = calculateModifier(character.abilities.constitution)
 
-  const { getArchetypesByClass, getArchetypeById, feats: allFeats } = useSRDStore()
+  const { getArchetypesByClass, getArchetypeById } = useSRDStore()
+  const allClasses = useAllClasses()
+  const allFeats = useAllFeats()
 
   const [activeTab, setActiveTab] = useState<TabId>('class')
 
@@ -187,7 +189,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
   // Clases nuevas incompatibles con el alineamiento actual se filtran del selector; una
   // clase ya en progreso que deja de cumplir su restricción (p.ej. el alineamiento cambió
   // en otro momento) no bloquea la subida — pasa a "ex-clase" (no se pierden niveles).
-  const eligibleNewClasses = CLASSES.filter(
+  const eligibleNewClasses = allClasses.filter(
     (cd) => !character.classes.some((c) => c.id === cd.id) && isAlignmentAllowedForClass(character.alignment, cd)
   )
   const existingClassAlignmentWarning = classChoice.type === 'existing' && resolvedClassData
@@ -444,7 +446,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
                 >
                   <option value="">Elige clase…</option>
                   {eligibleNewClasses.map((cd) => (
-                    <option key={cd.id} value={cd.id}>{cd.name}</option>
+                    <option key={cd.id} value={cd.id}>{cd.name}{cd.source === 'homebrew' ? ' (Homebrew)' : ''}</option>
                   ))}
                 </select>
               )}

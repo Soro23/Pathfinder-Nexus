@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Card, Select } from '../ui'
-import { FEAT_TYPES, useSRDStore, type FeatType } from '../../data'
+import { Card, Select, HomebrewBadge } from '../ui'
+import { FEAT_TYPES, useAllFeats, type FeatType } from '../../data'
 import { isFeatRepeatable } from '../../data/feats'
 import type { CharacterFeat } from '../../store/characterStore'
 import styles from './FeatsSelector.module.css'
@@ -25,7 +25,7 @@ interface FeatsSelectorProps {
 }
 
 export function FeatsSelector({ selectedFeats, onAdd, onRemove, maxFeats }: FeatsSelectorProps) {
-  const { feats: FEATS } = useSRDStore()
+  const FEATS = useAllFeats()
   const [filter, setFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
   // featId → pending specification text for repeatable feats
@@ -91,6 +91,7 @@ export function FeatsSelector({ selectedFeats, onAdd, onRemove, maxFeats }: Feat
             >
               <div className={styles.featHeader}>
                 <h4>{feat.name}</h4>
+                {feat.source === 'Homebrew' && <HomebrewBadge />}
                 <span className={styles.type}>{feat.type.map(t => TYPE_LABELS[t]).join(', ')}</span>
               </div>
               {feat.prerequisite && (

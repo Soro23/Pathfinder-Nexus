@@ -1,6 +1,7 @@
 import type { Character, StatusEffect } from '../store/characterStore'
 import { getFeatById } from '../data/feats'
 import { RACES } from '../data/races'
+import { homebrewStore } from '../store/homebrewStore'
 import type { Modifier, ModifierTarget, ModifierType, ResolvedStats } from './types'
 
 function stackModifiers(modifiers: Modifier[], target: ModifierTarget): number {
@@ -154,6 +155,7 @@ export function resolveModifiers(character: Character): ResolvedStats {
 
   // 4. Bonificadores raciales
   const raceData = RACES.find((r) => r.id === character.race?.toLowerCase())
+    ?? homebrewStore.getState().races.find((r) => r.id === character.race?.toLowerCase())
   if (raceData?.bonuses) {
     for (const [ability, bonus] of Object.entries(raceData.bonuses)) {
       if (bonus && bonus !== 0) {

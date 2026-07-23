@@ -23,6 +23,8 @@ export interface Race {
   traits: RacialTrait[]
   subraces?: Subrace[]
   desc: string
+  /** Editorial: undefined = Paizo (oficial), con valor = contenido de terceros (p.ej. homebrew). */
+  source?: string
 }
 
 export const RACES: Race[] = [

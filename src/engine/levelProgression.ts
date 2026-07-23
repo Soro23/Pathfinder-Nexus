@@ -92,6 +92,8 @@ const ALIGNMENT_AXES: Record<string, { law: LawAxis; good: GoodAxis; label: stri
 export function isAlignmentAllowedForClass(alignmentCode: string, classData: ClassData): boolean {
   const axes = ALIGNMENT_AXES[alignmentCode]
   if (!axes) return true
+  // Sin datos de alineamiento (p.ej. clase homebrew creada sin restricciones): no bloquear.
+  if (classData.alignment.length === 0) return true
   if (classData.alignment.some((entry) => entry === 'Cualquiera')) return true
 
   return classData.alignment.some((entry) => {

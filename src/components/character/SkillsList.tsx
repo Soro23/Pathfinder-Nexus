@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { ChevronDown, ChevronUp, Lock, Unlock, Plus, Trash2 } from 'lucide-react'
-import { Button } from '../ui'
-import { calculateModifier, CharacterClass, useSRDStore } from '../../data'
+import { Button, HomebrewBadge } from '../ui'
+import { calculateModifier, CharacterClass, useAllSkills } from '../../data'
 import type { Archetype } from '../../data/archetypes'
 import type { MiscBonus, SkillRank } from '../../store'
 import { computeSkillTotal, isClassSkillForCharacter } from '../../engine'
@@ -33,7 +33,7 @@ export function SkillsList({
   resolvedStats,
   archetypesByClassId,
 }: SkillsListProps) {
-  const { skills: SKILLS } = useSRDStore()
+  const SKILLS = useAllSkills()
   const [showAll, setShowAll] = useState(false)
   const [sortBy, setSortBy] = useState<'name' | 'total'>('name')
   const [search, setSearch] = useState('')
@@ -199,6 +199,7 @@ export function SkillsList({
                     <Unlock size={12} className={styles.unlockIcon} />
                   )}
                   <span className={styles.skillName}>{skill.name}</span>
+                  {skill.source === 'Homebrew' && <HomebrewBadge />}
                   <span className={styles.abilityMod}>
                     {calculateModifier(abilities[skill.ability]) >= 0 ? '+' : ''}
                     {calculateModifier(abilities[skill.ability])}

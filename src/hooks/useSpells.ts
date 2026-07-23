@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Spell, SpellLevel } from '../data/spells'
 import { useCustomSpellsStore } from '../store/customSpellsStore'
+import { useHomebrewStore } from '../store/homebrewStore'
 import { pickLocalized } from '../lib/localization'
 import { escapeForOrFilter } from '../lib/postgrest'
 
@@ -63,6 +64,7 @@ export function useSpells(filters: SpellFilters, page: number = 1) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const customSpells = useCustomSpellsStore((s) => s.customSpells)
+  const homebrewSpells = useHomebrewStore((s) => s.spells)
 
   // Derive unique allowed types from classIds (e.g. ['arcane'] or ['divine'] or both)
   const allowedTypes = [
@@ -126,9 +128,10 @@ export function useSpells(filters: SpellFilters, page: number = 1) {
           mapSpellRow(row as unknown as Record<string, unknown>)
         )
 
-        // Custom spells: filter client-side (usually few). Solo se muestran en la
-        // primera página para no duplicarlos en cada página del catálogo.
-        const filteredCustom = page === 1 ? customSpells.filter((cs) => {
+        // Custom spells (importadas por admin) y homebrew (creadas por el usuario): se
+        // filtran client-side (usualmente pocas). Solo se muestran en la primera página
+        // para no duplicarlas en cada página del catálogo.
+        const matchesFilters = (cs: Spell) => {
           if (filters.search && !cs.name.toLowerCase().includes(filters.search.toLowerCase()) && !cs.id.toLowerCase().includes(filters.search.toLowerCase())) return false
           if (filters.type !== 'all' && cs.type !== filters.type && cs.type !== 'both') return false
           if (filters.school !== 'all' && cs.school !== filters.school) return false
@@ -136,10 +139,16 @@ export function useSpells(filters: SpellFilters, page: number = 1) {
           if (filters.showKnownOnly && !filters.knownSpellIds.includes(cs.id)) return false
           if (allowedTypes.length === 1 && cs.type !== allowedTypes[0] && cs.type !== 'both') return false
           return true
-        }) : []
+        }
+        const filteredCustom = page === 1 ? customSpells.filter(matchesFilters) : []
+        const filteredHomebrew = page === 1
+          ? homebrewSpells
+            .map((s) => ({ ...s, source: s.source ?? 'Homebrew' }))
+            .filter(matchesFilters)
+          : []
 
-        setSpells([...filteredCustom, ...dbSpells])
-        setTotal((count ?? 0) + filteredCustom.length)
+        setSpells([...filteredHomebrew, ...filteredCustom, ...dbSpells])
+        setTotal((count ?? 0) + filteredCustom.length + filteredHomebrew.length)
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Error desconocido')
       } finally {
@@ -161,6 +170,7 @@ export function useSpells(filters: SpellFilters, page: number = 1) {
     filters.knownSpellIds.join(','),
     allowedTypesKey,
     customSpells,
+    homebrewSpells,
     page,
   ])
 

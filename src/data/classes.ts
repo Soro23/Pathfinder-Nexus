@@ -1,4 +1,5 @@
 import type { CharacterClass } from '../store/characterStore'
+import { homebrewStore } from '../store/homebrewStore'
 
 export interface ClassFeature {
   name: string
@@ -30,7 +31,7 @@ export interface ClassData {
   magicType: MagicType
   casterAbility: 'intelligence' | 'wisdom' | 'charisma' | null
   startingGoldDice: string
-  source: 'core' | 'apg' | 'acg' | 'other'
+  source: 'core' | 'apg' | 'acg' | 'other' | 'homebrew'
   proficiencies?: { weapons: string; armor: string }
   spellsPerDay?: SpellsPerDayTable
   spellsKnown?: SpellsKnownTable
@@ -1833,7 +1834,7 @@ export const CLASSES: ClassData[] = [
 ]
 
 export function getClassById(id: string): ClassData | undefined {
-  return CLASSES.find((c) => c.id === id)
+  return CLASSES.find((c) => c.id === id) ?? homebrewStore.getState().classes.find((c) => c.id === id)
 }
 
 export function getBABForLevel(level: number, babType: 'good' | 'medium' | 'poor'): number {
