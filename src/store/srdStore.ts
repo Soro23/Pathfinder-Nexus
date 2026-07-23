@@ -133,11 +133,31 @@ function mapSkillRow(r: Record<string, unknown>): Skill {
   }
 }
 
+// La columna `type` en Supabase mezcla dos formatos históricos: texto plano
+// separado por comas ("combat,style") y arrays serializados en JSON
+// ('["combat","style"]', a veces doblemente serializados). Se normaliza
+// recursivamente para soportar ambos sin depender de una migración de datos.
+function parseFeatType(raw: unknown, depth = 0): string[] {
+  if (depth > 5) return []
+  if (Array.isArray(raw)) return raw.flatMap((v) => parseFeatType(v, depth + 1))
+  if (typeof raw !== 'string') return []
+
+  const trimmed = raw.trim()
+  if (trimmed.startsWith('[')) {
+    try {
+      return parseFeatType(JSON.parse(trimmed), depth + 1)
+    } catch {
+      // No es JSON válido: se trata como texto plano abajo
+    }
+  }
+  return trimmed.split(',').map((t) => t.trim()).filter(Boolean)
+}
+
 function mapFeatRow(r: Record<string, unknown>): Feat {
   return {
     id: r.id as string,
     name: r.name as string,
-    type: (r.type as string || '').split(',').map(t => t.trim()) as FeatType[],
+    type: parseFeatType(r.type) as FeatType[],
     prerequisite: r.prerequisite as string | undefined,
     benefit: r.benefit as string,
     normal: r.normal as string | undefined,

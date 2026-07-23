@@ -32,7 +32,7 @@ const TYPE_LABELS: Record<FeatType, string> = {
 
 export function Feats() {
   const { feats, fetchAll, initialized } = useSRDStore()
-  const [activeCategory, setActiveCategory] = useState<FeatType | 'all'>('all')
+  const [activeCategory, setActiveCategory] = useState<FeatType | 'all'>('combat')
   const [search, setSearch] = useState('')
   const { isLoading } = usePageTransition(initialized)
 
