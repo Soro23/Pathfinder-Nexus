@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { X, Dice6, Shield, Swords, Zap, Award, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, Dice6, Shield, Swords, Zap, Award, Sparkles } from 'lucide-react'
 import type {
   Character, CharacterClass, CharacterFeat, SkillRank,
   AbilityKey, HpGainMode, FavoredClassChoice, LevelChoice,
@@ -41,7 +41,7 @@ function SpellLearnPicker({
 }) {
   const [search, setSearch] = useState('')
   const [school, setSchool] = useState('all')
-  const [expandedSpellId, setExpandedSpellId] = useState<string | null>(null)
+  const [infoSpellId, setInfoSpellId] = useState<string | null>(null)
   const { spells, loading } = useSpells({
     search,
     type: 'all',
@@ -52,6 +52,7 @@ function SpellLearnPicker({
     knownSpellIds: alreadyKnown,
   })
   const candidates = spells.filter((s) => s.level <= maxLevel && !alreadyKnown.includes(s.id))
+  const infoSpell = infoSpellId ? candidates.find((s) => s.id === infoSpellId) : undefined
 
   return (
     <>
@@ -77,7 +78,6 @@ function SpellLearnPicker({
         {!loading && candidates.map((spell) => {
           const isSelected = selected.includes(spell.id)
           const disabled = !isSelected && selected.length >= maxCount
-          const isExpanded = expandedSpellId === spell.id
           return (
             <div key={spell.id} className={`${styles.archetypeOption} ${styles.spellOption} ${isSelected ? styles.spellOptionSelected : ''}`}>
               <button
@@ -92,25 +92,11 @@ function SpellLearnPicker({
               <button
                 type="button"
                 className={styles.spellInfoBtn}
-                aria-label={isExpanded ? 'Ocultar información' : 'Más información'}
-                onClick={() => setExpandedSpellId(isExpanded ? null : spell.id)}
+                aria-label="Más información"
+                onClick={() => setInfoSpellId(spell.id)}
               >
-                +Info {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                +Info
               </button>
-              {isExpanded && (
-                <div className={styles.spellDetails}>
-                  <p className={styles.infoItem}>
-                    <strong>Tiempo de lanzamiento:</strong> {spell.castingTime}
-                  </p>
-                  <p className={styles.infoItem}><strong>Alcance:</strong> {spell.range}</p>
-                  <p className={styles.infoItem}><strong>Duración:</strong> {spell.duration}</p>
-                  {spell.target && <p className={styles.infoItem}><strong>Objetivo:</strong> {spell.target}</p>}
-                  {spell.area && <p className={styles.infoItem}><strong>Área:</strong> {spell.area}</p>}
-                  {spell.savingThrow && <p className={styles.infoItem}><strong>TS:</strong> {spell.savingThrow}</p>}
-                  {spell.spellResistance && <p className={styles.infoItem}><strong>RC:</strong> {spell.spellResistance}</p>}
-                  <p className={styles.infoItem}>{spell.description}</p>
-                </div>
-              )}
             </div>
           )
         })}
@@ -118,6 +104,30 @@ function SpellLearnPicker({
           <p className={styles.archetypeHint}>No hay conjuros que coincidan con la búsqueda.</p>
         )}
       </div>
+
+      {infoSpell && (
+        <div className={styles.spellInfoOverlay} onClick={() => setInfoSpellId(null)}>
+          <div className={styles.spellInfoModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.spellInfoHeader}>
+              <h3 className={styles.spellInfoTitle}>{infoSpell.name}</h3>
+              <button className={styles.closeBtn} onClick={() => setInfoSpellId(null)} aria-label="Cerrar">
+                <X size={18} />
+              </button>
+            </div>
+            <p className={styles.archetypeHint}>{infoSpell.school} · nivel {infoSpell.level}</p>
+            <div className={styles.spellDetails}>
+              <p className={styles.infoItem}><strong>Tiempo de lanzamiento:</strong> {infoSpell.castingTime}</p>
+              <p className={styles.infoItem}><strong>Alcance:</strong> {infoSpell.range}</p>
+              <p className={styles.infoItem}><strong>Duración:</strong> {infoSpell.duration}</p>
+              {infoSpell.target && <p className={styles.infoItem}><strong>Objetivo:</strong> {infoSpell.target}</p>}
+              {infoSpell.area && <p className={styles.infoItem}><strong>Área:</strong> {infoSpell.area}</p>}
+              {infoSpell.savingThrow && <p className={styles.infoItem}><strong>TS:</strong> {infoSpell.savingThrow}</p>}
+              {infoSpell.spellResistance && <p className={styles.infoItem}><strong>RC:</strong> {infoSpell.spellResistance}</p>}
+              <p className={styles.infoItem}>{infoSpell.description}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
