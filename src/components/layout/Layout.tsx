@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   Users, Map, BookOpen, LayoutList, Shield, Globe, Zap,
@@ -9,6 +9,7 @@ import { useSRDStore } from '../../store/srdStore'
 import { usePageTransitionStore } from '../../store/pageTransitionStore'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../hooks/useTheme'
+import { PageLoader } from './PageLoader'
 import styles from './Layout.module.css'
 
 const compendiumLinks = [
@@ -298,7 +299,9 @@ export function Layout() {
 
       {/* ── Main content ── */}
       <main className={styles.main}>
-        <Outlet />
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   )

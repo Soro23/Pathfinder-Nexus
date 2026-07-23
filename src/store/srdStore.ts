@@ -82,7 +82,10 @@ interface SRDStore {
   blessings: BlessingData[]
   loading: boolean
   initialized: boolean
+  npcsLoading: boolean
+  npcsInitialized: boolean
   fetchAll: () => Promise<void>
+  fetchNpcs: () => Promise<void>
   getArchetypesByClass: (classId: string) => Archetype[]
   getArchetypeById: (id: string) => Archetype | undefined
   getDomainById: (id: string) => DomainData | undefined
@@ -291,6 +294,8 @@ export const useSRDStore = create<SRDStore>()((set, get) => ({
   blessings: BLESSINGS,
   loading: false,
   initialized: false,
+  npcsLoading: false,
+  npcsInitialized: false,
 
   getArchetypesByClass: (classId) =>
     get().archetypes.filter((a) => a.classId === classId),
@@ -304,18 +309,20 @@ export const useSRDStore = create<SRDStore>()((set, get) => ({
   getBlessingById: (id) =>
     get().blessings.find((b) => b.id === id),
 
+  // Nota rendimiento: `npcs` (bestiario) se excluye deliberadamente de este fetch —
+  // solo lo consume la pantalla NPCs, y su carga aquí obligaba a descargar ese catálogo
+  // en cada arranque de la app aunque el usuario nunca visitase esa pantalla. Ver `fetchNpcs`.
   fetchAll: async () => {
     if (get().initialized) return
     set({ loading: true })
 
     try {
-      const [skills, feats, classes, races, archetypes, npcs, domains, blessings] = await Promise.all([
+      const [skills, feats, classes, races, archetypes, domains, blessings] = await Promise.all([
         fetchAllPaginated('skills', mapSkillRow),
         fetchAllPaginated('feats', mapFeatRow),
         fetchAllPaginated('classes', mapClassRow),
         fetchAllPaginated('races', mapRaceRow, 'id'),
         fetchAllPaginated('archetypes', mapArchetypeRow),
-        fetchAllPaginated('npcs', mapNpcRow, 'cr'),
         fetchAllPaginated('domains', mapDomainRow),
         fetchAllPaginated('blessings', mapBlessingRow),
       ])
@@ -326,7 +333,6 @@ export const useSRDStore = create<SRDStore>()((set, get) => ({
       if (feats.length > 0) updates.feats = feats
       if (classes.length > 0) updates.classes = classes
       if (races.length > 0) updates.races = races
-      if (npcs.length > 0) updates.npcs = npcs
       if (domains.length > 0) updates.domains = domains
       if (blessings.length > 0) updates.blessings = blessings
 
@@ -341,6 +347,17 @@ export const useSRDStore = create<SRDStore>()((set, get) => ({
     } catch {
       // On any error, keep static data — just mark done
       set({ loading: false, initialized: true })
+    }
+  },
+
+  fetchNpcs: async () => {
+    if (get().npcsInitialized) return
+    set({ npcsLoading: true })
+    try {
+      const npcs = await fetchAllPaginated('npcs', mapNpcRow, 'cr')
+      set({ npcs, npcsLoading: false, npcsInitialized: true })
+    } catch {
+      set({ npcsLoading: false, npcsInitialized: true })
     }
   },
 }))

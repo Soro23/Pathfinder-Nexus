@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Users, ChevronDown, ChevronUp, Shield } from 'lucide-react'
 import { useSRDStore } from '../store/srdStore'
 import type { NPC } from '../store/srdStore'
@@ -315,8 +315,10 @@ function NPCCard({ npc }: { npc: NPC }) {
 
 export function NPCs() {
   const npcs = useSRDStore(s => s.npcs ?? [])
-  const loading = useSRDStore(s => s.loading)
-  const { isExiting, isEntering, isLoading } = usePageTransition(!loading)
+  const initialized = useSRDStore(s => s.npcsInitialized)
+  const fetchNpcs = useSRDStore(s => s.fetchNpcs)
+  useEffect(() => { if (!initialized) fetchNpcs() }, [initialized, fetchNpcs])
+  const { isExiting, isEntering, isLoading } = usePageTransition(initialized)
   const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
 
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
