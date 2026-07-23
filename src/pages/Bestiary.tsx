@@ -68,8 +68,7 @@ export function Bestiary() {
   useEffect(() => {
     if (!loading) setHasLoadedOnce(true)
   }, [loading])
-  const { isExiting, isEntering, isLoading } = usePageTransition(hasLoadedOnce)
-  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+  const { isLoading } = usePageTransition(hasLoadedOnce)
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -115,7 +114,7 @@ export function Bestiary() {
 
       {/* ── Left nav ── */}
       <nav className={styles.monsterNav}>
-        <div className={`${styles.monsterNavInner} ${navClass}`}>
+        <div className={styles.monsterNavInner}>
           <p className={styles.navTitle}>Categorías</p>
           <div className={styles.navList}>
             {CATEGORIES.map((cat) => (

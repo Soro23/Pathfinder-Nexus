@@ -318,8 +318,7 @@ export function NPCs() {
   const initialized = useSRDStore(s => s.npcsInitialized)
   const fetchNpcs = useSRDStore(s => s.fetchNpcs)
   useEffect(() => { if (!initialized) fetchNpcs() }, [initialized, fetchNpcs])
-  const { isExiting, isEntering, isLoading } = usePageTransition(initialized)
-  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+  const { isLoading } = usePageTransition(initialized)
 
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
 
@@ -343,7 +342,7 @@ export function NPCs() {
     <div className={styles.pageLayout}>
       {/* ── Sidebar nav ── */}
       <aside className={styles.sideNav}>
-        <div className={`${styles.sideNavInner} ${navClass}`}>
+        <div className={styles.sideNavInner}>
           <div className={styles.navTitle}>Filtrar por CR</div>
           <div className={styles.navFilterList}>
             <button

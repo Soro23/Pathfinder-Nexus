@@ -1,9 +1,4 @@
 /* ── Page layout ── */
-@keyframes unfoldReveal {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0 0 0 0); }
-}
-
 .pageLayout {
   display: flex;
   gap: var(--space-6);
@@ -42,15 +37,6 @@
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
-  clip-path: inset(0 100% 0 0);
-}
-
-.navEntering {
-  animation: unfoldReveal 0.8s ease-out forwards;
-}
-
-.navExiting {
-  animation: unfoldReveal 0.4s ease-in reverse forwards;
 }
 
 .navTitle {

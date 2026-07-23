@@ -1,12 +1,11 @@
-import { Suspense, useEffect, useRef, useState } from 'react'
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { Suspense, useEffect, useState } from 'react'
+import { Outlet, Link, useLocation } from 'react-router-dom'
 import {
   Users, Map, BookOpen, LayoutList, Shield, Globe, Zap,
   Sparkles, Backpack, PawPrint, Settings, Sun, Moon, LogOut, Sword, Wand2, X,
   Search as SearchIcon,
 } from 'lucide-react'
 import { useSRDStore } from '../../store/srdStore'
-import { usePageTransitionStore } from '../../store/pageTransitionStore'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../hooks/useTheme'
 import { PageLoader } from './PageLoader'
@@ -32,50 +31,19 @@ const bottomNavItems = [
   { path: '/campaigns', icon: Map,    label: 'Campañas',   exact: false },
 ]
 
-// Duración del pliegue de salida — debe coincidir con la animación de cada página de catálogo.
-const EXIT_ANIMATION_MS = 400
-
 export function Layout() {
   const location = useLocation()
-  const navigate = useNavigate()
   const { signOut } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
   const fetchAll = useSRDStore((s) => s.fetchAll)
-  const setExiting = usePageTransitionStore((s) => s.setExiting)
-  const pendingPath = usePageTransitionStore((s) => s.pendingPath)
-  const setPendingPath = usePageTransitionStore((s) => s.setPendingPath)
   const [compendiumOpen, setCompendiumOpen] = useState(false)
-  const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => { fetchAll() }, [fetchAll])
   useEffect(() => { setCompendiumOpen(false) }, [location.pathname])
-  useEffect(() => () => { if (exitTimerRef.current) clearTimeout(exitTimerRef.current) }, [])
 
-  // El destino pendiente manda mientras se navega: el ítem del menú se resalta
-  // como si ya estuvieses ahí desde el primer clic, no cuando la URL cambia de verdad.
   function isActive(path: string, exact: boolean) {
-    const current = pendingPath ?? location.pathname
-    if (exact) return current === path
-    return current.startsWith(path)
-  }
-
-  // Intercepta la navegación por clic para reproducir el pliegue de salida de la
-  // página de catálogo actual (si tiene uno) antes de cambiar de ruta de verdad.
-  // Respeta ctrl/cmd/shift (abrir en pestaña nueva).
-  function handleNavClick(path: string) {
-    return (e: React.MouseEvent) => {
-      if (path === location.pathname) return
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-      e.preventDefault()
-      setPendingPath(path)
-      setExiting(true)
-      if (exitTimerRef.current) clearTimeout(exitTimerRef.current)
-      exitTimerRef.current = setTimeout(() => {
-        setExiting(false)
-        navigate(path)
-        setPendingPath(null)
-      }, EXIT_ANIMATION_MS)
-    }
+    if (exact) return location.pathname === path
+    return location.pathname.startsWith(path)
   }
 
   const isCompendiumActive = compendiumLinks.some(({ path }) => location.pathname.startsWith(path))
@@ -96,7 +64,6 @@ export function Layout() {
               <Link
                 key={path}
                 to={path}
-                onClick={handleNavClick(path)}
                 className={`${styles.compendiumSheetItem} ${isActive(path, false) ? styles.compendiumSheetItemActive : ''}`}
               >
                 <Icon size={20} />
@@ -113,7 +80,6 @@ export function Layout() {
           <Link
             key={path}
             to={path}
-            onClick={handleNavClick(path)}
             className={`${styles.bottomNavItem} ${isActive(path, exact) ? styles.bottomNavActive : ''}`}
           >
             <Icon size={22} />
@@ -129,7 +95,6 @@ export function Layout() {
         </button>
         <Link
           to="/tools"
-          onClick={handleNavClick('/tools')}
           className={`${styles.bottomNavItem} ${isActive('/tools', false) ? styles.bottomNavActive : ''}`}
         >
           <Settings size={22} />
@@ -140,7 +105,7 @@ export function Layout() {
       {/* ── Sidebar ── */}
       <aside className={styles.sidebar}>
         {/* Brand */}
-        <Link to="/" onClick={handleNavClick('/')} className={styles.brand}>
+        <Link to="/" className={styles.brand}>
           <div className={styles.brandIcon}>
             <Sword size={18} />
           </div>
@@ -156,7 +121,6 @@ export function Layout() {
           <span className={styles.navSection}>Gestión</span>
           <Link
             to="/"
-            onClick={handleNavClick('/')}
             className={`${styles.navItem} ${isActive('/', true) ? styles.active : ''}`}
           >
             <Users size={18} />
@@ -164,7 +128,6 @@ export function Layout() {
           </Link>
           <Link
             to="/campaigns"
-            onClick={handleNavClick('/campaigns')}
             className={`${styles.navItem} ${isActive('/campaigns', false) ? styles.active : ''}`}
           >
             <Map size={18} />
@@ -175,7 +138,6 @@ export function Layout() {
           <span className={styles.navSection}>Compendio</span>
           <Link
             to="/rules"
-            onClick={handleNavClick('/rules')}
             className={`${styles.navItem} ${isActive('/rules', false) ? styles.active : ''}`}
           >
             <BookOpen size={18} />
@@ -183,7 +145,6 @@ export function Layout() {
           </Link>
           <Link
             to="/srd"
-            onClick={handleNavClick('/srd')}
             className={`${styles.navItem} ${isActive('/srd', false) ? styles.active : ''}`}
           >
             <SearchIcon size={18} />
@@ -191,7 +152,6 @@ export function Layout() {
           </Link>
           <Link
             to="/homebrew"
-            onClick={handleNavClick('/homebrew')}
             className={`${styles.navItem} ${isActive('/homebrew', false) ? styles.active : ''}`}
           >
             <Wand2 size={18} />
@@ -199,7 +159,6 @@ export function Layout() {
           </Link>
           <Link
             to="/tables"
-            onClick={handleNavClick('/tables')}
             className={`${styles.navItem} ${isActive('/tables', false) ? styles.active : ''}`}
           >
             <LayoutList size={18} />
@@ -207,7 +166,6 @@ export function Layout() {
           </Link>
           <Link
             to="/skills"
-            onClick={handleNavClick('/skills')}
             className={`${styles.navItem} ${isActive('/skills', false) ? styles.active : ''}`}
           >
             <Zap size={18} />
@@ -215,7 +173,6 @@ export function Layout() {
           </Link>
           <Link
             to="/spells"
-            onClick={handleNavClick('/spells')}
             className={`${styles.navItem} ${isActive('/spells', false) ? styles.active : ''}`}
           >
             <Sparkles size={18} />
@@ -223,7 +180,6 @@ export function Layout() {
           </Link>
           <Link
             to="/feats"
-            onClick={handleNavClick('/feats')}
             className={`${styles.navItem} ${isActive('/feats', false) ? styles.active : ''}`}
           >
             <Sword size={18} />
@@ -231,7 +187,6 @@ export function Layout() {
           </Link>
           <Link
             to="/items"
-            onClick={handleNavClick('/items')}
             className={`${styles.navItem} ${isActive('/items', false) ? styles.active : ''}`}
           >
             <Backpack size={18} />
@@ -239,7 +194,6 @@ export function Layout() {
           </Link>
           <Link
             to="/bestiary"
-            onClick={handleNavClick('/bestiary')}
             className={`${styles.navItem} ${isActive('/bestiary', false) ? styles.active : ''}`}
           >
             <PawPrint size={18} />
@@ -247,7 +201,6 @@ export function Layout() {
           </Link>
           <Link
             to="/classes"
-            onClick={handleNavClick('/classes')}
             className={`${styles.navItem} ${isActive('/classes', false) ? styles.active : ''}`}
           >
             <Shield size={18} />
@@ -255,7 +208,6 @@ export function Layout() {
           </Link>
           <Link
             to="/races"
-            onClick={handleNavClick('/races')}
             className={`${styles.navItem} ${isActive('/races', false) ? styles.active : ''}`}
           >
             <Globe size={18} />
@@ -263,7 +215,6 @@ export function Layout() {
           </Link>
           <Link
             to="/npcs"
-            onClick={handleNavClick('/npcs')}
             className={`${styles.navItem} ${isActive('/npcs', false) ? styles.active : ''}`}
           >
             <Users size={18} />
@@ -276,7 +227,6 @@ export function Layout() {
           <div className={styles.footerTopRow}>
             <Link
               to="/admin"
-              onClick={handleNavClick('/admin')}
               className={`${styles.footerBtn} ${isActive('/admin', false) ? styles.footerBtnActive : ''}`}
               title="Administración"
             >

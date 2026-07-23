@@ -87,8 +87,7 @@ export function Items() {
   useEffect(() => {
     if (!loading) setHasLoadedOnce(true)
   }, [loading])
-  const { isExiting, isEntering, isLoading } = usePageTransition(hasLoadedOnce)
-  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+  const { isLoading } = usePageTransition(hasLoadedOnce)
 
   const resetPage = () => setPage(1)
 
@@ -130,7 +129,7 @@ export function Items() {
 
       {/* ── Left nav ── */}
       <nav className={styles.itemNav}>
-        <div className={`${styles.itemNavInner} ${navClass}`}>
+        <div className={styles.itemNavInner}>
           <p className={styles.navTitle}>Tipo</p>
           <div className={styles.navList}>
             <button

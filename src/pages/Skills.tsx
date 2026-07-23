@@ -17,8 +17,7 @@ function fmtAbility(ability: string): string {
 }
 
 export function Skills() {
-  const { isExiting, isEntering, isLoading } = usePageTransition(true)
-  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+  const { isLoading } = usePageTransition(true)
 
   function scrollTo(id: string) {
     const el = document.getElementById(id)
@@ -48,7 +47,7 @@ export function Skills() {
 
       {/* ── Left skill nav ── */}
       <nav className={styles.skillNav}>
-        <div className={`${styles.skillNavInner} ${navClass}`}>
+        <div className={styles.skillNavInner}>
           <p className={styles.navTitle}>Habilidades</p>
           <div className={styles.navList}>
             {SKILLS.map((skill) => (

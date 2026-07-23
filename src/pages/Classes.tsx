@@ -113,8 +113,7 @@ function SpellsTable({ cls }: { cls: typeof CLASSES[0] }) {
 }
 
 export function Classes() {
-  const { isExiting, isEntering, isLoading } = usePageTransition(true)
-  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+  const { isLoading } = usePageTransition(true)
   const { classId } = useParams<{ classId: string }>()
   const navigate = useNavigate()
 
@@ -148,7 +147,7 @@ export function Classes() {
 
       {/* ── Left nav ── */}
       <nav className={styles.sideNav}>
-        <div className={`${styles.sideNavInner} ${navClass}`}>
+        <div className={styles.sideNavInner}>
           <p className={styles.navTitle}>Clases</p>
           <div className={styles.navList}>
             {GROUPED_CLASSES.map(g => (

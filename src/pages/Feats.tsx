@@ -34,8 +34,7 @@ export function Feats() {
   const { feats, fetchAll, initialized } = useSRDStore()
   const [activeCategory, setActiveCategory] = useState<FeatType | 'all'>('all')
   const [search, setSearch] = useState('')
-  const { isExiting, isEntering, isLoading } = usePageTransition(initialized)
-  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+  const { isLoading } = usePageTransition(initialized)
 
   useEffect(() => {
     if (!initialized) fetchAll()
@@ -73,7 +72,7 @@ export function Feats() {
 
       {/* ── Left nav ── */}
       <nav className={styles.featNav}>
-        <div className={`${styles.featNavInner} ${navClass}`}>
+        <div className={styles.featNavInner}>
           <p className={styles.navTitle}>Categorías</p>
           <div className={styles.navList}>
             <button

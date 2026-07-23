@@ -356,8 +356,7 @@ const SPELL_LEVELS_BONUS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function Tables() {
-  const { isExiting, isEntering, isLoading } = usePageTransition(true)
-  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+  const { isLoading } = usePageTransition(true)
 
   function scrollTo(id: string) {
     const el = document.getElementById(id)
@@ -391,7 +390,7 @@ export function Tables() {
 
       {/* ── Left category nav (desktop) ── */}
       <nav className={styles.tableNav}>
-        <div className={`${styles.tableNavInner} ${navClass}`}>
+        <div className={styles.tableNavInner}>
           <p className={styles.navTitle}>Categorías</p>
           {CATEGORIES.map(cat => (
             <div key={cat.id} className={styles.navGroup}>

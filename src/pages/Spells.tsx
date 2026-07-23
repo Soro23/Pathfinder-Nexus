@@ -54,8 +54,7 @@ export function Spells() {
   useEffect(() => {
     if (!loading) setHasLoadedOnce(true)
   }, [loading])
-  const { isExiting, isEntering, isLoading } = usePageTransition(hasLoadedOnce)
-  const navClass = isExiting ? styles.navExiting : isEntering ? styles.navEntering : ''
+  const { isLoading } = usePageTransition(hasLoadedOnce)
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -88,7 +87,7 @@ export function Spells() {
 
       {/* ── Left nav ── */}
       <nav className={styles.spellNav}>
-        <div className={`${styles.spellNavInner} ${navClass}`}>
+        <div className={styles.spellNavInner}>
           <p className={styles.navTitle}>Nivel</p>
           <div className={styles.navList}>
             {LEVELS.map((lvl) => (
