@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Backpack, Search, ChevronDown } from 'lucide-react'
+import { Backpack, Search, ChevronDown, X } from 'lucide-react'
 import { useItems, fetchItemDescription } from '../hooks/useItems'
 import { usePageTransition } from '../hooks/usePageTransition'
-import { ITEM_TYPES } from '../lib/itemsService'
+import { ITEM_TYPES, type CatalogItem } from '../lib/itemsService'
 import styles from './Items.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
 
@@ -71,6 +71,128 @@ function formatBonus(value: number | string | undefined | null): string | undefi
   return /^[+-]/.test(str) ? str : `+${str}`
 }
 
+function ItemDataMeta({ item }: { item: CatalogItem }) {
+  return (
+    <>
+      {item.data?.weapon && (
+        <div className={styles.itemMeta}>
+          <span>
+            <strong>Daño:</strong> {item.data.weapon.damage_medium}
+            {item.data.weapon.damage_type && ` (${translateDamageType(item.data.weapon.damage_type)})`}
+          </span>
+          {item.data.weapon.critical && <span><strong>Crítico:</strong> {item.data.weapon.critical}</span>}
+          {item.data.weapon.range_increment !== undefined && (
+            <span><strong>Alcance:</strong> {item.data.weapon.range_increment} pies</span>
+          )}
+          {item.data.weapon.combat_type && (
+            <span><strong>Tipo:</strong> {COMBAT_TYPE_LABELS[item.data.weapon.combat_type] ?? item.data.weapon.combat_type}</span>
+          )}
+          {item.data.weapon.category && (
+            <span><strong>Categoría:</strong> {WEAPON_CATEGORY_LABELS[item.data.weapon.category] ?? item.data.weapon.category}</span>
+          )}
+          {item.data.weapon.handed && (
+            <span><strong>Manejo:</strong> {WEAPON_HANDED_LABELS[item.data.weapon.handed] ?? item.data.weapon.handed}</span>
+          )}
+        </div>
+      )}
+
+      {item.data?.armor && (
+        <div className={styles.itemMeta}>
+          {item.data.armor.armor_bonus !== undefined && (
+            <span><strong>Bonif. CA:</strong> {formatBonus(item.data.armor.armor_bonus)}</span>
+          )}
+          {item.data.armor.max_dex_bonus !== undefined && item.data.armor.max_dex_bonus !== null && (
+            <span><strong>Máx. Des:</strong> {formatBonus(item.data.armor.max_dex_bonus)}</span>
+          )}
+          {item.data.armor.armor_check_penalty !== undefined && (
+            <span><strong>Penal. armadura:</strong> {item.data.armor.armor_check_penalty}</span>
+          )}
+          {item.data.armor.arcane_spell_failure !== undefined && (
+            <span><strong>Fallo arcano:</strong> {item.data.armor.arcane_spell_failure}%</span>
+          )}
+          {item.data.armor.category && (
+            <span><strong>Categoría:</strong> {ARMOR_CATEGORY_LABELS[item.data.armor.category] ?? item.data.armor.category}</span>
+          )}
+        </div>
+      )}
+
+      {item.data?.shield && (
+        <div className={styles.itemMeta}>
+          {item.data.shield.shield_bonus !== undefined && (
+            <span><strong>Bonif. CA:</strong> {formatBonus(item.data.shield.shield_bonus)}</span>
+          )}
+          {item.data.shield.max_dex_bonus !== undefined && item.data.shield.max_dex_bonus !== null && (
+            <span><strong>Máx. Des:</strong> {formatBonus(item.data.shield.max_dex_bonus)}</span>
+          )}
+          {item.data.shield.armor_check_penalty !== undefined && (
+            <span><strong>Penal. armadura:</strong> {item.data.shield.armor_check_penalty}</span>
+          )}
+          {item.data.shield.arcane_spell_failure !== undefined && (
+            <span><strong>Fallo arcano:</strong> {item.data.shield.arcane_spell_failure}%</span>
+          )}
+        </div>
+      )}
+    </>
+  )
+}
+
+function ItemDetailModal({
+  item,
+  description,
+  onClose,
+}: {
+  item: CatalogItem
+  description: string | 'loading' | undefined
+  onClose: () => void
+}) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <div className={styles.itemHeader}>
+            <h2 className={styles.itemName}>{item.name}</h2>
+            {item.magical && <span className={`${styles.badge} ${styles.magicalBadge}`}>Mágico</span>}
+          </div>
+          <button type="button" className={styles.modalCloseBtn} onClick={onClose} aria-label="Cerrar">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className={styles.itemMeta}>
+          <span className={`${styles.badge} ${styles.typeBadge}`}>
+            {ITEM_TYPE_LABELS[item.item_type] ?? item.item_type}
+          </span>
+          {item.subtype && <span><strong>Subtipo:</strong> {item.subtype}</span>}
+          {item.slot && <span><strong>Ranura:</strong> {item.slot}</span>}
+          {item.price_gp !== undefined && <span><strong>Precio:</strong> {item.price_gp} po</span>}
+          {item.weight !== undefined && <span><strong>Peso:</strong> {item.weight} lb</span>}
+          {item.consumable && <span>Consumible</span>}
+        </div>
+
+        <ItemDataMeta item={item} />
+
+        <div className={styles.itemDescription}>
+          {description === 'loading' || description === undefined ? (
+            <p>Cargando descripción...</p>
+          ) : description ? (
+            <p>{description}</p>
+          ) : (
+            <p>Sin descripción disponible.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const PAGE_SIZE = 60
 
 export function Items() {
@@ -78,6 +200,7 @@ export function Items() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [descriptions, setDescriptions] = useState<Record<string, string | 'loading'>>({})
+  const [selectedItem, setSelectedItem] = useState<CatalogItem | null>(null)
 
   const { items, loading, total } = useItems({ search, itemType }, page)
 
@@ -236,83 +359,31 @@ export function Items() {
                 {item.consumable && <span>Consumible</span>}
               </div>
 
-              {item.data?.weapon && (
-                <div className={styles.itemMeta}>
-                  <span>
-                    <strong>Daño:</strong> {item.data.weapon.damage_medium}
-                    {item.data.weapon.damage_type && ` (${translateDamageType(item.data.weapon.damage_type)})`}
-                  </span>
-                  {item.data.weapon.critical && <span><strong>Crítico:</strong> {item.data.weapon.critical}</span>}
-                  {item.data.weapon.range_increment !== undefined && (
-                    <span><strong>Alcance:</strong> {item.data.weapon.range_increment} pies</span>
-                  )}
-                  {item.data.weapon.combat_type && (
-                    <span><strong>Tipo:</strong> {COMBAT_TYPE_LABELS[item.data.weapon.combat_type] ?? item.data.weapon.combat_type}</span>
-                  )}
-                  {item.data.weapon.category && (
-                    <span><strong>Categoría:</strong> {WEAPON_CATEGORY_LABELS[item.data.weapon.category] ?? item.data.weapon.category}</span>
-                  )}
-                  {item.data.weapon.handed && (
-                    <span><strong>Manejo:</strong> {WEAPON_HANDED_LABELS[item.data.weapon.handed] ?? item.data.weapon.handed}</span>
-                  )}
-                </div>
-              )}
-
-              {item.data?.armor && (
-                <div className={styles.itemMeta}>
-                  {item.data.armor.armor_bonus !== undefined && (
-                    <span><strong>Bonif. CA:</strong> {formatBonus(item.data.armor.armor_bonus)}</span>
-                  )}
-                  {item.data.armor.max_dex_bonus !== undefined && item.data.armor.max_dex_bonus !== null && (
-                    <span><strong>Máx. Des:</strong> {formatBonus(item.data.armor.max_dex_bonus)}</span>
-                  )}
-                  {item.data.armor.armor_check_penalty !== undefined && (
-                    <span><strong>Penal. armadura:</strong> {item.data.armor.armor_check_penalty}</span>
-                  )}
-                  {item.data.armor.arcane_spell_failure !== undefined && (
-                    <span><strong>Fallo arcano:</strong> {item.data.armor.arcane_spell_failure}%</span>
-                  )}
-                  {item.data.armor.category && (
-                    <span><strong>Categoría:</strong> {ARMOR_CATEGORY_LABELS[item.data.armor.category] ?? item.data.armor.category}</span>
-                  )}
-                </div>
-              )}
-
-              {item.data?.shield && (
-                <div className={styles.itemMeta}>
-                  {item.data.shield.shield_bonus !== undefined && (
-                    <span><strong>Bonif. CA:</strong> {formatBonus(item.data.shield.shield_bonus)}</span>
-                  )}
-                  {item.data.shield.max_dex_bonus !== undefined && item.data.shield.max_dex_bonus !== null && (
-                    <span><strong>Máx. Des:</strong> {formatBonus(item.data.shield.max_dex_bonus)}</span>
-                  )}
-                  {item.data.shield.armor_check_penalty !== undefined && (
-                    <span><strong>Penal. armadura:</strong> {item.data.shield.armor_check_penalty}</span>
-                  )}
-                  {item.data.shield.arcane_spell_failure !== undefined && (
-                    <span><strong>Fallo arcano:</strong> {item.data.shield.arcane_spell_failure}%</span>
-                  )}
-                </div>
-              )}
+              <ItemDataMeta item={item} />
 
               <div className={styles.itemDescription}>
-                {descriptions[item.id] === 'loading' ? (
-                  <p>Cargando descripción...</p>
-                ) : descriptions[item.id] ? (
-                  <p>{descriptions[item.id]}</p>
-                ) : (
-                  <button
-                    type="button"
-                    className={styles.paginationBtn}
-                    onClick={() => loadDescription(item.id)}
-                  >
-                    Ver descripción completa
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className={styles.paginationBtn}
+                  onClick={() => {
+                    setSelectedItem(item)
+                    loadDescription(item.id)
+                  }}
+                >
+                  Ver descripción completa
+                </button>
               </div>
             </div>
           ))}
         </div>
+
+        {selectedItem && (
+          <ItemDetailModal
+            item={selectedItem}
+            description={descriptions[selectedItem.id]}
+            onClose={() => setSelectedItem(null)}
+          />
+        )}
 
         {/* Pagination bottom */}
         {totalPages > 1 && (
