@@ -313,6 +313,8 @@ function NPCCard({ npc }: { npc: NPC }) {
 
 // ── Page ───────────────────────────────────────────────────────────────────
 
+const PAGE_SIZE = 20
+
 export function NPCs() {
   const npcs = useSRDStore(s => s.npcs ?? [])
   const initialized = useSRDStore(s => s.npcsInitialized)
@@ -321,6 +323,7 @@ export function NPCs() {
   const { isLoading } = usePageTransition(initialized)
 
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
   // Build groups that have at least one NPC
   const groupedNPCs = CR_GROUPS.map(g => ({
@@ -333,6 +336,33 @@ export function NPCs() {
   const displayGroups = selectedGroup
     ? groupedNPCs.filter(g => g.key === selectedGroup)
     : groupedNPCs
+
+  const flatNPCs = displayGroups.flatMap(g => g.npcs.map(npc => ({ npc, groupKey: g.key, groupLabel: g.label })))
+  const totalPages = Math.max(1, Math.ceil(flatNPCs.length / PAGE_SIZE))
+  const pagedNPCs = flatNPCs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  // Reagrupa la página actual en tramos consecutivos del mismo CR para
+  // mostrar una única cabecera por grupo, igual que en la vista sin paginar.
+  const pagedGroups: { key: string; label: string; npcs: NPC[] }[] = []
+  for (const { npc, groupKey, groupLabel } of pagedNPCs) {
+    const last = pagedGroups[pagedGroups.length - 1]
+    if (last && last.key === groupKey) last.npcs.push(npc)
+    else pagedGroups.push({ key: groupKey, label: groupLabel, npcs: [npc] })
+  }
+
+  const resetPage = () => setPage(1)
+
+  const handleGroupChange = (group: string | null) => {
+    setSelectedGroup(group)
+    resetPage()
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   function scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -347,7 +377,7 @@ export function NPCs() {
           <div className={styles.navFilterList}>
             <button
               className={`${styles.navFilterBtn} ${selectedGroup === null ? styles.navFilterBtnActive : ''}`}
-              onClick={() => setSelectedGroup(null)}
+              onClick={() => handleGroupChange(null)}
             >
               <span>Todos</span>
               <span className={styles.navFilterCount}>{npcs.length}</span>
@@ -356,7 +386,7 @@ export function NPCs() {
               <button
                 key={group.key}
                 className={`${styles.navFilterBtn} ${selectedGroup === group.key ? styles.navFilterBtnActive : ''}`}
-                onClick={() => setSelectedGroup(group.key)}
+                onClick={() => handleGroupChange(group.key)}
               >
                 <span>{group.label}</span>
                 <span className={styles.navFilterCount}>{group.npcs.length}</span>
@@ -393,7 +423,7 @@ export function NPCs() {
             <select
               className={mobile.mobileCatSelect}
               value={selectedGroup ?? ''}
-              onChange={e => setSelectedGroup(e.target.value || null)}
+              onChange={e => handleGroupChange(e.target.value || null)}
             >
               <option value="">Todos los CR</option>
               {groupedNPCs.map(g => (
@@ -426,9 +456,39 @@ export function NPCs() {
           <p className={styles.emptyText}>No hay NPCs disponibles aún.</p>
         )}
 
+        {npcs.length > 0 && (
+          <div className={styles.resultsAndPagination}>
+            <p className={styles.resultsCount}>
+              {flatNPCs.length} NPC{flatNPCs.length !== 1 ? 's' : ''} encontrado{flatNPCs.length !== 1 ? 's' : ''}
+            </p>
+
+            {totalPages > 1 && (
+              <div className={styles.pagination}>
+                <button
+                  className={styles.paginationBtn}
+                  onClick={() => handlePageChange(page - 1)}
+                  disabled={page === 1}
+                >
+                  Anterior
+                </button>
+                <span className={styles.paginationInfo}>
+                  Página {page} de {totalPages}
+                </span>
+                <button
+                  className={styles.paginationBtn}
+                  onClick={() => handlePageChange(page + 1)}
+                  disabled={page === totalPages}
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className={styles.npcList}>
-          {displayGroups.map(group => (
-            <div key={group.key} className={styles.crGroup}>
+          {pagedGroups.map((group, i) => (
+            <div key={`${group.key}-${i}`} className={styles.crGroup}>
               <div className={styles.groupHeader}>
                 <span className={styles.groupLabel}>{group.label}</span>
               </div>
@@ -438,6 +498,28 @@ export function NPCs() {
             </div>
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button
+              className={styles.paginationBtn}
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+            >
+              Anterior
+            </button>
+            <span className={styles.paginationInfo}>
+              Página {page} de {totalPages}
+            </span>
+            <button
+              className={styles.paginationBtn}
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
         </>
         )}
       </div>

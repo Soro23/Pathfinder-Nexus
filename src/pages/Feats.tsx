@@ -30,10 +30,13 @@ const TYPE_LABELS: Record<FeatType, string> = {
   story: 'Historia',
 }
 
+const PAGE_SIZE = 60
+
 export function Feats() {
   const { feats, fetchAll, initialized } = useSRDStore()
-  const [activeCategory, setActiveCategory] = useState<FeatType | 'all'>('combat')
+  const [activeCategory, setActiveCategory] = useState<FeatType | 'all'>('all')
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
   const { isLoading } = usePageTransition(initialized)
 
   useEffect(() => {
@@ -49,6 +52,23 @@ export function Feats() {
     return matchesCategory && matchesSearch
   })
 
+  const totalPages = Math.max(1, Math.ceil(filteredFeats.length / PAGE_SIZE))
+  const pagedFeats = filteredFeats.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  const resetPage = () => setPage(1)
+
+  const handleCategoryChange = (category: FeatType | 'all') => {
+    setActiveCategory(category)
+    resetPage()
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
   return (
     <div className={`${styles.pageLayout} ${mobile.pageLayout}`}>
 
@@ -59,7 +79,7 @@ export function Feats() {
           <select
             className={mobile.mobileCatSelect}
             value={activeCategory}
-            onChange={e => setActiveCategory(e.target.value as FeatType | 'all')}
+            onChange={e => handleCategoryChange(e.target.value as FeatType | 'all')}
           >
             <option value="all">Todas las dotes</option>
             {CATEGORIES.map(cat => (
@@ -77,7 +97,7 @@ export function Feats() {
           <div className={styles.navList}>
             <button
               className={`${styles.navBtn} ${activeCategory === 'all' ? styles.navBtnActive : ''}`}
-              onClick={() => setActiveCategory('all')}
+              onClick={() => handleCategoryChange('all')}
             >
               Todas las dotes
             </button>
@@ -85,7 +105,7 @@ export function Feats() {
               <button
                 key={cat.id}
                 className={`${styles.navBtn} ${activeCategory === cat.id ? styles.navBtnActive : ''}`}
-                onClick={() => setActiveCategory(cat.id)}
+                onClick={() => handleCategoryChange(cat.id)}
               >
                 {cat.icon}
                 <span>{cat.label}</span>
@@ -123,24 +143,48 @@ export function Feats() {
             type="text"
             placeholder="Buscar dotes..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); resetPage() }}
             className={styles.searchInput}
           />
           {search && (
-            <button className={styles.searchClear} onClick={() => setSearch('')}>
+            <button className={styles.searchClear} onClick={() => { setSearch(''); resetPage() }}>
               ×
             </button>
           )}
         </div>
 
-        {/* Results count */}
-        <p className={styles.resultsCount}>
-          {filteredFeats.length} dote{filteredFeats.length !== 1 ? 's' : ''} encontrada{filteredFeats.length !== 1 ? 's' : ''}
-        </p>
+        {/* Results count and pagination */}
+        <div className={styles.resultsAndPagination}>
+          <p className={styles.resultsCount}>
+            {filteredFeats.length} dote{filteredFeats.length !== 1 ? 's' : ''} encontrada{filteredFeats.length !== 1 ? 's' : ''}
+          </p>
+
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button
+                className={styles.paginationBtn}
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page === 1}
+              >
+                Anterior
+              </button>
+              <span className={styles.paginationInfo}>
+                Página {page} de {totalPages}
+              </span>
+              <button
+                className={styles.paginationBtn}
+                onClick={() => handlePageChange(page + 1)}
+                disabled={page === totalPages}
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Feats grid */}
-        <div key={activeCategory} className={styles.featsGrid}>
-          {filteredFeats.map((feat) => (
+        <div key={`${activeCategory}-${page}`} className={styles.featsGrid}>
+          {pagedFeats.map((feat) => (
             <div key={feat.id} id={feat.id} className={styles.featCard}>
               <div className={styles.featHeader}>
                 <h3 className={styles.featName}>{feat.name}</h3>
@@ -201,6 +245,29 @@ export function Feats() {
             </div>
           ))}
         </div>
+
+        {/* Pagination bottom */}
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button
+              className={styles.paginationBtn}
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+            >
+              Anterior
+            </button>
+            <span className={styles.paginationInfo}>
+              Página {page} de {totalPages}
+            </span>
+            <button
+              className={styles.paginationBtn}
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
 
         {filteredFeats.length === 0 && (
           <div className={styles.noResults}>
