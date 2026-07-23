@@ -566,6 +566,7 @@ export function CharacterView() {
               abilities: updates.newAbilities,
               skills: updates.newSkills,
               feats: updates.newFeats,
+              spells: updates.newSpells,
               hp: {
                 ...character.hp,
                 max: character.hp.max + updates.hpGained,

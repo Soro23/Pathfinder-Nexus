@@ -399,6 +399,22 @@
   font-weight: 600;
 }
 
+.archetypeOption:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.spellOptionSelected,
+.spellOptionSelected:hover {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.spellOptionSelected small {
+  color: var(--color-on-primary);
+  opacity: 0.85;
+}
+
 .archetypeOption small {
   color: var(--color-on-surface-variant);
   font-size: var(--text-label-sm);
@@ -441,17 +457,3 @@
   background: var(--color-surface-container-low);
 }
 
-/* ── Desktop: modal más ancho con secciones en dos columnas ── */
-@media (min-width: 901px) {
-  .modal {
-    max-width: min(1100px, calc(100vw - var(--space-8)));
-  }
-
-  .sectionsGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-    column-gap: var(--space-6);
-    row-gap: var(--space-5);
-  }
-}

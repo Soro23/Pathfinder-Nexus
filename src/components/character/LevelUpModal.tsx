@@ -20,7 +20,71 @@ import type { BonusFeatSlot } from '../../engine'
 import { Button } from '../ui'
 import { SkillsList } from './SkillsList'
 import { FeatsSelector } from './FeatsSelector'
+import { useSpells } from '../../hooks/useSpells'
 import styles from './LevelUpModal.module.css'
+
+// Reglas de conjuros ganados por nivel: los lanzadores espontáneos (con `spellsKnown`) eligen
+// tantos conjuros nuevos como indique la tabla; el mago no tiene `spellsKnown` (prepara de su
+// grimorio) pero la regla base le da 2 conjuros nuevos gratis de grimorio en cada nivel de mago.
+const WIZARD_CLASS_ID = 'wizard'
+const WIZARD_FREE_SPELLS_PER_LEVEL = 2
+
+function SpellLearnPicker({
+  classId, maxLevel, alreadyKnown, selected, maxCount, onToggle,
+}: {
+  classId: string
+  maxLevel: number
+  alreadyKnown: string[]
+  selected: string[]
+  maxCount: number
+  onToggle: (spellId: string) => void
+}) {
+  const [search, setSearch] = useState('')
+  const { spells, loading } = useSpells({
+    search,
+    type: 'all',
+    school: 'all',
+    level: 'all',
+    classIds: [classId],
+    showKnownOnly: false,
+    knownSpellIds: alreadyKnown,
+  })
+  const candidates = spells.filter((s) => s.level <= maxLevel && !alreadyKnown.includes(s.id))
+
+  return (
+    <>
+      <input
+        className={styles.searchInput}
+        type="search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Buscar conjuro..."
+      />
+      <div className={styles.archetypeOptionList}>
+        {loading && <p className={styles.archetypeHint}>Buscando conjuros...</p>}
+        {!loading && candidates.map((spell) => {
+          const isSelected = selected.includes(spell.id)
+          const disabled = !isSelected && selected.length >= maxCount
+          return (
+            <button
+              key={spell.id}
+              type="button"
+              disabled={disabled}
+              className={`${styles.archetypeOption} ${isSelected ? styles.spellOptionSelected : ''}`}
+              onClick={() => onToggle(spell.id)}
+            >
+              <span>{spell.name} <span className={styles.mono}>(nivel {spell.level})</span></span>
+              <small>{spell.school}</small>
+            </button>
+          )
+        })}
+        {!loading && candidates.length === 0 && (
+          <p className={styles.archetypeHint}>No hay conjuros que coincidan con la búsqueda.</p>
+        )}
+      </div>
+    </>
+  )
+}
 
 export interface LevelUpUpdates {
   newLevel: number
@@ -31,6 +95,7 @@ export interface LevelUpUpdates {
   newAbilities: Character['abilities']
   newSkills: SkillRank[]
   newFeats: CharacterFeat[]
+  newSpells: string[]
   levelChoice: LevelChoice
 }
 
@@ -83,6 +148,9 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
   // ── 7. Clase predilecta ──────────────────────────────────────────────────────────────
   const [favoredClassChoice, setFavoredClassChoice] = useState<FavoredClassChoice | undefined>(undefined)
 
+  // ── 8. Conjuros nuevos ───────────────────────────────────────────────────────────────
+  const [pendingSpellsLearned, setPendingSpellsLearned] = useState<string[]>([])
+
   const resolvedStats = useMemo(() => resolveModifiers(character), [character])
 
   const resolvedClassData = getClassById(classChoice.classId)
@@ -107,6 +175,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
     setPendingSkills(character.skills)
     setPendingFeats([])
     setFavoredClassChoice(undefined)
+    setPendingSpellsLearned([])
   }
 
   const changeClassChoice = (choice: ClassChoice) => {
@@ -203,18 +272,39 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
 
   const combinedSelectedFeats: CharacterFeat[] = [...character.feats, ...pendingFeats]
 
+  // ── Conjuros ganados este nivel (V-10) ──────────────────────────────────────────────
+  const spellsPerDayRow = resolvedClassData?.spellsPerDay
+  const currentSpellsPerDayRow = attainedLevel > 0 ? spellsPerDayRow?.[attainedLevel - 1] : undefined
+  const nextSpellsPerDayRow = spellsPerDayRow?.[newClassLevel - 1]
+  const spellSlotsGained = (nextSpellsPerDayRow ?? [])
+    .map((count, spellLevel) => ({ spellLevel, from: currentSpellsPerDayRow?.[spellLevel] ?? 0, to: count ?? 0 }))
+    .filter(({ from, to }) => to > from)
+
+  const spellsKnownRow = resolvedClassData?.spellsKnown
+  const currentKnownRow = attainedLevel > 0 ? spellsKnownRow?.[attainedLevel - 1] : undefined
+  const nextKnownRow = spellsKnownRow?.[newClassLevel - 1]
+  const knownSpellsGained = nextKnownRow
+    ? nextKnownRow.reduce((sum: number, count, spellLevel) => sum + Math.max(0, (count ?? 0) - (currentKnownRow?.[spellLevel] ?? 0)), 0)
+    : 0
+
+  const isWizardLevel = classChoice.classId === WIZARD_CLASS_ID
+  const spellsToLearnCount: number = spellsKnownRow ? knownSpellsGained : (isWizardLevel ? WIZARD_FREE_SPELLS_PER_LEVEL : 0)
+  const maxLearnableSpellLevel = (nextSpellsPerDayRow ?? nextKnownRow ?? [])
+    .reduce((max: number, count, spellLevel) => ((count ?? 0) > 0 ? spellLevel : max), 0)
+
   // ── Estado por pestaña — para marcar en la barra de pestañas qué grupo tiene pendientes ──
   const classTabIncomplete = isFavoredClassLevel && favoredClassChoice === undefined
   const combatTabIncomplete = hpGained === null || (abilityIncreaseRequired && abilityIncrease === null)
   const skillsTabIncomplete = skillPointsAvailable < 0
   const featsTabIncomplete = pendingFeats.length < featSlotsRequired || pendingFeatChecks.some(({ check }) => !check.met)
+  const spellsTabIncomplete = pendingSpellsLearned.length < spellsToLearnCount
 
   const tabs: { id: TabId; label: string; icon: typeof Shield; incomplete: boolean }[] = [
     { id: 'class', label: 'Clase', icon: Shield, incomplete: classTabIncomplete },
     { id: 'combat', label: 'Combate', icon: Swords, incomplete: combatTabIncomplete },
     { id: 'skills', label: 'Habilidades', icon: Zap, incomplete: skillsTabIncomplete },
     ...(featSlotsRequired > 0 ? [{ id: 'feats' as const, label: 'Dotes', icon: Award, incomplete: featsTabIncomplete }] : []),
-    ...(resolvedClassData?.spellsPerDay ? [{ id: 'spells' as const, label: 'Conjuros', icon: Sparkles, incomplete: false }] : []),
+    ...(resolvedClassData?.spellsPerDay ? [{ id: 'spells' as const, label: 'Conjuros', icon: Sparkles, incomplete: spellsTabIncomplete }] : []),
   ]
 
   const validationMessages = [
@@ -224,6 +314,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
     pendingFeats.length < featSlotsRequired ? `Elige ${featSlotsRequired - pendingFeats.length} dote(s) pendiente(s) de este nivel.` : null,
     pendingFeatChecks.some(({ check }) => !check.met) ? 'Una dote elegida no cumple sus prerrequisitos reconocidos.' : null,
     isFavoredClassLevel && favoredClassChoice === undefined ? 'Elige el beneficio de clase predilecta.' : null,
+    spellsTabIncomplete ? `Elige ${spellsToLearnCount - pendingSpellsLearned.length} conjuro(s) nuevo(s).` : null,
   ].filter((message): message is string => Boolean(message))
 
   const canConfirm = validationMessages.length === 0
@@ -264,6 +355,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
       featIds: pendingFeats.map((feat) => feat.id),
       favoredClassChoice: isFavoredClassLevel ? favoredClassChoice : undefined,
       skillRanksSpent,
+      spellsLearned: pendingSpellsLearned.length > 0 ? pendingSpellsLearned : undefined,
       source: 'level-up',
       createdAt: new Date().toISOString(),
     }
@@ -277,6 +369,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
       newAbilities,
       newSkills: pendingSkills,
       newFeats,
+      newSpells: [...character.spells, ...pendingSpellsLearned],
       levelChoice,
     })
   }
@@ -653,8 +746,49 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
         {/* ── Pestaña: Conjuros ── */}
         {activeTab === 'spells' && resolvedClassData?.spellsPerDay && (
           <div className={styles.sectionsGrid}>
+            {spellSlotsGained.length > 0 && (
+              <div className={styles.section}>
+                <p className={styles.sectionLabel}>Espacios de conjuro ganados</p>
+                <ul className={styles.infoList}>
+                  {spellSlotsGained.map(({ spellLevel, from, to }) => (
+                    <li key={spellLevel} className={styles.infoItem}>
+                      Nivel {spellLevel}: <span className={styles.mono}>{from} → {to}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {spellsToLearnCount > 0 ? (
+              <div className={styles.section}>
+                <p className={styles.sectionLabel}>
+                  Conjuros nuevos <span className={styles.mono}>({pendingSpellsLearned.length}/{spellsToLearnCount})</span>
+                </p>
+                <SpellLearnPicker
+                  classId={classChoice.classId}
+                  maxLevel={maxLearnableSpellLevel}
+                  alreadyKnown={character.spells}
+                  selected={pendingSpellsLearned}
+                  maxCount={spellsToLearnCount}
+                  onToggle={(spellId) => {
+                    setPendingSpellsLearned((prev) =>
+                      prev.includes(spellId) ? prev.filter((id) => id !== spellId) : [...prev, spellId]
+                    )
+                  }}
+                />
+              </div>
+            ) : (
+              <div className={styles.section}>
+                <p className={styles.sectionLabel}>Conjuros</p>
+                <p className={styles.archetypeHint}>
+                  {resolvedClassData.spellsKnown
+                    ? 'No ganas conjuros conocidos nuevos en este nivel.'
+                    : `${resolvedClassData.name} prepara sus conjuros de la lista completa cada día — no hace falta elegir conjuros nuevos aquí.`}
+                </p>
+              </div>
+            )}
+
             <div className={styles.section}>
-              <p className={styles.sectionLabel}>Conjuros</p>
               <p className={styles.archetypeHint}>Los espacios de conjuro se sincronizan automáticamente con la tabla de {resolvedClassData.name} al confirmar.</p>
             </div>
           </div>
