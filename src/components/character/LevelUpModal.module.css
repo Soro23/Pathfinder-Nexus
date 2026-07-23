@@ -404,10 +404,101 @@
   opacity: 0.5;
 }
 
+/* ── Selector de conjuros al subir de nivel ── */
+.pickerFilters {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.pickerFilters .searchInput {
+  flex: 1;
+}
+
+.spellOption {
+  cursor: default;
+  padding: 0;
+  gap: 0;
+}
+
+.spellOption:hover {
+  background: var(--color-surface-container);
+  color: var(--color-on-surface);
+}
+
+.spellOptionMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.spellOptionMain:hover {
+  color: var(--color-primary);
+}
+
+.spellOptionMain span {
+  font-weight: 600;
+}
+
+.spellOptionMain:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.spellInfoBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-end;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-on-surface-variant);
+  font-size: var(--text-label-sm);
+  padding: 0 var(--space-3) var(--space-2);
+}
+
+.spellInfoBtn:hover {
+  color: var(--color-primary);
+}
+
+.spellDetails {
+  padding: 0 var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  border-top: 1px solid var(--color-surface-container-high);
+}
+
+.spellDetails strong {
+  color: var(--color-on-surface);
+}
+
 .spellOptionSelected,
 .spellOptionSelected:hover {
   background: var(--color-primary);
   color: var(--color-on-primary);
+}
+
+.spellOptionSelected .spellOptionMain:hover {
+  color: var(--color-on-primary);
+}
+
+.spellOptionSelected .spellInfoBtn {
+  color: var(--color-on-primary);
+  opacity: 0.85;
+}
+
+.spellOptionSelected .spellInfoBtn:hover {
+  opacity: 1;
 }
 
 .spellOptionSelected small {

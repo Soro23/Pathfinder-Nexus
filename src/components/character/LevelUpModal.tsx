@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react'
-import { X, Dice6, Shield, Swords, Zap, Award, Sparkles } from 'lucide-react'
+import { X, Dice6, Shield, Swords, Zap, Award, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
 import type {
   Character, CharacterClass, CharacterFeat, SkillRank,
   AbilityKey, HpGainMode, FavoredClassChoice, LevelChoice,
 } from '../../store'
 import { calculateModifier } from '../../store'
-import { getClassById, useAllClasses, useAllFeats, getMulticlassStats } from '../../data'
+import { getClassById, useAllClasses, useAllFeats, getMulticlassStats, SPELL_SCHOOLS } from '../../data'
 import { useSRDStore } from '../../store/srdStore'
 import {
   archetypeAffectsAttainedLevel, findConflictingArchetype, resolveClassFeatures, buildArchetypesByClassId,
@@ -17,7 +17,7 @@ import {
   getBonusFeatSlotsForClassLevel, getFavoredClassHpBonus, getFavoredClassSkillBonus, resolveModifiers,
 } from '../../engine'
 import type { BonusFeatSlot } from '../../engine'
-import { Button } from '../ui'
+import { Button, Select } from '../ui'
 import { SkillsList } from './SkillsList'
 import { FeatsSelector } from './FeatsSelector'
 import { useSpells } from '../../hooks/useSpells'
@@ -40,10 +40,12 @@ function SpellLearnPicker({
   onToggle: (spellId: string) => void
 }) {
   const [search, setSearch] = useState('')
+  const [school, setSchool] = useState('all')
+  const [expandedSpellId, setExpandedSpellId] = useState<string | null>(null)
   const { spells, loading } = useSpells({
     search,
     type: 'all',
-    school: 'all',
+    school,
     level: 'all',
     classIds: [classId],
     showKnownOnly: false,
@@ -53,29 +55,63 @@ function SpellLearnPicker({
 
   return (
     <>
-      <input
-        className={styles.searchInput}
-        type="search"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Buscar conjuro..."
-      />
+      <div className={styles.pickerFilters}>
+        <input
+          className={styles.searchInput}
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar conjuro..."
+        />
+        <Select
+          value={school}
+          onChange={(e) => setSchool(e.target.value)}
+          options={[
+            { value: 'all', label: 'Todas las escuelas' },
+            ...SPELL_SCHOOLS.map((s) => ({ value: s, label: s })),
+          ]}
+        />
+      </div>
       <div className={styles.archetypeOptionList}>
         {loading && <p className={styles.archetypeHint}>Buscando conjuros...</p>}
         {!loading && candidates.map((spell) => {
           const isSelected = selected.includes(spell.id)
           const disabled = !isSelected && selected.length >= maxCount
+          const isExpanded = expandedSpellId === spell.id
           return (
-            <button
-              key={spell.id}
-              type="button"
-              disabled={disabled}
-              className={`${styles.archetypeOption} ${isSelected ? styles.spellOptionSelected : ''}`}
-              onClick={() => onToggle(spell.id)}
-            >
-              <span>{spell.name} <span className={styles.mono}>(nivel {spell.level})</span></span>
-              <small>{spell.school}</small>
-            </button>
+            <div key={spell.id} className={`${styles.archetypeOption} ${styles.spellOption} ${isSelected ? styles.spellOptionSelected : ''}`}>
+              <button
+                type="button"
+                disabled={disabled}
+                className={styles.spellOptionMain}
+                onClick={() => onToggle(spell.id)}
+              >
+                <span>{spell.name} <span className={styles.mono}>(nivel {spell.level})</span></span>
+                <small>{spell.school}</small>
+              </button>
+              <button
+                type="button"
+                className={styles.spellInfoBtn}
+                aria-label={isExpanded ? 'Ocultar información' : 'Más información'}
+                onClick={() => setExpandedSpellId(isExpanded ? null : spell.id)}
+              >
+                +Info {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+              {isExpanded && (
+                <div className={styles.spellDetails}>
+                  <p className={styles.infoItem}>
+                    <strong>Tiempo de lanzamiento:</strong> {spell.castingTime}
+                  </p>
+                  <p className={styles.infoItem}><strong>Alcance:</strong> {spell.range}</p>
+                  <p className={styles.infoItem}><strong>Duración:</strong> {spell.duration}</p>
+                  {spell.target && <p className={styles.infoItem}><strong>Objetivo:</strong> {spell.target}</p>}
+                  {spell.area && <p className={styles.infoItem}><strong>Área:</strong> {spell.area}</p>}
+                  {spell.savingThrow && <p className={styles.infoItem}><strong>TS:</strong> {spell.savingThrow}</p>}
+                  {spell.spellResistance && <p className={styles.infoItem}><strong>RC:</strong> {spell.spellResistance}</p>}
+                  <p className={styles.infoItem}>{spell.description}</p>
+                </div>
+              )}
+            </div>
           )
         })}
         {!loading && candidates.length === 0 && (
