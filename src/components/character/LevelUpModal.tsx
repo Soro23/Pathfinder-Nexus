@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { X, Dice6 } from 'lucide-react'
+import { X, Dice6, Shield, Swords, Zap, Award, Sparkles } from 'lucide-react'
 import type {
   Character, CharacterClass, CharacterFeat, SkillRank,
   AbilityKey, HpGainMode, FavoredClassChoice, LevelChoice,
@@ -41,6 +41,7 @@ interface LevelUpModalProps {
 }
 
 type ClassChoice = { type: 'existing'; classId: string } | { type: 'new'; classId: string }
+type TabId = 'class' | 'combat' | 'skills' | 'feats' | 'spells'
 
 const ABILITY_LABELS: Record<AbilityKey, string> = {
   strength: 'FUE', dexterity: 'DES', constitution: 'CON',
@@ -52,6 +53,8 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
   const conMod = calculateModifier(character.abilities.constitution)
 
   const { getArchetypesByClass, getArchetypeById, feats: allFeats } = useSRDStore()
+
+  const [activeTab, setActiveTab] = useState<TabId>('class')
 
   // ── 1. Clase ────────────────────────────────────────────────────────────────────────
   const [classChoice, setClassChoice] = useState<ClassChoice>({
@@ -200,6 +203,20 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
 
   const combinedSelectedFeats: CharacterFeat[] = [...character.feats, ...pendingFeats]
 
+  // ── Estado por pestaña — para marcar en la barra de pestañas qué grupo tiene pendientes ──
+  const classTabIncomplete = isFavoredClassLevel && favoredClassChoice === undefined
+  const combatTabIncomplete = hpGained === null || (abilityIncreaseRequired && abilityIncrease === null)
+  const skillsTabIncomplete = skillPointsAvailable < 0
+  const featsTabIncomplete = pendingFeats.length < featSlotsRequired || pendingFeatChecks.some(({ check }) => !check.met)
+
+  const tabs: { id: TabId; label: string; icon: typeof Shield; incomplete: boolean }[] = [
+    { id: 'class', label: 'Clase', icon: Shield, incomplete: classTabIncomplete },
+    { id: 'combat', label: 'Combate', icon: Swords, incomplete: combatTabIncomplete },
+    { id: 'skills', label: 'Habilidades', icon: Zap, incomplete: skillsTabIncomplete },
+    ...(featSlotsRequired > 0 ? [{ id: 'feats' as const, label: 'Dotes', icon: Award, incomplete: featsTabIncomplete }] : []),
+    ...(resolvedClassData?.spellsPerDay ? [{ id: 'spells' as const, label: 'Conjuros', icon: Sparkles, incomplete: false }] : []),
+  ]
+
   const validationMessages = [
     hpGained === null ? 'Resuelve los puntos de golpe.' : null,
     abilityIncreaseRequired && abilityIncrease === null ? 'Elige el aumento de caracteristica.' : null,
@@ -275,346 +292,373 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
           </button>
         </div>
 
-        <div className={styles.sectionsGrid}>
-        {/* 1 · Clase */}
-        <div className={styles.section}>
-          <p className={styles.sectionLabel}>Clase a subir</p>
-          <div className={styles.classChoiceList}>
-            {character.classes.map((cc) => {
-              const cd = getClassById(cc.id)
-              const isSelected = classChoice.type === 'existing' && classChoice.classId === cc.id
-              return (
-                <button
-                  key={cc.id}
-                  className={`${styles.modeBtn} ${isSelected ? styles.modeBtnActive : ''}`}
-                  onClick={() => changeClassChoice({ type: 'existing', classId: cc.id })}
-                >
-                  {cd?.name ?? cc.id}
-                  <span className={styles.mono}> Nv {cc.level}</span>
-                </button>
-              )
-            })}
-            {!showNewClassPicker && (
-              <button
-                className={styles.modeBtn}
-                onClick={() => setShowNewClassPicker(true)}
-              >
-                + Nueva clase
-              </button>
-            )}
-          </div>
-          {showNewClassPicker && (
-            <select
-              className={styles.newClassSelect}
-              value={classChoice.type === 'new' ? classChoice.classId : ''}
-              onChange={(e) => {
-                if (e.target.value) {
-                  changeClassChoice({ type: 'new', classId: e.target.value })
-                }
-              }}
+        {/* Barra de pestañas */}
+        <div className={styles.tabBar} role="tablist">
+          {tabs.map(({ id, label, icon: Icon, incomplete }) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === id}
+              className={`${styles.tabBtn} ${activeTab === id ? styles.tabBtnActive : ''}`}
+              onClick={() => setActiveTab(id)}
             >
-              <option value="">Elige clase…</option>
-              {eligibleNewClasses.map((cd) => (
-                <option key={cd.id} value={cd.id}>{cd.name}</option>
-              ))}
-            </select>
-          )}
-          {existingClassAlignmentWarning && (
-            <p className={styles.warningText}>
-              Tu alineamiento actual ya no encaja con las restricciones de {resolvedClassData?.name}. No pierdes niveles, pero tu DJ puede tratarla como «ex-clase» y restringir el uso de ciertos rasgos.
-            </p>
-          )}
+              <Icon size={15} />
+              {label}
+              {incomplete && <span className={styles.tabDot} aria-label="Pendiente" />}
+            </button>
+          ))}
         </div>
 
-        {/* Archetype Section */}
-        {classArchetypeOptions.length > 0 && (() => {
-          const addableArchetypes = classArchetypeOptions.filter(
-            (a) => !existingArchetypeIds.includes(a.id) && !newArchetypeIds.includes(a.id) && !archetypeBlockReason(a)
-          )
-          const normalizedArchetypeSearch = archetypeSearch.trim().toLowerCase()
-          const filteredAddableArchetypes = normalizedArchetypeSearch
-            ? addableArchetypes.filter((a) => (
-              a.name.toLowerCase().includes(normalizedArchetypeSearch) ||
-              a.id.toLowerCase().includes(normalizedArchetypeSearch) ||
-              a.description.toLowerCase().includes(normalizedArchetypeSearch)
-            ))
-            : addableArchetypes
-          const hasBlockedArchetypes = addableArchetypes.length + selectedArchetypes.length < classArchetypeOptions.length
-          return (
+        {/* ── Pestaña: Clase ── */}
+        {activeTab === 'class' && (
+          <div className={styles.sectionsGrid}>
             <div className={styles.section}>
-              <p className={styles.sectionLabel}>Arquetipos</p>
-
-              {selectedArchetypes.length > 0 && (
-                <div className={styles.archetypeChips}>
-                  {selectedArchetypes.map((a) => {
-                    const isLocked = existingArchetypeIds.includes(a.id)
-                    return (
-                      <span
-                        key={a.id}
-                        className={`${styles.archetypeChip} ${isLocked ? styles.archetypeChipLocked : ''}`}
-                        title={isLocked ? 'Ya elegido en niveles anteriores' : undefined}
-                      >
-                        {a.name}
-                        {!isLocked && (
-                          <button
-                            type="button"
-                            className={styles.archetypeChipRemove}
-                            onClick={() => toggleArchetype(a.id)}
-                            aria-label={`Quitar ${a.name}`}
-                          >
-                            <X size={12} />
-                          </button>
-                        )}
-                      </span>
-                    )
-                  })}
-                </div>
+              <p className={styles.sectionLabel}>Clase a subir</p>
+              <div className={styles.classChoiceList}>
+                {character.classes.map((cc) => {
+                  const cd = getClassById(cc.id)
+                  const isSelected = classChoice.type === 'existing' && classChoice.classId === cc.id
+                  return (
+                    <button
+                      key={cc.id}
+                      className={`${styles.modeBtn} ${isSelected ? styles.modeBtnActive : ''}`}
+                      onClick={() => changeClassChoice({ type: 'existing', classId: cc.id })}
+                    >
+                      {cd?.name ?? cc.id}
+                      <span className={styles.mono}> Nv {cc.level}</span>
+                    </button>
+                  )
+                })}
+                {!showNewClassPicker && (
+                  <button
+                    className={styles.modeBtn}
+                    onClick={() => setShowNewClassPicker(true)}
+                  >
+                    + Nueva clase
+                  </button>
+                )}
+              </div>
+              {showNewClassPicker && (
+                <select
+                  className={styles.newClassSelect}
+                  value={classChoice.type === 'new' ? classChoice.classId : ''}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      changeClassChoice({ type: 'new', classId: e.target.value })
+                    }
+                  }}
+                >
+                  <option value="">Elige clase…</option>
+                  {eligibleNewClasses.map((cd) => (
+                    <option key={cd.id} value={cd.id}>{cd.name}</option>
+                  ))}
+                </select>
               )}
-
-              {addableArchetypes.length > 0 ? (
-                <>
-                  <input
-                    className={styles.searchInput}
-                    type="search"
-                    value={archetypeSearch}
-                    onChange={(e) => setArchetypeSearch(e.target.value)}
-                    placeholder="Buscar arquetipo..."
-                  />
-                  <div className={styles.archetypeOptionList}>
-                    {filteredAddableArchetypes.map((a) => (
-                      <button
-                        key={a.id}
-                        type="button"
-                        className={styles.archetypeOption}
-                        onClick={() => toggleArchetype(a.id)}
-                      >
-                        <span>{a.name}</span>
-                        <small>{a.description}</small>
-                      </button>
-                    ))}
-                    {filteredAddableArchetypes.length === 0 && (
-                      <p className={styles.archetypeHint}>No hay arquetipos con ese filtro.</p>
-                    )}
-                  </div>
-                </>
-              ) : (
-                selectedArchetypes.length === 0 && (
-                  <p className={styles.archetypeHint}>No hay arquetipos disponibles para añadir.</p>
-                )
-              )}
-
-              {hasBlockedArchetypes && (
-                <p className={styles.archetypeHint}>
-                  {attainedLevel > 0
-                    ? `Algunos arquetipos no aparecen: modifican características de nivel ${attainedLevel} o anterior, ya obtenidas, o entran en conflicto con los ya elegidos.`
-                    : 'Algunos arquetipos no aparecen: entran en conflicto con los ya elegidos.'}
+              {existingClassAlignmentWarning && (
+                <p className={styles.warningText}>
+                  Tu alineamiento actual ya no encaja con las restricciones de {resolvedClassData?.name}. No pierdes niveles, pero tu DJ puede tratarla como «ex-clase» y restringir el uso de ciertos rasgos.
                 </p>
               )}
             </div>
-          )
-        })()}
 
-        {/* 2 · Puntos de golpe */}
-        <div className={styles.section}>
-          <p className={styles.sectionLabel}>Dado de golpe: d{hitDie}</p>
+            {classArchetypeOptions.length > 0 && (() => {
+              const addableArchetypes = classArchetypeOptions.filter(
+                (a) => !existingArchetypeIds.includes(a.id) && !newArchetypeIds.includes(a.id) && !archetypeBlockReason(a)
+              )
+              const normalizedArchetypeSearch = archetypeSearch.trim().toLowerCase()
+              const filteredAddableArchetypes = normalizedArchetypeSearch
+                ? addableArchetypes.filter((a) => (
+                  a.name.toLowerCase().includes(normalizedArchetypeSearch) ||
+                  a.id.toLowerCase().includes(normalizedArchetypeSearch) ||
+                  a.description.toLowerCase().includes(normalizedArchetypeSearch)
+                ))
+                : addableArchetypes
+              const hasBlockedArchetypes = addableArchetypes.length + selectedArchetypes.length < classArchetypeOptions.length
+              return (
+                <div className={styles.section}>
+                  <p className={styles.sectionLabel}>Arquetipos</p>
 
-          <div className={styles.modeToggle}>
-            <button
-              className={`${styles.modeBtn} ${hpMode === 'average' ? styles.modeBtnActive : ''}`}
-              onClick={() => setHpMode('average')}
-            >
-              Media (+{Math.floor(hitDie / 2) + 1})
-            </button>
-            <button
-              className={`${styles.modeBtn} ${hpMode === 'roll' ? styles.modeBtnActive : ''}`}
-              onClick={() => setHpMode('roll')}
-            >
-              <Dice6 size={15} />
-              Tirar dado
-            </button>
-            <button
-              className={`${styles.modeBtn} ${hpMode === 'manual' ? styles.modeBtnActive : ''}`}
-              onClick={() => setHpMode('manual')}
-            >
-              Manual
-            </button>
+                  {selectedArchetypes.length > 0 && (
+                    <div className={styles.archetypeChips}>
+                      {selectedArchetypes.map((a) => {
+                        const isLocked = existingArchetypeIds.includes(a.id)
+                        return (
+                          <span
+                            key={a.id}
+                            className={`${styles.archetypeChip} ${isLocked ? styles.archetypeChipLocked : ''}`}
+                            title={isLocked ? 'Ya elegido en niveles anteriores' : undefined}
+                          >
+                            {a.name}
+                            {!isLocked && (
+                              <button
+                                type="button"
+                                className={styles.archetypeChipRemove}
+                                onClick={() => toggleArchetype(a.id)}
+                                aria-label={`Quitar ${a.name}`}
+                              >
+                                <X size={12} />
+                              </button>
+                            )}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  {addableArchetypes.length > 0 ? (
+                    <>
+                      <input
+                        className={styles.searchInput}
+                        type="search"
+                        value={archetypeSearch}
+                        onChange={(e) => setArchetypeSearch(e.target.value)}
+                        placeholder="Buscar arquetipo..."
+                      />
+                      <div className={styles.archetypeOptionList}>
+                        {filteredAddableArchetypes.map((a) => (
+                          <button
+                            key={a.id}
+                            type="button"
+                            className={styles.archetypeOption}
+                            onClick={() => toggleArchetype(a.id)}
+                          >
+                            <span>{a.name}</span>
+                            <small>{a.description}</small>
+                          </button>
+                        ))}
+                        {filteredAddableArchetypes.length === 0 && (
+                          <p className={styles.archetypeHint}>No hay arquetipos con ese filtro.</p>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    selectedArchetypes.length === 0 && (
+                      <p className={styles.archetypeHint}>No hay arquetipos disponibles para añadir.</p>
+                    )
+                  )}
+
+                  {hasBlockedArchetypes && (
+                    <p className={styles.archetypeHint}>
+                      {attainedLevel > 0
+                        ? `Algunos arquetipos no aparecen: modifican características de nivel ${attainedLevel} o anterior, ya obtenidas, o entran en conflicto con los ya elegidos.`
+                        : 'Algunos arquetipos no aparecen: entran en conflicto con los ya elegidos.'}
+                    </p>
+                  )}
+                </div>
+              )
+            })()}
+
+            {isFavoredClassLevel && (
+              <div className={styles.section}>
+                <p className={styles.sectionLabel}>Clase predilecta — {resolvedClassData?.name}</p>
+                <div className={styles.modeToggle}>
+                  {(['hp', 'skill', 'racial'] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      className={`${styles.modeBtn} ${favoredClassChoice === opt ? styles.modeBtnActive : ''}`}
+                      onClick={() => setFavoredClassChoice(opt)}
+                    >
+                      {FAVORED_CLASS_LABELS[opt]}
+                    </button>
+                  ))}
+                </div>
+                {favoredClassChoice === 'racial' && (
+                  <p className={styles.archetypeHint}>
+                    Sin catálogo de opciones raciales alternativas todavía: anota el efecto elegido en las notas del personaje.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {featuresAtNewLevel.length > 0 && (
+              <div className={styles.section}>
+                <p className={styles.sectionLabel}>
+                  {resolvedClassData?.name} — características de nivel {newClassLevel}
+                </p>
+                <ul className={styles.infoList}>
+                  {featuresAtNewLevel
+                    .filter((f) => f.status !== 'replaced')
+                    .map((f, i) => (
+                      <li key={i} className={styles.infoItem}>
+                        <strong>{f.name}</strong>
+                        {f.status === 'changed' && <span className={styles.mono}> (modificada por arquetipo)</span>}
+                        {f.status === 'optional' && <span className={styles.mono}> (opcional por arquetipo)</span>}
+                        {f.status === 'archetype' && <span className={styles.mono}> (arquetipo)</span>}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            )}
           </div>
+        )}
 
-          {hpMode === 'roll' && (
-            <div className={styles.rollArea}>
-              <button className={styles.rollBtn} onClick={handleRoll}>
-                <Dice6 size={16} />
-                {rolledValue !== null ? 'Volver a tirar' : `Tirar d${hitDie}`}
-              </button>
-              {rolledValue !== null && (
-                <span className={styles.rollResult}>{rolledValue}</span>
+        {/* ── Pestaña: Combate ── */}
+        {activeTab === 'combat' && (
+          <div className={styles.sectionsGrid}>
+            <div className={styles.section}>
+              <p className={styles.sectionLabel}>Dado de golpe: d{hitDie}</p>
+
+              <div className={styles.modeToggle}>
+                <button
+                  className={`${styles.modeBtn} ${hpMode === 'average' ? styles.modeBtnActive : ''}`}
+                  onClick={() => setHpMode('average')}
+                >
+                  Media (+{Math.floor(hitDie / 2) + 1})
+                </button>
+                <button
+                  className={`${styles.modeBtn} ${hpMode === 'roll' ? styles.modeBtnActive : ''}`}
+                  onClick={() => setHpMode('roll')}
+                >
+                  <Dice6 size={15} />
+                  Tirar dado
+                </button>
+                <button
+                  className={`${styles.modeBtn} ${hpMode === 'manual' ? styles.modeBtnActive : ''}`}
+                  onClick={() => setHpMode('manual')}
+                >
+                  Manual
+                </button>
+              </div>
+
+              {hpMode === 'roll' && (
+                <div className={styles.rollArea}>
+                  <button className={styles.rollBtn} onClick={handleRoll}>
+                    <Dice6 size={16} />
+                    {rolledValue !== null ? 'Volver a tirar' : `Tirar d${hitDie}`}
+                  </button>
+                  {rolledValue !== null && (
+                    <span className={styles.rollResult}>{rolledValue}</span>
+                  )}
+                </div>
               )}
-            </div>
-          )}
 
-          {hpMode === 'manual' && (
-            <div className={styles.manualArea}>
-              <input
-                type="number"
-                className={styles.manualInput}
-                min={1}
-                max={hitDie}
-                value={manualValue}
-                onChange={(e) => setManualValue(Math.max(1, Math.min(hitDie, parseInt(e.target.value) || 1)))}
+              {hpMode === 'manual' && (
+                <div className={styles.manualArea}>
+                  <input
+                    type="number"
+                    className={styles.manualInput}
+                    min={1}
+                    max={hitDie}
+                    value={manualValue}
+                    onChange={(e) => setManualValue(Math.max(1, Math.min(hitDie, parseInt(e.target.value) || 1)))}
+                  />
+                </div>
+              )}
+
+              <div className={styles.hpSummary}>
+                <span className={styles.hpDetail}>
+                  Modificador CON: <span className={styles.mono}>{conMod >= 0 ? '+' : ''}{conMod}</span>
+                  {favoredHpBonus > 0 && <span className={styles.mono}> · Clase predilecta: +{favoredHpBonus}</span>}
+                </span>
+                {hpGained !== null && (
+                  <span className={styles.hpTotal}>
+                    Total PV ganados: <span className={styles.hpTotalVal}>+{hpGained}</span>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.section}>
+              <p className={styles.sectionLabel}>Ataque base y salvaciones</p>
+              <ul className={styles.infoList}>
+                <li className={styles.infoItem}>
+                  BAB: <span className={styles.mono}>+{currentStats.bab} → +{nextStats.bab}</span>
+                </li>
+                <li className={styles.infoItem}>
+                  Fort/Ref/Vol: <span className={styles.mono}>
+                    {currentStats.fortitude}/{currentStats.reflex}/{currentStats.will} → {nextStats.fortitude}/{nextStats.reflex}/{nextStats.will}
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {abilityIncreaseRequired && (
+              <div className={styles.section}>
+                <p className={styles.sectionLabel}>Aumento de característica (+1)</p>
+                <div className={styles.modeToggle}>
+                  {(Object.keys(ABILITY_LABELS) as AbilityKey[]).map((key) => (
+                    <button
+                      key={key}
+                      className={`${styles.modeBtn} ${abilityIncrease === key ? styles.modeBtnActive : ''}`}
+                      onClick={() => setAbilityIncrease(key)}
+                    >
+                      {ABILITY_LABELS[key]} <span className={styles.mono}>{character.abilities[key]}{abilityIncrease === key ? ` → ${character.abilities[key] + 1}` : ''}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Pestaña: Habilidades ── */}
+        {activeTab === 'skills' && (
+          <div className={styles.sectionsGrid}>
+            <div className={styles.section}>
+              <p className={styles.sectionLabel}>
+                Puntos de habilidad <span className={styles.mono}>({skillPointsAvailable} disponibles)</span>
+              </p>
+              <SkillsList
+                ranks={pendingSkills}
+                onChange={setPendingSkills}
+                abilities={effectiveAbilities}
+                classes={prospectiveClasses}
+                race={character.race}
+                level={newLevel}
+                skillPointsAvailable={skillPointsAvailable}
+                archetypesByClassId={archetypesByClassId}
+                resolvedStats={resolvedStats}
               />
             </div>
-          )}
-
-          <div className={styles.hpSummary}>
-            <span className={styles.hpDetail}>
-              Modificador CON: <span className={styles.mono}>{conMod >= 0 ? '+' : ''}{conMod}</span>
-              {favoredHpBonus > 0 && <span className={styles.mono}> · Clase predilecta: +{favoredHpBonus}</span>}
-            </span>
-            {hpGained !== null && (
-              <span className={styles.hpTotal}>
-                Total PV ganados: <span className={styles.hpTotalVal}>+{hpGained}</span>
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* 3 · BAB y salvaciones (recálculo informativo) */}
-        <div className={styles.section}>
-          <p className={styles.sectionLabel}>Ataque base y salvaciones</p>
-          <ul className={styles.infoList}>
-            <li className={styles.infoItem}>
-              BAB: <span className={styles.mono}>+{currentStats.bab} → +{nextStats.bab}</span>
-            </li>
-            <li className={styles.infoItem}>
-              Fort/Ref/Vol: <span className={styles.mono}>
-                {currentStats.fortitude}/{currentStats.reflex}/{currentStats.will} → {nextStats.fortitude}/{nextStats.reflex}/{nextStats.will}
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        {/* 4 · Aumento de característica */}
-        {abilityIncreaseRequired && (
-          <div className={styles.section}>
-            <p className={styles.sectionLabel}>Aumento de característica (+1)</p>
-            <div className={styles.modeToggle}>
-              {(Object.keys(ABILITY_LABELS) as AbilityKey[]).map((key) => (
-                <button
-                  key={key}
-                  className={`${styles.modeBtn} ${abilityIncrease === key ? styles.modeBtnActive : ''}`}
-                  onClick={() => setAbilityIncrease(key)}
-                >
-                  {ABILITY_LABELS[key]} <span className={styles.mono}>{character.abilities[key]}{abilityIncrease === key ? ` → ${character.abilities[key] + 1}` : ''}</span>
-                </button>
-              ))}
-            </div>
           </div>
         )}
 
-        {/* 5 · Puntos de habilidad */}
-        <div className={styles.section}>
-          <p className={styles.sectionLabel}>
-            Puntos de habilidad <span className={styles.mono}>({skillPointsAvailable} disponibles)</span>
-          </p>
-          <SkillsList
-            ranks={pendingSkills}
-            onChange={setPendingSkills}
-            abilities={effectiveAbilities}
-            classes={prospectiveClasses}
-            race={character.race}
-            level={newLevel}
-            skillPointsAvailable={skillPointsAvailable}
-            archetypesByClassId={archetypesByClassId}
-            resolvedStats={resolvedStats}
-          />
-        </div>
-
-        {/* 6 · Dote */}
-        {featSlotsRequired > 0 && (
-          <div className={styles.section}>
-            <p className={styles.sectionLabel}>
-              Dotes de este nivel <span className={styles.mono}>({pendingFeats.length}/{featSlotsRequired})</span>
-            </p>
-            <ul className={styles.infoList}>
-              {featSlots.map((slot) => (
-                <li key={slot.id} className={styles.infoItem}>
-                  {slot.label}{slot.allowedTypes ? <span className={styles.mono}> ({slot.allowedTypes.join(', ')})</span> : null}
-                </li>
-              ))}
-            </ul>
-            {pendingFeatChecks.filter(({ check }) => !check.met).map(({ feat, check }) => (
-              <p key={feat.id} className={styles.warningText}>
-                {feat.name}: {check.unmetReasons.join('; ')}
+        {/* ── Pestaña: Dotes ── */}
+        {activeTab === 'feats' && featSlotsRequired > 0 && (
+          <div className={styles.sectionsGrid}>
+            <div className={styles.section}>
+              <p className={styles.sectionLabel}>
+                Dotes de este nivel <span className={styles.mono}>({pendingFeats.length}/{featSlotsRequired})</span>
               </p>
-            ))}
-            <FeatsSelector
-              selectedFeats={combinedSelectedFeats}
-              maxFeats={character.feats.length + featSlotsRequired}
-              onAdd={(featId, specification) => {
-                if (pendingFeats.length >= featSlotsRequired) return
-                setPendingFeats([...pendingFeats, { id: featId, specification }])
-              }}
-              onRemove={(index) => {
-                if (index >= character.feats.length) {
-                  setPendingFeats(pendingFeats.filter((_, i) => i !== index - character.feats.length))
-                }
-              }}
-            />
-          </div>
-        )}
-
-        {/* 7 · Clase predilecta */}
-        {isFavoredClassLevel && (
-          <div className={styles.section}>
-            <p className={styles.sectionLabel}>Clase predilecta — {resolvedClassData?.name}</p>
-            <div className={styles.modeToggle}>
-              {(['hp', 'skill', 'racial'] as const).map((opt) => (
-                <button
-                  key={opt}
-                  className={`${styles.modeBtn} ${favoredClassChoice === opt ? styles.modeBtnActive : ''}`}
-                  onClick={() => setFavoredClassChoice(opt)}
-                >
-                  {FAVORED_CLASS_LABELS[opt]}
-                </button>
-              ))}
-            </div>
-            {favoredClassChoice === 'racial' && (
-              <p className={styles.archetypeHint}>
-                Sin catálogo de opciones raciales alternativas todavía: anota el efecto elegido en las notas del personaje.
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Class Features Section */}
-        {featuresAtNewLevel.length > 0 && (
-          <div className={styles.section}>
-            <p className={styles.sectionLabel}>
-              {resolvedClassData?.name} — características de nivel {newClassLevel}
-            </p>
-            <ul className={styles.infoList}>
-              {featuresAtNewLevel
-                .filter((f) => f.status !== 'replaced')
-                .map((f, i) => (
-                  <li key={i} className={styles.infoItem}>
-                    <strong>{f.name}</strong>
-                    {f.status === 'changed' && <span className={styles.mono}> (modificada por arquetipo)</span>}
-                    {f.status === 'optional' && <span className={styles.mono}> (opcional por arquetipo)</span>}
-                    {f.status === 'archetype' && <span className={styles.mono}> (arquetipo)</span>}
+              <ul className={styles.infoList}>
+                {featSlots.map((slot) => (
+                  <li key={slot.id} className={styles.infoItem}>
+                    {slot.label}{slot.allowedTypes ? <span className={styles.mono}> ({slot.allowedTypes.join(', ')})</span> : null}
                   </li>
                 ))}
-            </ul>
+              </ul>
+              {pendingFeatChecks.filter(({ check }) => !check.met).map(({ feat, check }) => (
+                <p key={feat.id} className={styles.warningText}>
+                  {feat.name}: {check.unmetReasons.join('; ')}
+                </p>
+              ))}
+              <FeatsSelector
+                selectedFeats={combinedSelectedFeats}
+                maxFeats={character.feats.length + featSlotsRequired}
+                onAdd={(featId, specification) => {
+                  if (pendingFeats.length >= featSlotsRequired) return
+                  setPendingFeats([...pendingFeats, { id: featId, specification }])
+                }}
+                onRemove={(index) => {
+                  if (index >= character.feats.length) {
+                    setPendingFeats(pendingFeats.filter((_, i) => i !== index - character.feats.length))
+                  }
+                }}
+              />
+            </div>
           </div>
         )}
 
-        {/* 8 · Conjuros */}
-        {resolvedClassData?.spellsPerDay && (
-          <div className={styles.section}>
-            <p className={styles.sectionLabel}>Conjuros</p>
-            <p className={styles.archetypeHint}>Los espacios de conjuro se sincronizan automáticamente con la tabla de {resolvedClassData.name} al confirmar.</p>
+        {/* ── Pestaña: Conjuros ── */}
+        {activeTab === 'spells' && resolvedClassData?.spellsPerDay && (
+          <div className={styles.sectionsGrid}>
+            <div className={styles.section}>
+              <p className={styles.sectionLabel}>Conjuros</p>
+              <p className={styles.archetypeHint}>Los espacios de conjuro se sincronizan automáticamente con la tabla de {resolvedClassData.name} al confirmar.</p>
+            </div>
           </div>
         )}
-        </div>
 
         {/* Confirm */}
         {validationMessages.length > 0 && (
