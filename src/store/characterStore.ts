@@ -250,18 +250,19 @@ export const useCharacterStore = create<CharacterStore>()((set, get) => ({
   },
 
   addCharacter: async (character) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    // Se usa la sesión local (la misma que ya valida AuthContext) en vez de `getUser()`,
+    // que revalida contra el servidor y puede lanzar AuthSessionMissingError incluso con
+    // sesión activa. RLS sigue protegiendo el insert en el servidor de todos modos.
+    const { data: { session } } = await supabase.auth.getSession()
+    const user = session?.user
+    if (!user) throw new Error('No hay una sesión activa: inicia sesión de nuevo.')
     const { data, error } = await supabase
       .from('characters')
       .insert({ id: character.id, user_id: user.id, data: character })
       .select('id')
       .single()
-    if (error) {
-      console.warn('[characterStore] addCharacter failed:', error.message)
-    } else if (data) {
-      set((state) => ({ characters: [...state.characters, normalizeCharacter({ ...character, id: data.id })] }))
-    }
+    if (error) throw new Error(error.message)
+    set((state) => ({ characters: [...state.characters, normalizeCharacter({ ...character, id: data.id })] }))
   },
 
   updateCharacter: async (id, updates) => {

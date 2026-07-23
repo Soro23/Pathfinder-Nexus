@@ -525,6 +525,12 @@
   font-weight: 700;
 }
 
+.errorText {
+  color: var(--color-error);
+  font-size: var(--text-body-sm, var(--text-body-md));
+  text-align: right;
+}
+
 /* ── Step actions ── */
 .stepActions {
   display: flex;

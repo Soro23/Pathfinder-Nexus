@@ -265,10 +265,12 @@ export function CharacterNew() {
   const selectedRace = storeRaces.find((r) => r.id === form.race)
   const selectedClass = CLASSES.find((c) => c.value === form.class)
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handleSubmit = async () => {
     if (!form.name.trim() || !form.race || !form.class || submitting) return
     setSubmitting(true)
+    setSubmitError(null)
 
     const classData = getClassById(form.class)
     const hitDie = classData?.hitDie ?? 8
@@ -322,8 +324,13 @@ export function CharacterNew() {
       updatedAt: new Date().toISOString(),
     }
 
-    await addCharacter(newCharacter)
-    navigate(`/characters/${id}`)
+    try {
+      await addCharacter(newCharacter)
+      navigate(`/characters/${id}`)
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'No se pudo crear el personaje.')
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -768,6 +775,9 @@ export function CharacterNew() {
                 </div>
               </div>
 
+              {submitError && (
+                <p className={styles.errorText}>{submitError}</p>
+              )}
               <div className={styles.stepActions}>
                 <Button variant="secondary" onClick={() => setStep('abilities')}>
                   <ArrowLeft size={18} />
