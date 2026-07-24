@@ -621,4 +621,16 @@
     width: 100%;
     justify-content: flex-start;
   }
+
+  .qtyBtn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .deleteBtn,
+  .equipBtn,
+  .coinBtn {
+    width: 32px;
+    height: 32px;
+  }
 }

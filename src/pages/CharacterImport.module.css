@@ -390,3 +390,18 @@
   gap: var(--space-3);
   padding-bottom: var(--space-8);
 }
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .abilitiesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+
+  .actions > * {
+    flex: 1;
+  }
+}

@@ -98,3 +98,13 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Móvil: área táctil mínima de 44px recomendada (Apple HIG / WCAG),
+   independiente del tamaño visual del botón. */
+@media (max-width: 640px) {
+  .sm,
+  .md,
+  .lg {
+    min-height: 44px;
+  }
+}

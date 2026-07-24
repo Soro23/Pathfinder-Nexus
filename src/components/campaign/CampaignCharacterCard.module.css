@@ -321,4 +321,11 @@
   width: 100%;
   box-sizing: border-box;
 }
+
+@media (max-width: 480px) {
+  .hpBtn {
+    width: 32px;
+    height: 32px;
+  }
+}
 .notesTextarea:focus { outline: 2px solid var(--color-primary); outline-offset: 1px; }

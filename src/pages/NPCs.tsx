@@ -369,7 +369,7 @@ export function NPCs() {
   }
 
   return (
-    <div className={styles.pageLayout}>
+    <div className={`${styles.pageLayout} ${mobile.pageLayout}`}>
       {/* ── Sidebar nav ── */}
       <aside className={styles.sideNav}>
         <div className={styles.sideNavInner}>

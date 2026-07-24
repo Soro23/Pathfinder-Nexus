@@ -194,5 +194,7 @@
 
   .deleteBtn {
     align-self: flex-end;
+    width: 36px;
+    height: 36px;
   }
 }

@@ -1050,3 +1050,19 @@
   .overviewSections { grid-template-columns: 1fr; }
   .npcFieldsGrid { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 480px) {
+  .statsRow { grid-template-columns: repeat(2, 1fr); }
+  .statsRow5 { grid-template-columns: repeat(2, 1fr); }
+
+  .sessionBtn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .statusSelect,
+  .formSelect {
+    font-size: var(--text-body-lg);
+    min-height: 44px;
+  }
+}

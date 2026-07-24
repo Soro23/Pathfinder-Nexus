@@ -52,3 +52,12 @@
   font-size: var(--text-label-sm);
   color: var(--color-error);
 }
+
+/* Móvil: 16px min. para que iOS Safari no haga zoom automático al enfocar,
+   y altura mínima táctil de 44px. */
+@media (max-width: 640px) {
+  .select {
+    font-size: var(--text-body-lg);
+    min-height: 44px;
+  }
+}

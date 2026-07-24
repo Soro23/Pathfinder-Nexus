@@ -3,11 +3,13 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-on-surface);
+  overflow-x: hidden;
 }
 
 /* Headings: Noto Serif for editorial authority */

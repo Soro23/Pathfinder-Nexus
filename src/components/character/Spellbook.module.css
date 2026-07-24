@@ -474,6 +474,16 @@
     min-width: auto;
     width: 100%;
   }
+
+  .knowBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .prepareBtn {
+    width: 36px;
+    height: 32px;
+  }
 }
 
 /* ── Spell type chips ── */

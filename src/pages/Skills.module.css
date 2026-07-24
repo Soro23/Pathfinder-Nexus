@@ -276,6 +276,8 @@
 @media (max-width: 900px) {
   .pageLayout {
     flex-direction: column;
+    margin-left: 0;
+    width: 100%;
   }
 
   .skillNav {

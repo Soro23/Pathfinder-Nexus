@@ -326,8 +326,13 @@
 }
 
 /* ── Attacks table ── */
+.tableScroll {
+  overflow-x: auto;
+}
+
 .attacksTable {
   width: 100%;
+  min-width: 360px;
   border-collapse: collapse;
   font-size: var(--text-body-md);
 }
@@ -650,4 +655,5 @@
   .statsRow { grid-template-columns: 1fr; }
   .abilityGrid { grid-template-columns: repeat(3, 1fr); }
   .statGrid { grid-template-columns: repeat(2, 1fr); }
+  .levelBtn { width: 36px; height: 36px; }
 }

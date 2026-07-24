@@ -1110,6 +1110,21 @@
   }
 }
 
+@media (max-width: 480px) {
+  .savesRow {
+    grid-template-columns: 1fr;
+  }
+
+  .slotPip {
+    width: 24px;
+    height: 24px;
+  }
+
+  .presetBtn {
+    min-height: 36px;
+  }
+}
+
 /* ── Class Features ── */
 .featureList {
   display: flex;

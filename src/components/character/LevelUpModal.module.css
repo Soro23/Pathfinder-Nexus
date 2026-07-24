@@ -587,3 +587,16 @@
   background: var(--color-surface-container-low);
 }
 
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .modal {
+    padding: var(--space-4);
+  }
+
+  .rollArea,
+  .manualArea,
+  .pickerFilters {
+    flex-wrap: wrap;
+  }
+}
+

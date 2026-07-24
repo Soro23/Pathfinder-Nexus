@@ -379,6 +379,7 @@ export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
             </Button>
           )}
         </div>
+        <div className={styles.tableScroll}>
         <table className={styles.attacksTable}>
           <thead>
             <tr>
@@ -452,6 +453,7 @@ export function AnimalCompanion({ companion, onChange, isEditing }: Props) {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* ── Tricks / Training ── */}
