@@ -4,7 +4,7 @@ import {
   ArrowLeft, Play, Edit2, Trash2,
   Sword, Shield, Scroll, Package, Star,
   Heart, Eye, PlusCircle, X, PawPrint, BookOpen, Download,
-  Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle
+  Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle, Menu
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
@@ -43,6 +43,11 @@ export function CharacterView() {
   const [activeTab, setActiveTab] = useState<Tab>('combat')
   const [isEditing, setIsEditing] = useState(false)
   const [showLevelUp, setShowLevelUp] = useState(false)
+  // En móvil, Modo Juego/Subir de nivel/Editar/Eliminar y el panel de notificaciones
+  // se ocultan detrás de un menú hamburguesa y una campanita respectivamente, en vez de
+  // ocupar espacio fijo en la cabecera todo el tiempo (en desktop siguen siempre visibles).
+  const [mobileActionsOpen, setMobileActionsOpen] = useState(false)
+  const [mobileNotifOpen, setMobileNotifOpen] = useState(false)
   // Fuera del flujo normal: cambia el nivel de una clase sin otorgar PG, puntos de
   // habilidad, dotes ni aumentos de característica. Solo para corregir errores de ficha,
   // por eso queda oculto tras un toggle explícito en vez de estar siempre a mano.
@@ -370,7 +375,35 @@ export function CharacterView() {
               {character.race} · {character.classes.map(c => `${c.id} ${c.level}`).join('/')} · Nivel {character.level}
             </p>
           </div>
-          <div className={styles.actions}>
+          <div className={styles.mobileHeaderControls}>
+            <button
+              type="button"
+              className={styles.mobileIconBtn}
+              onClick={() => { setMobileActionsOpen((v) => !v); setMobileNotifOpen(false) }}
+              aria-label="Acciones del personaje"
+              aria-expanded={mobileActionsOpen}
+            >
+              <Menu size={20} />
+            </button>
+            <button
+              type="button"
+              className={styles.mobileIconBtn}
+              onClick={() => { setMobileNotifOpen((v) => !v); setMobileActionsOpen(false) }}
+              aria-label="Notificaciones del personaje"
+              aria-expanded={mobileNotifOpen}
+            >
+              <Bell size={20} />
+              {notifications.length > 0 && (
+                <span className={`${styles.mobileBadge} ${warningCount > 0 ? styles.mobileBadgeWarn : ''}`}>
+                  {notifications.length}
+                </span>
+              )}
+            </button>
+          </div>
+          <div
+            className={`${styles.actions} ${mobileActionsOpen ? styles.actionsMobileOpen : ''}`}
+            onClick={() => setMobileActionsOpen(false)}
+          >
             <Link to={`/characters/${id}/play`}>
               <Button variant="primary">
                 <Play size={18} />
@@ -406,7 +439,10 @@ export function CharacterView() {
         </div>
       </header>
 
-      <section className={`${styles.notificationPanel} ${notifications.length === 0 ? styles.notificationPanelClear : ''}`}>
+      <section
+        className={`${styles.notificationPanel} ${notifications.length === 0 ? styles.notificationPanelClear : ''} ${mobileNotifOpen ? styles.notificationPanelMobileOpen : ''}`}
+        onClick={() => setMobileNotifOpen(false)}
+      >
         <div className={styles.notificationSummary}>
           <div className={styles.notificationIcon}>
             {notifications.length === 0 ? <Check size={18} /> : <Bell size={18} />}

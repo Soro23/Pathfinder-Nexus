@@ -62,6 +62,54 @@
   flex-shrink: 0;
 }
 
+/* Botones de hamburguesa/campanita — ocultos en desktop, sustituyen a .actions y al
+   panel de notificaciones en móvil (ver breakpoint más abajo). */
+.mobileHeaderControls {
+  display: none;
+}
+
+.mobileIconBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.mobileIconBtn:hover {
+  background: var(--color-surface-container-highest);
+}
+
+.mobileBadge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+}
+
+.mobileBadgeWarn {
+  background: var(--color-error, #b3261e);
+  color: #fff;
+}
+
 .notificationPanel {
   display: grid;
   grid-template-columns: minmax(260px, 0.9fr) 1.4fr;
@@ -1586,5 +1634,37 @@
   .classLevelBtn {
     width: 44px;
     height: 44px;
+  }
+
+  /* ── Hamburguesa + campanita sustituyen a las acciones y notificaciones fijas ── */
+  .mobileHeaderControls {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .actions {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    margin-top: var(--space-3);
+  }
+
+  .actions a,
+  .actions button {
+    flex: none;
+    width: 100%;
+  }
+
+  .actionsMobileOpen {
+    display: flex;
+  }
+
+  .notificationPanel {
+    display: none;
+  }
+
+  .notificationPanelMobileOpen {
+    display: flex;
+    flex-direction: column;
   }
 }
