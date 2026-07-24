@@ -4,7 +4,7 @@ import { ArrowLeft, ChevronRight, ChevronDown, Check, Lightbulb, Dice6 } from 'l
 import { Button, Card, HomebrewBadge } from '../components/ui'
 import { useCharacterStore, generateId, calculateModifier } from '../store'
 import type { XpProgressionSpeed } from '../store'
-import { getClassById } from '../data'
+import { getClassById, hasFloatingAbilityBonus } from '../data'
 import { useSRDStore } from '../store/srdStore'
 import { useHomebrewStore } from '../store/homebrewStore'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
@@ -195,6 +195,7 @@ export function CharacterNew() {
   const [form, setForm] = useState({
     name: '',
     race: '',
+    raceAbilityChoice: '' as AbilityKey | '',
     class: '',
     alignment: 'ng',
     xpProgression: 'medium' as XpProgressionSpeed,
@@ -280,12 +281,14 @@ export function CharacterNew() {
 
   // ── Submit ──
   const selectedRace = RACE_GROUPS.flatMap((g) => g.races).find((r) => r.id === form.race)
+  const hasFloatingRaceBonus = hasFloatingAbilityBonus(form.race)
   const selectedClass = ALL_CLASSES.find((c) => c.value === form.class)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handleSubmit = async () => {
     if (!form.name.trim() || !form.race || !form.class || submitting) return
+    if (hasFloatingRaceBonus && !form.raceAbilityChoice) return
     setSubmitting(true)
     setSubmitError(null)
 
@@ -299,6 +302,7 @@ export function CharacterNew() {
       id,
       name: form.name,
       race: form.race,
+      raceAbilityChoice: hasFloatingRaceBonus && form.raceAbilityChoice ? form.raceAbilityChoice : undefined,
       classes: [{ id: form.class, level: 1, archetypeIds: selectedArchetypeIds }],
       level: 1,
       xp: 0,
@@ -421,7 +425,10 @@ export function CharacterNew() {
                             <button
                               key={race.id}
                               className={`${styles.raceCard} ${form.race === race.id ? styles.selected : ''}`}
-                              onClick={() => updateForm('race', race.id)}
+                              onClick={() => {
+                                updateForm('race', race.id)
+                                updateForm('raceAbilityChoice', '')
+                              }}
                             >
                               <span className={styles.raceName}>{race.label}</span>
                               {race.source === 'Homebrew' && <HomebrewBadge />}
@@ -440,11 +447,29 @@ export function CharacterNew() {
                 <p className={styles.raceDesc}>{selectedRace.desc}</p>
               )}
 
+              {hasFloatingRaceBonus && (
+                <div className={styles.nameRow}>
+                  <label className={styles.nameLabel}>¿A qué característica aplicas el +2 racial?</label>
+                  <div className={styles.raceGrid}>
+                    {ABILITY_KEYS.map((key) => (
+                      <button
+                        key={key}
+                        className={`${styles.raceCard} ${form.raceAbilityChoice === key ? styles.selected : ''}`}
+                        onClick={() => updateForm('raceAbilityChoice', key)}
+                      >
+                        <span className={styles.raceName}>{ABILITY_LABELS[key][0]}</span>
+                        {form.raceAbilityChoice === key && <Check size={16} className={styles.selectedCheck} />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className={styles.stepActions}>
                 <Button
                   variant="primary"
                   onClick={() => setStep('class')}
-                  disabled={!form.race || !form.name.trim()}
+                  disabled={!form.race || !form.name.trim() || (hasFloatingRaceBonus && !form.raceAbilityChoice)}
                 >
                   Siguiente: Clase
                   <ChevronRight size={18} />

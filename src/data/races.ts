@@ -626,6 +626,15 @@ export function getRaceById(id: string): Race | undefined {
   return RACES.find((r) => r.id === id)
 }
 
+// Razas SRD con +2 a una característica a elección del jugador (en vez de bonificadores
+// fijos) — Humano, Medio Elfo y Medio Orco. Se listan explícitamente en vez de inferirlo de
+// `bonuses: {}` para no capturar por accidente futuras razas homebrew sin bonificadores.
+export const FLOATING_ABILITY_BONUS_RACE_IDS = ['human', 'half-elf', 'half-orc']
+
+export function hasFloatingAbilityBonus(raceId: string | undefined): boolean {
+  return !!raceId && FLOATING_ABILITY_BONUS_RACE_IDS.includes(raceId.toLowerCase())
+}
+
 export const RACE_OPTIONS = RACES.map((r) => ({
   value: r.id,
   label: r.label,

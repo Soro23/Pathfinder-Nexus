@@ -17,6 +17,7 @@ interface SkillsListProps {
   level: number
   skillPointsAvailable: number
   equippedArmorAcp?: number
+  encumbrancePenalty?: number
   resolvedStats: ResolvedStats
   archetypesByClassId?: Record<string, Archetype[]>
 }
@@ -30,6 +31,7 @@ export function SkillsList({
   level,
   skillPointsAvailable,
   equippedArmorAcp = 0,
+  encumbrancePenalty = 0,
   resolvedStats,
   archetypesByClassId,
 }: SkillsListProps) {
@@ -50,7 +52,7 @@ export function SkillsList({
   const getTotalForSkill = (skillId: string) => {
     const skill = SKILLS.find((s) => s.id === skillId)
     if (!skill) return 0
-    return computeSkillTotal(calcContext, skill, resolvedStats, equippedArmorAcp)
+    return computeSkillTotal(calcContext, skill, resolvedStats, equippedArmorAcp, encumbrancePenalty)
   }
 
   const getRanksForSkill = (skillId: string) => {

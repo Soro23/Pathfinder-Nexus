@@ -2,6 +2,7 @@ import type { Character } from '../store/characterStore'
 import { calculateModifier } from '../store/characterStore'
 import { getMulticlassStats } from '../data/classes'
 import { getCharacterSize, getSizeACModifier, getSizeCMBModifier } from './size'
+import { getEncumbranceDexCap, getEncumbranceLevel } from './carryingCapacity'
 import type { ResolvedStats } from './types'
 
 export interface CombatStats {
@@ -33,18 +34,23 @@ export function computeEffectiveMaxHp(character: Character, resolvedStats: Resol
   return Math.max(1, character.hp.max + resolvedStats.hpBonus - getNegativeLevelPenalty(character) * 5)
 }
 
-// Dex efectiva para CA: topada por el maxDex de la armadura corporal equipada.
+// Dex efectiva para CA: topada por el maxDex de la armadura corporal equipada y por el
+// tope de Destreza de la carga (encumbrance), usando el más restrictivo de los dos.
 // El tope aplica también a la CA de toque — es una restricción sobre el propio
 // modificador de Destreza, no sobre el bono de armadura (que sí se excluye del toque).
-function getDexForAC(character: Character, dexMod: number): number {
+function getDexForAC(character: Character, dexMod: number, encumbranceDexCap: number | null): number {
   const equippedBody = (character.armor ?? []).find((a) => a.equipped && a.type !== 'shield')
-  return equippedBody ? Math.min(dexMod, equippedBody.maxDex ?? 99) : dexMod
+  const armorCap = equippedBody ? equippedBody.maxDex ?? 99 : 99
+  const cap = encumbranceDexCap === null ? armorCap : Math.min(armorCap, encumbranceDexCap)
+  return Math.min(dexMod, cap)
 }
 
 // Fuente única de las estadísticas de combate derivadas (CA, salvaciones, BAB, CMB/CMD,
 // iniciativa). Sustituye a las implementaciones duplicadas que existían en CharacterView,
-// PlayMode, ArsenalManager y PartyCard.
-export function computeCombatStats(character: Character, resolvedStats: ResolvedStats): CombatStats {
+// PlayMode, ArsenalManager y PartyCard. `totalWeight` (peso total del inventario) se usa
+// para derivar el tope de Destreza y —a través de skills.ts— la penalización de habilidad
+// por llevar carga media/pesada, combinándolos con los de la armadura equipada.
+export function computeCombatStats(character: Character, resolvedStats: ResolvedStats, totalWeight = 0): CombatStats {
   const { abilities } = character
   const strMod = calculateModifier(abilities.strength)
   const dexMod = calculateModifier(abilities.dexterity)
@@ -61,7 +67,9 @@ export function computeCombatStats(character: Character, resolvedStats: Resolved
   const sizeMod = getSizeACModifier(size)     // se usa también para ataque
   const sizeCmbMod = getSizeCMBModifier(size) // signo opuesto, para CMB/CMD
 
-  const dexForAC = getDexForAC(character, dexMod)
+  const encumbranceLevel = getEncumbranceLevel(totalWeight, abilities.strength)
+  const encumbranceDexCap = getEncumbranceDexCap(encumbranceLevel)
+  const dexForAC = getDexForAC(character, dexMod, encumbranceDexCap)
   const { natural, deflection, dodge, armor, shield, total: acMisc } = resolvedStats.acBonuses
 
   // acMisc son bonos con target genérico 'ac' (p.ej. un efecto de estado creado a mano
@@ -69,7 +77,9 @@ export function computeCombatStats(character: Character, resolvedStats: Resolved
   // aplican en los tres estados de CA por simplicidad.
   const ac = 10 + dexForAC + armor + shield + natural + deflection + dodge + sizeMod + acMisc
   const acTouch = 10 + dexForAC + deflection + dodge + sizeMod + acMisc
-  const acFlatFooted = 10 + armor + shield + natural + deflection + sizeMod + acMisc
+  // Desprevenido: se pierde el bonificador de Destreza (y el de esquiva), pero se conserva
+  // cualquier penalización de Destreza — un modificador negativo nunca es un "bonificador".
+  const acFlatFooted = 10 + Math.min(dexForAC, 0) + armor + shield + natural + deflection + sizeMod + acMisc
 
   const fortitude = mcStats.fortitude + conMod + resolvedStats.saveBonuses.fort - negativeLevelPenalty
   const reflex = mcStats.reflex + dexMod + resolvedStats.saveBonuses.ref - negativeLevelPenalty

@@ -1,6 +1,6 @@
 import { Heart, Shield } from 'lucide-react'
 import { useSRDStore } from '../../data'
-import { resolveModifiers, computeCombatStats, computeSkillTotal } from '../../engine'
+import { resolveModifiers, computeCombatStats, computeSkillTotal, getEncumbranceLevel, getEncumbranceSkillPenalty } from '../../engine'
 import { buildArchetypesByClassId } from '../../data/resolveArchetype'
 import type { Character } from '../../store'
 import styles from './PartyCard.module.css'
@@ -16,7 +16,8 @@ export function PartyCard({ character }: PartyCardProps) {
 
   const resolvedStats = resolveModifiers(character)
   const archetypesByClassId = buildArchetypesByClassId(character.classes, getArchetypeById)
-  const combat = computeCombatStats(character, resolvedStats)
+  const totalWeight = (character.inventory ?? []).reduce((sum, item) => sum + item.weight * item.quantity, 0)
+  const combat = computeCombatStats(character, resolvedStats, totalWeight)
   const { bab, strMod, dexMod, ac, fortitude, reflex, will } = combat
 
   const hpPercent = Math.max(0, Math.min(100, (character.hp.current / character.hp.max) * 100))
@@ -27,11 +28,12 @@ export function PartyCard({ character }: PartyCardProps) {
   const equippedArmorAcp = (character.armor ?? [])
     .filter((a) => a.equipped && a.type !== 'shield')
     .reduce((sum, a) => sum + (a.armorCheckPenalty ?? 0), 0)
+  const encumbrancePenalty = getEncumbranceSkillPenalty(getEncumbranceLevel(totalWeight, character.abilities.strength))
 
   const keySkills = KEY_SKILL_IDS.map((skillId) => {
     const skill = SKILLS.find((s) => s.id === skillId)
     if (!skill) return null
-    return { name: skill.name, total: computeSkillTotal({ ...character, archetypesByClassId }, skill, resolvedStats, equippedArmorAcp) }
+    return { name: skill.name, total: computeSkillTotal({ ...character, archetypesByClassId }, skill, resolvedStats, equippedArmorAcp, encumbrancePenalty) }
   }).filter(Boolean) as { name: string; total: number }[]
 
   return (

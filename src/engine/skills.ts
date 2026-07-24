@@ -24,14 +24,19 @@ export interface SkillCalcContext {
 
 // Puntos de habilidad totales ganados: por cada clase, (base de la clase + mod. Int,
 // mínimo 1 por regla SRD) × niveles en esa clase. Soporta multiclase — cada clase aporta
-// sus propios puntos según su propia tabla base.
+// sus propios puntos según su propia tabla base. Los Humanos reciben +1 punto de habilidad
+// adicional por cada nivel de personaje (rasgo racial "Habilidades Adicionales").
 export function computeSkillPointsAvailable(character: SkillCalcContext, spentRanks: number): number {
   const intMod = calculateModifier(character.abilities.intelligence)
+  const isHuman = character.race?.toLowerCase() === 'human'
   let total = 0
   for (const cc of character.classes) {
     const classData = getClassById(cc.id)
     if (!classData) continue
     total += Math.max(1, classData.skillPointsPerLevel + intMod) * cc.level
+  }
+  if (isHuman) {
+    total += character.classes.reduce((sum, cc) => sum + cc.level, 0)
   }
   return Math.max(0, total - spentRanks)
 }
@@ -48,21 +53,25 @@ export function isClassSkillForCharacter(character: SkillCalcContext, skillId: s
 }
 
 // Bono total de una habilidad: rangos + mod. característica + bono de clase (+3 si tiene al
-// menos 1 rango y es de clase en alguna de sus clases) + penalización de armadura + modificador
-// de tamaño (solo Sigilo/Volar) + bonos misceláneos + modificadores del motor (dotes/objetos).
-// Recibe el objeto Skill ya resuelto (en vez de buscarlo en un catálogo estático) para funcionar
-// igual con el catálogo base o con el catálogo ampliado con homebrew de useSRDStore().
+// menos 1 rango y es de clase en alguna de sus clases) + penalización de armadura/carga +
+// modificador de tamaño (solo Sigilo/Volar) + bonos misceláneos + modificadores del motor
+// (dotes/objetos). Recibe el objeto Skill ya resuelto (en vez de buscarlo en un catálogo
+// estático) para funcionar igual con el catálogo base o con el catálogo ampliado con
+// homebrew de useSRDStore(). `encumbrancePenalty` (penalización por carga media/pesada,
+// ya en negativo) y `equippedArmorAcp` no se acumulan entre sí — se aplica la más
+// restrictiva de las dos, igual que en las reglas de carga del SRD.
 export function computeSkillTotal(
   character: SkillCalcContext,
   skill: Skill,
   resolvedStats: ResolvedStats,
   equippedArmorAcp: number,
+  encumbrancePenalty = 0,
 ): number {
   const rankEntry = character.skills.find((s) => s.id === skill.id)
   const ranks = rankEntry?.ranks ?? 0
   const abilityMod = calculateModifier(character.abilities[skill.ability])
   const classBonus = ranks > 0 && isClassSkillForCharacter(character, skill.id) ? 3 : 0
-  const acp = skill.hasArmorCheckPenalty ? equippedArmorAcp : 0
+  const acp = skill.hasArmorCheckPenalty ? Math.min(equippedArmorAcp, encumbrancePenalty) : 0
   const misc = rankEntry?.miscBonuses?.reduce((s, b) => s + b.value, 0) ?? 0
   const featBonus = resolvedStats.skillBonuses?.[skill.id] ?? 0
   const sizeMod = getSizeSkillModifier(getCharacterSize(character), skill.id)

@@ -179,6 +179,9 @@ export interface Character {
   id: string
   name: string
   race: string
+  // Característica elegida para el bonificador racial flotante de +2 (Humano, Medio Elfo,
+  // Medio Orco — razas cuyo `Race.bonuses` viene vacío porque el jugador elige el atributo).
+  raceAbilityChoice?: AbilityKey
   classes: CharacterClass[]
   level: number
   xp: number

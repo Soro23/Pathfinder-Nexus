@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, StatusEffect, BonusTarget } from '../store'
 import { getClassById, useSRDStore, calculateSpellDC } from '../data'
-import { resolveModifiers, computeCombatStats, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets } from '../engine'
+import { resolveModifiers, computeCombatStats, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets, getEncumbranceLevel, getEncumbranceSkillPenalty } from '../engine'
 import { buildArchetypesByClassId } from '../data/resolveArchetype'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card } from '../components/ui'
@@ -156,7 +156,8 @@ export function PlayMode() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resolvedStats = useMemo(() => resolveModifiers(character), [character])
   const archetypesByClassId = buildArchetypesByClassId(character.classes, getArchetypeById)
-  const combat = computeCombatStats(character, resolvedStats)
+  const totalWeight = (character.inventory ?? []).reduce((sum, item) => sum + item.weight * item.quantity, 0)
+  const combat = computeCombatStats(character, resolvedStats, totalWeight)
   const { bab, strMod, dexMod, ac, cmb, cmd, initiative } = combat
   const touchAC = combat.acTouch
   const flatFootedAC = combat.acFlatFooted
@@ -167,6 +168,7 @@ export function PlayMode() {
   const equippedArmorAcp = (character.armor ?? [])
     .filter((a) => a.equipped && a.type !== 'shield')
     .reduce((sum, a) => sum + (a.armorCheckPenalty ?? 0), 0)
+  const encumbrancePenalty = getEncumbranceSkillPenalty(getEncumbranceLevel(totalWeight, character.abilities.strength))
 
   // PV máximos efectivos: PV base + bonos del motor (dotes/objetos como Toughness).
   const effectiveMaxHp = character.hp.max + resolvedStats.hpBonus
@@ -793,7 +795,7 @@ export function PlayMode() {
                       const isRanged = weapon.range === 'ranged'
                       const paAtkPenalty = (powerAttackActive && !isRanged) ? -powerAttackPenalty : 0
                       const paDmgBonus = (powerAttackActive && !isRanged) ? getPowerAttackDamageBonus(powerAttackPenalty, weapon.grip) : 0
-                      const atkBase = computeWeaponAttackBonus(bab, isRanged ? dexMod : strMod, weapon.attackBonus, resolvedStats, combat.sizeMod) + paAtkPenalty
+                      const atkBase = computeWeaponAttackBonus(bab, isRanged ? dexMod : strMod, weapon.attackBonus, resolvedStats, combat.sizeMod, combat.negativeLevelPenalty) + paAtkPenalty
                       const dmgMod = isRanged ? dexMod : getStrDamageBonus(strMod, weapon.grip)
                       const dmgNotation = addModifierToNotation(weapon.damage, resolvedStats.damageBonus + dmgMod + paDmgBonus)
                       const iterativeOffsets = getIterativeAttackOffsets(bab)
@@ -837,8 +839,8 @@ export function PlayMode() {
                       {(() => {
                         const paAtkPenalty = powerAttackActive ? -powerAttackPenalty : 0
                         const paDmgBonus = powerAttackActive ? powerAttackDmgBonus : 0
-                        const meleeAtk = computeWeaponAttackBonus(bab, strMod, 0, resolvedStats, combat.sizeMod) + paAtkPenalty
-                        const rangedAtk = computeWeaponAttackBonus(bab, dexMod, 0, resolvedStats, combat.sizeMod)
+                        const meleeAtk = computeWeaponAttackBonus(bab, strMod, 0, resolvedStats, combat.sizeMod, combat.negativeLevelPenalty) + paAtkPenalty
+                        const rangedAtk = computeWeaponAttackBonus(bab, dexMod, 0, resolvedStats, combat.sizeMod, combat.negativeLevelPenalty)
                         const iterOffsets = getIterativeAttackOffsets(bab)
                         return (
                           <>
@@ -1348,7 +1350,7 @@ export function PlayMode() {
                         if (!skillDef) return null
                         const isClassSkill = isClassSkillForCharacter({ ...character, archetypesByClassId }, skillRank.id)
                         const skillEffectBonus = resolvedStats.skillBonuses[skillRank.id] ?? 0
-                        const total = computeSkillTotal({ ...character, archetypesByClassId }, skillDef, resolvedStats, equippedArmorAcp)
+                        const total = computeSkillTotal({ ...character, archetypesByClassId }, skillDef, resolvedStats, equippedArmorAcp, encumbrancePenalty)
                         return (
                           <button
                             key={skillRank.id}

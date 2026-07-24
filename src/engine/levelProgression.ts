@@ -39,7 +39,9 @@ export function getBonusFeatSlotsForClassLevel(classId: string, classLevel: numb
   return []
 }
 
-export function getExpectedFeatCount(characterLevel: number, classes: CharacterClass[]): number {
+// `race` es opcional para no romper las llamadas existentes que aún no la conocen; el
+// Humano recibe una dote adicional al primer nivel (rasgo racial "Talento Adicional").
+export function getExpectedFeatCount(characterLevel: number, classes: CharacterClass[], race?: string): number {
   const genericFeats = Array.from({ length: characterLevel }, (_, index) => index + 1)
     .filter(isGenericFeatLevel)
     .length
@@ -52,7 +54,9 @@ export function getExpectedFeatCount(characterLevel: number, classes: CharacterC
     return sum + classBonusFeats
   }, 0)
 
-  return genericFeats + bonusFeats
+  const racialBonusFeat = race?.toLowerCase() === 'human' ? 1 : 0
+
+  return genericFeats + bonusFeats + racialBonusFeat
 }
 
 export function computeHpGain(mode: HpGainMode, hitDie: number, conMod: number, rolled: number | null): number | null {

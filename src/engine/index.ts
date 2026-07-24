@@ -3,7 +3,7 @@ export { computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus, ge
 export { getCharacterSize, getSizeACModifier, getSizeCMBModifier, getSizeSkillModifier, normalizeSizeString } from './size'
 export { computeSkillPointsAvailable, computeSkillTotal, isClassSkillForCharacter } from './skills'
 export { getStrDamageBonus, getPowerAttackDamageBonus } from './weapon'
-export { getCarryingCapacity, getCarryingCapacityTiers, getEncumbranceLevel } from './carryingCapacity'
+export { getCarryingCapacity, getCarryingCapacityTiers, getEncumbranceLevel, getEncumbranceDexCap, getEncumbranceSkillPenalty } from './carryingCapacity'
 export type { CarryingCapacityTiers, EncumbranceLevel } from './carryingCapacity'
 export { computeSpeed } from './speed'
 export { canLevelUpFromXp, getNextLevelXp, getXpThresholdForLevel, getXpToNextLevel, XP_SLOW_TRACK, XP_MEDIUM_TRACK, XP_FAST_TRACK, XP_SPEED_LABELS } from './xp'

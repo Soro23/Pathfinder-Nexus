@@ -8,9 +8,9 @@ import {
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
-import { getClassById, SpellLevel, useSRDStore } from '../data'
+import { getClassById, getRaceById, hasFloatingAbilityBonus, SpellLevel, useSRDStore } from '../data'
 import { resolveClassSkills, buildArchetypesByClassId } from '../data/resolveArchetype'
-import { resolveModifiers, canLevelUpFromXp, computeCombatStats, computeEffectiveMaxHp, computeSkillPointsAvailable, computeSkillTotal, getExpectedFeatCount, getXpToNextLevel, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, computeSpeed, computeSyncedSpellSlots, validateProgressionAgainstCharacter, XP_SPEED_LABELS } from '../engine'
+import { resolveModifiers, canLevelUpFromXp, computeCombatStats, computeEffectiveMaxHp, computeSkillPointsAvailable, computeSkillTotal, getExpectedFeatCount, getXpToNextLevel, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, getEncumbranceSkillPenalty, computeSpeed, computeSyncedSpellSlots, validateProgressionAgainstCharacter, XP_SPEED_LABELS } from '../engine'
 import { Card, Button } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker } from '../components/character'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
@@ -98,13 +98,17 @@ export function CharacterView() {
 
   const { abilities } = character
 
-  const combat = computeCombatStats(character, resolvedStats)
+  const totalWeight = (character.inventory ?? []).reduce((sum, item) => sum + item.weight * item.quantity, 0)
+  const combat = computeCombatStats(character, resolvedStats, totalWeight)
   const { bab, ac, cmb, cmd, initiative, fortitude, reflex, will } = combat
   const acTouch = combat.acTouch
   const acFlat = combat.acFlatFooted
 
-  const totalWeight = (character.inventory ?? []).reduce((sum, item) => sum + item.weight * item.quantity, 0)
   const speed = computeSpeed(character, totalWeight)
+  const encumbrancePenalty = getEncumbranceSkillPenalty(getEncumbranceLevel(totalWeight, abilities.strength))
+
+  const raceData = getRaceById(character.race?.toLowerCase())
+  const hasFloatingRaceBonus = hasFloatingAbilityBonus(character.race)
 
   // PV máximos efectivos: PV base + bonos del motor (dotes/objetos como Toughness).
   const effectiveMaxHp = computeEffectiveMaxHp(character, resolvedStats)
@@ -131,7 +135,7 @@ export function CharacterView() {
 
   const spentSkillRanks = character.skills.reduce((sum, s) => sum + s.ranks, 0)
   const skillPointsAvailable = computeSkillPointsAvailable(character, spentSkillRanks)
-  const expectedFeats = getExpectedFeatCount(character.level, character.classes)
+  const expectedFeats = getExpectedFeatCount(character.level, character.classes, character.race)
   const xpToNextLevel = getXpToNextLevel(character.level, character.xp, xpSpeed)
   const inferredHistoryCount = (character.levelHistory ?? []).filter((choice) => choice.inferred).length
   const progressionMismatches = validateProgressionAgainstCharacter(character)
@@ -156,6 +160,16 @@ export function CharacterView() {
       id: 'missing-race',
       title: 'Falta la raza',
       detail: 'Indica la raza para cerrar los datos basicos.',
+      severity: 'warning',
+      tab: 'combat',
+    })
+  }
+
+  if (hasFloatingRaceBonus && !character.raceAbilityChoice) {
+    notifications.push({
+      id: 'missing-race-ability-choice',
+      title: 'Falta elegir el +2 racial',
+      detail: `${character.race} recibe +2 a una característica a elección — elígela en Atributos.`,
       severity: 'warning',
       tab: 'combat',
     })
@@ -618,6 +632,28 @@ export function CharacterView() {
                   )
                 })}
               </div>
+              {hasFloatingRaceBonus && (
+                <div className={styles.manualCorrectionBar}>
+                  <label className={styles.manualCorrectionToggle}>
+                    +2 racial ({raceData?.label}) a:
+                    {isEditing ? (
+                      <select
+                        value={character.raceAbilityChoice ?? ''}
+                        onChange={(e) => updateCharacter(character.id, {
+                          raceAbilityChoice: (e.target.value || undefined) as typeof character.raceAbilityChoice,
+                        })}
+                      >
+                        <option value="">Sin elegir</option>
+                        {(['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] as const).map((attr) => (
+                          <option key={attr} value={attr}>{ABILITY_ABBR[attr]}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span>{character.raceAbilityChoice ? ABILITY_ABBR[character.raceAbilityChoice] : 'Sin elegir'}</span>
+                    )}
+                  </label>
+                </div>
+              )}
             </Card>
 
             {/* Saves */}
@@ -1079,6 +1115,7 @@ export function CharacterView() {
                 level={character.level}
                 skillPointsAvailable={computeSkillPointsAvailable(character, character.skills.reduce((sum, s) => sum + s.ranks, 0))}
                 equippedArmorAcp={equippedArmorAcp}
+                encumbrancePenalty={encumbrancePenalty}
                 resolvedStats={resolvedStats}
                 archetypesByClassId={archetypesByClassId}
               />
@@ -1094,7 +1131,7 @@ export function CharacterView() {
                   const rankEntry = character.skills.find((s) => s.id === skill.id)
                   const ranks = rankEntry?.ranks ?? 0
                   const isClass = isClassSkillForCharacter({ ...character, archetypesByClassId }, skill.id)
-                  const total = computeSkillTotal({ ...character, archetypesByClassId }, skill, resolvedStats, equippedArmorAcp)
+                  const total = computeSkillTotal({ ...character, archetypesByClassId }, skill, resolvedStats, equippedArmorAcp, encumbrancePenalty)
                   return (
                     <div
                       key={skill.id}

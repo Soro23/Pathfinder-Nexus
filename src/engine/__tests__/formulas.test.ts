@@ -9,9 +9,10 @@ import { makeCharacter } from '../../test/fixtures'
 import { getCharacterSize, getSizeACModifier, getSizeCMBModifier, getSizeSkillModifier } from '../size'
 import { computeSkillPointsAvailable, computeSkillTotal, isClassSkillForCharacter } from '../skills'
 import { getStrDamageBonus, getPowerAttackDamageBonus } from '../weapon'
-import { getCarryingCapacity, getCarryingCapacityTiers, getEncumbranceLevel } from '../carryingCapacity'
+import { getCarryingCapacity, getCarryingCapacityTiers, getEncumbranceLevel, getEncumbranceDexCap, getEncumbranceSkillPenalty } from '../carryingCapacity'
 import { computeSpeed } from '../speed'
 import { computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus } from '../combatStats'
+import { getExpectedFeatCount } from '../levelProgression'
 import type { ResolvedStats } from '../types'
 
 const EMPTY_RESOLVED: ResolvedStats = {
@@ -55,6 +56,7 @@ describe('size.ts', () => {
 describe('skills.ts — puntos de habilidad', () => {
   it('suma el mod. Int a la base de la clase, con mínimo 1 por nivel', () => {
     const fighterIntPos = makeCharacter({
+      race: 'dwarf',
       classes: [{ id: 'fighter', level: 3 }],
       abilities: { strength: 10, dexterity: 10, constitution: 10, intelligence: 16, wisdom: 10, charisma: 10 },
     })
@@ -64,6 +66,7 @@ describe('skills.ts — puntos de habilidad', () => {
 
   it('aplica el mínimo de 1 punto/nivel incluso con Int muy baja', () => {
     const lowInt = makeCharacter({
+      race: 'dwarf',
       classes: [{ id: 'fighter', level: 2 }],
       abilities: { strength: 10, dexterity: 10, constitution: 10, intelligence: 6, wisdom: 10, charisma: 10 },
     })
@@ -73,6 +76,7 @@ describe('skills.ts — puntos de habilidad', () => {
 
   it('soporta multiclase: cada clase aporta según su propia base', () => {
     const multiclass = makeCharacter({
+      race: 'dwarf',
       classes: [{ id: 'fighter', level: 2 }, { id: 'rogue', level: 1 }],
       abilities: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
     })
@@ -81,8 +85,18 @@ describe('skills.ts — puntos de habilidad', () => {
   })
 
   it('resta los rangos ya gastados', () => {
-    const c = makeCharacter({ classes: [{ id: 'fighter', level: 1 }] })
+    const c = makeCharacter({ race: 'dwarf', classes: [{ id: 'fighter', level: 1 }] })
     expect(computeSkillPointsAvailable(c, 1)).toBe(1) // 2 base - 1 gastado
+  })
+
+  it('Humano: +1 punto de habilidad adicional por cada nivel de personaje', () => {
+    const human = makeCharacter({
+      race: 'human',
+      classes: [{ id: 'fighter', level: 3 }],
+      abilities: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+    })
+    // Fighter: 2/nivel × 3 niveles = 6. Humano: +1 × 3 niveles = 3. Total = 9
+    expect(computeSkillPointsAvailable(human, 0)).toBe(9)
   })
 })
 
@@ -125,6 +139,16 @@ describe('skills.ts — total de habilidad', () => {
     })
     expect(computeSkillTotal(c, climbSkill, EMPTY_RESOLVED, 0)).toBe(2)
   })
+
+  it('combina ACP de armadura y penalización por carga usando la más restrictiva de las dos', () => {
+    const c = makeCharacter({ classes: [{ id: 'fighter', level: 1 }], skills: [{ id: 'climb', ranks: 1 }] })
+    // ACP -2, carga -6 (pesada): se aplica -6 (más restrictiva)
+    expect(computeSkillTotal(c, climbSkill, EMPTY_RESOLVED, -2, -6)).toBe(1 + 0 + 3 - 6)
+    // ACP -6, carga -2: se aplica -6 (más restrictiva)
+    expect(computeSkillTotal(c, climbSkill, EMPTY_RESOLVED, -6, -2)).toBe(1 + 0 + 3 - 6)
+    // La penalización por carga no aplica a habilidades sin ACP
+    expect(computeSkillTotal(c, perceptionSkill, EMPTY_RESOLVED, 0, -6)).toBe(0)
+  })
 })
 
 describe('negative levels', () => {
@@ -150,6 +174,38 @@ describe('negative levels', () => {
       negativeLevels: 2,
     })
     expect(computeEffectiveMaxHp(c, EMPTY_RESOLVED)).toBe(10)
+  })
+})
+
+describe('combatStats.ts — CA desprevenido y tope de Destreza por carga', () => {
+  it('CA desprevenido pierde el bono de Destreza pero conserva la penalización', () => {
+    const withPositiveDex = makeCharacter({ abilities: { strength: 10, dexterity: 16, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 } })
+    const withNegativeDex = makeCharacter({ abilities: { strength: 10, dexterity: 6, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 } })
+    // Destreza +3: CA normal 13, desprevenido 10 (sin el bono)
+    expect(computeCombatStats(withPositiveDex, EMPTY_RESOLVED).ac).toBe(13)
+    expect(computeCombatStats(withPositiveDex, EMPTY_RESOLVED).acFlatFooted).toBe(10)
+    // Destreza -2: CA normal 8, desprevenido también 8 (conserva la penalización)
+    expect(computeCombatStats(withNegativeDex, EMPTY_RESOLVED).ac).toBe(8)
+    expect(computeCombatStats(withNegativeDex, EMPTY_RESOLVED).acFlatFooted).toBe(8)
+  })
+
+  it('el tope de Destreza por carga se combina con el de la armadura (el más restrictivo)', () => {
+    const c = makeCharacter({
+      abilities: { strength: 10, dexterity: 18, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+    })
+    // Sin carga: Destreza +4 sin tope → CA 14
+    expect(computeCombatStats(c, EMPTY_RESOLVED, 0).ac).toBe(14)
+    // Carga pesada (FUE 10, carga pesada > 66 lb): tope de Destreza +1 → CA 11
+    expect(computeCombatStats(c, EMPTY_RESOLVED, 90).ac).toBe(11)
+  })
+})
+
+describe('levelProgression.ts — dote adicional de Humano', () => {
+  it('Humano recibe una dote adicional respecto a otra raza en el mismo nivel', () => {
+    // Mago no tiene dote de bonificación en nivel 1 (solo múltiplos de 5), aísla el bono racial
+    const classes = [{ id: 'wizard', level: 1, archetypeIds: [] }]
+    expect(getExpectedFeatCount(1, classes, 'dwarf')).toBe(1)
+    expect(getExpectedFeatCount(1, classes, 'human')).toBe(2)
   })
 })
 
@@ -190,6 +246,20 @@ describe('carryingCapacity.ts', () => {
     expect(getEncumbranceLevel(50, 10)).toBe('medium')
     expect(getEncumbranceLevel(90, 10)).toBe('heavy')
     expect(getEncumbranceLevel(150, 10)).toBe('overloaded')
+  })
+
+  it('tope de Destreza por carga: ligera sin tope, media +3, pesada/sobrecargada +1', () => {
+    expect(getEncumbranceDexCap('light')).toBeNull()
+    expect(getEncumbranceDexCap('medium')).toBe(3)
+    expect(getEncumbranceDexCap('heavy')).toBe(1)
+    expect(getEncumbranceDexCap('overloaded')).toBe(1)
+  })
+
+  it('penalización de habilidad por carga: ligera 0, media -3, pesada/sobrecargada -6', () => {
+    expect(getEncumbranceSkillPenalty('light')).toBe(0)
+    expect(getEncumbranceSkillPenalty('medium')).toBe(-3)
+    expect(getEncumbranceSkillPenalty('heavy')).toBe(-6)
+    expect(getEncumbranceSkillPenalty('overloaded')).toBe(-6)
   })
 })
 

@@ -1,6 +1,6 @@
 import type { Character, StatusEffect } from '../store/characterStore'
 import { getFeatById } from '../data/feats'
-import { RACES } from '../data/races'
+import { RACES, hasFloatingAbilityBonus } from '../data/races'
 import { homebrewStore } from '../store/homebrewStore'
 import type { Modifier, ModifierTarget, ModifierType, ResolvedStats } from './types'
 
@@ -170,6 +170,21 @@ export function resolveModifiers(character: Character): ResolvedStats {
           })
         }
       }
+    }
+  }
+
+  // 4b. Bonificador racial flotante de +2 (Humano, Medio Elfo, Medio Orco): el jugador
+  // elige a qué característica se aplica.
+  if (raceData && hasFloatingAbilityBonus(character.race) && character.raceAbilityChoice) {
+    const target = ABILITY_KEY_TO_TARGET[character.raceAbilityChoice]
+    if (target) {
+      rawModifiers.push({
+        id: 'race-floating',
+        source: raceData.label,
+        type: 'racial',
+        target,
+        value: 2,
+      })
     }
   }
 

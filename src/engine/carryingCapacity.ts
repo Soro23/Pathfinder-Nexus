@@ -44,3 +44,20 @@ export function getEncumbranceLevel(totalWeight: number, strength: number): Encu
   if (totalWeight <= heavy) return 'heavy'
   return 'overloaded'
 }
+
+// Tope de Destreza a CA por carga (Tabla: Carrying Capacity). Carga ligera no impone tope
+// (null). Sobrecargado se trata como carga pesada a estos efectos (el SRD no define un
+// tope propio más allá del de carga pesada).
+export function getEncumbranceDexCap(level: EncumbranceLevel): number | null {
+  if (level === 'medium') return 3
+  if (level === 'heavy' || level === 'overloaded') return 1
+  return null
+}
+
+// Penalización a pruebas de habilidad por carga, idéntica en efecto a la penalización de
+// armadura (no se acumulan entre sí, se aplica la más restrictiva de las dos).
+export function getEncumbranceSkillPenalty(level: EncumbranceLevel): number {
+  if (level === 'medium') return -3
+  if (level === 'heavy' || level === 'overloaded') return -6
+  return 0
+}
