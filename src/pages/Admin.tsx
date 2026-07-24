@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users, Wand2, ChevronLeft, ChevronRight, Package, Plus } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
+import { Button } from '../components/ui'
 import type { Spell } from '../data/spells'
 import { SPELL_SCHOOLS } from '../data/spells'
 import { useCustomSpellsStore } from '../store/customSpellsStore'
@@ -89,7 +92,33 @@ async function findDuplicateInDB(name: string, customSpells: Spell[]): Promise<S
 type TabId = 'spells' | 'skills' | 'feats' | 'classes' | 'races' | 'archetypes' | 'items'
 type ImportStatus = 'idle' | 'loading' | 'done' | 'error'
 
+// Coincide con el email admitido en la política "admin write" de Supabase — la comprobación
+// real vive en RLS (el cliente nunca puede editar el catálogo sin ser ese usuario, sin importar
+// lo que muestre esta pantalla); esto solo evita mostrar un panel de administración que fallaría
+// en cada guardado a un usuario que no es admin.
+const ADMIN_EMAIL = 'registrorapido.aitorsolana@pm.me'
+
 export function Admin() {
+  const { user } = useAuth()
+
+  if (user?.email !== ADMIN_EMAIL) {
+    return (
+      <div className={styles.page}>
+        <p>No tienes acceso a esta sección.</p>
+        <Link to="/">
+          <Button variant="secondary">
+            <ArrowLeft size={18} />
+            Volver
+          </Button>
+        </Link>
+      </div>
+    )
+  }
+
+  return <AdminPanel />
+}
+
+function AdminPanel() {
   const [activeTab, setActiveTab] = useState<TabId>('spells')
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(true)
