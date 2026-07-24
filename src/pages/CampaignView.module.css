@@ -1052,8 +1052,8 @@
 }
 
 @media (max-width: 480px) {
-  .statsRow { grid-template-columns: repeat(2, 1fr); }
-  .statsRow5 { grid-template-columns: repeat(2, 1fr); }
+  .statsRow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .statsRow5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .sessionBtn {
     width: 44px;
