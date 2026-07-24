@@ -136,6 +136,22 @@ export function PlayMode() {
   const { spells: spellMap } = useSpellsByIds(character?.spells ?? [])
   const { spells: preparedSpellMap } = useSpellsByIds(character?.preparedSpells ?? [])
 
+  // Hook llamado siempre (con valores por defecto si aún no hay personaje) para no violar
+  // las reglas de hooks: en una carga directa de la URL, el store está vacío en el primer
+  // render y `character` pasa de undefined a definido entre renders — si este cálculo se
+  // hiciera después del `return` de "no encontrado", React vería un número de hooks distinto
+  // entre renders y lanzaría el error #310 (pantalla en blanco).
+  const resolvedStats = useMemo(
+    () => character ? resolveModifiers(character) : {
+      skillBonuses: {}, saveBonuses: { fort: 0, ref: 0, will: 0 },
+      acBonuses: { natural: 0, deflection: 0, dodge: 0, armor: 0, shield: 0, total: 0 },
+      abilityBonuses: { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 },
+      initiativeBonus: 0, attackBonus: 0, damageBonus: 0,
+      hpBonus: 0, speedBonus: 0, cmbBonus: 0, cmdBonus: 0, allModifiers: [],
+    },
+    [character]
+  )
+
   if (!character) {
     return (
       <div className={styles.notFound}>
@@ -152,9 +168,6 @@ export function PlayMode() {
 
   const { abilities } = character
   const classData = getClassById(character.classes[0]?.id || '')   // mantener — se usa en hasSpells, concentrationBonus
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const resolvedStats = useMemo(() => resolveModifiers(character), [character])
   const archetypesByClassId = buildArchetypesByClassId(character.classes, getArchetypeById)
   const totalWeight = (character.inventory ?? []).reduce((sum, item) => sum + item.weight * item.quantity, 0)
   const combat = computeCombatStats(character, resolvedStats, totalWeight)
