@@ -16,7 +16,7 @@ import { makeCharacter } from '../../test/fixtures'
 
 vi.mock('../../lib/supabase', () => ({
   supabase: {
-    auth: { getUser: vi.fn() },
+    auth: { getSession: vi.fn() },
     from: vi.fn(),
   },
 }))
@@ -48,9 +48,9 @@ function createQueryBuilder() {
 
 beforeEach(() => {
   useCharacterStore.setState({ characters: [] })
-  vi.mocked(supabase.auth.getUser).mockResolvedValue({
-    data: { user: { id: 'user-1' } },
-  } as Awaited<ReturnType<typeof supabase.auth.getUser>>)
+  vi.mocked(supabase.auth.getSession).mockResolvedValue({
+    data: { session: { user: { id: 'user-1' } } },
+  } as Awaited<ReturnType<typeof supabase.auth.getSession>>)
   vi.mocked(supabase.from).mockImplementation(() => createQueryBuilder() as unknown as ReturnType<typeof supabase.from>)
 })
 
