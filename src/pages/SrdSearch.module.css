@@ -135,6 +135,10 @@
   line-height: 1.5;
 }
 
+.resultSnippet p {
+  margin: 0;
+}
+
 .resultSnippet b {
   color: var(--color-accent-gold);
   font-weight: 700;

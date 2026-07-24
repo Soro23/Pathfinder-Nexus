@@ -4,6 +4,15 @@ import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { useSrdSearch, fetchSrdPage, type SrdPage } from '../hooks/useSrdSearch'
 import { repairMisplacedBold, cleanupUnparsedTableArtifacts } from '../lib/markdown'
+
+// El snippet que devuelve el RPC de búsqueda es un fragmento del Markdown original
+// (con `**negrita**` de origen) más el resaltado de coincidencias que añade Postgres
+// con `<b>`. Sin pasar por `marked`, el `**` de origen se mostraba literal — solo se
+// sanitizaban las etiquetas `<b>` del resaltado, nunca se interpretaba el Markdown.
+function renderSnippet(snippet: string): string {
+  const html = marked.parse(repairMisplacedBold(snippet), { async: false, breaks: true }) as string
+  return DOMPurify.sanitize(html, { ALLOWED_TAGS: ['b', 'strong', 'em', 'p'] })
+}
 import styles from './SrdSearch.module.css'
 
 export function SrdSearch() {
@@ -103,7 +112,7 @@ export function SrdSearch() {
                 </div>
                 <div
                   className={styles.resultSnippet}
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(r.snippet, { ALLOWED_TAGS: ['b'] }) }}
+                  dangerouslySetInnerHTML={{ __html: renderSnippet(r.snippet) }}
                 />
               </button>
             ))}
