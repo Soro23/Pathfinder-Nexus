@@ -1655,16 +1655,108 @@
     width: 100%;
   }
 
-  .actionsMobileOpen {
-    display: flex;
-  }
-
   .notificationPanel {
     display: none;
+  }
+
+  /* Altura exacta de la fila del nombre (fila 1) en móvil, calculada a partir de los
+     mismos tokens tipográficos que usa esa fila — la usan la barra de tabs (fila 2,
+     que se ancla justo debajo) y los desplegables de acciones/notificaciones (que
+     flotan justo debajo de la fila 1, por encima de la fila 2). */
+  .container {
+    --mobile-sticky-header-h: calc((var(--text-headline-md) * 1.2) + var(--space-1) + (var(--text-body-md) * 1.6) + (var(--space-2) * 2));
+  }
+
+  /* ── Fila 1 (nombre + hamburguesa/campanita): fija arriba mientras se hace scroll.
+     El sticky va en `.header` (no en `.titleRow`) porque un elemento sticky no puede
+     mantenerse fijo más allá de los límites de su propio padre — `.header` antes solo
+     envolvía el backLink + esta fila (muy bajo), así que se "despegaba" a los pocos
+     píxeles de scroll. `.header` ahora solo contiene la fila del nombre (el backLink
+     se sacó fuera, como hermano) y su padre (`.container`) sí abarca toda la página. */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--color-surface);
+  }
+
+  .titleRow {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: var(--space-2) 0;
+  }
+
+  .titleText {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .titleRow h1 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .subtitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Desplegables de acciones/notificaciones: flotan bajo la fila 1 en vez de
+     empujar su altura (que rompería el offset calculado para la fila de tabs). */
+  .actionsMobileOpen {
+    display: flex;
+    position: fixed;
+    top: var(--mobile-sticky-header-h);
+    left: var(--space-4);
+    right: var(--space-4);
+    width: auto;
+    margin-top: 0;
+    z-index: 60;
+    background: var(--color-surface-container-lowest);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-3);
+    max-height: calc(100vh - var(--mobile-sticky-header-h) - var(--space-6));
+    overflow-y: auto;
   }
 
   .notificationPanelMobileOpen {
     display: flex;
     flex-direction: column;
+    position: fixed;
+    top: var(--mobile-sticky-header-h);
+    left: var(--space-4);
+    right: var(--space-4);
+    z-index: 60;
+    margin-bottom: 0;
+    max-height: calc(100vh - var(--mobile-sticky-header-h) - var(--space-6));
+    overflow-y: auto;
+  }
+
+  /* ── Fila 2 (navegación Personaje/Hechizos/Inventario/…): fija bajo la fila 1,
+     como grid de 4 columnas en vez de una fila con scroll horizontal ── */
+  .mainTabs {
+    position: sticky;
+    top: var(--mobile-sticky-header-h);
+    z-index: 29;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    overflow-x: visible;
+    padding: var(--space-2);
+  }
+
+  .mainTab {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    padding: var(--space-2) var(--space-1);
+    font-size: var(--text-label-sm);
+    text-align: center;
+    white-space: normal;
+    line-height: 1.15;
   }
 }

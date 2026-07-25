@@ -363,28 +363,19 @@ export function CharacterView() {
   return (
     <div className={styles.container}>
       {/* ── Header ── */}
+      <Link to="/" className={styles.backLink}>
+        <ArrowLeft size={20} />
+        Volver
+      </Link>
       <header className={styles.header}>
-        <Link to="/" className={styles.backLink}>
-          <ArrowLeft size={20} />
-          Volver
-        </Link>
         <div className={styles.titleRow}>
-          <div>
+          <div className={styles.titleText}>
             <h1>{character.name}</h1>
             <p className={styles.subtitle}>
               {character.race} · {character.classes.map(c => `${c.id} ${c.level}`).join('/')} · Nivel {character.level}
             </p>
           </div>
           <div className={styles.mobileHeaderControls}>
-            <button
-              type="button"
-              className={styles.mobileIconBtn}
-              onClick={() => { setMobileActionsOpen((v) => !v); setMobileNotifOpen(false) }}
-              aria-label="Acciones del personaje"
-              aria-expanded={mobileActionsOpen}
-            >
-              <Menu size={20} />
-            </button>
             <button
               type="button"
               className={styles.mobileIconBtn}
@@ -398,6 +389,15 @@ export function CharacterView() {
                   {notifications.length}
                 </span>
               )}
+            </button>
+            <button
+              type="button"
+              className={styles.mobileIconBtn}
+              onClick={() => { setMobileActionsOpen((v) => !v); setMobileNotifOpen(false) }}
+              aria-label="Acciones del personaje"
+              aria-expanded={mobileActionsOpen}
+            >
+              <Menu size={20} />
             </button>
           </div>
           <div
@@ -586,11 +586,11 @@ export function CharacterView() {
       </div>
 
       {/* ── Tabs ── */}
-      <div className={styles.tabs}>
+      <div className={`${styles.tabs} ${styles.mainTabs}`}>
         {tabs.map(({ id: tabId, label, icon: Icon }) => (
           <button
             key={tabId}
-            className={`${styles.tab} ${activeTab === tabId ? styles.activeTab : ''}`}
+            className={`${styles.tab} ${styles.mainTab} ${activeTab === tabId ? styles.activeTab : ''}`}
             onClick={() => setActiveTab(tabId)}
           >
             <Icon size={15} />
