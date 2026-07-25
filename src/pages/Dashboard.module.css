@@ -155,7 +155,8 @@
 .avatarPlaceholder {
   width: 44px;
   height: 44px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
+  border: var(--portrait-border);
   background: var(--color-surface-container-high);
   color: var(--color-primary);
   display: flex;

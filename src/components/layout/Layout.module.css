@@ -84,12 +84,20 @@
 .navSection {
   font-size: var(--text-label-sm);
   font-weight: 700;
-  color: var(--color-on-surface-variant);
+  color: var(--color-secondary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: var(--space-3) var(--space-3) var(--space-1);
   display: block;
   margin-top: var(--space-3);
+  border-top: var(--border-ornate-width) solid var(--border-ornate-color);
+  padding-top: var(--space-4);
+}
+
+.navSection:first-child {
+  border-top: none;
+  padding-top: var(--space-3);
+  margin-top: 0;
 }
 
 .navItem {
@@ -99,11 +107,11 @@
   padding: var(--space-2) var(--space-3);
   color: var(--color-on-surface-variant);
   text-decoration: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   font-size: var(--text-body-md);
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast);
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   width: 100%;
   text-align: left;
@@ -115,8 +123,8 @@
 }
 
 .navItem.active {
-  background: var(--color-surface-container-high);
-  color: var(--color-primary);
+  background: var(--chip-bg-active);
+  color: var(--chip-color-active);
   font-weight: 600;
 }
 
@@ -251,8 +259,8 @@
 }
 
 .footerBtnActive {
-  color: var(--color-primary);
-  background: var(--color-surface-container-high);
+  color: var(--chip-color-active);
+  background: var(--chip-bg-active);
 }
 
 /* ── Main Content ── */
@@ -332,8 +340,8 @@
 }
 
 .compendiumSheetItemActive {
-  background: var(--color-surface-container-high);
-  color: var(--color-primary);
+  background: var(--chip-bg-active);
+  color: var(--chip-color-active);
   font-weight: 600;
 }
 
@@ -433,6 +441,8 @@
 
   .bottomNavActive {
     color: var(--color-primary);
+    background: var(--color-surface-container-high);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
   }
 
   .bottomNavActive svg {

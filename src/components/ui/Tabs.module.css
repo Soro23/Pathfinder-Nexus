@@ -1,0 +1,89 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tabList {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tabList::-webkit-scrollbar {
+  display: none;
+}
+
+.tabList.sm {
+  gap: var(--space-1);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 600;
+  background: none;
+  color: var(--color-on-surface-variant);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.tab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ── Variant: chip (estilo D&D Beyond — pill sólida en activo) ── */
+.chip {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--chip-border-idle);
+  border-radius: var(--radius-full);
+  background: var(--chip-bg-idle);
+  font-size: var(--text-label-md);
+}
+
+.chip.tabActive {
+  background: var(--chip-bg-active);
+  color: var(--chip-color-active);
+  border-color: var(--chip-bg-active);
+}
+
+/* ── Variant: underline (estética previa de CharacterView/PlayMode) ── */
+.underline {
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  font-size: var(--text-body-md);
+}
+
+.underline.tabActive {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.tabPanel:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .chip {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-label-sm);
+  }
+}

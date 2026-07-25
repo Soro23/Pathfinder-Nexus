@@ -20,6 +20,39 @@
 /* ── Page Header ── */
 .header {
   margin-bottom: var(--space-6);
+  background: var(--character-header-bg);
+  border-radius: var(--character-header-radius);
+  padding: var(--space-5);
+}
+
+.portrait {
+  flex-shrink: 0;
+  width: var(--portrait-size-mobile);
+  height: var(--portrait-size-mobile);
+  border-radius: var(--radius-full);
+  border: var(--portrait-border);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--text-title-lg);
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.portraitImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (min-width: 641px) {
+  .portrait {
+    width: var(--portrait-size-desktop);
+    height: var(--portrait-size-desktop);
+  }
 }
 
 .backLink {
@@ -233,8 +266,18 @@
 
 .hpCardLarge {
   flex: 1;
-  background: var(--color-surface-container-lowest) !important;
+  background: var(--character-header-bg) !important;
   box-shadow: var(--shadow-md) !important;
+}
+
+.hpLabel {
+  display: block;
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
 }
 
 .hpContent {
@@ -346,36 +389,8 @@
   gap: var(--space-2);
 }
 
-.quickStat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface-container-lowest);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  min-width: 72px;
-}
-
-.quickStat svg {
-  color: var(--color-secondary);
-}
-
-.quickStatValue {
-  font-family: var(--font-display);
-  /* Narrative numbers */
-  font-size: var(--text-title-md);
-  font-weight: 700;
-  color: var(--color-on-surface);
-  line-height: 1;
-}
-
-.quickStatLabel {
-  font-size: var(--text-label-sm);
-  color: var(--color-on-surface-variant);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+.xpPill {
+  min-width: 120px;
 }
 
 .quickStatSub {
@@ -397,44 +412,9 @@
   padding: var(--space-1);
 }
 
-/* ── Tabs ── */
-.tabs {
-  display: flex;
-  gap: 2px;
+/* ── Tabs (barra principal, migrada a components/ui/Tabs) ── */
+.mainTabsWrap {
   margin-bottom: var(--space-6);
-  background: var(--color-surface-container-low);
-  padding: var(--space-1);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.tab {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-sm);
-  color: var(--color-on-surface-variant);
-  font-family: var(--font-body);
-  font-size: var(--text-label-lg);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
-  white-space: nowrap;
-}
-
-.tab:hover {
-  background: var(--color-surface-container);
-  color: var(--color-on-surface);
-}
-
-.activeTab {
-  background: var(--color-surface-container-lowest);
-  color: var(--color-primary);
-  font-weight: 600;
-  box-shadow: var(--shadow-sm);
 }
 
 .tabContent {
@@ -636,22 +616,23 @@
       var(--color-surface-container-high) 100%);
 }
 
+.sectionTitleCentered {
+  justify-content: center;
+  text-align: center;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-body);
+  font-size: var(--text-label-lg);
+  font-weight: 700;
+  background: none;
+}
+
 /* Ability scores grid */
 .abilityGrid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: var(--space-2);
-}
-
-.abilityBlock {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: var(--space-3) var(--space-2);
-  background: var(--color-surface-container-lowest);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
 }
 
 .abilityAbbr {
@@ -669,30 +650,6 @@
   font-weight: 700;
   color: var(--color-on-surface);
   line-height: 1;
-}
-
-.abilityEditInput {
-  font-family: var(--font-display);
-  font-size: var(--text-headline-sm);
-  font-weight: 700;
-  width: 52px;
-  background: var(--color-surface-container-high);
-  border: 2px solid var(--color-outline-variant);
-  border-radius: var(--radius-sm);
-  color: var(--color-on-surface);
-  text-align: center;
-  padding: 2px;
-  outline: none;
-  line-height: 1;
-}
-
-.abilityEditInput:focus {
-  border-color: var(--color-primary);
-}
-
-.abilityMod {
-  font-size: var(--text-body-md);
-  font-weight: 700;
 }
 
 .positive {

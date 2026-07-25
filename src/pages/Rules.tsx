@@ -1,7 +1,7 @@
-import { BookOpen, ChevronDown } from 'lucide-react'
-import { Card } from '../components/ui'
+import { useState } from 'react'
+import { BookOpen } from 'lucide-react'
+import { Card, Tabs, TabList, Tab, TabPanel } from '../components/ui'
 import styles from './Rules.module.css'
-import mobile from '../styles/compendiumMobile.module.css'
 
 const QUICK_RULES = [
   {
@@ -46,35 +46,13 @@ const CONDITION_LIST = [
   { name: 'Aturdido', effect: 'No puede moverse ni hablar. Automáticamente falla salvaciones. Ataques contra tienen ventaja.' },
 ]
 
-const SECTIONS = [
-  { id: 'formulas',    label: 'Fórmulas Básicas' },
-  { id: 'condiciones', label: 'Condiciones' },
-]
+type Section = 'formulas' | 'condiciones'
 
 export function Rules() {
-  function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  const [activeSection, setActiveSection] = useState<Section>('formulas')
 
   return (
     <div className={styles.container}>
-
-      {/* ── Mobile sticky nav ── */}
-      <div className={mobile.mobileCatBar}>
-        <div className={mobile.mobileCatSelectWrap}>
-          <BookOpen size={15} className={mobile.mobileCatIcon} />
-          <select
-            className={mobile.mobileCatSelect}
-            defaultValue=""
-            onChange={e => { scrollTo(e.target.value); (e.target as HTMLSelectElement).value = '' }}
-          >
-            <option value="" disabled>Ir a sección…</option>
-            {SECTIONS.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
-          </select>
-          <ChevronDown size={15} className={mobile.mobileCatChevron} />
-        </div>
-      </div>
-
       <header className={styles.header}>
         <BookOpen size={28} className={styles.headerIcon} />
         <div>
@@ -83,30 +61,35 @@ export function Rules() {
         </div>
       </header>
 
-      <section id="formulas" className={styles.section}>
-        <h2>Fórmulas Básicas</h2>
-        <div className={styles.formulaGrid}>
-          {QUICK_RULES.map((rule) => (
-            <Card key={rule.title} padding="md" hoverable>
-              <h3>{rule.title}</h3>
-              <code className={styles.formula}>{rule.formula}</code>
-              <p>{rule.description}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
+      <Tabs value={activeSection} onChange={(v) => setActiveSection(v as Section)} className={styles.tabsWrap}>
+        <TabList aria-label="Secciones de reglas rápidas">
+          <Tab value="formulas">Fórmulas Básicas</Tab>
+          <Tab value="condiciones">Condiciones</Tab>
+        </TabList>
 
-      <section id="condiciones" className={styles.section}>
-        <h2>Condiciones</h2>
-        <div className={styles.conditionList}>
-          {CONDITION_LIST.map((cond) => (
-            <Card key={cond.name} padding="sm" className={styles.conditionCard}>
-              <h4>{cond.name}</h4>
-              <p>{cond.effect}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
+        <TabPanel value="formulas">
+          <div className={styles.formulaGrid}>
+            {QUICK_RULES.map((rule) => (
+              <Card key={rule.title} padding="md" hoverable>
+                <h3>{rule.title}</h3>
+                <code className={styles.formula}>{rule.formula}</code>
+                <p>{rule.description}</p>
+              </Card>
+            ))}
+          </div>
+        </TabPanel>
+
+        <TabPanel value="condiciones">
+          <div className={styles.conditionList}>
+            {CONDITION_LIST.map((cond) => (
+              <Card key={cond.name} padding="sm" className={styles.conditionCard}>
+                <h4>{cond.name}</h4>
+                <p>{cond.effect}</p>
+              </Card>
+            ))}
+          </div>
+        </TabPanel>
+      </Tabs>
     </div>
   )
 }

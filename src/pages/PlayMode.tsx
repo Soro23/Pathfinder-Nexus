@@ -9,7 +9,7 @@ import { getClassById, useSRDStore, calculateSpellDC } from '../data'
 import { resolveModifiers, computeCombatStats, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets, getEncumbranceLevel, getEncumbranceSkillPenalty } from '../engine'
 import { buildArchetypesByClassId } from '../data/resolveArchetype'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
-import { Button, Card } from '../components/ui'
+import { Button, Card, Tabs, TabList, Tab } from '../components/ui'
 import styles from './PlayMode.module.css'
 
 function addModifierToNotation(notation: string, extra: number): string {
@@ -730,38 +730,15 @@ export function PlayMode() {
           )}
 
           {/* Tab Navigation */}
-          <nav className={styles.tabNav}>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'combat' ? styles.tabBtnActive : ''}`}
-              onClick={() => setActiveTab('combat')}
-            >
-              <Swords size={16} /> COMBATE
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'skills' ? styles.tabBtnActive : ''}`}
-              onClick={() => setActiveTab('skills')}
-            >
-              <Brain size={16} /> HABILIDADES
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'spells' ? styles.tabBtnActive : ''}`}
-              onClick={() => setActiveTab('spells')}
-            >
-              <BookOpen size={16} /> CONJUROS
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'dice' ? styles.tabBtnActive : ''}`}
-              onClick={() => setActiveTab('dice')}
-            >
-              <Dices size={16} /> DADOS
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'encounter' ? styles.tabBtnActive : ''}`}
-              onClick={() => setActiveTab('encounter')}
-            >
-              <Swords size={16} /> ENCUENTRO
-            </button>
-          </nav>
+          <Tabs value={activeTab} onChange={(v) => setActiveTab(v as TabId)} className={styles.tabNavWrap}>
+            <TabList aria-label="Secciones de modo juego">
+              <Tab value="combat" icon={Swords}>COMBATE</Tab>
+              <Tab value="skills" icon={Brain}>HABILIDADES</Tab>
+              <Tab value="spells" icon={BookOpen}>CONJUROS</Tab>
+              <Tab value="dice" icon={Dices}>DADOS</Tab>
+              <Tab value="encounter" icon={Swords}>ENCUENTRO</Tab>
+            </TabList>
+          </Tabs>
 
           {/* ─── TAB: COMBATE ─── */}
           {activeTab === 'combat' && (

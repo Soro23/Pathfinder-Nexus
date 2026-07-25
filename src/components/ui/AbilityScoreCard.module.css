@@ -1,0 +1,82 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: var(--ability-card-min-width);
+}
+
+/* Forma "escudo/pergamino recortado" — clip-path hexagonal */
+.shield {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  aspect-ratio: 1 / 1.1;
+  padding: var(--space-3) var(--space-2) var(--space-2);
+  background: var(--color-surface-container-high);
+  box-shadow: var(--shadow-ornate-inset);
+  clip-path: polygon(50% 0%, 100% 18%, 100% 80%, 50% 100%, 0% 80%, 0% 18%);
+}
+
+.modifier {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.positive {
+  color: var(--color-primary);
+}
+
+.negative {
+  color: var(--color-on-surface-variant);
+}
+
+.neutral {
+  color: var(--color-on-surface);
+}
+
+.score,
+.scoreInput {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ability-score-circle-size);
+  height: var(--ability-score-circle-size);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-mono);
+  font-size: var(--text-label-md);
+  font-weight: 600;
+}
+
+.scoreInput {
+  border: none;
+  padding: 0;
+  text-align: center;
+  appearance: textfield;
+}
+
+.scoreInput::-webkit-outer-spin-button,
+.scoreInput::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.scoreInput:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-primary);
+}
+
+.label {
+  font-size: var(--text-label-sm);
+  font-weight: 700;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}

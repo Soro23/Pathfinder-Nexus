@@ -6,12 +6,12 @@ import {
   Heart, Eye, PlusCircle, X, PawPrint, BookOpen, Download,
   Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle, Menu
 } from 'lucide-react'
-import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
+import { useCharacterStore, calculateModifier, generateId } from '../store'
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
 import { getClassById, getRaceById, hasFloatingAbilityBonus, SpellLevel, useSRDStore } from '../data'
 import { resolveClassSkills, buildArchetypesByClassId } from '../data/resolveArchetype'
 import { resolveModifiers, canLevelUpFromXp, computeCombatStats, computeEffectiveMaxHp, computeSkillPointsAvailable, computeSkillTotal, getExpectedFeatCount, getXpToNextLevel, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, getEncumbranceSkillPenalty, computeSpeed, computeSyncedSpellSlots, validateProgressionAgainstCharacter, XP_SPEED_LABELS } from '../engine'
-import { Card, Button } from '../components/ui'
+import { Card, Button, Tabs, TabList, Tab, AbilityScoreCard, StatPill } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker } from '../components/character'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
 import type { LevelUpUpdates } from '../components/character'
@@ -369,6 +369,13 @@ export function CharacterView() {
       </Link>
       <header className={styles.header}>
         <div className={styles.titleRow}>
+          <div className={styles.portrait}>
+            {character.imageUrl ? (
+              <img src={character.imageUrl} alt={character.name} className={styles.portraitImage} />
+            ) : (
+              character.name.charAt(0).toUpperCase()
+            )}
+          </div>
           <div className={styles.titleText}>
             <h1>{character.name}</h1>
             <p className={styles.subtitle}>
@@ -492,6 +499,7 @@ export function CharacterView() {
           <div className={styles.hpContent}>
             <Heart size={28} className={styles.hpIcon} />
             <div>
+              <span className={styles.hpLabel}>Puntos de golpe</span>
               <div className={styles.hpValues}>
                 {isEditing ? (
                   <>
@@ -541,63 +549,48 @@ export function CharacterView() {
         </Card>
 
         <div className={styles.quickStats}>
-          <div className={styles.quickStat}>
-            <Shield size={18} />
-            <span className={styles.quickStatValue}>{ac}</span>
-            <span className={styles.quickStatLabel}>CA</span>
-          </div>
-          <div className={styles.quickStat}>
-            <Zap size={18} />
-            <span className={styles.quickStatValue}>{initiative >= 0 ? '+' : ''}{initiative}</span>
-            <span className={styles.quickStatLabel}>Inic.</span>
-          </div>
-          <div className={styles.quickStat}>
-            <Sword size={18} />
-            <span className={styles.quickStatValue}>+{bab}</span>
-            <span className={styles.quickStatLabel}>BAB</span>
-          </div>
-          <div className={styles.quickStat}>
-            <Star size={18} />
-            <span className={styles.quickStatValue}>{speed}ft</span>
-            <span className={styles.quickStatLabel}>Vel.</span>
-          </div>
-          <div
-            className={styles.quickStat}
-            title={xpToNextLevel !== null
-              ? `Faltan ${xpToNextLevel.toLocaleString('es-ES')} XP para el siguiente nivel — Progresión ${XP_SPEED_LABELS[xpSpeed]}`
-              : `Nivel máximo — Progresión ${XP_SPEED_LABELS[xpSpeed]}`}
-          >
-            <TrendingUp size={18} />
-            {isEditing ? (
-              <input
-                className={styles.quickStatInput}
-                type="number"
-                min={0}
-                value={character.xp}
-                onChange={(e) => updateCharacter(character.id, { xp: Math.max(0, parseInt(e.target.value) || 0) })}
-              />
-            ) : (
-              <span className={styles.quickStatValue}>{character.xp.toLocaleString('es-ES')}</span>
-            )}
-            <span className={styles.quickStatLabel}>XP</span>
-            {xpToNextLevel !== null && <span className={styles.quickStatSub}>faltan {xpToNextLevel.toLocaleString('es-ES')}</span>}
-          </div>
+          <StatPill label="CA" value={ac} icon={Shield} />
+          <StatPill label="Inic." value={`${initiative >= 0 ? '+' : ''}${initiative}`} icon={Zap} />
+          <StatPill label="BAB" value={`+${bab}`} icon={Sword} />
+          <StatPill label="Vel." value={speed} suffix="ft" icon={Star} />
+          <StatPill
+            label="XP"
+            icon={TrendingUp}
+            className={styles.xpPill}
+            value={
+              isEditing ? (
+                <input
+                  className={styles.quickStatInput}
+                  type="number"
+                  min={0}
+                  value={character.xp}
+                  onChange={(e) => updateCharacter(character.id, { xp: Math.max(0, parseInt(e.target.value) || 0) })}
+                />
+              ) : (
+                <span
+                  title={xpToNextLevel !== null
+                    ? `Faltan ${xpToNextLevel.toLocaleString('es-ES')} XP para el siguiente nivel — Progresión ${XP_SPEED_LABELS[xpSpeed]}`
+                    : `Nivel máximo — Progresión ${XP_SPEED_LABELS[xpSpeed]}`}
+                >
+                  {character.xp.toLocaleString('es-ES')}
+                </span>
+              )
+            }
+          />
+          {xpToNextLevel !== null && !isEditing && (
+            <span className={styles.quickStatSub}>faltan {xpToNextLevel.toLocaleString('es-ES')}</span>
+          )}
         </div>
       </div>
 
       {/* ── Tabs ── */}
-      <div className={`${styles.tabs} ${styles.mainTabs}`}>
-        {tabs.map(({ id: tabId, label, icon: Icon }) => (
-          <button
-            key={tabId}
-            className={`${styles.tab} ${styles.mainTab} ${activeTab === tabId ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab(tabId)}
-          >
-            <Icon size={15} />
-            {label}
-          </button>
-        ))}
-      </div>
+      <Tabs value={activeTab} onChange={(v) => setActiveTab(v as Tab)} className={styles.mainTabsWrap}>
+        <TabList aria-label="Secciones del personaje">
+          {tabs.map(({ id: tabId, label, icon: Icon }) => (
+            <Tab key={tabId} value={tabId} icon={Icon}>{label}</Tab>
+          ))}
+        </TabList>
+      </Tabs>
 
       {/* ── Level Up Modal ── */}
       {showLevelUp && (
@@ -644,27 +637,17 @@ export function CharacterView() {
                   const value = abilities[attr]
                   const mod = calculateModifier(value)
                   return (
-                    <div key={attr} className={styles.abilityBlock}>
-                      <span className={styles.abilityAbbr}>{ABILITY_ABBR[attr]}</span>
-                      {isEditing ? (
-                        <input
-                          className={styles.abilityEditInput}
-                          type="number"
-                          min={1}
-                          max={30}
-                          defaultValue={value}
-                          onBlur={(e) => {
-                            const v = Math.max(1, Math.min(30, parseInt(e.target.value) || 1))
-                            updateCharacter(character.id, { abilities: { ...character.abilities, [attr]: v } })
-                          }}
-                        />
-                      ) : (
-                        <span className={styles.abilityScore}>{value}</span>
-                      )}
-                      <span className={`${styles.abilityMod} ${mod >= 0 ? styles.positive : styles.negative}`}>
-                        {getModifierString(value)}
-                      </span>
-                    </div>
+                    <AbilityScoreCard
+                      key={attr}
+                      label={ABILITY_ABBR[attr]}
+                      score={value}
+                      modifier={mod}
+                      editable={isEditing}
+                      onScoreChange={(v) => {
+                        const clamped = Math.max(1, Math.min(30, v || 1))
+                        updateCharacter(character.id, { abilities: { ...character.abilities, [attr]: clamped } })
+                      }}
+                    />
                   )
                 })}
               </div>
@@ -693,8 +676,8 @@ export function CharacterView() {
             </Card>
 
             {/* Saves */}
-            <Card padding="md">
-              <h3 className={styles.sectionTitle}>Tiros de Salvación</h3>
+            <Card padding="md" variant="ornate">
+              <h3 className={styles.sectionTitleCentered}>Tiros de Salvación</h3>
               <div className={styles.savesGrid}>
                 {[
                   { label: 'Fort', full: 'Fortaleza', val: fortitude, abbr: 'CON' },
@@ -835,21 +818,19 @@ export function CharacterView() {
                     </div>
                   ) : (
                     character.classes.length > 1 && (
-                      <div className={styles.tabs}>
-                        {character.classes.map((cc) => {
-                          const cd = getClassById(cc.id)
-                          return (
-                            <button
-                              key={cc.id}
-                              className={`${styles.tab} ${progressionTab === cc.id ? styles.activeTab : ''}`}
-                              onClick={() => setProgressionTab(cc.id)}
-                            >
-                              {cd?.name ?? cc.id}
-                              <span style={{ opacity: 0.6, fontSize: '0.85em' }}> Nv {cc.level}</span>
-                            </button>
-                          )
-                        })}
-                      </div>
+                      <Tabs value={progressionTab} onChange={setProgressionTab} variant="underline" size="sm">
+                        <TabList aria-label="Progresión por clase">
+                          {character.classes.map((cc) => {
+                            const cd = getClassById(cc.id)
+                            return (
+                              <Tab key={cc.id} value={cc.id}>
+                                {cd?.name ?? cc.id}
+                                <span style={{ opacity: 0.6, fontSize: '0.85em' }}> Nv {cc.level}</span>
+                              </Tab>
+                            )
+                          })}
+                        </TabList>
+                      </Tabs>
                     )
                   )}
                   {!isEditing && activeClassData && (

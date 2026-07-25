@@ -1,11 +1,10 @@
 import { Wand2 } from 'lucide-react'
-import styles from './HomebrewBadge.module.css'
+import { Badge } from './Badge'
 
 export function HomebrewBadge({ className }: { className?: string }) {
   return (
-    <span className={`${styles.badge} ${className || ''}`} title="Contenido homebrew">
-      <Wand2 size={11} />
+    <Badge variant="secondary" size="sm" icon={Wand2} className={className} title="Contenido homebrew">
       Homebrew
-    </span>
+    </Badge>
   )
 }

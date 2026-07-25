@@ -428,7 +428,8 @@
 .summaryAvatar {
   width: 56px;
   height: 56px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
+  border: var(--portrait-border);
   background: var(--color-surface-container-high);
   color: var(--color-primary);
   display: flex;
@@ -493,36 +494,6 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: var(--space-2);
-}
-
-.summaryAbility {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: var(--space-2);
-  background: var(--color-surface-container-lowest);
-  border-radius: var(--radius-sm);
-}
-
-.summaryAbilityAbbr {
-  font-size: var(--text-label-sm);
-  color: var(--color-on-surface-variant);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 700;
-}
-
-.summaryAbilityVal {
-  font-family: var(--font-display);
-  font-size: var(--text-title-sm);
-  font-weight: 700;
-  color: var(--color-on-surface);
-}
-
-.summaryAbilityMod {
-  font-size: var(--text-body-md);
-  font-weight: 700;
 }
 
 .errorText {

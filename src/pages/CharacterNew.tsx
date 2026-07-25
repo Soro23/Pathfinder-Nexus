@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, ChevronRight, ChevronDown, Check, Lightbulb, Dice6 } from 'lucide-react'
-import { Button, Card, HomebrewBadge } from '../components/ui'
+import { Button, Card, HomebrewBadge, AbilityScoreCard } from '../components/ui'
 import { useCharacterStore, generateId, calculateModifier } from '../store'
 import type { XpProgressionSpeed } from '../store'
 import { getClassById, hasFloatingAbilityBonus } from '../data'
@@ -805,15 +805,7 @@ export function CharacterNew() {
                     const [, abbr] = ABILITY_LABELS[attr]
                     const val = form[attr]
                     const mod = calculateModifier(val)
-                    return (
-                      <div key={attr} className={styles.summaryAbility}>
-                        <span className={styles.summaryAbilityAbbr}>{abbr}</span>
-                        <span className={styles.summaryAbilityVal}>{val}</span>
-                        <span className={`${styles.summaryAbilityMod} ${mod >= 0 ? styles.modPos : styles.modNeg}`}>
-                          {mod >= 0 ? '+' : ''}{mod}
-                        </span>
-                      </div>
-                    )
+                    return <AbilityScoreCard key={attr} label={abbr} score={val} modifier={mod} />
                   })}
                 </div>
               </div>
