@@ -388,7 +388,7 @@ export function Spellbook({
                       {translateSchool(spell.school)} {spell.descriptor && `(${translateDescriptor(spell.descriptor)})`}
                     </span>
                   </div>
-                  {spell.type === 'both' && (
+                  {!compact && spell.type === 'both' && (
                     <span className={styles.bothBadge} title="Arcano y Divino">A+D</span>
                   )}
                   <span className={styles.spellLevel}>
