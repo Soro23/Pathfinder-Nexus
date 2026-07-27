@@ -64,24 +64,6 @@
   }
 }
 
-.headerTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.backLink {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  color: var(--color-text-secondary);
-  font-size: 0.8rem;
-}
-
-.backLink:hover {
-  color: var(--color-accent-gold);
-}
-
 .statusBtn {
   position: relative;
   display: inline-flex;
@@ -213,6 +195,13 @@
   min-width: 0;
 }
 
+.identityNameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
 .identityText h1 {
   font-size: 1.3rem;
   color: var(--color-accent-gold);
@@ -220,6 +209,24 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
+}
+
+.settingsLink {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.settingsLink:hover {
+  color: var(--color-accent-gold);
+  background: var(--color-bg-secondary);
 }
 
 .identitySubtitle {

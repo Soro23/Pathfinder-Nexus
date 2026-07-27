@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
-  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair
+  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair, Settings
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { JournalEntry } from '../store'
@@ -607,13 +607,6 @@ export function PlayMode() {
       {/* ── Header ── */}
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <div className={styles.headerTop}>
-            <Link to={`/characters/${id}`} className={styles.backLink}>
-              <ArrowLeft size={16} />
-              Volver
-            </Link>
-          </div>
-
           {/* Banda de identidad: retrato + nombre + raza/clase/nivel + Efectos + recuadro de PV */}
           <div className={styles.identityBand}>
             <div className={styles.identityMain}>
@@ -625,7 +618,12 @@ export function PlayMode() {
                 )}
               </div>
               <div className={styles.identityText}>
-                <h1>{character.name}</h1>
+                <div className={styles.identityNameRow}>
+                  <h1>{character.name}</h1>
+                  <Link to={`/characters/${id}`} className={styles.settingsLink} title="Salir de Modo Juego a la ficha">
+                    <Settings size={16} />
+                  </Link>
+                </div>
                 <p className={styles.identitySubtitle}>{raceLabel} · {classSummary}</p>
               </div>
             </div>
