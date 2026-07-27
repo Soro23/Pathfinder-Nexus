@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
-  Swords, X, Zap, BookOpen, Activity
+  Swords, X, Zap, BookOpen, Activity, Menu
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString } from '../store'
 import { getClassById, getRaceById, useSRDStore, calculateSpellDC } from '../data'
@@ -100,6 +100,7 @@ export function PlayMode() {
   const [statExplain, setStatExplain] = useState<StatExplain | null>(null)
   const [rolling, setRolling] = useState(false)
   const [dicePanelOpen, setDicePanelOpen] = useState(false)
+  const [tabMenuOpen, setTabMenuOpen] = useState(false)
   const [showStatusEffects, setShowStatusEffects] = useState(false)
   const [hpDrawerOpen, setHpDrawerOpen] = useState(false)
 
@@ -1581,17 +1582,43 @@ export function PlayMode() {
           </div>
         )}
 
-        {/* ── Control fijo inferior-derecha: acceso a Efectos con el pulgar ── */}
+        {/* ── Menú flotante de secciones (Combate/Habilidades/Conjuros/Dados/Encuentro) ── */}
+        {tabMenuOpen && (
+          <div className={styles.tabMenuFloating}>
+            <div className={styles.dicePanelHeader}>
+              <span className={styles.dicePanelTitle}><Menu size={16} /> Secciones</span>
+              <button className={styles.dicePanelClose} onClick={() => setTabMenuOpen(false)}>
+                <X size={16} />
+              </button>
+            </div>
+            <div className={styles.tabMenuGrid}>
+              {([
+                { id: 'combat' as TabId, icon: Swords, label: 'COMBATE' },
+                { id: 'skills' as TabId, icon: Brain, label: 'HABILIDADES' },
+                { id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' },
+                { id: 'dice' as TabId, icon: Dices, label: 'DADOS' },
+                { id: 'encounter' as TabId, icon: Swords, label: 'ENCUENTRO' },
+              ]).map(({ id, icon: Icon, label }) => (
+                <button
+                  key={id}
+                  className={`${styles.tabMenuItem} ${activeTab === id ? styles.tabMenuItemActive : ''}`}
+                  onClick={() => { setActiveTab(id); setTabMenuOpen(false) }}
+                >
+                  <Icon size={16} /> {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Control fijo inferior-derecha: acceso al menú de secciones con el pulgar ── */}
         <div className={styles.fabCluster}>
           <button
-            className={`${styles.fabBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.fabBtnActive : ''}`}
-            onClick={() => setShowStatusEffects(true)}
-            title="Efectos y Condiciones"
+            className={`${styles.fabBtn} ${tabMenuOpen ? styles.fabBtnActive : ''}`}
+            onClick={() => setTabMenuOpen(!tabMenuOpen)}
+            title="Secciones"
           >
-            <Activity size={18} />
-            {(statusEffects.length + activeConditionsCount) > 0 && (
-              <span className={styles.fabBadge}>{statusEffects.length + activeConditionsCount}</span>
-            )}
+            <Menu size={18} />
           </button>
         </div>
 
