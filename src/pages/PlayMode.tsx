@@ -16,7 +16,7 @@ import { buildArchetypesByClassId } from '../data/resolveArchetype'
 import { RAGE_EFFECT_ID, RAGE_EFFECT_MODIFIERS, MUTAGEN_EFFECT_ID, buildMutagenModifiers, MUTAGEN_ABILITY_LABELS } from '../data/classFeatureEffects'
 import type { PhysicalAbility } from '../data/classFeatureEffects'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
-import { translateCastingTime, translateRange, translateDuration, translateSavingThrow, translateSpellResistance, translateUnits } from '../lib/spellTermsEs'
+import { translateCastingTime, translateRange, translateDuration, translateSavingThrow, translateSpellResistance, translateSchool, translateUnits } from '../lib/spellTermsEs'
 import { Button, Card, Drawer } from '../components/ui'
 import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager, CombatActionsPanel, Spellbook } from '../components/character'
 import type { DieRoll } from '../components/character/Dice3D'
@@ -755,7 +755,15 @@ export function PlayMode() {
               </div>
               <div className={styles.identityText}>
                 <h1>{character.name}</h1>
-                <p className={styles.identitySubtitle}>{raceLabel} · {classSummary}</p>
+                <p className={styles.identitySubtitle}>{raceLabel} · Nivel {character.level}</p>
+                <div className={styles.identityClasses}>
+                  {character.classes.map((cc) => (
+                    <p key={cc.id} className={styles.identityClassLine}>
+                      {getClassById(cc.id)?.name ?? cc.id}
+                      <span className={styles.identityClassLevel}>{cc.level}</span>
+                    </p>
+                  ))}
+                </div>
               </div>
             </Link>
             <div className={styles.identityActions}>
@@ -1629,7 +1637,7 @@ export function PlayMode() {
                                     <span className={styles.spellCellMeta}>
                                       {spell.savingThrow ? `CD ${calculateSpellDC(spell.level, casterAbilityMod)}` : '—'}
                                     </span>
-                                    <span className={styles.spellCellMeta}>{spell.effect ? translateUnits(spell.effect) : spell.school}</span>
+                                    <span className={styles.spellCellMeta}>{spell.effect ? translateUnits(spell.effect) : translateSchool(spell.school)}</span>
                                   </button>
                                   {isExpanded && (
                                     <div className={styles.spellRowDetail}>

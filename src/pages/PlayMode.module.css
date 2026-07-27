@@ -232,6 +232,28 @@
   white-space: nowrap;
 }
 
+.identityClasses {
+  display: flex;
+  flex-direction: column;
+}
+
+.identityClassLine {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identityClassLevel {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--color-accent-gold);
+}
+
 /* ── Grupo de cabecera (Defensa + Salvaciones + CMB/CMD) ── */
 .headerGroup {
   display: flex;
@@ -756,14 +778,14 @@
 
 .slotPips {
   display: flex;
-  gap: 3px;
+  gap: 7px;
   flex-wrap: wrap;
   flex: 1;
 }
 
 .slotPip {
-  width: 13px;
-  height: 13px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   border: 1px solid var(--color-border);
   cursor: pointer;
