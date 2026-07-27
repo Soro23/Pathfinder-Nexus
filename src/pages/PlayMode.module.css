@@ -791,8 +791,8 @@
 }
 
 .slotPip {
-  width: 7px;
-  height: 7px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   border: 1px solid var(--color-border);
   cursor: pointer;
@@ -1087,15 +1087,23 @@
   }
 }
 
-/* ── Mobile: mínimo táctil 44×44 px (G-06), mismo breakpoint que Button.module.css ── */
+/* ── Mobile: mínimo táctil 44×44 px (G-06), mismo breakpoint que Button.module.css ──
+   slotPip es la excepción: al ser el propio punto visual (no un botón con padding),
+   crecer a 44px reales se veía desproporcionado; en su lugar se mantiene el tamaño
+   visual y se amplía el área de toque con un ::after invisible más grande. */
 @media (max-width: 640px) {
   .skillBtn {
     min-height: 44px;
   }
 
   .slotPip {
-    width: 44px;
-    height: 44px;
+    position: relative;
+  }
+
+  .slotPip::after {
+    content: '';
+    position: absolute;
+    inset: -15px;
   }
 
   .presetBtn {
