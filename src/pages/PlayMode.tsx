@@ -16,6 +16,7 @@ import { buildArchetypesByClassId } from '../data/resolveArchetype'
 import { RAGE_EFFECT_ID, RAGE_EFFECT_MODIFIERS, MUTAGEN_EFFECT_ID, buildMutagenModifiers, MUTAGEN_ABILITY_LABELS } from '../data/classFeatureEffects'
 import type { PhysicalAbility } from '../data/classFeatureEffects'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
+import { translateCastingTime, translateRange, translateDuration, translateSavingThrow, translateSpellResistance, translateUnits } from '../lib/spellTermsEs'
 import { Button, Card, Drawer } from '../components/ui'
 import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager, CombatActionsPanel, Spellbook } from '../components/character'
 import type { DieRoll } from '../components/character/Dice3D'
@@ -1543,8 +1544,8 @@ export function PlayMode() {
 
                   {/* Spell Slots */}
                   {Object.keys(character.spellSlots ?? {}).length > 0 && (
-                    <Card padding="md">
-                      <h3 className={styles.sectionTitle}><Zap size={18} />Espacios de Conjuro</h3>
+                    <Card padding="sm">
+                      <h3 className={styles.sectionTitle}><Zap size={16} />Espacios de Conjuro</h3>
                       <div className={styles.slotContainer}>
                         {Object.entries(character.spellSlots ?? {})
                           .sort(([a], [b]) => Number(a) - Number(b))
@@ -1624,22 +1625,22 @@ export function PlayMode() {
                                     onClick={() => setExpandedSpellRow(isExpanded ? null : key)}
                                   >
                                     <span className={styles.spellCellName}>{spell.name}</span>
-                                    <span className={styles.spellCellMeta}>{spell.castingTime} · {spell.range}</span>
+                                    <span className={styles.spellCellMeta}>{translateCastingTime(spell.castingTime)} · {translateRange(spell.range)}</span>
                                     <span className={styles.spellCellMeta}>
                                       {spell.savingThrow ? `CD ${calculateSpellDC(spell.level, casterAbilityMod)}` : '—'}
                                     </span>
-                                    <span className={styles.spellCellMeta}>{spell.effect ?? spell.school}</span>
+                                    <span className={styles.spellCellMeta}>{spell.effect ? translateUnits(spell.effect) : spell.school}</span>
                                   </button>
                                   {isExpanded && (
                                     <div className={styles.spellRowDetail}>
                                       <div className={styles.spellStats}>
-                                        <div><strong>Tiempo:</strong> {spell.castingTime}</div>
-                                        <div><strong>Alcance:</strong> {spell.range}</div>
-                                        <div><strong>Duración:</strong> {spell.duration}</div>
-                                        {spell.target && <div><strong>Objetivo:</strong> {spell.target}</div>}
-                                        {spell.area && <div><strong>Área:</strong> {spell.area}</div>}
-                                        {spell.savingThrow && <div><strong>TS:</strong> {spell.savingThrow}</div>}
-                                        {spell.spellResistance && <div><strong>RC:</strong> {spell.spellResistance}</div>}
+                                        <div><strong>Tiempo:</strong> {translateCastingTime(spell.castingTime)}</div>
+                                        <div><strong>Alcance:</strong> {translateRange(spell.range)}</div>
+                                        <div><strong>Duración:</strong> {translateDuration(spell.duration)}</div>
+                                        {spell.target && <div><strong>Objetivo:</strong> {translateUnits(spell.target)}</div>}
+                                        {spell.area && <div><strong>Área:</strong> {translateUnits(spell.area)}</div>}
+                                        {spell.savingThrow && <div><strong>TS:</strong> {translateSavingThrow(spell.savingThrow)}</div>}
+                                        {spell.spellResistance && <div><strong>RC:</strong> {translateSpellResistance(spell.spellResistance)}</div>}
                                       </div>
                                       <p className={styles.spellDesc}>{spell.description}</p>
                                       <Button

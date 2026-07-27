@@ -4,6 +4,7 @@ import { Card, Select, HomebrewBadge } from '../ui'
 import { SPELL_SCHOOLS, SPELL_TYPES, SpellLevel, calculateSpellDC, getClassById } from '../../data'
 import { useSpells } from '../../hooks/useSpells'
 import { useSpellsByIds } from '../../hooks/useSpellsByIds'
+import { translateCastingTime, translateRange, translateDuration, translateSavingThrow, translateSpellResistance, translateUnits } from '../../lib/spellTermsEs'
 import styles from './Spellbook.module.css'
 
 // Tope de conjuros conocidos por nivel de conjuro, sumando la tabla `spellsKnown` de cada
@@ -404,16 +405,16 @@ export function Spellbook({
                 {isExpanded && (
                   <div className={styles.spellDetails}>
                     <div className={styles.spellStats}>
-                      <div><strong>Tiempo:</strong> {spell.castingTime}</div>
-                      <div><strong>Alcance:</strong> {spell.range}</div>
-                      <div><strong>Duración:</strong> {spell.duration}</div>
-                      {spell.target && <div><strong>Objetivo:</strong> {spell.target}</div>}
-                      {spell.area && <div><strong>Área:</strong> {spell.area}</div>}
+                      <div><strong>Tiempo:</strong> {translateCastingTime(spell.castingTime)}</div>
+                      <div><strong>Alcance:</strong> {translateRange(spell.range)}</div>
+                      <div><strong>Duración:</strong> {translateDuration(spell.duration)}</div>
+                      {spell.target && <div><strong>Objetivo:</strong> {translateUnits(spell.target)}</div>}
+                      {spell.area && <div><strong>Área:</strong> {translateUnits(spell.area)}</div>}
                       {spell.savingThrow && (
-                        <div><strong>TS:</strong> {spell.savingThrow}</div>
+                        <div><strong>TS:</strong> {translateSavingThrow(spell.savingThrow)}</div>
                       )}
                       {spell.spellResistance && (
-                        <div><strong>SR:</strong> {spell.spellResistance}</div>
+                        <div><strong>RC:</strong> {translateSpellResistance(spell.spellResistance)}</div>
                       )}
                     </div>
                     <p className={styles.spellDesc}>{spell.description}</p>
