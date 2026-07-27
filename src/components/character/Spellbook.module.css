@@ -112,13 +112,13 @@
 
 .slotPips {
   display: flex;
-  gap: 9px;
+  gap: 4px;
   flex-wrap: wrap;
 }
 
 .slotPip {
-  width: 11px;
-  height: 11px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
