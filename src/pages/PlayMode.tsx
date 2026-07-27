@@ -9,14 +9,16 @@ import { mdiDiceD20, mdiDiceD12, mdiDiceD10, mdiDiceD8, mdiDiceD6, mdiDiceD4 } f
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { JournalEntry } from '../store'
 import { getClassById, getRaceById, useSRDStore, calculateSpellDC } from '../data'
-import { resolveModifiers, computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets, getEncumbranceLevel, getEncumbranceSkillPenalty, getCarryingCapacity, buildRollBreakdown, buildStatExplain, sumSessionModifiers } from '../engine'
+import type { SpellLevel, Spell } from '../data'
+import { resolveModifiers, computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets, getEncumbranceLevel, getEncumbranceSkillPenalty, getCarryingCapacity, buildRollBreakdown, buildStatExplain, sumSessionModifiers, computeSyncedSpellSlots } from '../engine'
 import type { ModifierTarget, RollBreakdown, StatExplain } from '../engine'
 import { buildArchetypesByClassId } from '../data/resolveArchetype'
 import { RAGE_EFFECT_ID, RAGE_EFFECT_MODIFIERS, MUTAGEN_EFFECT_ID, buildMutagenModifiers, MUTAGEN_ABILITY_LABELS } from '../data/classFeatureEffects'
 import type { PhysicalAbility } from '../data/classFeatureEffects'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card, Drawer } from '../components/ui'
-import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager, CombatActionsPanel } from '../components/character'
+import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager, CombatActionsPanel, Spellbook } from '../components/character'
+import type { DieRoll } from '../components/character/Dice3D'
 import styles from './PlayMode.module.css'
 
 // Carga perezosa: three.js + @react-three/fiber + @react-three/drei pesan ~1MB
@@ -69,6 +71,17 @@ interface RollBreakdownInput {
   targets: ModifierTarget[]
 }
 
+// Tirada ya resuelta pero aún no revelada: el resultado se calcula al
+// instante (para saber en qué cara debe asentarse el dado 3D), y solo se
+// vuelca a rollResult/history/drawer cuando la animación termina de rodar.
+interface PendingRoll {
+  name: string
+  isAttack: boolean
+  breakdownInput?: RollBreakdownInput
+  result: { total: number; rolls: number[] }
+  dice: DieRoll[]
+}
+
 interface Combatant {
   id: string
   name: string
@@ -112,12 +125,11 @@ export function PlayMode() {
   const [diceNotation, setDiceNotation] = useState('1d20')
   const [dicePool, setDicePool] = useState<Record<number, number>>({})
   const [rollResult, setRollResult] = useState<{ total: number; rolls: number[]; key: number } | null>(null)
-  const [rollingDice, setRollingDice] = useState<{ count: number; sides: number } | null>(null)
+  const [pendingRoll, setPendingRoll] = useState<PendingRoll | null>(null)
   const [lastRollType, setLastRollType] = useState('')
   const [history, setHistory] = useState<{ notation: string; result: number; isCrit?: boolean; isFumble?: boolean }[]>([])
   const [rollBreakdown, setRollBreakdown] = useState<RollBreakdown | null>(null)
   const [statExplain, setStatExplain] = useState<StatExplain | null>(null)
-  const [rolling, setRolling] = useState(false)
   const [dicePanelOpen, setDicePanelOpen] = useState(false)
   const [rollDrawerOpen, setRollDrawerOpen] = useState(false)
   const [tabMenuOpen, setTabMenuOpen] = useState(false)
@@ -126,6 +138,10 @@ export function PlayMode() {
   const [noteDraft, setNoteDraft] = useState('')
   const [showAllSkills, setShowAllSkills] = useState(false)
   const [weaponFilter, setWeaponFilter] = useState<'all' | 'melee' | 'ranged'>('all')
+  const [spellSearch, setSpellSearch] = useState('')
+  const [spellLevelFilter, setSpellLevelFilter] = useState<number | 'all'>('all')
+  const [manageSpellsOpen, setManageSpellsOpen] = useState(false)
+  const [expandedSpellRow, setExpandedSpellRow] = useState<string | null>(null)
 
   // ── Encounter tracker state ──
   const [combatants, setCombatants] = useState<Combatant[]>([])
@@ -253,26 +269,46 @@ export function PlayMode() {
     setNoteDraft('')
   }
 
-  function triggerRollAnimation(notation: string, cb: () => void) {
+  // El resultado se calcula al instante (para saber en qué cara se debe
+  // asentar cada dado 3D), pero no se vuelca a rollResult/history/drawer
+  // hasta que el dado termina de rodar — eso lo dispara commitPendingRoll,
+  // llamado por Dice3D cuando su animación de asentado acaba.
+  const startRoll = (notation: string, name: string, isAttack = false, breakdownInput?: RollBreakdownInput) => {
+    const result = rollDice(notation)
     const match = notation.match(/(\d+)d(\d+)/)
-    setRollingDice(match ? { count: parseInt(match[1], 10), sides: parseInt(match[2], 10) } : null)
-    setRolling(true)
+    const sides = match ? parseInt(match[2], 10) : 20
+    const dice: DieRoll[] = result.rolls.map((value) => ({ sides, value }))
+
+    setLastRollType(name)
+    setPendingRoll({ name, isAttack, breakdownInput, result, dice })
+  }
+
+  const commitPendingRoll = () => {
+    if (!pendingRoll) return
+    const { result, name, isAttack, breakdownInput } = pendingRoll
+    const d20 = result.rolls[0]
+    const isCrit = isAttack && d20 === 20
+    const isFumble = isAttack && d20 === 1
+
+    setRollResult({ ...result, key: Date.now() })
+    setHistory((prev) => [{ notation: name, result: result.total, isCrit, isFumble }, ...prev.slice(0, 19)])
+
+    if (breakdownInput) {
+      setRollBreakdown(buildRollBreakdown(
+        name, d20, result.rolls, result.total,
+        breakdownInput.baseComponents, resolvedStats.allModifiers, breakdownInput.targets,
+        { isCrit, isFumble },
+      ))
+    } else {
+      setRollBreakdown(null)
+    }
+
     setRollDrawerOpen(true)
-    setTimeout(() => {
-      cb()
-      setRolling(false)
-      setRollingDice(null)
-    }, 650)
+    setPendingRoll(null)
   }
 
   const handleRoll = () => {
-    setLastRollType(diceNotation)
-    setRollBreakdown(null)
-    triggerRollAnimation(diceNotation, () => {
-      const result = rollDice(diceNotation)
-      setRollResult({ ...result, key: Date.now() })
-      setHistory((prev) => [{ notation: diceNotation, result: result.total }, ...prev.slice(0, 19)])
-    })
+    startRoll(diceNotation, diceNotation)
     setDicePool({})
   }
 
@@ -295,25 +331,7 @@ export function PlayMode() {
   }
 
   const handleQuickRoll = (notation: string, name: string, isAttack = false, breakdownInput?: RollBreakdownInput) => {
-    setLastRollType(name)
-    if (!breakdownInput) setRollBreakdown(null)
-    triggerRollAnimation(notation, () => {
-      const result = rollDice(notation)
-      const d20 = result.rolls[0]
-      const isCrit = isAttack && d20 === 20
-      const isFumble = isAttack && d20 === 1
-
-      setRollResult({ ...result, key: Date.now() })
-      setHistory((prev) => [{ notation: name, result: result.total, isCrit, isFumble }, ...prev.slice(0, 19)])
-
-      if (breakdownInput) {
-        setRollBreakdown(buildRollBreakdown(
-          name, d20, result.rolls, result.total,
-          breakdownInput.baseComponents, resolvedStats.allModifiers, breakdownInput.targets,
-          { isCrit, isFumble },
-        ))
-      }
-    })
+    startRoll(notation, name, isAttack, breakdownInput)
   }
 
   const adjustHP = (amount: number) => {
@@ -550,6 +568,28 @@ export function PlayMode() {
   const activeSpellMap = isPreparedCaster ? preparedSpellMap : spellMap
   const activeSpellIds = isPreparedCaster ? (character.preparedSpells ?? []) : (character.spells ?? [])
 
+  const touchAttackBonus = bab + dexMod + combat.sizeMod
+  const casterLevel = character.classes[0]?.level ?? character.level
+
+  const spellEntries = activeSpellIds
+    .map((spellId, idx) => ({ key: `${spellId}-${idx}`, spellId, spell: activeSpellMap[spellId] }))
+    .filter((entry): entry is { key: string; spellId: string; spell: Spell } => !!entry.spell)
+
+  const availableSpellLevels = Array.from(new Set(spellEntries.map((e) => e.spell.level))).sort((a, b) => a - b)
+
+  const filteredSpellEntries = spellEntries.filter((e) =>
+    (spellLevelFilter === 'all' || e.spell.level === spellLevelFilter) &&
+    (spellSearch.trim() === '' || e.spell.name.toLowerCase().includes(spellSearch.trim().toLowerCase()))
+  )
+
+  const spellsByLevel = new Map<number, typeof filteredSpellEntries>()
+  filteredSpellEntries.forEach((e) => {
+    const arr = spellsByLevel.get(e.spell.level) ?? []
+    arr.push(e)
+    spellsByLevel.set(e.spell.level, arr)
+  })
+  const sortedSpellLevels = Array.from(spellsByLevel.keys()).sort((a, b) => a - b)
+
   return (
     <div className={styles.container}>
       {/* ── Drawer lateral de tiradas: se abre con cualquier tirada, con desglose si lo hay + historial ── */}
@@ -636,6 +676,51 @@ export function PlayMode() {
             onRemove={(id) => updateCharacter(character.id, { statusEffects: statusEffects.filter((e) => e.id !== id) })}
           />
         </div>
+      </Drawer>
+
+      {/* ── Gestionar Conjuros Drawer ── */}
+      <Drawer open={manageSpellsOpen} onClose={() => setManageSpellsOpen(false)} title="Gestionar Conjuros">
+        <Spellbook
+          knownSpells={character.spells}
+          preparedSpells={character.preparedSpells ?? []}
+          spellSlots={character.spellSlots || {}}
+          abilityModifier={casterAbilityMod}
+          classIds={character.classes.map((c) => c.id)}
+          classes={character.classes}
+          isEditing={false}
+          compact
+          onToggleKnown={(spellId) => {
+            const newSpells = character.spells.includes(spellId)
+              ? character.spells.filter((s) => s !== spellId)
+              : [...character.spells, spellId]
+            updateCharacter(character.id, { spells: newSpells })
+          }}
+          onTogglePrepared={(spellId) => {
+            const prepared = character.preparedSpells ?? []
+            const idx = prepared.indexOf(spellId)
+            const newPrepared = idx >= 0
+              ? [...prepared.slice(0, idx), ...prepared.slice(idx + 1)]
+              : [...prepared, spellId]
+            updateCharacter(character.id, { preparedSpells: newPrepared })
+          }}
+          onToggleSlotPip={(level: SpellLevel, pipIndex: number) => {
+            const slots = { ...(character.spellSlots ?? {}) }
+            const slot = slots[level] ?? { max: 0, used: 0 }
+            const newUsed = pipIndex < slot.used ? slot.used - 1 : Math.min(slot.used + 1, slot.max)
+            updateCharacter(character.id, { spellSlots: { ...slots, [level]: { ...slot, used: newUsed } } })
+          }}
+          onLongRest={() => {
+            const slots = { ...(character.spellSlots ?? {}) }
+            Object.keys(slots).forEach((k) => {
+              slots[Number(k)] = { ...slots[Number(k)], used: 0 }
+            })
+            updateCharacter(character.id, { spellSlots: slots, preparedSpells: [], classFeatureUses: {} })
+          }}
+          onSyncSlots={() => {
+            const syncedSlots = computeSyncedSpellSlots(character.classes, character.abilities, character.spellSlots ?? {})
+            if (syncedSlots) updateCharacter(character.id, { spellSlots: syncedSlots })
+          }}
+        />
       </Drawer>
 
       {/* ── Header ── */}
@@ -1429,6 +1514,28 @@ export function PlayMode() {
                 </Card>
               ) : (
                 <>
+                  {/* Spell Header: stats + manage button */}
+                  <Card padding="md">
+                    <h3 className={`${styles.sectionTitle} ${styles.sectionTitleCentered}`}><BookOpen size={18} />Conjuros</h3>
+                    <div className={styles.spellStatsRow}>
+                      <div className={styles.spellStatBlock}>
+                        <span className={styles.spellStatValue}>{casterAbilityMod >= 0 ? `+${casterAbilityMod}` : casterAbilityMod}</span>
+                        <span className={styles.spellStatLabel}>Modificador</span>
+                      </div>
+                      <div className={styles.spellStatBlock}>
+                        <span className={styles.spellStatValue}>{touchAttackBonus >= 0 ? `+${touchAttackBonus}` : touchAttackBonus}</span>
+                        <span className={styles.spellStatLabel}>Ataque de Toque</span>
+                      </div>
+                      <div className={styles.spellStatBlock}>
+                        <span className={styles.spellStatValue}>{casterLevel}</span>
+                        <span className={styles.spellStatLabel}>Nv. Lanzador</span>
+                      </div>
+                    </div>
+                    <Button variant="secondary" onClick={() => setManageSpellsOpen(true)} className={styles.manageSpellsBtn}>
+                      Gestionar Conjuros
+                    </Button>
+                  </Card>
+
                   {/* Spell Slots */}
                   {Object.keys(character.spellSlots ?? {}).length > 0 && (
                     <Card padding="md">
@@ -1461,34 +1568,90 @@ export function PlayMode() {
 
                   {/* Spell List */}
                   <Card padding="md">
-                    <h3 className={styles.sectionTitle}>
-                      <BookOpen size={18} />{isPreparedCaster ? 'Conjuros Preparados Hoy' : 'Conjuros Conocidos'}
-                    </h3>
-                    {activeSpellIds.length > 0 ? (
-                      <div className={styles.spellList}>
-                        {activeSpellIds.map((spellId, idx) => {
-                          const spell = activeSpellMap[spellId]
-                          if (!spell) return null
-                          return (
-                            <div key={`${spellId}-${idx}`} className={styles.spellRow}>
-                              <div className={styles.spellInfo}>
-                                <span className={styles.spellName}>{spell.name}</span>
-                                <span className={styles.spellMeta}>Nv {spell.level} · {spell.school}{spell.level > 0 ? ` · DC ${calculateSpellDC(spell.level, casterAbilityMod)}` : ''}</span>
-                              </div>
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => handleQuickRoll(
-                                  `1d20+${concentrationBonus}`,
-                                  `Concentración — ${spell.name}`
-                                )}
-                              >
-                                Conc. +{concentrationBonus}
-                              </Button>
-                            </div>
-                          )
-                        })}
+                    <div className={styles.sectionTitleRow}>
+                      <h3 className={styles.sectionTitle}>
+                        <BookOpen size={18} />{isPreparedCaster ? 'Conjuros Preparados Hoy' : 'Conjuros Conocidos'}
+                      </h3>
+                    </div>
+                    <input
+                      type="text"
+                      className={styles.spellSearchInput}
+                      placeholder="Buscar por nombre..."
+                      value={spellSearch}
+                      onChange={(e) => setSpellSearch(e.target.value)}
+                    />
+                    {availableSpellLevels.length > 1 && (
+                      <div className={styles.spellLevelFilterRow}>
+                        <button
+                          className={`${styles.spellLevelPill} ${spellLevelFilter === 'all' ? styles.spellLevelPillActive : ''}`}
+                          onClick={() => setSpellLevelFilter('all')}
+                        >
+                          Todos
+                        </button>
+                        {availableSpellLevels.map((level) => (
+                          <button
+                            key={level}
+                            className={`${styles.spellLevelPill} ${spellLevelFilter === level ? styles.spellLevelPillActive : ''}`}
+                            onClick={() => setSpellLevelFilter(level)}
+                          >
+                            {level === 0 ? 'Trucos' : `Nv ${level}`}
+                          </button>
+                        ))}
                       </div>
+                    )}
+                    {sortedSpellLevels.length > 0 ? (
+                      sortedSpellLevels.map((level) => (
+                        <div key={level} className={styles.spellLevelGroup}>
+                          <h4 className={styles.spellLevelHeading}>{level === 0 ? 'Trucos' : `Nivel ${level}`}</h4>
+                          <div className={styles.spellsTable}>
+                            <div className={styles.spellsTableHeader}>
+                              <span>Nombre</span>
+                              <span>Tiempo / Alcance</span>
+                              <span>TS/CD</span>
+                              <span>Efecto</span>
+                            </div>
+                            {spellsByLevel.get(level)!.map(({ key, spell }) => {
+                              const isExpanded = expandedSpellRow === key
+                              return (
+                                <div key={key} className={styles.spellsTableRow}>
+                                  <button
+                                    className={styles.spellRowMain}
+                                    onClick={() => setExpandedSpellRow(isExpanded ? null : key)}
+                                  >
+                                    <span className={styles.spellCellName}>{spell.name}</span>
+                                    <span className={styles.spellCellMeta}>{spell.castingTime} · {spell.range}</span>
+                                    <span className={styles.spellCellMeta}>
+                                      {spell.savingThrow ? `CD ${calculateSpellDC(spell.level, casterAbilityMod)}` : '—'}
+                                    </span>
+                                    <span className={styles.spellCellMeta}>{spell.effect ?? spell.school}</span>
+                                  </button>
+                                  {isExpanded && (
+                                    <div className={styles.spellRowDetail}>
+                                      <div className={styles.spellStats}>
+                                        <div><strong>Tiempo:</strong> {spell.castingTime}</div>
+                                        <div><strong>Alcance:</strong> {spell.range}</div>
+                                        <div><strong>Duración:</strong> {spell.duration}</div>
+                                        {spell.target && <div><strong>Objetivo:</strong> {spell.target}</div>}
+                                        {spell.area && <div><strong>Área:</strong> {spell.area}</div>}
+                                        {spell.savingThrow && <div><strong>TS:</strong> {spell.savingThrow}</div>}
+                                        {spell.spellResistance && <div><strong>RC:</strong> {spell.spellResistance}</div>}
+                                      </div>
+                                      <p className={styles.spellDesc}>{spell.description}</p>
+                                      <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => handleQuickRoll(`1d20+${concentrationBonus}`, `Concentración — ${spell.name}`)}
+                                      >
+                                        Conc. +{concentrationBonus}
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      ))
                     ) : (
                       <p className={styles.emptyHistory}>{isPreparedCaster ? 'Sin conjuros preparados hoy. Prepáralos en la ficha de personaje.' : 'Sin conjuros asignados'}</p>
                     )}

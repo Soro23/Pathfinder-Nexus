@@ -4,6 +4,19 @@
   gap: var(--space-4);
 }
 
+.containerCompact {
+  grid-template-columns: 1fr;
+}
+
+.containerCompact .slotsPanel {
+  order: 2;
+}
+
+.containerCompact .slotsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
 .slotsPanel {
   padding: var(--space-3);
   background: var(--color-bg-secondary);

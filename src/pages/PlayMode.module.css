@@ -748,40 +748,193 @@
   text-align: right;
 }
 
-/* ── Spell List ── */
-.spellList {
+/* ── Conjuros: cabecera con estadisticas + boton Gestionar ── */
+.sectionTitleCentered {
+  justify-content: center;
+}
+
+.spellStatsRow {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-3) 0;
+}
+
+.spellStatBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.spellStatValue {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+}
+
+.spellStatLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+.manageSpellsBtn {
+  width: 100%;
+}
+
+/* ── Conjuros: buscador y filtro de nivel ── */
+.spellSearchInput {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  margin-bottom: var(--space-2);
+}
+
+.spellSearchInput:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+.spellLevelFilterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+
+.spellLevelPill {
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.spellLevelPillActive {
+  background: var(--color-accent-gold);
+  border-color: var(--color-accent-gold);
+  color: var(--color-bg-primary);
+}
+
+/* ── Conjuros: tabla por nivel ── */
+.spellLevelGroup {
+  margin-bottom: var(--space-3);
+}
+
+.spellLevelHeading {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent-gold);
+  margin: 0 0 var(--space-1);
+}
+
+.spellsTable {
+  display: flex;
+  flex-direction: column;
+}
+
+.spellsTableHeader {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.5fr) 90px 60px minmax(80px, 1.2fr);
+  gap: var(--space-2);
+  padding: 0 var(--space-2) var(--space-1);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.spellsTableRow {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.spellsTableRow:last-child {
+  border-bottom: none;
+}
+
+.spellRowMain {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.5fr) 90px 60px minmax(80px, 1.2fr);
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.spellCellName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-style: italic;
+}
+
+.spellCellMeta {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.spellRowDetail {
+  padding: 0 var(--space-2) var(--space-3);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
-.spellRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  flex-wrap: wrap;
+.spellStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-1) var(--space-3);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
 }
 
-.spellInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.spellName {
-  font-size: 0.9rem;
-  font-weight: 600;
+.spellStats strong {
   color: var(--color-text-primary);
 }
 
-.spellMeta {
-  font-size: 0.75rem;
+.spellDesc {
+  font-size: 0.85rem;
   color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .spellsTableHeader {
+    grid-template-columns: 1fr 60px;
+  }
+
+  .spellsTableHeader span:nth-child(2),
+  .spellsTableHeader span:nth-child(4) {
+    display: none;
+  }
+
+  .spellRowMain {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 'name ts';
+  }
+
+  .spellCellName { grid-area: name; }
+  .spellCellMeta:nth-of-type(3) { grid-area: ts; }
+  .spellCellMeta:nth-of-type(2),
+  .spellCellMeta:nth-of-type(4) { display: none; }
 }
 
 .emptyHistory {

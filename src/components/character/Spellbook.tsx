@@ -60,6 +60,8 @@ interface SpellbookProps {
   classIds: string[]
   classes?: { id: string; level: number }[]
   isEditing?: boolean
+  /** Fuerza el panel de slots a apilarse en una sola columna, para contenedores estrechos (p.ej. un Drawer lateral). */
+  compact?: boolean
   onToggleKnown: (spellId: string) => void
   onTogglePrepared?: (spellId: string) => void
   onToggleSlotPip: (level: SpellLevel, pipIndex: number) => void
@@ -76,6 +78,7 @@ export function Spellbook({
   classIds,
   classes = [],
   isEditing,
+  compact = false,
   onToggleKnown,
   onTogglePrepared,
   onToggleSlotPip,
@@ -123,7 +126,7 @@ export function Spellbook({
   )]
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${compact ? styles.containerCompact : ''}`}>
       <div className={styles.slotsPanel}>
         <div className={styles.slotsPanelHeader}>
           <h3 className={styles.sectionTitle}>Slots</h3>
