@@ -165,7 +165,21 @@ export function InventoryManager({
   return (
     <div className={styles.container}>
       {/* ── Monedas ── */}
-      <Card padding="md" className={styles.coinsCard}>
+      <Card
+        padding="md"
+        className={styles.coinsCard}
+        hoverable
+        role="button"
+        tabIndex={0}
+        onClick={() => setCoinPanelOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setCoinPanelOpen(true)
+          }
+        }}
+        title="Gestionar monedas"
+      >
         <div className={styles.coinsHeader}>
           <Coins size={18} className={styles.coinsIcon} />
           <h4>Monedas</h4>
@@ -175,16 +189,10 @@ export function InventoryManager({
             const meta = COIN_META[type]
             const Icon = meta.icon
             return (
-              <button
-                key={type}
-                type="button"
-                className={styles.coinChip}
-                onClick={() => setCoinPanelOpen(true)}
-                title={meta.name}
-              >
+              <span key={type} className={styles.coinChip} title={meta.name}>
                 <Icon size={14} color={meta.color} fill={meta.color} />
                 <span className={styles.coinChipValue}>{coinValue(type)}</span>
-              </button>
+              </span>
             )
           })}
         </div>
