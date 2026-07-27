@@ -437,6 +437,105 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* ── Menú flotante de secciones (mismo patrón que Modo Juego) ── */
+.fabCluster {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  display: flex;
+  gap: var(--space-2);
+  z-index: 101;
+}
+
+.fabBtn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--color-surface-container) 80%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  box-shadow: var(--shadow-float);
+  transition: all var(--transition-fast);
+}
+
+.fabBtn:hover,
+.fabBtnActive {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+  background: color-mix(in srgb, var(--color-surface-container) 92%, transparent);
+}
+
+.tabMenuOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 99;
+}
+
+.tabMenuFloating {
+  position: fixed;
+  bottom: calc(var(--space-4) + 64px);
+  left: 0;
+  right: 0;
+  background: var(--color-surface-container);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+  z-index: 100;
+  animation: tabMenuSlideInUp 0.2s ease-out;
+}
+
+@keyframes tabMenuSlideInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.tabMenuGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-3);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.tabMenuItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 64px;
+  padding: var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tabMenuItem:hover {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+}
+
+.tabMenuItemActive {
+  background: var(--color-accent-gold);
+  color: var(--color-bg-primary);
+  border-color: var(--color-accent-gold);
+}
+
 .tabContent {
   animation: fadeIn var(--transition-normal);
 }
@@ -1736,27 +1835,11 @@
     overflow-y: auto;
   }
 
-  /* ── Fila 2 (navegación Personaje/Hechizos/Inventario/…): fija bajo la fila 1,
-     como grid de 4 columnas en vez de una fila con scroll horizontal ── */
-  .mainTabs {
-    position: sticky;
-    top: var(--mobile-sticky-header-h);
-    z-index: 29;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
-    overflow-x: visible;
-    padding: var(--space-2);
+  .fabCluster {
+    bottom: calc(64px + var(--space-4));
   }
 
-  .mainTab {
-    flex-direction: column;
-    justify-content: center;
-    gap: 2px;
-    padding: var(--space-2) var(--space-1);
-    font-size: var(--text-label-sm);
-    text-align: center;
-    white-space: normal;
-    line-height: 1.15;
+  .tabMenuFloating {
+    bottom: calc(64px + var(--space-4) + 64px);
   }
 }

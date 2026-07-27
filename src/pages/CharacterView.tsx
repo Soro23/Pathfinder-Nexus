@@ -4,7 +4,7 @@ import {
   ArrowLeft, Play, Edit2, Trash2,
   Sword, Shield, Scroll, Package, Star,
   Heart, Eye, PlusCircle, X, PawPrint, BookOpen, Download,
-  Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle, Menu, Layers
+  Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle, Menu, Layers, LayoutGrid
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
@@ -41,6 +41,7 @@ export function CharacterView() {
   const deleteCharacter = useCharacterStore((state) => state.deleteCharacter)
 
   const [activeTab, setActiveTab] = useState<Tab>('combat')
+  const [tabMenuOpen, setTabMenuOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [showLevelUp, setShowLevelUp] = useState(false)
   // En móvil, Modo Juego/Subir de nivel/Editar/Eliminar y el panel de notificaciones
@@ -586,18 +587,36 @@ export function CharacterView() {
         </div>
       </div>
 
-      {/* ── Tabs ── */}
-      <div className={`${styles.tabs} ${styles.mainTabs}`}>
-        {tabs.map(({ id: tabId, label, icon: Icon }) => (
-          <button
-            key={tabId}
-            className={`${styles.tab} ${styles.mainTab} ${activeTab === tabId ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab(tabId)}
-          >
-            <Icon size={15} />
-            {label}
-          </button>
-        ))}
+      {/* ── Menú flotante de secciones ── */}
+      {tabMenuOpen && (
+        <>
+          <div className={styles.tabMenuOverlay} onClick={() => setTabMenuOpen(false)} />
+          <div className={styles.tabMenuFloating}>
+            <div className={styles.tabMenuGrid}>
+              {tabs.map(({ id: tabId, label, icon: Icon }) => (
+                <button
+                  key={tabId}
+                  className={`${styles.tabMenuItem} ${activeTab === tabId ? styles.tabMenuItemActive : ''}`}
+                  onClick={() => { setActiveTab(tabId); setTabMenuOpen(false) }}
+                >
+                  <Icon size={20} />
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── Control fijo inferior-derecha: acceso al menú de secciones ── */}
+      <div className={styles.fabCluster}>
+        <button
+          className={`${styles.fabBtn} ${tabMenuOpen ? styles.fabBtnActive : ''}`}
+          onClick={() => setTabMenuOpen(!tabMenuOpen)}
+          title="Secciones"
+        >
+          <LayoutGrid size={18} />
+        </button>
       </div>
 
       {/* ── Level Up Modal ── */}
