@@ -254,8 +254,8 @@ export function Spellbook({
           </div>
         )}
 
-        {/* RF-P07: Magic type badge(s) */}
-        {(spellView === 'book' || !isPreparedCaster) && magicTypeBadges.length > 0 && (
+        {/* RF-P07: Magic type badge(s) — se omiten en el panel lateral (compact) de Modo Juego */}
+        {!compact && (spellView === 'book' || !isPreparedCaster) && magicTypeBadges.length > 0 && (
           <div className={styles.magicTypeBadges}>
             {magicTypeBadges.map((label) => (
               <span key={label} className={styles.magicTypeBadge}>{label}</span>
@@ -263,8 +263,8 @@ export function Spellbook({
           </div>
         )}
         <div className={styles.filters} style={isPreparedCaster && spellView === 'prepared' ? { display: 'none' } : {}}>
-          {/* Type chips — only if more than one type is available */}
-          {presentTypes.length > 1 && (
+          {/* Type chips — solo si hay más de un tipo disponible, y no en el panel lateral compact */}
+          {!compact && presentTypes.length > 1 && (
             <div className={styles.typeChips}>
               {SPELL_TYPES.filter((t) => t.value === 'all' || presentTypes.includes(t.value as 'arcane' | 'divine')).map((t) => (
                 <button

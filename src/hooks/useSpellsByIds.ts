@@ -4,8 +4,8 @@ import type { Spell } from '../data/spells'
 import { mapSpellRow } from './useSpells'
 
 const SPELL_COLUMNS =
-  'id,name,school,subschool,descriptor,level,type,casting_time,range,target,area,' +
-  'effect,duration,saving_throw,spell_resistance,description,material,arcane_focus,' +
+  'id,name,name_es,school,subschool,descriptor,level,type,casting_time,range,target,area,' +
+  'effect,duration,saving_throw,spell_resistance,description,description_es,material,arcane_focus,' +
   'divine_focus,costly_components'
 
 /** Fetches a set of spells by their IDs and returns them as a id→Spell map. */
