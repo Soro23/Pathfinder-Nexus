@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, Suspense, lazy } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
-  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair, Info, ListChecks, Layers, Palette
+  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair, Info, ListChecks, Layers, Palette, PawPrint
 } from 'lucide-react'
 import mdiReact from '@mdi/react'
 import { mdiDiceD20, mdiDiceD12, mdiDiceD10, mdiDiceD8, mdiDiceD6, mdiDiceD4 } from '@mdi/js'
@@ -19,7 +19,7 @@ import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { useDiceTemplate } from '../hooks/useDiceTemplate'
 import { translateCastingTime, translateRange, translateDuration, translateSavingThrow, translateSpellResistance, translateSchool, translateUnits } from '../lib/spellTermsEs'
 import { Button, Card, Drawer } from '../components/ui'
-import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager, CombatActionsPanel, Spellbook, FeaturesTraitsPanel } from '../components/character'
+import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager, CombatActionsPanel, Spellbook, FeaturesTraitsPanel, AnimalCompanion } from '../components/character'
 import type { DieRoll } from '../components/character/Dice3D'
 import styles from './PlayMode.module.css'
 
@@ -66,7 +66,7 @@ function rollDice(notation: string): { total: number; rolls: number[] } {
   return { total: subtotal + modifier, rolls }
 }
 
-type TabId = 'combat' | 'actions' | 'skills' | 'spells' | 'features' | 'encounter' | 'inventory' | 'background' | 'notes'
+type TabId = 'combat' | 'actions' | 'skills' | 'spells' | 'features' | 'companion' | 'encounter' | 'inventory' | 'background' | 'notes'
 
 interface RollBreakdownInput {
   baseComponents: { label: string; value: number }[]
@@ -1820,6 +1820,20 @@ export function PlayMode() {
             </div>
           )}
 
+          {/* ─── TAB: COMPAÑERO ANIMAL ─── */}
+          {activeTab === 'companion' && character.companion && (
+            <div className={styles.tabContent}>
+              <Card padding="md">
+                <h3 className={styles.sectionTitle}><PawPrint size={18} />Compañero Animal</h3>
+                <AnimalCompanion
+                  companion={character.companion}
+                  isEditing={false}
+                  onChange={(companion) => updateCharacter(character.id, { companion })}
+                />
+              </Card>
+            </div>
+          )}
+
           {/* ─── TAB: TRASFONDO ─── */}
           {activeTab === 'background' && (
             <div className={styles.tabContent}>
@@ -1972,8 +1986,9 @@ export function PlayMode() {
                     { id: 'combat' as TabId, icon: Swords, label: 'STATS' },
                     { id: 'actions' as TabId, icon: Crosshair, label: 'ACCIONES' },
                     { id: 'skills' as TabId, icon: Brain, label: 'HABILIDADES' },
-                    { id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' },
+                    ...(hasSpells ? [{ id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' }] : []),
                     { id: 'features' as TabId, icon: Layers, label: 'RASGOS' },
+                    ...(character.companion ? [{ id: 'companion' as TabId, icon: PawPrint, label: 'COMPAÑERO' }] : []),
                     { id: 'inventory' as TabId, icon: Backpack, label: 'INVENTARIO' },
                     { id: 'background' as TabId, icon: ScrollText, label: 'TRASFONDO' },
                     { id: 'notes' as TabId, icon: NotebookPen, label: 'NOTAS' },

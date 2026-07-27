@@ -91,7 +91,10 @@ export function Spellbook({
   const [filterType, setFilterType] = useState<string>('all')
   const [filterSchool, setFilterSchool] = useState<string>('all')
   const [filterLevel, setFilterLevel] = useState<string>('all')
-  const [showKnownOnly, setShowKnownOnly] = useState(false)
+  // En el panel lateral de Modo Juego (compact) se abre filtrado a "Solo conocidos"
+  // por defecto: es la vista que se usa en partida y evita cargar/renderizar todo el
+  // listado de conjuros de la clase en cada apertura del drawer.
+  const [showKnownOnly, setShowKnownOnly] = useState(compact)
   const [expandedSpell, setExpandedSpell] = useState<string | null>(null)
   const [spellView, setSpellView] = useState<'book' | 'prepared'>('book')
 
