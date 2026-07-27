@@ -521,6 +521,7 @@
   font-weight: 600;
   letter-spacing: 0.02em;
   text-align: center;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
@@ -534,6 +535,10 @@
   background: var(--color-accent-gold);
   color: var(--color-bg-primary);
   border-color: var(--color-accent-gold);
+}
+
+.tabMenuItemWide {
+  grid-column: 1 / -1;
 }
 
 .tabContent {

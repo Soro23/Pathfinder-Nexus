@@ -593,10 +593,10 @@ export function CharacterView() {
           <div className={styles.tabMenuOverlay} onClick={() => setTabMenuOpen(false)} />
           <div className={styles.tabMenuFloating}>
             <div className={styles.tabMenuGrid}>
-              {tabs.map(({ id: tabId, label, icon: Icon }) => (
+              {tabs.map(({ id: tabId, label, icon: Icon }, idx) => (
                 <button
                   key={tabId}
-                  className={`${styles.tabMenuItem} ${activeTab === tabId ? styles.tabMenuItemActive : ''}`}
+                  className={`${styles.tabMenuItem} ${activeTab === tabId ? styles.tabMenuItemActive : ''} ${idx === 0 && tabs.length % 2 !== 0 ? styles.tabMenuItemWide : ''}`}
                   onClick={() => { setActiveTab(tabId); setTabMenuOpen(false) }}
                 >
                   <Icon size={20} />
