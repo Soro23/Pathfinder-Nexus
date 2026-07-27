@@ -315,43 +315,6 @@
   50% { opacity: 0.5; }
 }
 
-/* ── Tab Nav ── */
-.tabNav {
-  display: flex;
-  gap: var(--space-1);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1);
-}
-
-.tabBtn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
-  background: none;
-  border: none;
-  border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.tabBtn:hover {
-  color: var(--color-text-primary);
-  background: var(--color-bg-primary);
-}
-
-.tabBtnActive {
-  background: var(--color-accent-gold) !important;
-  color: var(--color-bg-primary) !important;
-}
 
 /* ── Tab Content ── */
 .tabContent {
@@ -847,11 +810,6 @@
     grid-template-columns: 1fr;
   }
 
-  .tabBtn {
-    font-size: 0.65rem;
-    padding: var(--space-2);
-  }
-
   .combatStats {
     gap: var(--space-1);
   }
@@ -865,10 +823,6 @@
 
 /* ── Mobile: mínimo táctil 44×44 px (G-06), mismo breakpoint que Button.module.css ── */
 @media (max-width: 640px) {
-  .tabBtn {
-    min-height: 44px;
-  }
-
   .skillBtn {
     min-height: 44px;
   }
@@ -1190,21 +1144,26 @@
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-2);
   padding: var(--space-3);
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .tabMenuItem {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  min-height: 44px;
-  padding: var(--space-2) var(--space-3);
+  gap: var(--space-1);
+  min-height: 64px;
+  padding: var(--space-3);
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
@@ -1341,6 +1300,84 @@
   font-size: 2rem;
   font-weight: 700;
   color: var(--color-accent-gold);
+}
+
+/* ── Trasfondo (Modo Juego) ── */
+.backgroundGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.backgroundField {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.backgroundLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+.backgroundValue {
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+}
+
+/* ── Notas / Diario (Modo Juego) ── */
+.noteDraftRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-end;
+  margin-bottom: var(--space-3);
+}
+
+.noteDraftInput {
+  flex: 1;
+  min-height: 60px;
+  padding: var(--space-2);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  resize: vertical;
+}
+
+.noteDraftInput:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+.journalList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.journalEntryRow {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.journalEntryDate {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-accent-gold);
+}
+
+.journalEntryContent {
+  margin: var(--space-1) 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
 }
 
 .dicePanelRollsDetail {

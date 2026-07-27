@@ -2,18 +2,19 @@ import React, { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
-  Swords, X, Zap, BookOpen, Activity, Menu
+  Swords, X, Zap, BookOpen, Activity, Menu, Backpack, ScrollText, NotebookPen
 } from 'lucide-react'
-import { useCharacterStore, calculateModifier, getModifierString } from '../store'
+import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
+import type { JournalEntry } from '../store'
 import { getClassById, getRaceById, useSRDStore, calculateSpellDC } from '../data'
-import { resolveModifiers, computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets, getEncumbranceLevel, getEncumbranceSkillPenalty, buildRollBreakdown, buildStatExplain, sumSessionModifiers } from '../engine'
+import { resolveModifiers, computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets, getEncumbranceLevel, getEncumbranceSkillPenalty, getCarryingCapacity, buildRollBreakdown, buildStatExplain, sumSessionModifiers } from '../engine'
 import type { ModifierTarget, RollBreakdown, StatExplain } from '../engine'
 import { buildArchetypesByClassId } from '../data/resolveArchetype'
 import { RAGE_EFFECT_ID, RAGE_EFFECT_MODIFIERS, MUTAGEN_EFFECT_ID, buildMutagenModifiers, MUTAGEN_ABILITY_LABELS } from '../data/classFeatureEffects'
 import type { PhysicalAbility } from '../data/classFeatureEffects'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card, Drawer } from '../components/ui'
-import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel } from '../components/character'
+import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager } from '../components/character'
 import styles from './PlayMode.module.css'
 
 function addModifierToNotation(notation: string, extra: number): string {
@@ -44,7 +45,7 @@ function rollDice(notation: string): { total: number; rolls: number[] } {
   return { total: subtotal + modifier, rolls }
 }
 
-type TabId = 'combat' | 'skills' | 'spells' | 'dice' | 'encounter'
+type TabId = 'combat' | 'skills' | 'spells' | 'dice' | 'encounter' | 'inventory' | 'background' | 'notes'
 
 interface RollBreakdownInput {
   baseComponents: { label: string; value: number }[]
@@ -103,6 +104,7 @@ export function PlayMode() {
   const [tabMenuOpen, setTabMenuOpen] = useState(false)
   const [showStatusEffects, setShowStatusEffects] = useState(false)
   const [hpDrawerOpen, setHpDrawerOpen] = useState(false)
+  const [noteDraft, setNoteDraft] = useState('')
 
   // ── Encounter tracker state ──
   const [combatants, setCombatants] = useState<Combatant[]>([])
@@ -206,6 +208,19 @@ export function PlayMode() {
       ? conditions.map((c) => c.id === id ? { ...c, active: !c.active } : c)
       : [...conditions, { id, label, active: true }]
     updateCharacter(character.id, { conditions: next })
+  }
+
+  const addJournalEntry = () => {
+    if (!noteDraft.trim()) return
+    const entry: JournalEntry = {
+      id: generateId(),
+      date: new Date().toISOString().slice(0, 10),
+      content: noteDraft.trim(),
+      importantCharacters: [],
+      discoveredPlaces: [],
+    }
+    updateCharacter(character.id, { journalEntries: [...(character.journalEntries ?? []), entry] })
+    setNoteDraft('')
   }
 
   function triggerRollAnimation(cb: () => void) {
@@ -728,40 +743,6 @@ export function PlayMode() {
               )}
             </div>
           )}
-
-          {/* Tab Navigation */}
-          <nav className={styles.tabNav}>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'combat' ? styles.tabBtnActive : ''}`}
-              onClick={() => setActiveTab('combat')}
-            >
-              <Swords size={16} /> COMBATE
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'skills' ? styles.tabBtnActive : ''}`}
-              onClick={() => setActiveTab('skills')}
-            >
-              <Brain size={16} /> HABILIDADES
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'spells' ? styles.tabBtnActive : ''}`}
-              onClick={() => setActiveTab('spells')}
-            >
-              <BookOpen size={16} /> CONJUROS
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'dice' ? styles.tabBtnActive : ''}`}
-              onClick={() => setActiveTab('dice')}
-            >
-              <Dices size={16} /> DADOS
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'encounter' ? styles.tabBtnActive : ''}`}
-              onClick={() => setActiveTab('encounter')}
-            >
-              <Swords size={16} /> ENCUENTRO
-            </button>
-          </nav>
 
           {/* ─── TAB: COMBATE ─── */}
           {activeTab === 'combat' && (
@@ -1534,6 +1515,90 @@ export function PlayMode() {
               )}
             </div>
           )}
+
+          {/* ─── TAB: INVENTARIO ─── */}
+          {activeTab === 'inventory' && (
+            <div className={styles.tabContent}>
+              <Card padding="md">
+                <h3 className={styles.sectionTitle}><Backpack size={18} />Inventario</h3>
+                <InventoryManager
+                  items={character.inventory}
+                  gold={character.coins.gp}
+                  silver={character.coins.sp}
+                  copper={character.coins.cp}
+                  platinum={character.coins.pp}
+                  onChangeItems={(inventory) => updateCharacter(character.id, { inventory })}
+                  onChangeCoins={(coins) => updateCharacter(character.id, { coins })}
+                  carryCapacity={getCarryingCapacity(abilities.strength)}
+                  encumbrance={getEncumbranceLevel(totalWeight, abilities.strength)}
+                />
+              </Card>
+            </div>
+          )}
+
+          {/* ─── TAB: TRASFONDO ─── */}
+          {activeTab === 'background' && (
+            <div className={styles.tabContent}>
+              <Card padding="md">
+                <h3 className={styles.sectionTitle}><ScrollText size={18} />Trasfondo</h3>
+                <div className={styles.backgroundGrid}>
+                  <div className={styles.backgroundField}>
+                    <span className={styles.backgroundLabel}>Raza</span>
+                    <span className={styles.backgroundValue}>{raceLabel}</span>
+                  </div>
+                  <div className={styles.backgroundField}>
+                    <span className={styles.backgroundLabel}>Alineamiento</span>
+                    <span className={styles.backgroundValue}>{character.alignment || '—'}</span>
+                  </div>
+                  <div className={styles.backgroundField}>
+                    <span className={styles.backgroundLabel}>Clases</span>
+                    <span className={styles.backgroundValue}>{classSummary || '—'}</span>
+                  </div>
+                  {character.favoredClassId && (
+                    <div className={styles.backgroundField}>
+                      <span className={styles.backgroundLabel}>Clase Favorecida</span>
+                      <span className={styles.backgroundValue}>{getClassById(character.favoredClassId)?.name ?? character.favoredClassId}</span>
+                    </div>
+                  )}
+                </div>
+                {character.companion && (
+                  <div className={styles.backgroundField}>
+                    <span className={styles.backgroundLabel}>Compañero Animal</span>
+                    <span className={styles.backgroundValue}>{character.companion.name} (Nivel {character.companion.level})</span>
+                  </div>
+                )}
+              </Card>
+            </div>
+          )}
+
+          {/* ─── TAB: NOTAS ─── */}
+          {activeTab === 'notes' && (
+            <div className={styles.tabContent}>
+              <Card padding="md">
+                <h3 className={styles.sectionTitle}><NotebookPen size={18} />Diario de Campaña</h3>
+                <div className={styles.noteDraftRow}>
+                  <textarea
+                    className={styles.noteDraftInput}
+                    placeholder="Anota algo rápido de la sesión…"
+                    value={noteDraft}
+                    onChange={(e) => setNoteDraft(e.target.value)}
+                  />
+                  <Button variant="primary" size="sm" onClick={addJournalEntry}>Añadir</Button>
+                </div>
+                {(character.journalEntries ?? []).length === 0 && (
+                  <p className={styles.emptyHistory}>{character.notes || 'Sin entradas todavía.'}</p>
+                )}
+                <div className={styles.journalList}>
+                  {[...(character.journalEntries ?? [])].reverse().map((entry) => (
+                    <div key={entry.id} className={styles.journalEntryRow}>
+                      <span className={styles.journalEntryDate}>{entry.date}</span>
+                      <p className={styles.journalEntryContent}>{entry.content}</p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          )}
         </div>
 
         {/* ── Dice Panel Floating ── */}
@@ -1582,7 +1647,7 @@ export function PlayMode() {
           </div>
         )}
 
-        {/* ── Menú flotante de secciones (Combate/Habilidades/Conjuros/Dados/Encuentro) ── */}
+        {/* ── Menú flotante de secciones ── */}
         {tabMenuOpen && (
           <div className={styles.tabMenuFloating}>
             <div className={styles.dicePanelHeader}>
@@ -1596,6 +1661,9 @@ export function PlayMode() {
                 { id: 'combat' as TabId, icon: Swords, label: 'COMBATE' },
                 { id: 'skills' as TabId, icon: Brain, label: 'HABILIDADES' },
                 { id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' },
+                { id: 'inventory' as TabId, icon: Backpack, label: 'INVENTARIO' },
+                { id: 'background' as TabId, icon: ScrollText, label: 'TRASFONDO' },
+                { id: 'notes' as TabId, icon: NotebookPen, label: 'NOTAS' },
                 { id: 'dice' as TabId, icon: Dices, label: 'DADOS' },
                 { id: 'encounter' as TabId, icon: Swords, label: 'ENCUENTRO' },
               ]).map(({ id, icon: Icon, label }) => (
@@ -1604,7 +1672,8 @@ export function PlayMode() {
                   className={`${styles.tabMenuItem} ${activeTab === id ? styles.tabMenuItemActive : ''}`}
                   onClick={() => { setActiveTab(id); setTabMenuOpen(false) }}
                 >
-                  <Icon size={16} /> {label}
+                  <Icon size={20} />
+                  <span>{label}</span>
                 </button>
               ))}
             </div>
