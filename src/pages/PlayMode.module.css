@@ -412,6 +412,11 @@
   border-radius: var(--radius-md);
 }
 
+.dice3dViewport {
+  width: 100%;
+  height: 160px;
+}
+
 .rollDrawerHistory {
   display: flex;
   flex-direction: column;
@@ -727,99 +732,6 @@
   color: var(--color-text-secondary);
 }
 
-/* ── Dice Tab ── */
-.diceRoller {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.diceInput {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.diceInputField {
-  flex: 1;
-  padding: var(--space-3);
-  background: var(--color-bg-secondary);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-primary);
-  font-family: var(--font-mono);
-  font-size: 1.25rem;
-  text-align: center;
-}
-
-.diceInputField:focus {
-  outline: none;
-  border-color: var(--color-accent-gold);
-}
-
-.presets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-}
-
-.presetBtn {
-  padding: var(--space-1) var(--space-2);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.presetBtn:hover {
-  border-color: var(--color-accent-gold);
-  color: var(--color-accent-gold);
-}
-
-/* Inline result (mobile only, hidden on desktop) */
-.inlineResult {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-}
-
-.resultNumber {
-  font-family: var(--font-mono);
-  font-size: 4rem;
-  font-weight: 700;
-  color: var(--color-accent-gold);
-  animation: rollIn 0.3s ease-out;
-}
-
-.rollsDetail {
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-}
-
-.rollType {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  text-align: center;
-}
-
-@keyframes rollIn {
-  0%   { transform: scale(0.3) rotate(-20deg); opacity: 0; }
-  60%  { transform: scale(1.15) rotate(4deg);  opacity: 1; }
-  80%  { transform: scale(0.95) rotate(-2deg); }
-  100% { transform: scale(1) rotate(0deg);     opacity: 1; }
-}
-
 .emptyHistory {
   color: var(--color-text-secondary);
   font-style: italic;
@@ -871,7 +783,6 @@
   100% { transform: rotate(0deg) scale(1); }
 }
 .btnShaking { animation: diceShake 0.28s ease-in-out; }
-.presetShaking { animation: diceShake 0.28s ease-in-out; }
 
 /* ── History crit/fumble highlights ── */
 .historyItemCrit { background: var(--color-primary-container) !important; color: var(--color-primary) !important; opacity: 1 !important; }
@@ -1352,24 +1263,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-text-secondary);
   transition: all var(--transition-fast);
 }
 
 .dicePanelDiceBtn:hover .diceShape {
-  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
 }
 
 .diceShapeActive {
-  background: color-mix(in srgb, var(--color-accent-gold) 20%, var(--color-bg-secondary));
-  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+  background: color-mix(in srgb, var(--color-accent-gold) 18%, transparent);
 }
 
 .diceShapeBadge {
   position: absolute;
-  top: -6px;
-  left: -6px;
+  top: -4px;
+  left: -4px;
   width: 18px;
   height: 18px;
   display: flex;
@@ -1388,13 +1299,31 @@
   text-transform: lowercase;
 }
 
-.diceShapeD4 { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
-.diceShapeD6 { border-radius: var(--radius-sm); }
-.diceShapeD8 { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
-.diceShapeD10,
-.diceShapeD100 { clip-path: polygon(50% 0%, 100% 40%, 50% 100%, 0% 40%); }
-.diceShapeD12 { clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
-.diceShapeD20 { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
+/* ── d100: dos d10 superpuestos en diagonal ── */
+.diceD100Stack {
+  position: relative;
+  width: 1.4rem;
+  height: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diceD100Back,
+.diceD100Front {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.diceD100Back {
+  transform: translate(calc(-50% + 3px), calc(-50% + 3px));
+  opacity: 0.55;
+}
+
+.diceD100Front {
+  transform: translate(calc(-50% - 3px), calc(-50% - 3px));
+}
 
 /* ── Botones Reset / Roll del panel flotante ── */
 .dicePanelActions {

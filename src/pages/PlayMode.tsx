@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, Suspense, lazy } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
   Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair, Settings
 } from 'lucide-react'
+import MdiIcon from '@mdi/react'
+import { mdiDiceD20, mdiDiceD12, mdiDiceD10, mdiDiceD8, mdiDiceD6, mdiDiceD4 } from '@mdi/js'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { JournalEntry } from '../store'
 import { getClassById, getRaceById, useSRDStore, calculateSpellDC } from '../data'
@@ -16,6 +18,10 @@ import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card, Drawer } from '../components/ui'
 import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager } from '../components/character'
 import styles from './PlayMode.module.css'
+
+// Carga perezosa: three.js + @react-three/fiber + @react-three/drei pesan ~1MB
+// minificados y solo hacen falta mientras el drawer de tirada está animando.
+const Dice3D = lazy(() => import('../components/character/Dice3D').then((m) => ({ default: m.Dice3D })))
 
 function addModifierToNotation(notation: string, extra: number): string {
   if (extra === 0) return notation
@@ -45,7 +51,7 @@ function rollDice(notation: string): { total: number; rolls: number[] } {
   return { total: subtotal + modifier, rolls }
 }
 
-type TabId = 'combat' | 'actions' | 'skills' | 'spells' | 'dice' | 'encounter' | 'inventory' | 'background' | 'notes'
+type TabId = 'combat' | 'actions' | 'skills' | 'spells' | 'encounter' | 'inventory' | 'background' | 'notes'
 
 interface RollBreakdownInput {
   baseComponents: { label: string; value: number }[]
@@ -530,11 +536,13 @@ export function PlayMode() {
         {rolling ? (
           <div className={styles.rollDrawerCurrent}>
             <span className={styles.rollStripType}>{lastRollType}</span>
-            <div className={styles.rollDiceRow}>
-              {rollingDice && Array.from({ length: rollingDice.count }).map((_, i) => (
-                <span key={i} className={`${styles.rollDie} ${styles.rollDieSpinning}`} />
-              ))}
-            </div>
+            {rollingDice && (
+              <div className={styles.dice3dViewport}>
+                <Suspense fallback={null}>
+                  <Dice3D sides={rollingDice.sides} count={rollingDice.count} spinning={rolling} />
+                </Suspense>
+              </div>
+            )}
           </div>
         ) : rollBreakdown ? (
           <RollExplainDrawer
@@ -1440,51 +1448,6 @@ export function PlayMode() {
             </div>
           )}
 
-          {/* ─── TAB: DADOS ─── */}
-          {activeTab === 'dice' && (
-            <div className={styles.tabContent}>
-              <Card padding="md">
-                <h3 className={styles.sectionTitle}><Dices size={18} />Tirador de Dados</h3>
-                <div className={styles.diceRoller}>
-                  <div className={styles.diceInput}>
-                    <input
-                      type="text"
-                      value={diceNotation}
-                      onChange={(e) => setDiceNotation(e.target.value)}
-                      placeholder="1d20+5"
-                      className={styles.diceInputField}
-                    />
-                    <Button variant="primary" onClick={handleRoll} className={rolling ? styles.btnShaking : ''}>
-                      Tirar
-                    </Button>
-                  </div>
-                  <div className={styles.presets}>
-                    {['1d4', '1d6', '1d8', '1d10', '1d12', '1d20', '2d6', '2d10', '1d100'].map((d) => (
-                      <button
-                        key={d}
-                        className={`${styles.presetBtn} ${rolling ? styles.presetShaking : ''}`}
-                        onClick={() => { setDiceNotation(d); handleQuickRoll(d, d) }}
-                      >
-                        {d}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-
-              {/* Inline result for mobile (hidden on desktop) */}
-              {rollResult !== null && (
-                <div className={styles.inlineResult}>
-                  <span key={rollResult.key} className={styles.resultNumber}>{rollResult.total}</span>
-                  {rollResult.rolls.length > 1 && (
-                    <span className={styles.rollsDetail}>[{rollResult.rolls.join(' + ')}]</span>
-                  )}
-                  {lastRollType && <span className={styles.rollType}>{lastRollType}</span>}
-                </div>
-              )}
-            </div>
-          )}
-
           {/* ─── TAB: ENCUENTRO ─── */}
           {activeTab === 'encounter' && (
             <div className={styles.tabContent}>
@@ -1658,14 +1621,14 @@ export function PlayMode() {
             <div className={styles.dicePanelContent}>
               <div className={styles.dicePanelGrid}>
                 {([
-                  { sides: 20, shape: styles.diceShapeD20 },
-                  { sides: 12, shape: styles.diceShapeD12 },
-                  { sides: 100, shape: styles.diceShapeD100 },
-                  { sides: 10, shape: styles.diceShapeD10 },
-                  { sides: 8, shape: styles.diceShapeD8 },
-                  { sides: 6, shape: styles.diceShapeD6 },
-                  { sides: 4, shape: styles.diceShapeD4 },
-                ]).map(({ sides, shape }) => {
+                  { sides: 20, icon: mdiDiceD20 },
+                  { sides: 12, icon: mdiDiceD12 },
+                  { sides: 100, icon: mdiDiceD10 },
+                  { sides: 10, icon: mdiDiceD10 },
+                  { sides: 8, icon: mdiDiceD8 },
+                  { sides: 6, icon: mdiDiceD6 },
+                  { sides: 4, icon: mdiDiceD4 },
+                ]).map(({ sides, icon }) => {
                   const count = dicePool[sides] ?? 0
                   return (
                     <button
@@ -1673,7 +1636,15 @@ export function PlayMode() {
                       className={styles.dicePanelDiceBtn}
                       onClick={() => bumpDicePreset(sides)}
                     >
-                      <span className={`${styles.diceShape} ${shape} ${count > 0 ? styles.diceShapeActive : ''}`}>
+                      <span className={`${styles.diceShape} ${count > 0 ? styles.diceShapeActive : ''}`}>
+                        {sides === 100 ? (
+                          <span className={styles.diceD100Stack}>
+                            <MdiIcon path={icon} size="1.1rem" className={styles.diceD100Back} />
+                            <MdiIcon path={icon} size="1.1rem" className={styles.diceD100Front} />
+                          </span>
+                        ) : (
+                          <MdiIcon path={icon} size="1.4rem" />
+                        )}
                         {count > 0 && <span className={styles.diceShapeBadge}>{count}</span>}
                       </span>
                       <span className={styles.diceShapeLabel}>d{sides}</span>
@@ -1703,7 +1674,6 @@ export function PlayMode() {
                   { id: 'inventory' as TabId, icon: Backpack, label: 'INVENTARIO' },
                   { id: 'background' as TabId, icon: ScrollText, label: 'TRASFONDO' },
                   { id: 'notes' as TabId, icon: NotebookPen, label: 'NOTAS' },
-                  { id: 'dice' as TabId, icon: Dices, label: 'DADOS' },
                   { id: 'encounter' as TabId, icon: Swords, label: 'ENCUENTRO' },
                 ]).map(({ id, icon: Icon, label }) => (
                   <button
