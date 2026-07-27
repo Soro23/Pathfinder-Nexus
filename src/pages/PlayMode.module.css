@@ -92,7 +92,60 @@
 .identityBand {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-3);
+}
+
+.identityMain {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  flex: 1;
+}
+
+/* ── Recuadro de PV en la cabecera (abre el drawer de Gestión de PV) ── */
+.hpBadge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.hpBadge:hover {
+  border-color: var(--color-accent-gold);
+}
+
+.hpBadgeCurrent {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.hpBadgeSep {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.hpBadgeMax {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.hpBadgeCritical .hpBadgeCurrent {
+  color: var(--color-accent-red);
+}
+
+.hpBadgeZero .hpBadgeCurrent {
+  color: var(--color-accent-red);
+  text-shadow: 0 0 12px rgba(224, 80, 80, 0.6);
 }
 
 .avatar {
@@ -149,6 +202,54 @@
 .saveBand {
   display: flex;
   gap: var(--space-2);
+}
+
+/* ── Banda de características en la cabecera (FUE/DES/CON/INT/SAB/CAR) ── */
+.headerAbilityGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.headerAbilityCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2) var(--space-1);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.headerAbilityCard:hover {
+  border-color: var(--color-accent-gold);
+}
+
+.headerAbilityLabel {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.headerAbilityMod {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+}
+
+.headerAbilityScore {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 0 6px;
 }
 
 .headerRollBtn {

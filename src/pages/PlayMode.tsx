@@ -100,6 +100,7 @@ export function PlayMode() {
   const [rolling, setRolling] = useState(false)
   const [dicePanelOpen, setDicePanelOpen] = useState(false)
   const [showStatusEffects, setShowStatusEffects] = useState(false)
+  const [hpDrawerOpen, setHpDrawerOpen] = useState(false)
 
   // ── Encounter tracker state ──
   const [combatants, setCombatants] = useState<Combatant[]>([])
@@ -485,6 +486,17 @@ export function PlayMode() {
         {statExplain && <StatExplainPanel explain={statExplain} />}
       </Drawer>
 
+      {/* ── Drawer de PV: se abre desde el recuadro de vida en la cabecera ── */}
+      <Drawer open={hpDrawerOpen} onClose={() => setHpDrawerOpen(false)} title="Gestión de PV">
+        <HpTracker
+          current={character.hp.current}
+          max={effectiveMaxHp}
+          temp={character.hp.temp ?? 0}
+          onAdjust={adjustHP}
+          onTempChange={setTempHP}
+        />
+      </Drawer>
+
       {/* ── Efectos y Condiciones Drawer ── */}
       <Drawer open={showStatusEffects} onClose={() => setShowStatusEffects(false)} title="Efectos y Condiciones">
         <div>
@@ -533,19 +545,30 @@ export function PlayMode() {
           </div>
         </div>
 
-        {/* Banda de identidad: retrato + nombre + raza/clase/nivel */}
+        {/* Banda de identidad: retrato + nombre + raza/clase/nivel + recuadro de PV */}
         <div className={styles.identityBand}>
-          <div className={styles.avatar}>
-            {character.imageUrl ? (
-              <img src={character.imageUrl} alt={character.name} className={styles.avatarImage} />
-            ) : (
-              character.name.charAt(0).toUpperCase()
-            )}
+          <div className={styles.identityMain}>
+            <div className={styles.avatar}>
+              {character.imageUrl ? (
+                <img src={character.imageUrl} alt={character.name} className={styles.avatarImage} />
+              ) : (
+                character.name.charAt(0).toUpperCase()
+              )}
+            </div>
+            <div className={styles.identityText}>
+              <h1>{character.name}</h1>
+              <p className={styles.identitySubtitle}>{raceLabel} · {classSummary}</p>
+            </div>
           </div>
-          <div className={styles.identityText}>
-            <h1>{character.name}</h1>
-            <p className={styles.identitySubtitle}>{raceLabel} · {classSummary}</p>
-          </div>
+          <button
+            className={`${styles.hpBadge} ${character.hp.current === 0 ? styles.hpBadgeZero : character.hp.current <= effectiveMaxHp * 0.25 ? styles.hpBadgeCritical : ''}`}
+            onClick={() => setHpDrawerOpen(true)}
+            title="Gestionar PV"
+          >
+            <span className={styles.hpBadgeCurrent}>{character.hp.current}</span>
+            <span className={styles.hpBadgeSep}>/</span>
+            <span className={styles.hpBadgeMax}>{effectiveMaxHp}</span>
+          </button>
         </div>
 
         {/* Banda de defensas: CA/Toque/Desprevenido (informativos) + Iniciativa (tirable) */}
@@ -583,6 +606,28 @@ export function PlayMode() {
           </Button>
         </div>
 
+        {/* Banda de características: FUE/DES/CON/INT/SAB/CAR con modificador y puntuación */}
+        <div className={styles.headerAbilityGrid}>
+          {([
+            { label: 'FUE', score: abilities.strength },
+            { label: 'DES', score: abilities.dexterity },
+            { label: 'CON', score: abilities.constitution },
+            { label: 'INT', score: abilities.intelligence },
+            { label: 'SAB', score: abilities.wisdom },
+            { label: 'CAR', score: abilities.charisma },
+          ]).map(({ label, score }) => (
+            <button
+              key={label}
+              className={styles.headerAbilityCard}
+              onClick={() => handleQuickRoll(`1d20+${calculateModifier(score)}`, `Prueba ${label}`)}
+            >
+              <span className={styles.headerAbilityLabel}>{label}</span>
+              <span className={styles.headerAbilityMod}>{getModifierString(score)}</span>
+              <span className={styles.headerAbilityScore}>{score}</span>
+            </button>
+          ))}
+        </div>
+
         {/* Banda de salvaciones — se tiran en el turno de cualquiera, siempre visibles */}
         <div className={styles.saveBand}>
           {([
@@ -614,15 +659,6 @@ export function PlayMode() {
       <div className={styles.pageLayout}>
         {/* ── Tab Shell ── */}
         <div className={styles.tabShell}>
-          {/* HP Tracker — always visible */}
-          <HpTracker
-            current={character.hp.current}
-            max={effectiveMaxHp}
-            temp={character.hp.temp ?? 0}
-            onAdjust={adjustHP}
-            onTempChange={setTempHP}
-          />
-
           {/* Roll Result Strip */}
           {rollResult !== null && (
             <div className={styles.rollResultStrip}>
