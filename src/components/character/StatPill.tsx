@@ -1,4 +1,5 @@
 import { AlertTriangle } from 'lucide-react'
+import type { ReactNode } from 'react'
 import styles from './StatPill.module.css'
 
 interface StatPillProps {
@@ -7,13 +8,15 @@ interface StatPillProps {
   bonus?: number
   altered?: boolean
   onExplain?: () => void
+  /** Icono opcional para marcar visualmente el tipo de acción (p. ej. "info" en la cabecera). */
+  icon?: ReactNode
 }
 
-export function StatPill({ label, value, bonus = 0, altered = false, onExplain }: StatPillProps) {
+export function StatPill({ label, value, bonus = 0, altered = false, onExplain, icon }: StatPillProps) {
   const content = (
     <>
       <span className={styles.statPillLabel}>
-        {altered && <AlertTriangle size={10} className={styles.alteredIcon} />}
+        {altered ? <AlertTriangle size={10} className={styles.alteredIcon} /> : icon}
         {label}
       </span>
       <span className={styles.statPillValue}>{value}</span>

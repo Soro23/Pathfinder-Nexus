@@ -122,6 +122,24 @@
   gap: var(--space-3);
   min-width: 0;
   flex: 1;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+  margin: calc(var(--space-1) * -1);
+  transition: background var(--transition-fast);
+}
+
+.identityMain:hover {
+  background: var(--color-bg-secondary);
+}
+
+.identityMain:hover .avatar {
+  box-shadow: 0 0 0 2px rgba(212, 164, 76, 0.35);
+}
+
+.identityMain:hover .identityText h1 {
+  color: var(--color-primary);
 }
 
 /* ── Recuadro de PV en la cabecera (abre el drawer de Gestión de PV) ── */
@@ -195,13 +213,6 @@
   min-width: 0;
 }
 
-.identityNameRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-width: 0;
-}
-
 .identityText h1 {
   font-size: 1.3rem;
   color: var(--color-accent-gold);
@@ -210,23 +221,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
-}
-
-.settingsLink {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
-  transition: color var(--transition-fast), background var(--transition-fast);
-}
-
-.settingsLink:hover {
-  color: var(--color-accent-gold);
-  background: var(--color-bg-secondary);
+  transition: color var(--transition-fast);
 }
 
 .identitySubtitle {
@@ -314,6 +309,9 @@
 }
 
 .headerRollLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -324,6 +322,19 @@
   font-family: var(--font-mono);
   font-size: 0.95rem;
   font-weight: 700;
+}
+
+/* ── Distinción visual: tirar dado (carmesí) vs. ver información (neutro) ──
+   Se suma al patrón ya existente de borde (Button.secondary) vs. sin borde (StatPill). */
+.rollDiceIcon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.pillInfoIcon {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+  flex-shrink: 0;
 }
 
 /* ── Page Layout ── */
@@ -415,6 +426,39 @@
 .dice3dViewport {
   width: 100%;
   height: 160px;
+}
+
+/* ── Overlay centrado mientras el dado 3D rueda hasta asentarse ──
+   z-index por encima del Drawer (1000, ver Drawer.module.css) porque confirmar
+   un crítico dispara una tirada nueva con el drawer de resultado ya abierto. */
+.diceRollOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background: rgba(10, 8, 6, 0.72);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.15s ease-out;
+}
+
+.diceRollOverlay .rollStripType {
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  flex: none;
+}
+
+.diceRollOverlay .dice3dViewport {
+  width: min(90vw, 420px);
+  height: min(50vh, 420px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .rollDrawerHistory {

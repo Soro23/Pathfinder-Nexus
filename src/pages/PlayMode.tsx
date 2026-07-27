@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, Suspense, lazy } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
-  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair, Settings, ListChecks
+  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair, Info, ListChecks
 } from 'lucide-react'
 import mdiReact from '@mdi/react'
 import { mdiDiceD20, mdiDiceD12, mdiDiceD10, mdiDiceD8, mdiDiceD6, mdiDiceD4 } from '@mdi/js'
@@ -592,20 +592,22 @@ export function PlayMode() {
 
   return (
     <div className={styles.container}>
-      {/* ── Drawer lateral de tiradas: se abre con cualquier tirada, con desglose si lo hay + historial ── */}
-      <Drawer open={rollDrawerOpen} onClose={() => setRollDrawerOpen(false)} title="Tirada de Dados">
-        {rolling ? (
-          <div className={styles.rollDrawerCurrent}>
-            <span className={styles.rollStripType}>{lastRollType}</span>
-            {rollingDice && (
-              <div className={styles.dice3dViewport}>
-                <Suspense fallback={null}>
-                  <Dice3D sides={rollingDice.sides} count={rollingDice.count} spinning={rolling} />
-                </Suspense>
-              </div>
-            )}
+      {/* ── Overlay centrado: el/los dado(s) 3D ruedan hasta asentarse en el valor real
+          ya calculado; solo entonces se revela el resultado y se abre el drawer lateral ── */}
+      {pendingRoll && (
+        <div className={styles.diceRollOverlay}>
+          <span className={styles.rollStripType}>{lastRollType}</span>
+          <div className={styles.dice3dViewport}>
+            <Suspense fallback={null}>
+              <Dice3D dice={pendingRoll.dice} onSettled={commitPendingRoll} />
+            </Suspense>
           </div>
-        ) : rollBreakdown ? (
+        </div>
+      )}
+
+      {/* ── Drawer lateral de tiradas: se abre cuando el dado termina de rodar, con desglose si lo hay + historial ── */}
+      <Drawer open={rollDrawerOpen} onClose={() => setRollDrawerOpen(false)} title="Tirada de Dados">
+        {rollBreakdown ? (
           <RollExplainDrawer
             breakdown={rollBreakdown}
             onConfirmCrit={() => {
@@ -728,7 +730,7 @@ export function PlayMode() {
         <div className={styles.headerInner}>
           {/* Banda de identidad: retrato + nombre + raza/clase/nivel + Efectos + recuadro de PV */}
           <div className={styles.identityBand}>
-            <div className={styles.identityMain}>
+            <Link to={`/characters/${id}`} className={styles.identityMain} title="Salir de Modo Juego a la ficha">
               <div className={styles.avatar}>
                 {character.imageUrl ? (
                   <img src={character.imageUrl} alt={character.name} className={styles.avatarImage} />
@@ -737,15 +739,10 @@ export function PlayMode() {
                 )}
               </div>
               <div className={styles.identityText}>
-                <div className={styles.identityNameRow}>
-                  <h1>{character.name}</h1>
-                  <Link to={`/characters/${id}`} className={styles.settingsLink} title="Salir de Modo Juego a la ficha">
-                    <Settings size={16} />
-                  </Link>
-                </div>
+                <h1>{character.name}</h1>
                 <p className={styles.identitySubtitle}>{raceLabel} · {classSummary}</p>
               </div>
-            </div>
+            </Link>
             <div className={styles.identityActions}>
               <button
                 className={`${styles.statusBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.statusBtnActive : ''}`}
@@ -774,6 +771,7 @@ export function PlayMode() {
             <div className={styles.defenseBand}>
               <StatPill
                 label="CA" value={`${ac}`}
+                icon={<Info size={9} className={styles.pillInfoIcon} />}
                 altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
                 onExplain={() => explainStat('CA', ac,
                   [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
@@ -781,6 +779,7 @@ export function PlayMode() {
               />
               <StatPill
                 label="Toque" value={`${touchAC}`}
+                icon={<Info size={9} className={styles.pillInfoIcon} />}
                 altered={isAltered(['ac', 'ac_deflection', 'ac_dodge'])}
                 onExplain={() => explainStat('CA de Toque', touchAC,
                   [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
@@ -788,6 +787,7 @@ export function PlayMode() {
               />
               <StatPill
                 label="Desprev" value={`${flatFootedAC}`}
+                icon={<Info size={9} className={styles.pillInfoIcon} />}
                 altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
                 onExplain={() => explainStat('CA Desprevenido', flatFootedAC,
                   [{ label: 'Base', value: 10 }, { label: 'Tamaño', value: combat.sizeMod }],
@@ -800,11 +800,11 @@ export function PlayMode() {
                   { baseComponents: [{ label: 'Destreza', value: dexMod }], targets: ['initiative'] },
                 )}
               >
-                <span className={styles.headerRollLabel}>INI</span>
+                <span className={styles.headerRollLabel}><Dices size={9} className={styles.rollDiceIcon} />INI</span>
                 <span className={styles.headerRollValue}>{initiative >= 0 ? `+${initiative}` : initiative}</span>
               </Button>
             </div>
-  
+
             {/* Salvaciones — se tiran en el turno de cualquiera, siempre visibles */}
             <div className={styles.saveBand}>
               {([
@@ -818,7 +818,7 @@ export function PlayMode() {
                     key={label} variant="secondary" size="sm" className={styles.headerRollBtn}
                     onClick={() => handleQuickRoll(`1d20+${total}`, `${label} (+${total})`)}
                   >
-                    <span className={styles.headerRollLabel}>{label}</span>
+                    <span className={styles.headerRollLabel}><Dices size={9} className={styles.rollDiceIcon} />{label}</span>
                     <span className={styles.headerRollValue}>
                       {total >= 0 ? `+${total}` : total}
                       {eff !== 0 && (
@@ -831,7 +831,7 @@ export function PlayMode() {
                 )
               })}
             </div>
-  
+
             <div className={styles.defenseBand}>
               <Button
                 variant="secondary" size="sm" className={styles.headerRollBtn}
@@ -840,7 +840,7 @@ export function PlayMode() {
                   { baseComponents: [{ label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }], targets: ['cmb'] },
                 )}
               >
-                <span className={styles.headerRollLabel}>CMB</span>
+                <span className={styles.headerRollLabel}><Dices size={9} className={styles.rollDiceIcon} />CMB</span>
                 <span className={styles.headerRollValue}>
                   {cmb >= 0 ? `+${cmb}` : cmb}
                   {cmbEffect !== 0 && (
@@ -850,22 +850,13 @@ export function PlayMode() {
                   )}
                 </span>
               </Button>
-              <Button
-                variant="secondary" size="sm" className={styles.headerRollBtn}
-                onClick={() => explainStat('CMD', cmd,
+              <StatPill
+                label="CMD" value={`${cmd}`} bonus={cmdEffect}
+                icon={<Info size={9} className={styles.pillInfoIcon} />}
+                onExplain={() => explainStat('CMD', cmd,
                   [{ label: 'Base', value: 10 }, { label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }, { label: 'Destreza', value: dexMod }],
                   ['cmd'])}
-              >
-                <span className={styles.headerRollLabel}>CMD</span>
-                <span className={styles.headerRollValue}>
-                  {cmd}
-                  {cmdEffect !== 0 && (
-                    <span className={cmdEffect > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
-                      {cmdEffect > 0 ? `+${cmdEffect}` : cmdEffect}
-                    </span>
-                  )}
-                </span>
-              </Button>
+              />
             </div>
           </div>
         </div>
@@ -1867,7 +1858,7 @@ export function PlayMode() {
               </div>
               <div className={styles.dicePanelActions}>
                 <Button variant="secondary" onClick={resetDicePool}>Reset</Button>
-                <Button variant="primary" onClick={handleRoll} className={rolling ? styles.btnShaking : ''}>Roll</Button>
+                <Button variant="primary" onClick={handleRoll} className={pendingRoll ? styles.btnShaking : ''}>Roll</Button>
               </div>
             </div>
           </div>
