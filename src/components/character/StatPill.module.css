@@ -1,24 +1,29 @@
+/* StatPill es un StaticValue (informativo): a propósito NO lleva recuadro ni fondo,
+   para que el único indicador visual de "esto se puede tirar" sea el borde de Button
+   (ver Button.module.css .secondary). Tap abre explicación, no tirada. */
 .statPill {
   flex: 1;
   min-width: 52px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  gap: 2px;
+  padding: var(--space-2) var(--space-1);
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: border-color var(--transition-fast);
 }
 
-.statPill:hover {
-  border-color: var(--color-accent-gold);
+.statPill:hover .statPillValue {
+  color: var(--color-primary);
 }
 
-.altered {
-  border-color: #e0a850;
+.altered .statPillValue {
+  color: #e0a850;
+}
+
+.altered .statPillLabel {
+  border-bottom: 1px dotted #e0a850;
 }
 
 .statPillLabel {

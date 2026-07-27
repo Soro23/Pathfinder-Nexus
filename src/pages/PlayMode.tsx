@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
-  ArrowLeft, Dices, Shield, Heart, Brain,
+  ArrowLeft, Dices, Shield, Brain,
   Swords, X, Zap, BookOpen, Activity
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString } from '../store'
-import { getClassById, useSRDStore, calculateSpellDC } from '../data'
+import { getClassById, getRaceById, useSRDStore, calculateSpellDC } from '../data'
 import { resolveModifiers, computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets, getEncumbranceLevel, getEncumbranceSkillPenalty, buildRollBreakdown, buildStatExplain, sumSessionModifiers } from '../engine'
 import type { ModifierTarget, RollBreakdown, StatExplain } from '../engine'
 import { buildArchetypesByClassId } from '../data/resolveArchetype'
@@ -155,6 +155,10 @@ export function PlayMode() {
 
   const { abilities } = character
   const classData = getClassById(character.classes[0]?.id || '')   // mantener — se usa en hasSpells, concentrationBonus
+  const raceLabel = getRaceById(character.race?.toLowerCase() ?? '')?.label ?? character.race
+  const classSummary = character.classes
+    .map((cc) => `${getClassById(cc.id)?.name ?? cc.id} ${cc.level}`)
+    .join(' / ')
   const archetypesByClassId = buildArchetypesByClassId(character.classes, getArchetypeById)
   const totalWeight = (character.inventory ?? []).reduce((sum, item) => sum + item.weight * item.quantity, 0)
   const combat = computeCombatStats(character, resolvedStats, totalWeight)
@@ -503,27 +507,107 @@ export function PlayMode() {
 
       {/* ── Header ── */}
       <header className={styles.header}>
-        <Link to={`/characters/${id}`} className={styles.backLink}>
-          <ArrowLeft size={20} />
-          Volver
-        </Link>
-        <div className={styles.headerRight}>
-          <h1>Modo Juego — {character.name}</h1>
-          <button
-            className={`${styles.statusBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.statusBtnActive : ''}`}
-            onClick={() => setShowStatusEffects(true)}
-          >
-            <Activity size={16} />
-            {(statusEffects.length + activeConditionsCount) > 0 && (
-              <span className={styles.statusBadge}>{statusEffects.length + activeConditionsCount}</span>
+        <div className={styles.headerTop}>
+          <Link to={`/characters/${id}`} className={styles.backLink}>
+            <ArrowLeft size={16} />
+            Volver
+          </Link>
+          <div className={styles.headerActions}>
+            <button
+              className={`${styles.statusBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.statusBtnActive : ''}`}
+              onClick={() => setShowStatusEffects(true)}
+              title="Efectos y Condiciones"
+            >
+              <Activity size={16} />
+              {(statusEffects.length + activeConditionsCount) > 0 && (
+                <span className={styles.statusBadge}>{statusEffects.length + activeConditionsCount}</span>
+              )}
+            </button>
+            <button
+              className={`${styles.statusBtn} ${dicePanelOpen ? styles.statusBtnActive : ''}`}
+              onClick={() => setDicePanelOpen(!dicePanelOpen)}
+              title="Dados"
+            >
+              <Dices size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Banda de identidad: retrato + nombre + raza/clase/nivel */}
+        <div className={styles.identityBand}>
+          <div className={styles.avatar}>
+            {character.imageUrl ? (
+              <img src={character.imageUrl} alt={character.name} className={styles.avatarImage} />
+            ) : (
+              character.name.charAt(0).toUpperCase()
             )}
-          </button>
-          <button
-            className={`${styles.statusBtn} ${dicePanelOpen ? styles.statusBtnActive : ''}`}
-            onClick={() => setDicePanelOpen(!dicePanelOpen)}
+          </div>
+          <div className={styles.identityText}>
+            <h1>{character.name}</h1>
+            <p className={styles.identitySubtitle}>{raceLabel} · {classSummary}</p>
+          </div>
+        </div>
+
+        {/* Banda de defensas: CA/Toque/Desprevenido (informativos) + Iniciativa (tirable) */}
+        <div className={styles.defenseBand}>
+          <StatPill
+            label="CA" value={`${ac}`}
+            altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
+            onExplain={() => explainStat('CA', ac,
+              [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
+              ['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
+          />
+          <StatPill
+            label="Toque" value={`${touchAC}`}
+            altered={isAltered(['ac', 'ac_deflection', 'ac_dodge'])}
+            onExplain={() => explainStat('CA de Toque', touchAC,
+              [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
+              ['ac', 'ac_deflection', 'ac_dodge'])}
+          />
+          <StatPill
+            label="Desprev" value={`${flatFootedAC}`}
+            altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
+            onExplain={() => explainStat('CA Desprevenido', flatFootedAC,
+              [{ label: 'Base', value: 10 }, { label: 'Tamaño', value: combat.sizeMod }],
+              ['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
+          />
+          <Button
+            variant="secondary" size="sm" className={styles.headerRollBtn}
+            onClick={() => handleQuickRoll(
+              `1d20+${initiative}`, `Iniciativa (${initiative >= 0 ? '+' : ''}${initiative})`, false,
+              { baseComponents: [{ label: 'Destreza', value: dexMod }], targets: ['initiative'] },
+            )}
           >
-            <Dices size={16} />
-          </button>
+            <span className={styles.headerRollLabel}>INI</span>
+            <span className={styles.headerRollValue}>{initiative >= 0 ? `+${initiative}` : initiative}</span>
+          </Button>
+        </div>
+
+        {/* Banda de salvaciones — se tiran en el turno de cualquiera, siempre visibles */}
+        <div className={styles.saveBand}>
+          {([
+            { label: 'Fortaleza', total: fortSave, target: 'save_fort' as ModifierTarget },
+            { label: 'Reflejos', total: refSave, target: 'save_ref' as ModifierTarget },
+            { label: 'Voluntad', total: willSave, target: 'save_will' as ModifierTarget },
+          ]).map(({ label, total, target }) => {
+            const eff = sumSessionModifiers(resolvedStats.allModifiers, [target])
+            return (
+              <Button
+                key={label} variant="secondary" size="sm" className={styles.headerRollBtn}
+                onClick={() => handleQuickRoll(`1d20+${total}`, `${label} (+${total})`)}
+              >
+                <span className={styles.headerRollLabel}>{label}</span>
+                <span className={styles.headerRollValue}>
+                  {total >= 0 ? `+${total}` : total}
+                  {eff !== 0 && (
+                    <span className={eff > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
+                      {eff > 0 ? `+${eff}` : eff}
+                    </span>
+                  )}
+                </span>
+              </Button>
+            )
+          })}
         </div>
       </header>
 
@@ -593,34 +677,8 @@ export function PlayMode() {
           {/* ─── TAB: COMBATE ─── */}
           {activeTab === 'combat' && (
             <div className={styles.tabContent}>
-              {/* Combat Stats Bar */}
+              {/* Combat Stats Bar — CA/Toque/Desprevenido/Iniciativa/Salvaciones viven en la cabecera */}
               <div className={styles.combatStats}>
-                <StatPill
-                  label="CA" value={`${ac}`}
-                  altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
-                  onExplain={() => explainStat('CA', ac,
-                    [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
-                    ['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
-                />
-                <StatPill
-                  label="Toque" value={`${touchAC}`}
-                  altered={isAltered(['ac', 'ac_deflection', 'ac_dodge'])}
-                  onExplain={() => explainStat('CA de Toque', touchAC,
-                    [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
-                    ['ac', 'ac_deflection', 'ac_dodge'])}
-                />
-                <StatPill
-                  label="Desprev" value={`${flatFootedAC}`}
-                  altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
-                  onExplain={() => explainStat('CA Desprevenido', flatFootedAC,
-                    [{ label: 'Base', value: 10 }, { label: 'Tamaño', value: combat.sizeMod }],
-                    ['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
-                />
-                <StatPill
-                  label="INI" value={initiative >= 0 ? `+${initiative}` : `${initiative}`}
-                  altered={isAltered(['initiative'])}
-                  onExplain={() => explainStat('Iniciativa', initiative, [{ label: 'Destreza', value: dexMod }], ['initiative'])}
-                />
                 <StatPill
                   label="CMB" value={cmb >= 0 ? `+${cmb}` : `${cmb}`}
                   altered={isAltered(['cmb'])}
@@ -739,33 +797,6 @@ export function PlayMode() {
                       })()}
                     </div>
                   )}
-                </div>
-              </Card>
-
-              {/* Saving Throws */}
-              <Card padding="md">
-                <h3 className={styles.sectionTitle}><Heart size={18} />Tiros de Salvación</h3>
-                <div className={styles.savesRow}>
-                  {([
-                    { label: 'Fortaleza', total: fortSave, target: 'save_fort' as ModifierTarget },
-                    { label: 'Reflejos', total: refSave, target: 'save_ref' as ModifierTarget },
-                    { label: 'Voluntad', total: willSave, target: 'save_will' as ModifierTarget },
-                  ]).map(({ label, total, target }) => {
-                    // `eff` es solo la porción del total ya incluido que viene de
-                    // condiciones/efectos de sesión activos — es informativo (AlteredValue),
-                    // no se vuelve a sumar (el motor ya lo integró en `total`).
-                    const eff = sumSessionModifiers(resolvedStats.allModifiers, [target])
-                    return (
-                      <Button key={label} variant="secondary" onClick={() => handleQuickRoll(`1d20+${total}`, `${label} (+${total})`)}>
-                        {label} {total >= 0 ? `+${total}` : total}
-                        {eff !== 0 && (
-                          <span className={eff > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
-                            {eff > 0 ? `+${eff}` : eff}
-                          </span>
-                        )}
-                      </Button>
-                    )
-                  })}
                 </div>
               </Card>
 
@@ -1159,36 +1190,41 @@ export function PlayMode() {
             <div className={styles.tabContent}>
               <Card padding="md">
                 <h3 className={styles.sectionTitle}><Brain size={18} />Habilidades con Rangos</h3>
-                {character.skills && character.skills.length > 0 ? (
-                  <div className={styles.skillsGrid}>
+                {character.skills && character.skills.some((sr) => sr.ranks > 0) ? (
+                  <div className={styles.skillsTable}>
+                    <div className={styles.skillsTableHeader}>
+                      <span>Clase</span>
+                      <span>Atr</span>
+                      <span>Habilidad</span>
+                      <span>Bono</span>
+                    </div>
                     {character.skills
                       .filter((sr) => sr.ranks > 0)
-                      .map((skillRank) => {
-                        const skillDef = SKILLS.find((s) => s.id === skillRank.id)
-                        if (!skillDef) return null
+                      .map((skillRank) => ({ skillRank, skillDef: SKILLS.find((s) => s.id === skillRank.id) }))
+                      .filter((row) => row.skillDef !== undefined)
+                      .sort((a, b) => a.skillDef!.name.localeCompare(b.skillDef!.name))
+                      .map(({ skillRank, skillDef: maybeSkillDef }) => {
+                        const skillDef = maybeSkillDef!
                         const isClassSkill = isClassSkillForCharacter({ ...character, archetypesByClassId }, skillRank.id)
                         const skillEffectBonus = resolvedStats.skillBonuses[skillRank.id] ?? 0
                         const total = computeSkillTotal({ ...character, archetypesByClassId }, skillDef, resolvedStats, equippedArmorAcp, encumbrancePenalty)
                         return (
-                          <button
-                            key={skillRank.id}
-                            className={styles.skillBtn}
-                            onClick={() => handleQuickRoll(`1d20+${total}`, skillDef.name)}
-                          >
-                            <span className={styles.skillName}>
-                              {skillDef.name}
-                              {isClassSkill && <span className={styles.classSkillDot}>●</span>}
-                            </span>
-                            <span className={styles.skillAbility}>{abilityAbbr[skillDef.ability]}</span>
-                            <span className={styles.skillBonus}>
+                          <div key={skillRank.id} className={styles.skillsTableRow}>
+                            <span className={`${styles.skillProf} ${isClassSkill ? styles.skillProfOn : ''}`}>●</span>
+                            <span className={styles.skillMod}>{abilityAbbr[skillDef.ability]}</span>
+                            <span className={styles.skillNameCell}>{skillDef.name}</span>
+                            <button
+                              className={styles.skillBonusBtn}
+                              onClick={() => handleQuickRoll(`1d20+${total}`, skillDef.name)}
+                            >
                               {total >= 0 ? `+${total}` : total}
                               {skillEffectBonus !== 0 && (
                                 <span className={skillEffectBonus > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
                                   {skillEffectBonus > 0 ? `+${skillEffectBonus}` : skillEffectBonus}
                                 </span>
                               )}
-                            </span>
-                          </button>
+                            </button>
+                          </div>
                         )
                       })}
                   </div>
@@ -1199,13 +1235,25 @@ export function PlayMode() {
 
               <Card padding="md">
                 <h3 className={styles.sectionTitle}><Brain size={18} />Pruebas de Característica</h3>
-                <div className={styles.quickRolls}>
-                  <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${calculateModifier(abilities.strength)}`, 'Prueba FUE')}>Fuerza {getModifierString(abilities.strength)}</Button>
-                  <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${calculateModifier(abilities.dexterity)}`, 'Prueba DES')}>Destreza {getModifierString(abilities.dexterity)}</Button>
-                  <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${calculateModifier(abilities.constitution)}`, 'Prueba CON')}>Constitución {getModifierString(abilities.constitution)}</Button>
-                  <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${calculateModifier(abilities.intelligence)}`, 'Prueba INT')}>Inteligencia {getModifierString(abilities.intelligence)}</Button>
-                  <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${calculateModifier(abilities.wisdom)}`, 'Prueba SAB')}>Sabiduría {getModifierString(abilities.wisdom)}</Button>
-                  <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${calculateModifier(abilities.charisma)}`, 'Prueba CAR')}>Carisma {getModifierString(abilities.charisma)}</Button>
+                <div className={styles.abilityGrid}>
+                  {([
+                    { label: 'Fuerza', abbr: 'FUE', score: abilities.strength },
+                    { label: 'Destreza', abbr: 'DES', score: abilities.dexterity },
+                    { label: 'Constitución', abbr: 'CON', score: abilities.constitution },
+                    { label: 'Inteligencia', abbr: 'INT', score: abilities.intelligence },
+                    { label: 'Sabiduría', abbr: 'SAB', score: abilities.wisdom },
+                    { label: 'Carisma', abbr: 'CAR', score: abilities.charisma },
+                  ]).map(({ label, abbr, score }) => (
+                    <button
+                      key={abbr}
+                      className={styles.abilityCard}
+                      onClick={() => handleQuickRoll(`1d20+${calculateModifier(score)}`, `Prueba ${abbr}`)}
+                    >
+                      <span className={styles.abilityLabel}>{label}</span>
+                      <span className={styles.abilityMod}>{getModifierString(score)}</span>
+                      <span className={styles.abilityScore}>{score}</span>
+                    </button>
+                  ))}
                 </div>
               </Card>
             </div>

@@ -19,34 +19,36 @@
   top: 0;
   z-index: 50;
   background: var(--color-bg-primary);
-  padding-top: var(--space-3);
-  padding-bottom: var(--space-4);
-  margin-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-3) 0 var(--space-3);
+  margin-bottom: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .backLink {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
   color: var(--color-text-secondary);
-  margin-bottom: var(--space-3);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
 }
 
 .backLink:hover {
   color: var(--color-accent-gold);
 }
 
-.headerRight {
+.headerActions {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-}
-
-.header h1 {
-  font-size: 1.5rem;
-  color: var(--color-accent-gold);
-  flex: 1;
+  gap: var(--space-2);
 }
 
 .statusBtn {
@@ -84,6 +86,91 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ── Banda de identidad: retrato + nombre + raza/clase ── */
+.identityBand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-accent-gold);
+  background: var(--color-bg-secondary);
+  color: var(--color-accent-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.identityText {
+  min-width: 0;
+}
+
+.identityText h1 {
+  font-size: 1.3rem;
+  color: var(--color-accent-gold);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identitySubtitle {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Banda de defensas (CA/Toque/Desprevenido informativos + Iniciativa tirable) ── */
+.defenseBand {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ── Banda de salvaciones (siempre tirables, visibles en toda la pantalla) ── */
+.saveBand {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.headerRollBtn {
+  flex: 1;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px !important;
+  line-height: 1.1;
+}
+
+.headerRollLabel {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.75;
+}
+
+.headerRollValue {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 /* ── Page Layout ── */
@@ -256,64 +343,138 @@
   gap: var(--space-2);
 }
 
-.savesRow {
+/* ── Ability cards ("plate"): modificador grande, puntuación pequeña en óvalo ── */
+.abilityGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-2);
 }
 
-/* ── Skills ── */
-.skillsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-2);
-}
-
-.skillBtn {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  text-align: left;
-}
-
-.skillBtn:hover {
-  border-color: var(--color-accent-gold);
-  background: var(--color-bg-primary);
-}
-
-.skillName {
-  font-size: 0.8rem;
-  color: var(--color-text-primary);
+.abilityCard {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
 }
 
-.classSkillDot {
+.abilityCard:hover {
+  border-color: var(--color-accent-gold);
+}
+
+.abilityLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.abilityMod {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--color-accent-gold);
-  font-size: 0.5rem;
 }
 
-.skillAbility {
+.abilityScore {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 1px 8px;
+}
+
+@media (max-width: 480px) {
+  .abilityGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Skills: tabla Clase · Atr · Habilidad · Bono ── */
+.skillsTable {
+  display: flex;
+  flex-direction: column;
+}
+
+.skillsTableHeader {
+  display: grid;
+  grid-template-columns: 40px 40px 1fr auto;
+  gap: var(--space-2);
+  padding: 0 var(--space-2) var(--space-2);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.skillsTableRow {
+  display: grid;
+  grid-template-columns: 40px 40px 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.skillsTableRow:last-child {
+  border-bottom: none;
+}
+
+.skillProf {
+  font-size: 0.55rem;
+  color: var(--color-border);
+}
+
+.skillProfOn {
+  color: var(--color-accent-gold);
+}
+
+.skillMod {
   font-family: var(--font-mono);
   font-size: 0.65rem;
   color: var(--color-text-secondary);
 }
 
-.skillBonus {
+.skillNameCell {
+  font-size: 0.8rem;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skillBonusBtn {
   font-family: var(--font-mono);
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--color-accent-gold);
-  min-width: 28px;
-  text-align: right;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  min-width: 44px;
+  min-height: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.skillBonusBtn:hover {
+  border-color: var(--color-accent-gold);
+}
+
+@media (max-width: 640px) {
+  .skillBonusBtn {
+    min-height: 44px;
+  }
 }
 
 /* ── Spell Slots ── */
@@ -566,10 +727,6 @@
     display: flex;
   }
 
-  .skillsGrid {
-    grid-template-columns: 1fr;
-  }
-
   .quickRolls {
     grid-template-columns: 1fr;
   }
@@ -820,7 +977,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-surface-container);
+  background: color-mix(in srgb, var(--color-surface-container) 80%, transparent);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -832,6 +990,7 @@
 .fabBtnActive {
   border-color: var(--color-accent-gold);
   color: var(--color-accent-gold);
+  background: color-mix(in srgb, var(--color-surface-container) 92%, transparent);
 }
 
 .fabBadge {
