@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 
 const DIE_COLOR = '#e0a850'
+const EDGE_COLOR = '#141210'
 const ROLL_DURATION = 1.4 // segundos
 
 // d10: three.js no trae un trapezoedro pentagonal (la forma real de un d10).
@@ -180,12 +181,16 @@ function DieMesh({ sides, value, variant }: DieMeshProps) {
   )
 
   const ref = useSettlingRotation(targetQuat, ROLL_DURATION)
+  const edges = useMemo(() => new THREE.EdgesGeometry(geometry), [geometry])
 
   return (
     <group ref={ref}>
       <mesh geometry={geometry}>
         <meshStandardMaterial color={DIE_COLOR} flatShading />
       </mesh>
+      <lineSegments geometry={edges}>
+        <lineBasicMaterial color={EDGE_COLOR} />
+      </lineSegments>
       {faces.map((f, i) => (
         <FaceLabel
           key={i}
