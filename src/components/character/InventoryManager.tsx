@@ -115,6 +115,15 @@ export function InventoryManager({
   const coinValue = (type: CoinType) =>
     type === 'pp' ? platinum : type === 'gp' ? gold : type === 'sp' ? silver : copper
 
+  const setCoinValue = (type: CoinType, value: number) => {
+    onChangeCoins({
+      pp: type === 'pp' ? Math.max(0, value) : platinum,
+      gp: type === 'gp' ? Math.max(0, value) : gold,
+      sp: type === 'sp' ? Math.max(0, value) : silver,
+      cp: type === 'cp' ? Math.max(0, value) : copper,
+    })
+  }
+
   const applyCoinAdjust = (sign: 1 | -1) => {
     onChangeCoins({
       pp: Math.max(0, platinum + sign * (parseInt(coinAdjust.pp) || 0)),
@@ -201,7 +210,13 @@ export function InventoryManager({
                   <span className={styles.coinPanelRowName}>{meta.name} ({type})</span>
                   {meta.rate && <span className={styles.coinPanelRowRate}>{meta.rate}</span>}
                 </div>
-                <span className={styles.coinPanelRowValue}>{coinValue(type)}</span>
+                <input
+                  className={styles.coinPanelRowInput}
+                  type="number"
+                  min={0}
+                  value={coinValue(type)}
+                  onChange={(e) => setCoinValue(type, parseInt(e.target.value) || 0)}
+                />
               </div>
             )
           })}

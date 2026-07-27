@@ -122,11 +122,28 @@
   opacity: 0.75;
 }
 
-.coinPanelRowValue {
+.coinPanelRowInput {
+  flex-shrink: 0;
+  width: 72px;
   font-family: var(--font-mono);
   font-size: 0.95rem;
   font-weight: 700;
+  text-align: right;
   color: var(--color-text-primary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  outline: none;
+}
+
+.coinPanelRowInput:hover {
+  border-color: var(--color-border);
+}
+
+.coinPanelRowInput:focus {
+  border-color: var(--color-accent-gold);
+  background: var(--color-bg-primary);
 }
 
 .coinPanelAdjust {
@@ -147,7 +164,7 @@
 
 .coinPanelAdjustGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
 }
 
@@ -155,6 +172,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  min-width: 0;
 }
 
 .coinPanelAdjustLabel {
@@ -181,12 +199,17 @@
 }
 
 .coinPanelAdjustActions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
 }
 
 .coinPanelAdjustActions > * {
-  flex: 1;
+  min-width: 0;
+}
+
+.coinPanelAdjustActions > *:last-child {
+  grid-column: 1 / -1;
 }
 
 .weightCard {
@@ -636,10 +659,6 @@
 }
 
 @media (max-width: 600px) {
-  .coinPanelAdjustGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .formGrid {
     grid-template-columns: 1fr;
   }
