@@ -2,9 +2,9 @@ import React, { useState, useMemo, Suspense, lazy } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
-  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair, Settings
+  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair, Settings, ListChecks
 } from 'lucide-react'
-import MdiIcon from '@mdi/react'
+import mdiReact from '@mdi/react'
 import { mdiDiceD20, mdiDiceD12, mdiDiceD10, mdiDiceD8, mdiDiceD6, mdiDiceD4 } from '@mdi/js'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { JournalEntry } from '../store'
@@ -16,12 +16,20 @@ import { RAGE_EFFECT_ID, RAGE_EFFECT_MODIFIERS, MUTAGEN_EFFECT_ID, buildMutagenM
 import type { PhysicalAbility } from '../data/classFeatureEffects'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
 import { Button, Card, Drawer } from '../components/ui'
-import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager } from '../components/character'
+import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager, CombatActionsPanel } from '../components/character'
 import styles from './PlayMode.module.css'
 
 // Carga perezosa: three.js + @react-three/fiber + @react-three/drei pesan ~1MB
 // minificados y solo hacen falta mientras el drawer de tirada está animando.
 const Dice3D = lazy(() => import('../components/character/Dice3D').then((m) => ({ default: m.Dice3D })))
+
+// @mdi/react es un bundle CJS cuyo export por defecto no interopera bien con
+// Rollup/Node ESM: `import Icon from '@mdi/react'` resuelve al objeto
+// { Icon, Stack, default } completo en vez del componente, y provoca
+// "React error #130" al renderizarlo. Desestructurar en runtime sí funciona;
+// los tipos declaran el default como el componente directamente (no reflejan
+// este desajuste de interop), de ahí el cast.
+const MdiIcon = (mdiReact as unknown as { Icon: typeof mdiReact }).Icon
 
 function addModifierToNotation(notation: string, extra: number): string {
   if (extra === 0) return notation
@@ -114,6 +122,7 @@ export function PlayMode() {
   const [hpDrawerOpen, setHpDrawerOpen] = useState(false)
   const [noteDraft, setNoteDraft] = useState('')
   const [showAllSkills, setShowAllSkills] = useState(false)
+  const [weaponFilter, setWeaponFilter] = useState<'all' | 'melee' | 'ranged'>('all')
 
   // ── Encounter tracker state ──
   const [combatants, setCombatants] = useState<Combatant[]>([])
@@ -829,9 +838,30 @@ export function PlayMode() {
                     </button>
                   )}
                 </div>
-                <div className={styles.weaponList}>
+                {character.weapons && character.weapons.length > 0 && (
+                  <div className={styles.weaponFilterToggle}>
+                    {([['all', 'Todas'], ['melee', 'Cuerpo a cuerpo'], ['ranged', 'A distancia']] as const).map(([value, label]) => (
+                      <button
+                        key={value}
+                        className={`${styles.weaponFilterBtn} ${weaponFilter === value ? styles.weaponFilterBtnActive : ''}`}
+                        onClick={() => setWeaponFilter(value)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className={styles.attacksTable}>
+                  <div className={styles.attacksTableHeader}>
+                    <span>Arma</span>
+                    <span>Alcance</span>
+                    <span>Golpe</span>
+                    <span>Daño</span>
+                  </div>
                   {character.weapons && character.weapons.length > 0 ? (
-                    character.weapons.map((weapon) => {
+                    character.weapons
+                      .filter((weapon) => weaponFilter === 'all' || weapon.range === weaponFilter)
+                      .map((weapon) => {
                       const isRanged = weapon.range === 'ranged'
                       const paAtkPenalty = (powerAttackActive && !isRanged) ? -powerAttackPenalty : 0
                       const paDmgBonus = (powerAttackActive && !isRanged) ? getPowerAttackDamageBonus(powerAttackPenalty, weapon.grip) : 0
@@ -844,6 +874,7 @@ export function PlayMode() {
                           key={weapon.id}
                           name={weapon.name}
                           critical={weapon.critical}
+                          range={isRanged ? 'A distancia' : 'Cuerpo a cuerpo'}
                           iterativeOffsets={iterativeOffsets}
                           attackBase={atkBase}
                           damageNotation={dmgNotation}
@@ -870,53 +901,60 @@ export function PlayMode() {
                       )
                     })
                   ) : (
-                    <div className={styles.quickRolls}>
-                      {(() => {
-                        const paAtkPenalty = powerAttackActive ? -powerAttackPenalty : 0
-                        const paDmgBonus = powerAttackActive ? powerAttackDmgBonus : 0
-                        const meleeAtk = computeWeaponAttackBonus(bab, strMod, 0, resolvedStats, combat.sizeMod, combat.negativeLevelPenalty) + paAtkPenalty
-                        const rangedAtk = computeWeaponAttackBonus(bab, dexMod, 0, resolvedStats, combat.sizeMod, combat.negativeLevelPenalty)
-                        const iterOffsets = getIterativeAttackOffsets(bab)
-                        return (
-                          <>
-                            {iterOffsets.map((offset, i) => {
-                              const atk = meleeAtk - offset
-                              const baseComponents = [{ label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }]
-                              if (combat.sizeMod !== 0) baseComponents.push({ label: 'Tamaño', value: combat.sizeMod })
-                              if (paAtkPenalty !== 0) baseComponents.push({ label: 'Ataque Poderoso', value: paAtkPenalty })
-                              if (combat.negativeLevelPenalty > 0) baseComponents.push({ label: 'Nivel negativo', value: -combat.negativeLevelPenalty })
-                              if (offset !== 0) baseComponents.push({ label: 'Ataque iterativo', value: -offset })
-                              return (
-                                <Button
-                                  key={`melee-${i}`}
-                                  variant="secondary"
-                                  onClick={() => handleQuickRoll(`1d20+${atk}`, `Melee Atq.${i + 1} (${atk >= 0 ? `+${atk}` : atk})`, true, { baseComponents, targets: ['attack'] })}
-                                >
-                                  Melee {i > 0 ? `Atq.${i + 1} ` : ''}{atk >= 0 ? `+${atk}` : atk}
-                                </Button>
-                              )
-                            })}
-                            <Button
-                              variant="secondary"
-                              onClick={() => handleQuickRoll(`1d20+${rangedAtk}`, `Ranged (+${rangedAtk})`, true, {
+                    (() => {
+                      const paAtkPenalty = powerAttackActive ? -powerAttackPenalty : 0
+                      const paDmgBonus = powerAttackActive ? powerAttackDmgBonus : 0
+                      const meleeAtk = computeWeaponAttackBonus(bab, strMod, 0, resolvedStats, combat.sizeMod, combat.negativeLevelPenalty) + paAtkPenalty
+                      const rangedAtk = computeWeaponAttackBonus(bab, dexMod, 0, resolvedStats, combat.sizeMod, combat.negativeLevelPenalty)
+                      const iterOffsets = getIterativeAttackOffsets(bab)
+                      const meleeDmgNotation = addModifierToNotation(`1d6+${strMod}`, resolvedStats.damageBonus + paDmgBonus)
+                      const rangedDmgNotation = addModifierToNotation(`1d8+${dexMod}`, resolvedStats.damageBonus)
+                      return (
+                        <>
+                          {weaponFilter !== 'ranged' && (
+                            <WeaponAttackRow
+                              name="Ataque Cuerpo a Cuerpo"
+                              range="Cuerpo a cuerpo"
+                              iterativeOffsets={iterOffsets}
+                              attackBase={meleeAtk}
+                              damageNotation={meleeDmgNotation}
+                              onRollAttack={(atk, i) => {
+                                const offset = iterOffsets[i]
+                                const baseComponents = [{ label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }]
+                                if (combat.sizeMod !== 0) baseComponents.push({ label: 'Tamaño', value: combat.sizeMod })
+                                if (paAtkPenalty !== 0) baseComponents.push({ label: 'Ataque Poderoso', value: paAtkPenalty })
+                                if (combat.negativeLevelPenalty > 0) baseComponents.push({ label: 'Nivel negativo', value: -combat.negativeLevelPenalty })
+                                if (offset !== 0) baseComponents.push({ label: 'Ataque iterativo', value: -offset })
+                                handleQuickRoll(`1d20+${atk}`, `Melee${i > 0 ? ` Atq.${i + 1}` : ''} (${atk >= 0 ? `+${atk}` : atk})`, true, { baseComponents, targets: ['attack'] })
+                              }}
+                              onRollDamage={() => handleQuickRoll(meleeDmgNotation, 'Daño Melee')}
+                            />
+                          )}
+                          {weaponFilter !== 'melee' && (
+                            <WeaponAttackRow
+                              name="Ataque a Distancia"
+                              range="A distancia"
+                              iterativeOffsets={[0]}
+                              attackBase={rangedAtk}
+                              damageNotation={rangedDmgNotation}
+                              onRollAttack={(atk) => handleQuickRoll(`1d20+${atk}`, `Ranged (+${atk})`, true, {
                                 baseComponents: [{ label: 'BAB', value: bab }, { label: 'Destreza', value: dexMod }],
                                 targets: ['attack'],
                               })}
-                            >
-                              Ranged +{rangedAtk}
-                            </Button>
-                            <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d6+${strMod}`, resolvedStats.damageBonus + paDmgBonus), 'Daño Melee')}>
-                              Daño Melee {addModifierToNotation(`1d6+${strMod}`, resolvedStats.damageBonus + paDmgBonus)}
-                            </Button>
-                            <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d8+${dexMod}`, resolvedStats.damageBonus), 'Daño Ranged')}>
-                              Daño Ranged {addModifierToNotation(`1d8+${dexMod}`, resolvedStats.damageBonus)}
-                            </Button>
-                          </>
-                        )
-                      })()}
-                    </div>
+                              onRollDamage={() => handleQuickRoll(rangedDmgNotation, 'Daño Ranged')}
+                            />
+                          )}
+                        </>
+                      )
+                    })()
                   )}
                 </div>
+              </Card>
+
+              {/* Combat Actions */}
+              <Card padding="md">
+                <h3 className={styles.sectionTitle}><ListChecks size={18} />Acciones en Combate</h3>
+                <CombatActionsPanel />
               </Card>
 
               {/* Class Features */}

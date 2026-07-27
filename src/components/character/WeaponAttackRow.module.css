@@ -1,36 +1,86 @@
 .weaponRow {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(110px, 1.4fr) 76px minmax(90px, 1.3fr) 84px;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  flex-wrap: wrap;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.weaponRow:last-child {
+  border-bottom: none;
 }
 
 .weaponInfo {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-width: 120px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .weaponName {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .weaponCrit {
   font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+.weaponRange {
   font-size: 0.75rem;
   color: var(--color-text-secondary);
 }
 
-.weaponBtns {
+.hitCell {
   display: flex;
-  gap: var(--space-2);
   flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.hitBtn,
+.damageBtn {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.hitBtn:hover,
+.damageBtn:hover {
+  border-color: var(--color-accent-gold);
+}
+
+.damageBtn {
+  color: var(--color-accent-red);
+  justify-self: end;
+}
+
+@media (max-width: 640px) {
+  .weaponRow {
+    grid-template-columns: 1fr 56px;
+    grid-template-areas:
+      'info hit'
+      'range hit'
+      'damage damage';
+    row-gap: var(--space-1);
+  }
+
+  .weaponInfo { grid-area: info; }
+  .weaponRange { grid-area: range; }
+  .hitCell { grid-area: hit; justify-content: flex-end; }
+  .damageBtn { grid-area: damage; justify-self: stretch; }
 }
