@@ -106,6 +106,7 @@ export function PlayMode() {
   const [showStatusEffects, setShowStatusEffects] = useState(false)
   const [hpDrawerOpen, setHpDrawerOpen] = useState(false)
   const [noteDraft, setNoteDraft] = useState('')
+  const [showAllSkills, setShowAllSkills] = useState(false)
 
   // ── Encounter tracker state ──
   const [combatants, setCombatants] = useState<Combatant[]>([])
@@ -611,9 +612,8 @@ export function PlayMode() {
           </button>
         </div>
 
-        {/* ── Grupo: Defensa (CA/Toque/Desprevenido/Iniciativa + CMB/CMD) ── */}
+        {/* ── Grupo: Defensa (CA/Toque/Desprevenido/Iniciativa, Salvaciones, CMB/CMD) ── */}
         <div className={styles.headerGroup}>
-          <span className={styles.headerGroupLabel}>Defensa</span>
           <div className={styles.defenseBand}>
             <StatPill
               label="CA" value={`${ac}`}
@@ -646,6 +646,33 @@ export function PlayMode() {
               <span className={styles.headerRollLabel}>INI</span>
               <span className={styles.headerRollValue}>{initiative >= 0 ? `+${initiative}` : initiative}</span>
             </Button>
+          </div>
+
+          {/* Salvaciones — se tiran en el turno de cualquiera, siempre visibles */}
+          <div className={styles.saveBand}>
+            {([
+              { label: 'Fortaleza', total: fortSave, target: 'save_fort' as ModifierTarget },
+              { label: 'Reflejos', total: refSave, target: 'save_ref' as ModifierTarget },
+              { label: 'Voluntad', total: willSave, target: 'save_will' as ModifierTarget },
+            ]).map(({ label, total, target }) => {
+              const eff = sumSessionModifiers(resolvedStats.allModifiers, [target])
+              return (
+                <Button
+                  key={label} variant="secondary" size="sm" className={styles.headerRollBtn}
+                  onClick={() => handleQuickRoll(`1d20+${total}`, `${label} (+${total})`)}
+                >
+                  <span className={styles.headerRollLabel}>{label}</span>
+                  <span className={styles.headerRollValue}>
+                    {total >= 0 ? `+${total}` : total}
+                    {eff !== 0 && (
+                      <span className={eff > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
+                        {eff > 0 ? `+${eff}` : eff}
+                      </span>
+                    )}
+                  </span>
+                </Button>
+              )
+            })}
           </div>
 
           <div className={styles.defenseBand}>
@@ -683,58 +710,6 @@ export function PlayMode() {
               </span>
             </Button>
           </div>
-        </div>
-
-        {/* ── Grupo: Stats (FUE/DES/CON/INT/SAB/CAR con modificador y puntuación) ── */}
-        <div className={styles.headerGroup}>
-          <span className={styles.headerGroupLabel}>Stats</span>
-          <div className={styles.headerAbilityGrid}>
-            {([
-              { label: 'FUE', score: abilities.strength },
-              { label: 'DES', score: abilities.dexterity },
-              { label: 'CON', score: abilities.constitution },
-              { label: 'INT', score: abilities.intelligence },
-              { label: 'SAB', score: abilities.wisdom },
-              { label: 'CAR', score: abilities.charisma },
-            ]).map(({ label, score }) => (
-              <button
-                key={label}
-                className={styles.headerAbilityCard}
-                onClick={() => handleQuickRoll(`1d20+${calculateModifier(score)}`, `Prueba ${label}`)}
-              >
-                <span className={styles.headerAbilityLabel}>{label}</span>
-                <span className={styles.headerAbilityMod}>{getModifierString(score)}</span>
-                <span className={styles.headerAbilityScore}>{score}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Banda de salvaciones — se tiran en el turno de cualquiera, siempre visibles */}
-        <div className={styles.saveBand}>
-          {([
-            { label: 'Fortaleza', total: fortSave, target: 'save_fort' as ModifierTarget },
-            { label: 'Reflejos', total: refSave, target: 'save_ref' as ModifierTarget },
-            { label: 'Voluntad', total: willSave, target: 'save_will' as ModifierTarget },
-          ]).map(({ label, total, target }) => {
-            const eff = sumSessionModifiers(resolvedStats.allModifiers, [target])
-            return (
-              <Button
-                key={label} variant="secondary" size="sm" className={styles.headerRollBtn}
-                onClick={() => handleQuickRoll(`1d20+${total}`, `${label} (+${total})`)}
-              >
-                <span className={styles.headerRollLabel}>{label}</span>
-                <span className={styles.headerRollValue}>
-                  {total >= 0 ? `+${total}` : total}
-                  {eff !== 0 && (
-                    <span className={eff > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
-                      {eff > 0 ? `+${eff}` : eff}
-                    </span>
-                  )}
-                </span>
-              </Button>
-            )
-          })}
         </div>
       </header>
 
@@ -790,6 +765,30 @@ export function PlayMode() {
                   onExplain={() => handleQuickRoll(`1d20+${senseMotiveTotal}`, 'Sentir Motivaciones')}
                 />
               </div>
+
+              <Card padding="md">
+                <h3 className={styles.sectionTitle}><Brain size={18} />Características</h3>
+                <div className={styles.headerAbilityGrid}>
+                  {([
+                    { label: 'FUE', score: abilities.strength },
+                    { label: 'DES', score: abilities.dexterity },
+                    { label: 'CON', score: abilities.constitution },
+                    { label: 'INT', score: abilities.intelligence },
+                    { label: 'SAB', score: abilities.wisdom },
+                    { label: 'CAR', score: abilities.charisma },
+                  ]).map(({ label, score }) => (
+                    <button
+                      key={label}
+                      className={styles.headerAbilityCard}
+                      onClick={() => handleQuickRoll(`1d20+${calculateModifier(score)}`, `Prueba ${label}`)}
+                    >
+                      <span className={styles.headerAbilityLabel}>{label}</span>
+                      <span className={styles.headerAbilityMod}>{getModifierString(score)}</span>
+                      <span className={styles.headerAbilityScore}>{score}</span>
+                    </button>
+                  ))}
+                </div>
+              </Card>
             </div>
           )}
 
@@ -1288,27 +1287,42 @@ export function PlayMode() {
           {activeTab === 'skills' && (
             <div className={styles.tabContent}>
               <Card padding="md">
-                <h3 className={styles.sectionTitle}><Brain size={18} />Habilidades con Rangos</h3>
-                {character.skills && character.skills.some((sr) => sr.ranks > 0) ? (
-                  <div className={styles.skillsTable}>
-                    <div className={styles.skillsTableHeader}>
-                      <span>Clase</span>
-                      <span>Atr</span>
-                      <span>Habilidad</span>
-                      <span>Bono</span>
-                    </div>
-                    {character.skills
-                      .filter((sr) => sr.ranks > 0)
-                      .map((skillRank) => ({ skillRank, skillDef: SKILLS.find((s) => s.id === skillRank.id) }))
-                      .filter((row) => row.skillDef !== undefined)
-                      .sort((a, b) => a.skillDef!.name.localeCompare(b.skillDef!.name))
-                      .map(({ skillRank, skillDef: maybeSkillDef }) => {
-                        const skillDef = maybeSkillDef!
-                        const isClassSkill = isClassSkillForCharacter({ ...character, archetypesByClassId }, skillRank.id)
-                        const skillEffectBonus = resolvedStats.skillBonuses[skillRank.id] ?? 0
+                <div className={styles.sectionTitleRow}>
+                  <h3 className={styles.sectionTitle}><Brain size={18} />Habilidades</h3>
+                  <div className={styles.skillsFilterToggle}>
+                    <button
+                      className={`${styles.skillsFilterBtn} ${!showAllSkills ? styles.skillsFilterBtnActive : ''}`}
+                      onClick={() => setShowAllSkills(false)}
+                    >
+                      Con rangos
+                    </button>
+                    <button
+                      className={`${styles.skillsFilterBtn} ${showAllSkills ? styles.skillsFilterBtnActive : ''}`}
+                      onClick={() => setShowAllSkills(true)}
+                    >
+                      Todas
+                    </button>
+                  </div>
+                </div>
+                {(() => {
+                  const rows = (showAllSkills
+                    ? SKILLS
+                    : SKILLS.filter((s) => (character.skills.find((sr) => sr.id === s.id)?.ranks ?? 0) > 0)
+                  ).slice().sort((a, b) => a.name.localeCompare(b.name))
+                  return rows.length > 0 ? (
+                    <div className={styles.skillsTable}>
+                      <div className={styles.skillsTableHeader}>
+                        <span>Clase</span>
+                        <span>Atr</span>
+                        <span>Habilidad</span>
+                        <span>Bono</span>
+                      </div>
+                      {rows.map((skillDef) => {
+                        const isClassSkill = isClassSkillForCharacter({ ...character, archetypesByClassId }, skillDef.id)
+                        const skillEffectBonus = resolvedStats.skillBonuses[skillDef.id] ?? 0
                         const total = computeSkillTotal({ ...character, archetypesByClassId }, skillDef, resolvedStats, equippedArmorAcp, encumbrancePenalty)
                         return (
-                          <div key={skillRank.id} className={styles.skillsTableRow}>
+                          <div key={skillDef.id} className={styles.skillsTableRow}>
                             <span className={`${styles.skillProf} ${isClassSkill ? styles.skillProfOn : ''}`}>●</span>
                             <span className={styles.skillMod}>{abilityAbbr[skillDef.ability]}</span>
                             <span className={styles.skillNameCell}>{skillDef.name}</span>
@@ -1326,34 +1340,11 @@ export function PlayMode() {
                           </div>
                         )
                       })}
-                  </div>
-                ) : (
-                  <p className={styles.emptyHistory}>Sin habilidades con rangos</p>
-                )}
-              </Card>
-
-              <Card padding="md">
-                <h3 className={styles.sectionTitle}><Brain size={18} />Pruebas de Característica</h3>
-                <div className={styles.abilityGrid}>
-                  {([
-                    { label: 'Fuerza', abbr: 'FUE', score: abilities.strength },
-                    { label: 'Destreza', abbr: 'DES', score: abilities.dexterity },
-                    { label: 'Constitución', abbr: 'CON', score: abilities.constitution },
-                    { label: 'Inteligencia', abbr: 'INT', score: abilities.intelligence },
-                    { label: 'Sabiduría', abbr: 'SAB', score: abilities.wisdom },
-                    { label: 'Carisma', abbr: 'CAR', score: abilities.charisma },
-                  ]).map(({ label, abbr, score }) => (
-                    <button
-                      key={abbr}
-                      className={styles.abilityCard}
-                      onClick={() => handleQuickRoll(`1d20+${calculateModifier(score)}`, `Prueba ${abbr}`)}
-                    >
-                      <span className={styles.abilityLabel}>{label}</span>
-                      <span className={styles.abilityMod}>{getModifierString(score)}</span>
-                      <span className={styles.abilityScore}>{score}</span>
-                    </button>
-                  ))}
-                </div>
+                    </div>
+                  ) : (
+                    <p className={styles.emptyHistory}>Sin habilidades con rangos</p>
+                  )
+                })()}
               </Card>
             </div>
           )}

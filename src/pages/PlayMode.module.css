@@ -18,7 +18,7 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: var(--color-bg-primary);
+  background: var(--color-surface-container-highest);
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-3) 0 var(--space-3);
   margin-bottom: var(--space-4);
@@ -192,19 +192,11 @@
   white-space: nowrap;
 }
 
-/* ── Grupo de cabecera con etiqueta (Defensa / Stats) ── */
+/* ── Grupo de cabecera (Defensa + Salvaciones + CMB/CMD) ── */
 .headerGroup {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-}
-
-.headerGroupLabel {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-text-secondary);
-  opacity: 0.8;
 }
 
 /* ── Banda de defensas (CA/Toque/Desprevenido informativos + Iniciativa tirable; también CMB/CMD) ── */
@@ -463,58 +455,31 @@
   gap: var(--space-2);
 }
 
-/* ── Ability cards ("plate"): modificador grande, puntuación pequeña en óvalo ── */
-.abilityGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
-}
-
-.abilityCard {
+/* ── Filtro Todas / Con rangos ── */
+.skillsFilterToggle {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-2);
+  gap: 2px;
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: border-color var(--transition-fast);
+  border-radius: var(--radius-sm);
+  padding: 2px;
 }
 
-.abilityCard:hover {
-  border-color: var(--color-accent-gold);
-}
-
-.abilityLabel {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.skillsFilterBtn {
+  padding: var(--space-1) var(--space-2);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
-}
-
-.abilityMod {
-  font-family: var(--font-mono);
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-accent-gold);
-}
-
-.abilityScore {
-  font-family: var(--font-mono);
   font-size: 0.7rem;
-  color: var(--color-text-secondary);
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  padding: 1px 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
-@media (max-width: 480px) {
-  .abilityGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.skillsFilterBtnActive {
+  background: var(--color-accent-gold);
+  color: var(--color-bg-primary);
 }
 
 /* ── Skills: tabla Clase · Atr · Habilidad · Bono ── */
