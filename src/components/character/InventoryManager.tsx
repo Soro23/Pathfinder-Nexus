@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
-import { Plus, Trash2, Package, Coins, Weight, Search, Loader, Star, FlaskConical } from 'lucide-react'
-import { Card, Button, Input } from '../ui'
+import { Plus, Minus, Trash2, Package, Coins, Weight, Search, Loader, Star, FlaskConical, Diamond, Circle, Triangle, Square } from 'lucide-react'
+import { Card, Button, Input, Drawer } from '../ui'
 import { generateId } from '../../store'
 import type { InventoryItem } from '../../store'
 import type { EncumbranceLevel } from '../../engine'
@@ -21,6 +21,14 @@ interface InventoryManagerProps {
 }
 
 type AddMode = 'manual' | 'catalog'
+type CoinType = 'pp' | 'gp' | 'sp' | 'cp'
+
+const COIN_META: Record<CoinType, { name: string; icon: typeof Diamond; color: string; rate: string }> = {
+  pp: { name: 'Platino', icon: Diamond, color: '#b0c4de', rate: '1 pp = 10 gp' },
+  gp: { name: 'Oro', icon: Circle, color: 'var(--color-accent-gold)', rate: '' },
+  sp: { name: 'Plata', icon: Triangle, color: '#c0c0c0', rate: '1 gp = 10 sp' },
+  cp: { name: 'Cobre', icon: Square, color: '#b87333', rate: '1 gp = 100 cp' },
+}
 
 const ENCUMBRANCE_WARNING: Partial<Record<EncumbranceLevel, string>> = {
   medium: 'Carga media: velocidad reducida y penalización a Acrobacias/Escapismo/Sigilo/Trepar/Nadar.',
@@ -50,8 +58,9 @@ export function InventoryManager({
   const [selectedCatalogItem, setSelectedCatalogItem] = useState<CatalogItem | null>(null)
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Quick gold state
-  const [quickGoldAmount, setQuickGoldAmount] = useState('')
+  // Coin management panel
+  const [coinPanelOpen, setCoinPanelOpen] = useState(false)
+  const [coinAdjust, setCoinAdjust] = useState<Record<CoinType, string>>({ pp: '', gp: '', sp: '', cp: '' })
 
   const totalWeight = items.reduce((sum, item) => sum + item.weight * item.quantity, 0)
   const isOverEncumbered = encumbrance !== 'light'
@@ -103,21 +112,20 @@ export function InventoryManager({
     ))
   }
 
-  const updateCoin = (type: 'pp' | 'gp' | 'sp' | 'cp', value: number) => {
+  const coinValue = (type: CoinType) =>
+    type === 'pp' ? platinum : type === 'gp' ? gold : type === 'sp' ? silver : copper
+
+  const applyCoinAdjust = (sign: 1 | -1) => {
     onChangeCoins({
-      pp: type === 'pp' ? Math.max(0, value) : platinum,
-      gp: type === 'gp' ? Math.max(0, value) : gold,
-      sp: type === 'sp' ? Math.max(0, value) : silver,
-      cp: type === 'cp' ? Math.max(0, value) : copper,
+      pp: Math.max(0, platinum + sign * (parseInt(coinAdjust.pp) || 0)),
+      gp: Math.max(0, gold + sign * (parseInt(coinAdjust.gp) || 0)),
+      sp: Math.max(0, silver + sign * (parseInt(coinAdjust.sp) || 0)),
+      cp: Math.max(0, copper + sign * (parseInt(coinAdjust.cp) || 0)),
     })
+    setCoinAdjust({ pp: '', gp: '', sp: '', cp: '' })
   }
 
-  const handleQuickGold = (sign: 1 | -1) => {
-    const amount = parseFloat(quickGoldAmount)
-    if (!amount || isNaN(amount) || amount <= 0) return
-    updateCoin('gp', gold + sign * amount)
-    setQuickGoldAmount('')
-  }
+  const clearCoinAdjust = () => setCoinAdjust({ pp: '', gp: '', sp: '', cp: '' })
 
   // Catalog search with debounce
   const handleCatalogSearch = (query: string) => {
@@ -153,49 +161,85 @@ export function InventoryManager({
           <Coins size={18} className={styles.coinsIcon} />
           <h4>Monedas</h4>
         </div>
-        <div className={styles.coinsGrid}>
+        <div className={styles.coinChipsRow}>
           {(['pp', 'gp', 'sp', 'cp'] as const).map((type) => {
-            const val = type === 'pp' ? platinum : type === 'gp' ? gold : type === 'sp' ? silver : copper
+            const meta = COIN_META[type]
+            const Icon = meta.icon
             return (
-              <div key={type} className={styles.coinRow}>
-                <span className={`${styles.coinLabel} ${styles[`coin_${type}`]}`}>{type.toUpperCase()}</span>
-                <button className={styles.coinBtn} onClick={() => updateCoin(type, val - 1)}>-</button>
-                <input
-                  className={styles.coinInput}
-                  type="number"
-                  min={0}
-                  value={val}
-                  onChange={(e) => updateCoin(type, parseInt(e.target.value) || 0)}
-                />
-                <button className={styles.coinBtn} onClick={() => updateCoin(type, val + 1)}>+</button>
+              <button
+                key={type}
+                type="button"
+                className={styles.coinChip}
+                onClick={() => setCoinPanelOpen(true)}
+                title={meta.name}
+              >
+                <Icon size={14} color={meta.color} fill={meta.color} />
+                <span className={styles.coinChipValue}>{coinValue(type)}</span>
+              </button>
+            )
+          })}
+        </div>
+        <div className={styles.totalGold}>
+          Total: <strong>{totalGoldValue.toFixed(2)} GP</strong>
+        </div>
+      </Card>
+
+      <Drawer open={coinPanelOpen} onClose={() => setCoinPanelOpen(false)} title="Gestionar Monedas">
+        <div className={styles.coinPanelTotal}>
+          <span>Total (en gp)</span>
+          <strong>{totalGoldValue.toFixed(2)} GP</strong>
+        </div>
+
+        <div className={styles.coinPanelList}>
+          {(['pp', 'gp', 'sp', 'cp'] as const).map((type) => {
+            const meta = COIN_META[type]
+            const Icon = meta.icon
+            return (
+              <div key={type} className={styles.coinPanelRow}>
+                <Icon size={18} color={meta.color} fill={meta.color} />
+                <div className={styles.coinPanelRowInfo}>
+                  <span className={styles.coinPanelRowName}>{meta.name} ({type})</span>
+                  {meta.rate && <span className={styles.coinPanelRowRate}>{meta.rate}</span>}
+                </div>
+                <span className={styles.coinPanelRowValue}>{coinValue(type)}</span>
               </div>
             )
           })}
         </div>
 
-        {/* Quick gold transaction */}
-        <div className={styles.quickGoldRow}>
-          <input
-            className={styles.quickGoldInput}
-            type="number"
-            min={1}
-            placeholder="Cantidad GP..."
-            value={quickGoldAmount}
-            onChange={(e) => setQuickGoldAmount(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleQuickGold(1) }}
-          />
-          <button className={`${styles.quickGoldBtn} ${styles.quickGoldAdd}`} onClick={() => handleQuickGold(1)} title="Ganar GP">
-            + GP
-          </button>
-          <button className={`${styles.quickGoldBtn} ${styles.quickGoldSub}`} onClick={() => handleQuickGold(-1)} title="Gastar GP">
-            − GP
-          </button>
+        <div className={styles.coinPanelAdjust}>
+          <h5>Ajustar Monedas</h5>
+          <div className={styles.coinPanelAdjustGrid}>
+            {(['pp', 'gp', 'sp', 'cp'] as const).map((type) => (
+              <div key={type} className={styles.coinPanelAdjustField}>
+                <span className={styles.coinPanelAdjustLabel} style={{ color: COIN_META[type].color }}>
+                  {type.toUpperCase()}
+                </span>
+                <input
+                  className={styles.coinPanelAdjustInput}
+                  type="number"
+                  min={0}
+                  value={coinAdjust[type]}
+                  onChange={(e) => setCoinAdjust({ ...coinAdjust, [type]: e.target.value })}
+                />
+              </div>
+            ))}
+          </div>
+          <div className={styles.coinPanelAdjustActions}>
+            <Button variant="primary" size="sm" onClick={() => applyCoinAdjust(1)}>
+              <Plus size={14} />
+              Añadir
+            </Button>
+            <Button variant="danger" size="sm" onClick={() => applyCoinAdjust(-1)}>
+              <Minus size={14} />
+              Quitar
+            </Button>
+            <Button variant="ghost" size="sm" onClick={clearCoinAdjust}>
+              Limpiar
+            </Button>
+          </div>
         </div>
-
-        <div className={styles.totalGold}>
-          Total: <strong>{totalGoldValue.toFixed(2)} GP</strong>
-        </div>
-      </Card>
+      </Drawer>
 
       {/* ── Peso ── */}
       <div className={styles.weightCard}>

@@ -25,122 +25,33 @@
   color: var(--color-accent-gold);
 }
 
-.coinsGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-3);
+.coinChipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
-.coinRow {
+.coinChip {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: var(--space-1);
-}
-
-.coinLabel {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  min-width: 24px;
-}
-
-.coin_pp { color: #b0c4de; }
-.coin_gp { color: var(--color-accent-gold); }
-.coin_sp { color: #c0c0c0; }
-.coin_cp { color: #b87333; }
-
-.coinRow {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.coinBtn {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-primary);
-  font-size: 1rem;
+  border-radius: var(--radius-full);
+  padding: var(--space-1) var(--space-3);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.coinBtn:hover {
+.coinChip:hover {
   border-color: var(--color-accent-gold);
-  color: var(--color-accent-gold);
 }
 
-.coinInput {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  width: 52px;
-  text-align: center;
-  color: var(--color-accent-gold);
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--color-border);
-  padding: 0 2px;
-  outline: none;
-}
-
-.coinInput:focus {
-  border-bottom-color: var(--color-accent-gold);
-}
-
-/* Quick gold row */
-.quickGoldRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-  padding-top: var(--space-2);
-  border-top: 1px dashed var(--color-border);
-}
-
-.quickGoldInput {
-  flex: 1;
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
+.coinChipValue {
   font-family: var(--font-mono);
   font-size: 0.875rem;
-  color: var(--color-text-primary);
-  outline: none;
-}
-
-.quickGoldInput:focus { border-color: var(--color-accent-gold); }
-.quickGoldInput::placeholder { color: var(--color-text-secondary); opacity: 0.6; }
-
-.quickGoldBtn {
-  padding: var(--space-1) var(--space-2);
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
   font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: opacity var(--transition-fast);
-}
-
-.quickGoldBtn:hover { opacity: 0.85; }
-
-.quickGoldAdd {
-  background: rgba(74, 124, 74, 0.25);
-  color: var(--color-accent-green);
-}
-
-.quickGoldSub {
-  background: rgba(139, 58, 58, 0.25);
-  color: var(--color-accent-red);
+  color: var(--color-text-primary);
 }
 
 .totalGold {
@@ -154,6 +65,128 @@
 
 .totalGold strong {
   color: var(--color-accent-gold);
+}
+
+/* ── Coin management panel ── */
+.coinPanelTotal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.coinPanelTotal strong {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--color-accent-gold);
+}
+
+.coinPanelList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.coinPanelRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.coinPanelRow:last-child {
+  border-bottom: none;
+}
+
+.coinPanelRowInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.coinPanelRowName {
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.coinPanelRowRate {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  opacity: 0.75;
+}
+
+.coinPanelRowValue {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.coinPanelAdjust {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.coinPanelAdjust h5 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.coinPanelAdjustGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.coinPanelAdjustField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.coinPanelAdjustLabel {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.coinPanelAdjustInput {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1);
+  outline: none;
+}
+
+.coinPanelAdjustInput:focus {
+  border-color: var(--color-accent-gold);
+}
+
+.coinPanelAdjustActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.coinPanelAdjustActions > * {
+  flex: 1;
 }
 
 .weightCard {
@@ -603,7 +636,7 @@
 }
 
 @media (max-width: 600px) {
-  .coinsGrid {
+  .coinPanelAdjustGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -628,8 +661,7 @@
   }
 
   .deleteBtn,
-  .equipBtn,
-  .coinBtn {
+  .equipBtn {
     width: 32px;
     height: 32px;
   }
