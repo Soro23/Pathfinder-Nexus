@@ -4,7 +4,7 @@ import {
   ArrowLeft, Play, Edit2, Trash2,
   Sword, Shield, Scroll, Package, Star,
   Heart, Eye, PlusCircle, X, PawPrint, BookOpen, Download,
-  Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle, Menu
+  Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle, Menu, Layers
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
@@ -12,12 +12,12 @@ import { getClassById, getRaceById, hasFloatingAbilityBonus, SpellLevel, useSRDS
 import { resolveClassSkills, buildArchetypesByClassId } from '../data/resolveArchetype'
 import { resolveModifiers, canLevelUpFromXp, computeCombatStats, computeEffectiveMaxHp, computeSkillPointsAvailable, computeSkillTotal, getExpectedFeatCount, getXpToNextLevel, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, getEncumbranceSkillPenalty, computeSpeed, computeSyncedSpellSlots, validateProgressionAgainstCharacter, XP_SPEED_LABELS } from '../engine'
 import { Card, Button } from '../components/ui'
-import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker } from '../components/character'
+import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker, FeaturesTraitsPanel } from '../components/character'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
 import type { LevelUpUpdates } from '../components/character'
 import styles from './CharacterView.module.css'
 
-type Tab = 'combat' | 'skills' | 'feats' | 'weapons' | 'inventory' | 'spells' | 'notes' | 'companion'
+type Tab = 'combat' | 'features' | 'skills' | 'feats' | 'weapons' | 'inventory' | 'spells' | 'notes' | 'companion'
 
 type CharacterNotification = {
   id: string
@@ -351,6 +351,7 @@ export function CharacterView() {
 
   const tabs = [
     { id: 'combat' as Tab, label: 'Personaje', icon: Sword },
+    { id: 'features' as Tab, label: 'Rasgos', icon: Layers },
     ...(isCaster ? [{ id: 'spells' as Tab, label: 'Hechizos', icon: Scroll }] : []),
     { id: 'inventory' as Tab, label: 'Inventario', icon: Package },
     { id: 'skills' as Tab, label: 'Habilidades', icon: Star },
@@ -1133,6 +1134,20 @@ export function CharacterView() {
               )}
             </Card>
           </div>
+        )}
+
+        {/* ══ RASGOS Y CARACTERÍSTICAS ══ */}
+        {activeTab === 'features' && (
+          <Card padding="md">
+            <h3 className={styles.sectionTitle}>Características y Rasgos</h3>
+            <FeaturesTraitsPanel
+              classes={character.classes}
+              race={character.race}
+              feats={character.feats}
+              archetypesByClassId={archetypesByClassId}
+              allFeats={FEATS}
+            />
+          </Card>
         )}
 
         {/* ══ HABILIDADES ══ */}

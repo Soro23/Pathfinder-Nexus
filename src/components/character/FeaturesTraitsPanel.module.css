@@ -1,0 +1,113 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.filterTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.filterTab {
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filterTab:hover {
+  border-color: var(--color-accent-gold);
+  color: var(--color-text-primary);
+}
+
+.filterTabActive {
+  background: var(--color-accent-gold);
+  border-color: var(--color-accent-gold);
+  color: var(--color-bg-primary);
+}
+
+.empty {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: var(--space-4) 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent-gold);
+  margin: 0;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.subgroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.subgroupTitle {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.entryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.entry {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-accent-gold);
+}
+
+.entryHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.entryName {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.entryMeta {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.entryDesc {
+  margin: var(--space-1) 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
