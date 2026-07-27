@@ -3,6 +3,7 @@ import {
   Sparkles, Star, Zap, Shield, Globe,
   PlusCircle, Trash2, ChevronDown, ChevronUp, Loader2,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useHomebrewStore } from '../store/homebrewStore'
 import type { HomebrewType } from '../store/homebrewStore'
 import { SPELL_SCHOOLS } from '../data/spells'
@@ -47,7 +48,7 @@ function Txt(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
 
 // ── Tab definitions ───────────────────────────────────────────────────────────
 
-const TABS: { id: HomebrewType; label: string; icon: React.ElementType }[] = [
+const TABS: { id: HomebrewType; label: string; icon: LucideIcon }[] = [
   { id: 'spell',  label: 'Conjuros',     icon: Sparkles },
   { id: 'feat',   label: 'Dotes',        icon: Star },
   { id: 'skill',  label: 'Habilidades',  icon: Zap },
