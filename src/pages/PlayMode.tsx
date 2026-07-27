@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
-  Swords, X, Zap, BookOpen, Activity, Menu, Backpack, ScrollText, NotebookPen
+  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { JournalEntry } from '../store'
@@ -1649,35 +1649,32 @@ export function PlayMode() {
 
         {/* ── Menú flotante de secciones ── */}
         {tabMenuOpen && (
-          <div className={styles.tabMenuFloating}>
-            <div className={styles.dicePanelHeader}>
-              <span className={styles.dicePanelTitle}><Menu size={16} /> Secciones</span>
-              <button className={styles.dicePanelClose} onClick={() => setTabMenuOpen(false)}>
-                <X size={16} />
-              </button>
+          <>
+            <div className={styles.tabMenuOverlay} onClick={() => setTabMenuOpen(false)} />
+            <div className={styles.tabMenuFloating}>
+              <div className={styles.tabMenuGrid}>
+                {([
+                  { id: 'combat' as TabId, icon: Swords, label: 'COMBATE' },
+                  { id: 'skills' as TabId, icon: Brain, label: 'HABILIDADES' },
+                  { id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' },
+                  { id: 'inventory' as TabId, icon: Backpack, label: 'INVENTARIO' },
+                  { id: 'background' as TabId, icon: ScrollText, label: 'TRASFONDO' },
+                  { id: 'notes' as TabId, icon: NotebookPen, label: 'NOTAS' },
+                  { id: 'dice' as TabId, icon: Dices, label: 'DADOS' },
+                  { id: 'encounter' as TabId, icon: Swords, label: 'ENCUENTRO' },
+                ]).map(({ id, icon: Icon, label }) => (
+                  <button
+                    key={id}
+                    className={`${styles.tabMenuItem} ${activeTab === id ? styles.tabMenuItemActive : ''}`}
+                    onClick={() => { setActiveTab(id); setTabMenuOpen(false) }}
+                  >
+                    <Icon size={20} />
+                    <span>{label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className={styles.tabMenuGrid}>
-              {([
-                { id: 'combat' as TabId, icon: Swords, label: 'COMBATE' },
-                { id: 'skills' as TabId, icon: Brain, label: 'HABILIDADES' },
-                { id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' },
-                { id: 'inventory' as TabId, icon: Backpack, label: 'INVENTARIO' },
-                { id: 'background' as TabId, icon: ScrollText, label: 'TRASFONDO' },
-                { id: 'notes' as TabId, icon: NotebookPen, label: 'NOTAS' },
-                { id: 'dice' as TabId, icon: Dices, label: 'DADOS' },
-                { id: 'encounter' as TabId, icon: Swords, label: 'ENCUENTRO' },
-              ]).map(({ id, icon: Icon, label }) => (
-                <button
-                  key={id}
-                  className={`${styles.tabMenuItem} ${activeTab === id ? styles.tabMenuItemActive : ''}`}
-                  onClick={() => { setActiveTab(id); setTabMenuOpen(false) }}
-                >
-                  <Icon size={20} />
-                  <span>{label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+          </>
         )}
 
         {/* ── Control fijo inferior-derecha: acceso al menú de secciones con el pulgar ── */}
@@ -1687,7 +1684,7 @@ export function PlayMode() {
             onClick={() => setTabMenuOpen(!tabMenuOpen)}
             title="Secciones"
           >
-            <Menu size={18} />
+            <LayoutGrid size={18} />
           </button>
         </div>
 

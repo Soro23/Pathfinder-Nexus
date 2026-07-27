@@ -1126,6 +1126,13 @@
 }
 
 /* ── Menú flotante de secciones: ocupa todo el ancho, encima del cluster derecho ── */
+.tabMenuOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 99;
+}
+
 .tabMenuFloating {
   position: fixed;
   bottom: 80px;
