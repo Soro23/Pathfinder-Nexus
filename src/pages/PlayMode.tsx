@@ -262,6 +262,11 @@ export function PlayMode() {
     )
   }
 
+  const resetDicePool = () => {
+    setDicePool({})
+    setDiceNotation('1d20')
+  }
+
   const handleQuickRoll = (notation: string, name: string, isAttack = false, breakdownInput?: RollBreakdownInput) => {
     setLastRollType(name)
     if (!breakdownInput) setRollBreakdown(null)
@@ -1651,38 +1656,35 @@ export function PlayMode() {
               </button>
             </div>
             <div className={styles.dicePanelContent}>
-              <div className={styles.dicePanelInput}>
-                <input
-                  type="text"
-                  value={diceNotation}
-                  onChange={(e) => setDiceNotation(e.target.value)}
-                  placeholder="1d20+5"
-                  className={styles.diceInputField}
-                  onKeyDown={(e) => e.key === 'Enter' && handleRoll()}
-                />
-                <Button variant="primary" size="sm" onClick={handleRoll} className={rolling ? styles.btnShaking : ''}>
-                  Tirar
-                </Button>
+              <div className={styles.dicePanelGrid}>
+                {([
+                  { sides: 20, shape: styles.diceShapeD20 },
+                  { sides: 12, shape: styles.diceShapeD12 },
+                  { sides: 100, shape: styles.diceShapeD100 },
+                  { sides: 10, shape: styles.diceShapeD10 },
+                  { sides: 8, shape: styles.diceShapeD8 },
+                  { sides: 6, shape: styles.diceShapeD6 },
+                  { sides: 4, shape: styles.diceShapeD4 },
+                ]).map(({ sides, shape }) => {
+                  const count = dicePool[sides] ?? 0
+                  return (
+                    <button
+                      key={sides}
+                      className={styles.dicePanelDiceBtn}
+                      onClick={() => bumpDicePreset(sides)}
+                    >
+                      <span className={`${styles.diceShape} ${shape} ${count > 0 ? styles.diceShapeActive : ''}`}>
+                        {count > 0 && <span className={styles.diceShapeBadge}>{count}</span>}
+                      </span>
+                      <span className={styles.diceShapeLabel}>d{sides}</span>
+                    </button>
+                  )
+                })}
               </div>
-              <div className={styles.dicePanelPresets}>
-                {[4, 6, 8, 10, 12, 20, 100].map((sides) => (
-                  <button
-                    key={sides}
-                    className={styles.dicePanelPresetBtn}
-                    onClick={() => bumpDicePreset(sides)}
-                  >
-                    1d{sides}
-                  </button>
-                ))}
+              <div className={styles.dicePanelActions}>
+                <Button variant="secondary" onClick={resetDicePool}>Reset</Button>
+                <Button variant="primary" onClick={handleRoll} className={rolling ? styles.btnShaking : ''}>Roll</Button>
               </div>
-              {rollResult !== null && (
-                <div className={styles.dicePanelResult}>
-                  <span className={styles.dicePanelResultNumber}>{rollResult.total}</span>
-                  {rollResult.rolls.length > 1 && (
-                    <span className={styles.dicePanelRollsDetail}>[{rollResult.rolls.join(' + ')}]</span>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         )}

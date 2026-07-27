@@ -1327,65 +1327,83 @@
   gap: var(--space-3);
 }
 
-.dicePanelInput {
-  display: flex;
+/* ── Rejilla de dados del panel flotante (uno por tipo, con forma propia) ── */
+.dicePanelGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-2);
 }
 
-.dicePanelInput .diceInputField {
-  flex: 1;
-  padding: var(--space-2);
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-primary);
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-}
-
-.dicePanelInput .diceInputField:focus {
-  outline: none;
-  border-color: var(--color-accent-gold);
-}
-
-.dicePanelPresets {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+.dicePanelDiceBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: var(--space-1);
-}
-
-.dicePanelPresetBtn {
-  padding: var(--space-1) var(--space-2);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  padding: var(--space-2);
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: all var(--transition-fast);
 }
 
-.dicePanelPresetBtn:hover {
-  border-color: var(--color-accent-gold);
-  color: var(--color-accent-gold);
-}
-
-.dicePanelResult {
+.diceShape {
+  position: relative;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-sm);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-fast);
 }
 
-.dicePanelResultNumber {
-  font-family: var(--font-mono);
-  font-size: 2rem;
+.dicePanelDiceBtn:hover .diceShape {
+  border-color: var(--color-accent-gold);
+}
+
+.diceShapeActive {
+  background: color-mix(in srgb, var(--color-accent-gold) 20%, var(--color-bg-secondary));
+  border-color: var(--color-accent-gold);
+}
+
+.diceShapeBadge {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-accent-gold);
+  color: var(--color-bg-primary);
+  font-size: 0.65rem;
   font-weight: 700;
-  color: var(--color-accent-gold);
+}
+
+.diceShapeLabel {
+  font-size: 0.65rem;
+  color: var(--color-text-secondary);
+  text-transform: lowercase;
+}
+
+.diceShapeD4 { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+.diceShapeD6 { border-radius: var(--radius-sm); }
+.diceShapeD8 { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+.diceShapeD10,
+.diceShapeD100 { clip-path: polygon(50% 0%, 100% 40%, 50% 100%, 0% 40%); }
+.diceShapeD12 { clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+.diceShapeD20 { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
+
+/* ── Botones Reset / Roll del panel flotante ── */
+.dicePanelActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dicePanelActions > button {
+  flex: 1;
 }
 
 /* ── Trasfondo (Modo Juego) ── */
@@ -1464,10 +1482,4 @@
   font-size: 0.875rem;
   color: var(--color-text-primary);
   white-space: pre-wrap;
-}
-
-.dicePanelRollsDetail {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
 }
