@@ -46,6 +46,10 @@
 
 .hitBtn,
 .damageBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
   font-family: var(--font-mono);
   font-size: 0.85rem;
   font-weight: 700;
@@ -67,6 +71,11 @@
 .damageBtn {
   color: var(--color-accent-red);
   justify-self: end;
+}
+
+.rollDiceIcon {
+  color: var(--color-primary);
+  flex-shrink: 0;
 }
 
 @media (max-width: 640px) {

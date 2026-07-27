@@ -1,3 +1,4 @@
+import { Dices } from 'lucide-react'
 import styles from './WeaponAttackRow.module.css'
 
 interface WeaponAttackRowProps {
@@ -26,12 +27,14 @@ export function WeaponAttackRow({
           const iterAtk = attackBase - offset
           return (
             <button key={i} className={styles.hitBtn} onClick={() => onRollAttack(iterAtk, i)}>
+              <Dices size={9} className={styles.rollDiceIcon} />
               {iterAtk >= 0 ? `+${iterAtk}` : iterAtk}
             </button>
           )
         })}
       </div>
       <button className={styles.damageBtn} onClick={onRollDamage}>
+        <Dices size={9} className={styles.rollDiceIcon} />
         {damageNotation}
       </button>
     </div>

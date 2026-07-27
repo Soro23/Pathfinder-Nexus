@@ -1,4 +1,4 @@
-import { Flame, Swords } from 'lucide-react'
+import { Flame, Swords, Dices } from 'lucide-react'
 import type { RollBreakdown } from '../../engine'
 import { Button } from '../ui'
 import { ModifierBreakdownList } from './ModifierBreakdownList'
@@ -21,7 +21,7 @@ export function RollExplainDrawer({ breakdown, onConfirmCrit }: RollExplainDrawe
             Si superas la CA del objetivo, el daño se <strong>duplica</strong>.
           </p>
           <div className={styles.critActions}>
-            <Button variant="primary" onClick={onConfirmCrit}>Confirmar Crítico</Button>
+            <Button variant="primary" onClick={onConfirmCrit}><Dices size={14} />Confirmar Crítico</Button>
           </div>
         </>
       )}

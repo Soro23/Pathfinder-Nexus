@@ -895,14 +895,17 @@ export function PlayMode() {
               <div className={styles.combatStats}>
                 <StatPill
                   label="BAB" value={`+${bab}`}
+                  icon={<Info size={9} className={styles.pillInfoIcon} />}
                   onExplain={() => explainStat('BAB', bab, [{ label: 'Suma de BAB por clase', value: bab }], [])}
                 />
                 <StatPill
                   label="Percepción" value={perceptionTotal >= 0 ? `+${perceptionTotal}` : `${perceptionTotal}`}
+                  icon={<Dices size={9} className={styles.rollDiceIcon} />}
                   onExplain={() => handleQuickRoll(`1d20+${perceptionTotal}`, 'Percepción')}
                 />
                 <StatPill
                   label="Sentir Motiv." value={senseMotiveTotal >= 0 ? `+${senseMotiveTotal}` : `${senseMotiveTotal}`}
+                  icon={<Dices size={9} className={styles.rollDiceIcon} />}
                   onExplain={() => handleQuickRoll(`1d20+${senseMotiveTotal}`, 'Sentir Motivaciones')}
                 />
               </div>
@@ -923,7 +926,7 @@ export function PlayMode() {
                       className={styles.headerAbilityCard}
                       onClick={() => handleQuickRoll(`1d20+${calculateModifier(score)}`, `Prueba ${label}`)}
                     >
-                      <span className={styles.headerAbilityLabel}>{label}</span>
+                      <span className={styles.headerAbilityLabel}><Dices size={8} className={styles.rollDiceIcon} />{label}</span>
                       <span className={styles.headerAbilityMod}>{getModifierString(score)}</span>
                       <span className={styles.headerAbilityScore}>{score}</span>
                     </button>
@@ -1107,6 +1110,7 @@ export function PlayMode() {
                           onClick={() => { useFeature('channel', channelMaxUses); handleQuickRoll(`${Math.ceil(clericClass.level / 2)}d6`, 'Canalizar Energía') }}
                           disabled={channelUses <= 0}
                         >
+                          <Dices size={12} className={styles.rollDiceIcon} />
                           Canalizar
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => restoreFeature('channel', channelMaxUses)} disabled={channelUses >= channelMaxUses}>+1</Button>
@@ -1172,6 +1176,7 @@ export function PlayMode() {
                           onClick={() => { useFeature('fervor', fervorMax); handleQuickRoll(`${fervorDice}d6`, 'Fervor') }}
                           disabled={fervorUses <= 0}
                         >
+                          <Dices size={12} />
                           Usar Fervor
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => restoreFeature('fervor', fervorMax)} disabled={fervorUses >= fervorMax}>+1</Button>
@@ -1219,6 +1224,7 @@ export function PlayMode() {
                     {rogueClass && (
                       <ClassFeatureRow name="Ataque Furtivo" meta={`+${sneakDice}d6 daño (flanqueo / negado DES)`}>
                         <Button variant="danger" size="sm" onClick={() => handleQuickRoll(`${sneakDice}d6`, 'Ataque Furtivo (daño extra)')}>
+                          <Dices size={12} />
                           Tirar {sneakDice}d6
                         </Button>
                       </ClassFeatureRow>
@@ -1233,6 +1239,7 @@ export function PlayMode() {
                           onClick={() => { useFeature('lay', layMaxUses); handleQuickRoll(`${Math.max(1, Math.floor(paladinClass.level / 2))}d6`, 'Imponer Manos') }}
                           disabled={layUses <= 0}
                         >
+                          <Dices size={12} />
                           Curar
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => restoreFeature('lay', layMaxUses)} disabled={layUses >= layMaxUses}>+1</Button>
@@ -1297,7 +1304,7 @@ export function PlayMode() {
                           uses={bombUses}
                           max={bombMaxUses}
                         >
-                          <Button variant="danger" size="sm" onClick={() => { useFeature('bomb', bombMaxUses); handleQuickRoll(`${Math.ceil(alchemistClass.level / 2)}d6+${intMod}`, 'Bomba') }} disabled={bombUses <= 0}>Lanzar</Button>
+                          <Button variant="danger" size="sm" onClick={() => { useFeature('bomb', bombMaxUses); handleQuickRoll(`${Math.ceil(alchemistClass.level / 2)}d6+${intMod}`, 'Bomba') }} disabled={bombUses <= 0}><Dices size={12} />Lanzar</Button>
                           <Button variant="ghost" size="sm" onClick={() => restoreFeature('bomb', bombMaxUses)} disabled={bombUses >= bombMaxUses}>+1</Button>
                         </ClassFeatureRow>
                         <ClassFeatureRow
@@ -1402,7 +1409,7 @@ export function PlayMode() {
                         uses={oracleChannelUses}
                         max={oracleChannelMax}
                       >
-                        <Button variant="secondary" size="sm" onClick={() => { useFeature('ochannel', oracleChannelMax); handleQuickRoll(`${Math.ceil(oracleClass.level / 2)}d6`, 'Canal de Energía') }} disabled={oracleChannelUses <= 0}>Canalizar</Button>
+                        <Button variant="secondary" size="sm" onClick={() => { useFeature('ochannel', oracleChannelMax); handleQuickRoll(`${Math.ceil(oracleClass.level / 2)}d6`, 'Canal de Energía') }} disabled={oracleChannelUses <= 0}><Dices size={12} className={styles.rollDiceIcon} />Canalizar</Button>
                         <Button variant="ghost" size="sm" onClick={() => restoreFeature('ochannel', oracleChannelMax)} disabled={oracleChannelUses >= oracleChannelMax}>+1</Button>
                       </ClassFeatureRow>
                     )}
@@ -1500,6 +1507,7 @@ export function PlayMode() {
                               className={styles.skillBonusBtn}
                               onClick={() => handleQuickRoll(`1d20+${total}`, skillDef.name)}
                             >
+                              <Dices size={9} className={styles.rollDiceIcon} />
                               {total >= 0 ? `+${total}` : total}
                               {skillEffectBonus !== 0 && (
                                 <span className={skillEffectBonus > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
@@ -1656,6 +1664,7 @@ export function PlayMode() {
                                         size="sm"
                                         onClick={() => handleQuickRoll(`1d20+${concentrationBonus}`, `Concentración — ${spell.name}`)}
                                       >
+                                        <Dices size={12} className={styles.rollDiceIcon} />
                                         Conc. +{concentrationBonus}
                                       </Button>
                                     </div>
