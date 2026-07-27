@@ -19,15 +19,31 @@
    No se ancla a 100vw/viewport porque el sidebar de Layout desplaza a .main en
    tablet/desktop — anclarse al viewport completo desalinea el header y provoca
    scroll horizontal. En su lugar se expande exactamente el padding horizontal
-   que .main aplica en cada breakpoint (ver Layout.module.css:352-368). */
+   que .main aplica en cada breakpoint (ver Layout.module.css:352-368).
+   El fondo/borde vive en ::before (position:absolute), no en .header: un
+   position:sticky no colapsa su margin-top negativo con el padding del ancestro
+   como lo haría un elemento normal, así que el navegador reserva menos espacio de
+   flujo del que realmente pinta y el contenido siguiente (.combatStats) queda
+   tapado por el propio header. Un ::before absoluto no participa en ese cálculo
+   de flujo y puede sangrar hacia arriba sin ese efecto secundario. */
 .header {
   position: sticky;
   top: 0;
   z-index: 50;
+  width: calc(100% + 2 * var(--space-12));
+  margin: 0 calc(-1 * var(--space-12)) var(--space-4);
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--space-8));
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: var(--color-surface-container-highest);
   border-bottom: 1px solid var(--color-border);
-  width: calc(100% + 2 * var(--space-12));
-  margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-12)) var(--space-4);
+  z-index: -1;
 }
 
 .headerInner {
@@ -39,14 +55,18 @@
   gap: var(--space-3);
 }
 
-/* La compensación de arriba/laterales debe seguir el padding real de .main (Layout.module.css)
-   en cada breakpoint, o el fondo del header deja un hueco o se pasa de largo. */
+/* La compensación lateral y el offset de ::before deben seguir el padding real
+   de .main (Layout.module.css) en cada breakpoint, o el fondo del header deja
+   un hueco o se pasa de largo. */
 @media (max-width: 1024px) {
   .header {
     width: calc(100% + 2 * var(--space-8));
-    margin-top: calc(-1 * var(--space-6));
     margin-left: calc(-1 * var(--space-8));
     margin-right: calc(-1 * var(--space-8));
+  }
+
+  .header::before {
+    top: calc(-1 * var(--space-6));
   }
 
   .headerInner {
@@ -70,9 +90,12 @@
 @media (max-width: 640px) {
   .header {
     width: calc(100% + 2 * var(--space-4));
-    margin-top: calc(-1 * var(--space-4));
     margin-left: calc(-1 * var(--space-4));
     margin-right: calc(-1 * var(--space-4));
+  }
+
+  .header::before {
+    top: calc(-1 * var(--space-4));
   }
 
   .headerInner {
