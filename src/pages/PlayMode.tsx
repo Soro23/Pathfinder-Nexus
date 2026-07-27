@@ -567,148 +567,150 @@ export function PlayMode() {
 
       {/* ── Header ── */}
       <header className={styles.header}>
-        <div className={styles.headerTop}>
-          <Link to={`/characters/${id}`} className={styles.backLink}>
-            <ArrowLeft size={16} />
-            Volver
-          </Link>
-          <div className={styles.headerActions}>
+        <div className={styles.headerInner}>
+          <div className={styles.headerTop}>
+            <Link to={`/characters/${id}`} className={styles.backLink}>
+              <ArrowLeft size={16} />
+              Volver
+            </Link>
+            <div className={styles.headerActions}>
+              <button
+                className={`${styles.statusBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.statusBtnActive : ''}`}
+                onClick={() => setShowStatusEffects(true)}
+                title="Efectos y Condiciones"
+              >
+                <Activity size={16} />
+                {(statusEffects.length + activeConditionsCount) > 0 && (
+                  <span className={styles.statusBadge}>{statusEffects.length + activeConditionsCount}</span>
+                )}
+              </button>
+            </div>
+          </div>
+  
+          {/* Banda de identidad: retrato + nombre + raza/clase/nivel + recuadro de PV */}
+          <div className={styles.identityBand}>
+            <div className={styles.identityMain}>
+              <div className={styles.avatar}>
+                {character.imageUrl ? (
+                  <img src={character.imageUrl} alt={character.name} className={styles.avatarImage} />
+                ) : (
+                  character.name.charAt(0).toUpperCase()
+                )}
+              </div>
+              <div className={styles.identityText}>
+                <h1>{character.name}</h1>
+                <p className={styles.identitySubtitle}>{raceLabel} · {classSummary}</p>
+              </div>
+            </div>
             <button
-              className={`${styles.statusBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.statusBtnActive : ''}`}
-              onClick={() => setShowStatusEffects(true)}
-              title="Efectos y Condiciones"
+              className={`${styles.hpBadge} ${character.hp.current === 0 ? styles.hpBadgeZero : character.hp.current <= effectiveMaxHp * 0.25 ? styles.hpBadgeCritical : ''}`}
+              onClick={() => setHpDrawerOpen(true)}
+              title="Gestionar PV"
             >
-              <Activity size={16} />
-              {(statusEffects.length + activeConditionsCount) > 0 && (
-                <span className={styles.statusBadge}>{statusEffects.length + activeConditionsCount}</span>
-              )}
+              <span className={styles.hpBadgeCurrent}>{character.hp.current}</span>
+              <span className={styles.hpBadgeSep}>/</span>
+              <span className={styles.hpBadgeMax}>{effectiveMaxHp}</span>
             </button>
           </div>
-        </div>
-
-        {/* Banda de identidad: retrato + nombre + raza/clase/nivel + recuadro de PV */}
-        <div className={styles.identityBand}>
-          <div className={styles.identityMain}>
-            <div className={styles.avatar}>
-              {character.imageUrl ? (
-                <img src={character.imageUrl} alt={character.name} className={styles.avatarImage} />
-              ) : (
-                character.name.charAt(0).toUpperCase()
-              )}
-            </div>
-            <div className={styles.identityText}>
-              <h1>{character.name}</h1>
-              <p className={styles.identitySubtitle}>{raceLabel} · {classSummary}</p>
-            </div>
-          </div>
-          <button
-            className={`${styles.hpBadge} ${character.hp.current === 0 ? styles.hpBadgeZero : character.hp.current <= effectiveMaxHp * 0.25 ? styles.hpBadgeCritical : ''}`}
-            onClick={() => setHpDrawerOpen(true)}
-            title="Gestionar PV"
-          >
-            <span className={styles.hpBadgeCurrent}>{character.hp.current}</span>
-            <span className={styles.hpBadgeSep}>/</span>
-            <span className={styles.hpBadgeMax}>{effectiveMaxHp}</span>
-          </button>
-        </div>
-
-        {/* ── Grupo: Defensa (CA/Toque/Desprevenido/Iniciativa, Salvaciones, CMB/CMD) ── */}
-        <div className={styles.headerGroup}>
-          <div className={styles.defenseBand}>
-            <StatPill
-              label="CA" value={`${ac}`}
-              altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
-              onExplain={() => explainStat('CA', ac,
-                [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
-                ['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
-            />
-            <StatPill
-              label="Toque" value={`${touchAC}`}
-              altered={isAltered(['ac', 'ac_deflection', 'ac_dodge'])}
-              onExplain={() => explainStat('CA de Toque', touchAC,
-                [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
-                ['ac', 'ac_deflection', 'ac_dodge'])}
-            />
-            <StatPill
-              label="Desprev" value={`${flatFootedAC}`}
-              altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
-              onExplain={() => explainStat('CA Desprevenido', flatFootedAC,
-                [{ label: 'Base', value: 10 }, { label: 'Tamaño', value: combat.sizeMod }],
-                ['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
-            />
-            <Button
-              variant="secondary" size="sm" className={styles.headerRollBtn}
-              onClick={() => handleQuickRoll(
-                `1d20+${initiative}`, `Iniciativa (${initiative >= 0 ? '+' : ''}${initiative})`, false,
-                { baseComponents: [{ label: 'Destreza', value: dexMod }], targets: ['initiative'] },
-              )}
-            >
-              <span className={styles.headerRollLabel}>INI</span>
-              <span className={styles.headerRollValue}>{initiative >= 0 ? `+${initiative}` : initiative}</span>
-            </Button>
-          </div>
-
-          {/* Salvaciones — se tiran en el turno de cualquiera, siempre visibles */}
-          <div className={styles.saveBand}>
-            {([
-              { label: 'Fortaleza', total: fortSave, target: 'save_fort' as ModifierTarget },
-              { label: 'Reflejos', total: refSave, target: 'save_ref' as ModifierTarget },
-              { label: 'Voluntad', total: willSave, target: 'save_will' as ModifierTarget },
-            ]).map(({ label, total, target }) => {
-              const eff = sumSessionModifiers(resolvedStats.allModifiers, [target])
-              return (
-                <Button
-                  key={label} variant="secondary" size="sm" className={styles.headerRollBtn}
-                  onClick={() => handleQuickRoll(`1d20+${total}`, `${label} (+${total})`)}
-                >
-                  <span className={styles.headerRollLabel}>{label}</span>
-                  <span className={styles.headerRollValue}>
-                    {total >= 0 ? `+${total}` : total}
-                    {eff !== 0 && (
-                      <span className={eff > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
-                        {eff > 0 ? `+${eff}` : eff}
-                      </span>
-                    )}
-                  </span>
-                </Button>
-              )
-            })}
-          </div>
-
-          <div className={styles.defenseBand}>
-            <Button
-              variant="secondary" size="sm" className={styles.headerRollBtn}
-              onClick={() => handleQuickRoll(
-                `1d20+${cmb}`, `CMB (${cmb >= 0 ? '+' : ''}${cmb})`, false,
-                { baseComponents: [{ label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }], targets: ['cmb'] },
-              )}
-            >
-              <span className={styles.headerRollLabel}>CMB</span>
-              <span className={styles.headerRollValue}>
-                {cmb >= 0 ? `+${cmb}` : cmb}
-                {cmbEffect !== 0 && (
-                  <span className={cmbEffect > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
-                    {cmbEffect > 0 ? `+${cmbEffect}` : cmbEffect}
-                  </span>
+  
+          {/* ── Grupo: Defensa (CA/Toque/Desprevenido/Iniciativa, Salvaciones, CMB/CMD) ── */}
+          <div className={styles.headerGroup}>
+            <div className={styles.defenseBand}>
+              <StatPill
+                label="CA" value={`${ac}`}
+                altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
+                onExplain={() => explainStat('CA', ac,
+                  [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
+                  ['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
+              />
+              <StatPill
+                label="Toque" value={`${touchAC}`}
+                altered={isAltered(['ac', 'ac_deflection', 'ac_dodge'])}
+                onExplain={() => explainStat('CA de Toque', touchAC,
+                  [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
+                  ['ac', 'ac_deflection', 'ac_dodge'])}
+              />
+              <StatPill
+                label="Desprev" value={`${flatFootedAC}`}
+                altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
+                onExplain={() => explainStat('CA Desprevenido', flatFootedAC,
+                  [{ label: 'Base', value: 10 }, { label: 'Tamaño', value: combat.sizeMod }],
+                  ['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
+              />
+              <Button
+                variant="secondary" size="sm" className={styles.headerRollBtn}
+                onClick={() => handleQuickRoll(
+                  `1d20+${initiative}`, `Iniciativa (${initiative >= 0 ? '+' : ''}${initiative})`, false,
+                  { baseComponents: [{ label: 'Destreza', value: dexMod }], targets: ['initiative'] },
                 )}
-              </span>
-            </Button>
-            <Button
-              variant="secondary" size="sm" className={styles.headerRollBtn}
-              onClick={() => explainStat('CMD', cmd,
-                [{ label: 'Base', value: 10 }, { label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }, { label: 'Destreza', value: dexMod }],
-                ['cmd'])}
-            >
-              <span className={styles.headerRollLabel}>CMD</span>
-              <span className={styles.headerRollValue}>
-                {cmd}
-                {cmdEffect !== 0 && (
-                  <span className={cmdEffect > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
-                    {cmdEffect > 0 ? `+${cmdEffect}` : cmdEffect}
-                  </span>
+              >
+                <span className={styles.headerRollLabel}>INI</span>
+                <span className={styles.headerRollValue}>{initiative >= 0 ? `+${initiative}` : initiative}</span>
+              </Button>
+            </div>
+  
+            {/* Salvaciones — se tiran en el turno de cualquiera, siempre visibles */}
+            <div className={styles.saveBand}>
+              {([
+                { label: 'Fortaleza', total: fortSave, target: 'save_fort' as ModifierTarget },
+                { label: 'Reflejos', total: refSave, target: 'save_ref' as ModifierTarget },
+                { label: 'Voluntad', total: willSave, target: 'save_will' as ModifierTarget },
+              ]).map(({ label, total, target }) => {
+                const eff = sumSessionModifiers(resolvedStats.allModifiers, [target])
+                return (
+                  <Button
+                    key={label} variant="secondary" size="sm" className={styles.headerRollBtn}
+                    onClick={() => handleQuickRoll(`1d20+${total}`, `${label} (+${total})`)}
+                  >
+                    <span className={styles.headerRollLabel}>{label}</span>
+                    <span className={styles.headerRollValue}>
+                      {total >= 0 ? `+${total}` : total}
+                      {eff !== 0 && (
+                        <span className={eff > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
+                          {eff > 0 ? `+${eff}` : eff}
+                        </span>
+                      )}
+                    </span>
+                  </Button>
+                )
+              })}
+            </div>
+  
+            <div className={styles.defenseBand}>
+              <Button
+                variant="secondary" size="sm" className={styles.headerRollBtn}
+                onClick={() => handleQuickRoll(
+                  `1d20+${cmb}`, `CMB (${cmb >= 0 ? '+' : ''}${cmb})`, false,
+                  { baseComponents: [{ label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }], targets: ['cmb'] },
                 )}
-              </span>
-            </Button>
+              >
+                <span className={styles.headerRollLabel}>CMB</span>
+                <span className={styles.headerRollValue}>
+                  {cmb >= 0 ? `+${cmb}` : cmb}
+                  {cmbEffect !== 0 && (
+                    <span className={cmbEffect > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
+                      {cmbEffect > 0 ? `+${cmbEffect}` : cmbEffect}
+                    </span>
+                  )}
+                </span>
+              </Button>
+              <Button
+                variant="secondary" size="sm" className={styles.headerRollBtn}
+                onClick={() => explainStat('CMD', cmd,
+                  [{ label: 'Base', value: 10 }, { label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }, { label: 'Destreza', value: dexMod }],
+                  ['cmd'])}
+              >
+                <span className={styles.headerRollLabel}>CMD</span>
+                <span className={styles.headerRollValue}>
+                  {cmd}
+                  {cmdEffect !== 0 && (
+                    <span className={cmdEffect > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
+                      {cmdEffect > 0 ? `+${cmdEffect}` : cmdEffect}
+                    </span>
+                  )}
+                </span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>

@@ -13,18 +13,55 @@
   text-align: center;
 }
 
-/* ── Header ── */
+/* ── Header ──
+   Se sale del padding de .main (Layout) y del ancho de .container para que el fondo
+   oscuro llegue a los bordes reales de la pantalla; .headerInner recentra el contenido. */
 .header {
   position: sticky;
   top: 0;
   z-index: 50;
   background: var(--color-surface-container-highest);
   border-bottom: 1px solid var(--color-border);
-  padding: var(--space-3) 0 var(--space-3);
-  margin-bottom: var(--space-4);
+  width: 100vw;
+  margin: calc(-1 * var(--space-8)) calc(-50vw + 50%) var(--space-4);
+}
+
+.headerInner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: calc(var(--space-3) + var(--space-8)) var(--space-12) var(--space-3);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+/* La compensación de arriba/laterales debe seguir el padding real de .main (Layout.module.css)
+   en cada breakpoint, o el fondo del header deja un hueco o se pasa de largo. */
+@media (max-width: 1024px) {
+  .header {
+    margin-top: calc(-1 * var(--space-6));
+  }
+
+  .headerInner {
+    padding: calc(var(--space-3) + var(--space-6)) var(--space-8) var(--space-3);
+  }
+}
+
+@media (max-width: 900px) {
+  .headerInner {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    margin-top: calc(-1 * var(--space-4));
+  }
+
+  .headerInner {
+    padding: calc(var(--space-3) + var(--space-4)) var(--space-4) var(--space-3);
+  }
 }
 
 .headerTop {
