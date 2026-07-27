@@ -102,6 +102,7 @@ export function PlayMode() {
   const [statExplain, setStatExplain] = useState<StatExplain | null>(null)
   const [rolling, setRolling] = useState(false)
   const [dicePanelOpen, setDicePanelOpen] = useState(false)
+  const [rollDrawerOpen, setRollDrawerOpen] = useState(false)
   const [tabMenuOpen, setTabMenuOpen] = useState(false)
   const [showStatusEffects, setShowStatusEffects] = useState(false)
   const [hpDrawerOpen, setHpDrawerOpen] = useState(false)
@@ -229,6 +230,7 @@ export function PlayMode() {
     const match = notation.match(/(\d+)d(\d+)/)
     setRollingDice(match ? { count: parseInt(match[1], 10), sides: parseInt(match[2], 10) } : null)
     setRolling(true)
+    setRollDrawerOpen(true)
     setTimeout(() => {
       cb()
       setRolling(false)
@@ -238,6 +240,7 @@ export function PlayMode() {
 
   const handleRoll = () => {
     setLastRollType(diceNotation)
+    setRollBreakdown(null)
     triggerRollAnimation(diceNotation, () => {
       const result = rollDice(diceNotation)
       setRollResult({ ...result, key: Date.now() })
@@ -261,6 +264,7 @@ export function PlayMode() {
 
   const handleQuickRoll = (notation: string, name: string, isAttack = false, breakdownInput?: RollBreakdownInput) => {
     setLastRollType(name)
+    if (!breakdownInput) setRollBreakdown(null)
     triggerRollAnimation(notation, () => {
       const result = rollDice(notation)
       const d20 = result.rolls[0]
@@ -516,9 +520,18 @@ export function PlayMode() {
 
   return (
     <div className={styles.container}>
-      {/* ── Drawer tipo A: resultado de tirada (incluye crítico/pifia como caso especial) ── */}
-      <Drawer open={rollBreakdown !== null} onClose={() => setRollBreakdown(null)} title="Resultado">
-        {rollBreakdown && (
+      {/* ── Drawer lateral de tiradas: se abre con cualquier tirada, con desglose si lo hay + historial ── */}
+      <Drawer open={rollDrawerOpen} onClose={() => setRollDrawerOpen(false)} title="Tirada de Dados">
+        {rolling ? (
+          <div className={styles.rollDrawerCurrent}>
+            <span className={styles.rollStripType}>{lastRollType}</span>
+            <div className={styles.rollDiceRow}>
+              {rollingDice && Array.from({ length: rollingDice.count }).map((_, i) => (
+                <span key={i} className={`${styles.rollDie} ${styles.rollDieSpinning}`} />
+              ))}
+            </div>
+          </div>
+        ) : rollBreakdown ? (
           <RollExplainDrawer
             breakdown={rollBreakdown}
             onConfirmCrit={() => {
@@ -526,6 +539,32 @@ export function PlayMode() {
               setRollBreakdown(null)
             }}
           />
+        ) : rollResult !== null ? (
+          <div className={styles.rollDrawerCurrent}>
+            <span className={styles.rollStripType}>{lastRollType}</span>
+            <div className={styles.rollStripResult}>
+              <span key={rollResult.key} className={styles.rollStripTotal}>{rollResult.total}</span>
+              <div className={styles.rollDiceRow}>
+                {rollResult.rolls.map((r, i) => (
+                  <span key={i} className={styles.rollDie}>{r}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {history.length > 0 && (
+          <div className={styles.rollDrawerHistory}>
+            <h4 className={styles.drawerSectionTitle}>Historial</h4>
+            <div className={styles.rollHistoryList}>
+              {history.map((h, i) => (
+                <div key={i} className={`${styles.rollHistoryRow} ${h.isCrit ? styles.historyItemCrit : ''} ${h.isFumble ? styles.historyItemFumble : ''}`}>
+                  <span className={styles.rollHistoryNotation}>{h.notation}</span>
+                  <span className={styles.rollHistoryResult}>{h.result}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </Drawer>
 
@@ -718,37 +757,6 @@ export function PlayMode() {
       <div className={styles.pageLayout}>
         {/* ── Tab Shell ── */}
         <div className={styles.tabShell}>
-          {/* Roll Result Strip */}
-          {(rollResult !== null || rolling) && (
-            <div className={styles.rollResultStrip}>
-              <span className={styles.rollStripType}>{lastRollType}</span>
-              <div className={styles.rollStripResult}>
-                {rollResult !== null && !rolling && (
-                  <span key={rollResult.key} className={styles.rollStripTotal}>{rollResult.total}</span>
-                )}
-                <div className={styles.rollDiceRow}>
-                  {rolling && rollingDice
-                    ? Array.from({ length: rollingDice.count }).map((_, i) => (
-                        <span key={i} className={`${styles.rollDie} ${styles.rollDieSpinning}`} />
-                      ))
-                    : rollResult?.rolls.map((r, i) => (
-                        <span key={i} className={styles.rollDie}>{r}</span>
-                      ))
-                  }
-                </div>
-              </div>
-              {history.length > 1 && !rolling && (
-                <span className={styles.rollStripHistory}>
-                  {history.slice(1, 4).map((h, i) => (
-                    <span key={i} className={`${styles.rollStripPrev} ${h.isCrit ? styles.historyItemCrit : ''} ${h.isFumble ? styles.historyItemFumble : ''}`}>
-                      {h.result}
-                    </span>
-                  ))}
-                </span>
-              )}
-            </div>
-          )}
-
           {/* ─── TAB: COMBATE ─── */}
           {activeTab === 'combat' && (
             <div className={styles.tabContent}>

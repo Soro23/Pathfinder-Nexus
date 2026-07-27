@@ -392,15 +392,53 @@
   font-weight: 700;
 }
 
-/* ── Roll Result Strip ── */
-.rollResultStrip {
+/* ── Drawer lateral de tiradas: tirada actual + historial ── */
+.rollDrawerCurrent {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
+  gap: var(--space-2);
+  padding: var(--space-4);
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+}
+
+.rollDrawerHistory {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.rollHistoryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.rollHistoryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.rollHistoryNotation {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rollHistoryResult {
+  font-family: var(--font-mono, 'Fira Code', monospace);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
 }
 
 .rollStripType {
@@ -458,18 +496,6 @@
   0% { transform: rotate(0deg) scale(1); }
   50% { transform: rotate(180deg) scale(0.8); }
   100% { transform: rotate(360deg) scale(1); }
-}
-
-.rollStripHistory {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.rollStripPrev {
-  font-family: var(--font-mono, 'Fira Code', monospace);
-  font-size: 0.85rem;
-  color: var(--color-text-muted, var(--color-text-secondary));
-  opacity: 0.6;
 }
 
 /* ── Combat Stats Bar ── */
