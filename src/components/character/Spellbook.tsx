@@ -4,7 +4,7 @@ import { Card, Select, HomebrewBadge } from '../ui'
 import { SPELL_SCHOOLS, SPELL_TYPES, SpellLevel, calculateSpellDC, getClassById } from '../../data'
 import { useSpells } from '../../hooks/useSpells'
 import { useSpellsByIds } from '../../hooks/useSpellsByIds'
-import { translateCastingTime, translateRange, translateDuration, translateSavingThrow, translateSpellResistance, translateUnits } from '../../lib/spellTermsEs'
+import { translateCastingTime, translateRange, translateDuration, translateSavingThrow, translateSpellResistance, translateSchool, translateDescriptor, translateUnits } from '../../lib/spellTermsEs'
 import styles from './Spellbook.module.css'
 
 // Tope de conjuros conocidos por nivel de conjuro, sumando la tabla `spellsKnown` de cada
@@ -243,7 +243,7 @@ export function Spellbook({
                     <div key={spellId} className={styles.preparedRow}>
                       <div className={styles.preparedInfo}>
                         <span className={styles.preparedName}>{spell?.name ?? spellId}</span>
-                        {spell && <span className={styles.preparedMeta}>Nv {spell.level} · {spell.school}</span>}
+                        {spell && <span className={styles.preparedMeta}>Nv {spell.level} · {translateSchool(spell.school)}</span>}
                       </div>
                       {count > 1 && <span className={styles.preparedCount}>×{count}</span>}
                       <button
@@ -390,7 +390,7 @@ export function Spellbook({
                     <span className={styles.spellName}>{spell.name}</span>
                     {spell.source === 'Homebrew' && <HomebrewBadge />}
                     <span className={styles.spellMeta}>
-                      {spell.school} {spell.descriptor && `(${spell.descriptor})`}
+                      {translateSchool(spell.school)} {spell.descriptor && `(${translateDescriptor(spell.descriptor)})`}
                     </span>
                   </div>
                   {spell.type === 'both' && (

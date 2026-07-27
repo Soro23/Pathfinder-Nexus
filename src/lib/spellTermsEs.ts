@@ -76,6 +76,59 @@ const RESISTANCE_RULES: Rule[] = [
   [/^see text$/i, 'Ver texto'],
 ]
 
+const SCHOOL_RULES: Rule[] = [
+  [/\babjuration\b/gi, 'Abjuración'],
+  [/\bconjuration\b/gi, 'Conjuración'],
+  [/\bdivination\b/gi, 'Adivinación'],
+  [/\benchantment\b/gi, 'Encantamiento'],
+  [/\bevocation\b/gi, 'Evocación'],
+  [/\billusion\b/gi, 'Ilusión'],
+  [/\bnecromancy\b/gi, 'Nigromancia'],
+  [/\btransmutation\b/gi, 'Transmutación'],
+  [/\buniversal\b/gi, 'Universal'],
+  // Subescuelas
+  [/\bcalling\b/gi, 'llamado'],
+  [/\bcreation\b/gi, 'creación'],
+  [/\bhealing\b/gi, 'curación'],
+  [/\bsummoning\b/gi, 'convocación'],
+  [/\bteleportation\b/gi, 'teleportación'],
+  [/\bcharm\b/gi, 'encanto'],
+  [/\bcompulsion\b/gi, 'compulsión'],
+  [/\bfigment\b/gi, 'quimera'],
+  [/\bglamer\b/gi, 'ensueño'],
+  [/\bpattern\b/gi, 'patrón'],
+  [/\bphantasm\b/gi, 'fantasma'],
+  [/\bshadow\b/gi, 'sombra'],
+  [/\bpolymorph\b/gi, 'polimorfia'],
+]
+
+const DESCRIPTOR_RULES: Rule[] = [
+  [/\bacid\b/gi, 'ácido'],
+  [/\bair\b/gi, 'aire'],
+  [/\bchaotic\b/gi, 'caótico'],
+  [/\bcold\b/gi, 'frío'],
+  [/\bcurse\b/gi, 'maldición'],
+  [/\bdarkness\b/gi, 'oscuridad'],
+  [/\bdeath\b/gi, 'muerte'],
+  [/\bdisease\b/gi, 'enfermedad'],
+  [/\bearth\b/gi, 'tierra'],
+  [/\belectricity\b/gi, 'electricidad'],
+  [/\bemotion\b/gi, 'emoción'],
+  [/\bevil\b/gi, 'malvado'],
+  [/\bfear\b/gi, 'miedo'],
+  [/\bfire\b/gi, 'fuego'],
+  [/\bforce\b/gi, 'fuerza'],
+  [/\bgood\b/gi, 'bueno'],
+  [/\blanguage-dependent\b/gi, 'depende del idioma'],
+  [/\blawful\b/gi, 'legal'],
+  [/\blight\b/gi, 'luz'],
+  [/\bmind-affecting\b/gi, 'afecta a la mente'],
+  [/\bpain\b/gi, 'dolor'],
+  [/\bpoison\b/gi, 'veneno'],
+  [/\bsonic\b/gi, 'sónico'],
+  [/\bwater\b/gi, 'agua'],
+]
+
 function applyRules(text: string, rules: Rule[]): string {
   return rules.reduce((acc, [pattern, replacement]) => acc.replace(pattern, replacement), text)
 }
@@ -112,4 +165,14 @@ export function translateSavingThrow(text?: string): string {
 export function translateSpellResistance(text?: string): string {
   if (!text) return ''
   return applyRules(text, RESISTANCE_RULES)
+}
+
+export function translateSchool(text?: string): string {
+  if (!text) return ''
+  return applyRules(text, SCHOOL_RULES)
+}
+
+export function translateDescriptor(text?: string): string {
+  if (!text) return ''
+  return applyRules(text, DESCRIPTOR_RULES)
 }
