@@ -143,6 +143,25 @@
   --transition-fast:   150ms ease-out;
   --transition-normal: 250ms ease-out;
   --transition-slow:   400ms ease-out;
+
+  /* ============================================================
+     BREAKPOINTS (referencia / documentación)
+     Las custom properties de CSS no pueden usarse como condición de un
+     @media (@media (max-width: var(--x)) no es válido), así que estos
+     valores son documentación de los cortes ya usados en Layout.module.css
+     y PlayMode.module.css — si cambian aquí, revisar manualmente los
+     @media que los citan.
+     ============================================================ */
+  --breakpoint-mobile:  640px;
+  --breakpoint-tablet:  900px;
+  --breakpoint-desktop: 1024px;
+
+  /* Ancho real del sidebar de Layout.module.css por breakpoint, para que
+     elementos "position: fixed" de otras páginas (p.ej. PlayMode) puedan
+     descontarlo sin reimplementar la lógica del sidebar. */
+  --sidebar-width-desktop: 240px; /* > 900px, ver Layout.module.css:14 */
+  --sidebar-width-tablet:  200px; /* 641-900px, ver Layout.module.css:360 */
+  --sidebar-width-mobile:  0px;   /* <=640px, sidebar oculto, Layout.module.css:377 */
 }
 
 /* ============================================================
