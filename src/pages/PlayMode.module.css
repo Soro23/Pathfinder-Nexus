@@ -1171,6 +1171,21 @@
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* ── Móvil: dejar hueco para la barra de navegación inferior (64px, Layout.module.css) ── */
+@media (max-width: 640px) {
+  .fabCluster {
+    bottom: calc(64px + var(--space-4));
+  }
+
+  .diceFab {
+    bottom: calc(64px + var(--space-4));
+  }
+
+  .dicePanelFloating {
+    bottom: calc(64px + 80px);
+  }
+}
+
 .dicePanelHeader {
   display: flex;
   align-items: center;

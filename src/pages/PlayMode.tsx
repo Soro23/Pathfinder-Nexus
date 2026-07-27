@@ -552,13 +552,6 @@ export function PlayMode() {
                 <span className={styles.statusBadge}>{statusEffects.length + activeConditionsCount}</span>
               )}
             </button>
-            <button
-              className={`${styles.statusBtn} ${dicePanelOpen ? styles.statusBtnActive : ''}`}
-              onClick={() => setDicePanelOpen(!dicePanelOpen)}
-              title="Dados"
-            >
-              <Dices size={16} />
-            </button>
           </div>
         </div>
 
