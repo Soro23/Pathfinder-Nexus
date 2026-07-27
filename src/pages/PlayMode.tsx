@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
-  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen
+  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
 import type { JournalEntry } from '../store'
@@ -45,7 +45,7 @@ function rollDice(notation: string): { total: number; rolls: number[] } {
   return { total: subtotal + modifier, rolls }
 }
 
-type TabId = 'combat' | 'skills' | 'spells' | 'dice' | 'encounter' | 'inventory' | 'background' | 'notes'
+type TabId = 'combat' | 'actions' | 'skills' | 'spells' | 'dice' | 'encounter' | 'inventory' | 'background' | 'notes'
 
 interface RollBreakdownInput {
   baseComponents: { label: string; value: number }[]
@@ -95,6 +95,7 @@ export function PlayMode() {
   const [diceNotation, setDiceNotation] = useState('1d20')
   const [dicePool, setDicePool] = useState<Record<number, number>>({})
   const [rollResult, setRollResult] = useState<{ total: number; rolls: number[]; key: number } | null>(null)
+  const [rollingDice, setRollingDice] = useState<{ count: number; sides: number } | null>(null)
   const [lastRollType, setLastRollType] = useState('')
   const [history, setHistory] = useState<{ notation: string; result: number; isCrit?: boolean; isFumble?: boolean }[]>([])
   const [rollBreakdown, setRollBreakdown] = useState<RollBreakdown | null>(null)
@@ -223,19 +224,22 @@ export function PlayMode() {
     setNoteDraft('')
   }
 
-  function triggerRollAnimation(cb: () => void) {
+  function triggerRollAnimation(notation: string, cb: () => void) {
+    const match = notation.match(/(\d+)d(\d+)/)
+    setRollingDice(match ? { count: parseInt(match[1], 10), sides: parseInt(match[2], 10) } : null)
     setRolling(true)
     setTimeout(() => {
       cb()
       setRolling(false)
+      setRollingDice(null)
     }, 280)
   }
 
   const handleRoll = () => {
-    triggerRollAnimation(() => {
+    setLastRollType(diceNotation)
+    triggerRollAnimation(diceNotation, () => {
       const result = rollDice(diceNotation)
       setRollResult({ ...result, key: Date.now() })
-      setLastRollType(diceNotation)
       setHistory((prev) => [{ notation: diceNotation, result: result.total }, ...prev.slice(0, 19)])
     })
     setDicePool({})
@@ -255,14 +259,14 @@ export function PlayMode() {
   }
 
   const handleQuickRoll = (notation: string, name: string, isAttack = false, breakdownInput?: RollBreakdownInput) => {
-    triggerRollAnimation(() => {
+    setLastRollType(name)
+    triggerRollAnimation(notation, () => {
       const result = rollDice(notation)
       const d20 = result.rolls[0]
       const isCrit = isAttack && d20 === 20
       const isFumble = isAttack && d20 === 1
 
       setRollResult({ ...result, key: Date.now() })
-      setLastRollType(name)
       setHistory((prev) => [{ notation: name, result: result.total, isCrit, isFumble }, ...prev.slice(0, 19)])
 
       if (breakdownInput) {
@@ -383,6 +387,16 @@ export function PlayMode() {
     bardClass || druidClass || fighterClass || rangerClass || alchemistClass ||
     inquisitorClass || cavalierClass || maguClass || gunslingerClass || shifterClass ||
     oracleClass || witchClass || summonerClass || warpriestClass
+
+  // Skills siempre visibles en Combate (útiles en tirada de iniciativa/reacción)
+  const perceptionSkillDef = SKILLS.find((s) => s.id === 'perception')
+  const senseMotiveSkillDef = SKILLS.find((s) => s.id === 'sense_motive')
+  const perceptionTotal = perceptionSkillDef
+    ? computeSkillTotal({ ...character, archetypesByClassId }, perceptionSkillDef, resolvedStats, equippedArmorAcp, encumbrancePenalty)
+    : 0
+  const senseMotiveTotal = senseMotiveSkillDef
+    ? computeSkillTotal({ ...character, archetypesByClassId }, senseMotiveSkillDef, resolvedStats, equippedArmorAcp, encumbrancePenalty)
+    : 0
 
   const useFeature = (key: string, max: number) => {
     const current = featureUses[key] ?? max
@@ -728,11 +742,25 @@ export function PlayMode() {
         {/* ── Tab Shell ── */}
         <div className={styles.tabShell}>
           {/* Roll Result Strip */}
-          {rollResult !== null && (
+          {(rollResult !== null || rolling) && (
             <div className={styles.rollResultStrip}>
               <span className={styles.rollStripType}>{lastRollType}</span>
-              <span key={rollResult.key} className={styles.rollStripTotal}>{rollResult.total}</span>
-              {history.length > 1 && (
+              <div className={styles.rollStripResult}>
+                {rollResult !== null && !rolling && (
+                  <span key={rollResult.key} className={styles.rollStripTotal}>{rollResult.total}</span>
+                )}
+                <div className={styles.rollDiceRow}>
+                  {rolling && rollingDice
+                    ? Array.from({ length: rollingDice.count }).map((_, i) => (
+                        <span key={i} className={`${styles.rollDie} ${styles.rollDieSpinning}`} />
+                      ))
+                    : rollResult?.rolls.map((r, i) => (
+                        <span key={i} className={styles.rollDie}>{r}</span>
+                      ))
+                  }
+                </div>
+              </div>
+              {history.length > 1 && !rolling && (
                 <span className={styles.rollStripHistory}>
                   {history.slice(1, 4).map((h, i) => (
                     <span key={i} className={`${styles.rollStripPrev} ${h.isCrit ? styles.historyItemCrit : ''} ${h.isFumble ? styles.historyItemFumble : ''}`}>
@@ -753,8 +781,21 @@ export function PlayMode() {
                   label="BAB" value={`+${bab}`}
                   onExplain={() => explainStat('BAB', bab, [{ label: 'Suma de BAB por clase', value: bab }], [])}
                 />
+                <StatPill
+                  label="Percepción" value={perceptionTotal >= 0 ? `+${perceptionTotal}` : `${perceptionTotal}`}
+                  onExplain={() => handleQuickRoll(`1d20+${perceptionTotal}`, 'Percepción')}
+                />
+                <StatPill
+                  label="Sentir Motiv." value={senseMotiveTotal >= 0 ? `+${senseMotiveTotal}` : `${senseMotiveTotal}`}
+                  onExplain={() => handleQuickRoll(`1d20+${senseMotiveTotal}`, 'Sentir Motivaciones')}
+                />
               </div>
+            </div>
+          )}
 
+          {/* ─── TAB: ACCIONES ─── */}
+          {activeTab === 'actions' && (
+            <div className={styles.tabContent}>
               {/* Weapons */}
               <Card padding="md">
                 <div className={styles.sectionTitleRow}>
@@ -1655,6 +1696,7 @@ export function PlayMode() {
               <div className={styles.tabMenuGrid}>
                 {([
                   { id: 'combat' as TabId, icon: Swords, label: 'COMBATE' },
+                  { id: 'actions' as TabId, icon: Crosshair, label: 'ACCIONES' },
                   { id: 'skills' as TabId, icon: Brain, label: 'HABILIDADES' },
                   { id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' },
                   { id: 'inventory' as TabId, icon: Backpack, label: 'INVENTARIO' },
