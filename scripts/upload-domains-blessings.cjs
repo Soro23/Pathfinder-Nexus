@@ -26,13 +26,18 @@
  *   CREATE POLICY "Service insert" ON public.blessings FOR INSERT WITH CHECK (true);
  *   CREATE POLICY "Service update" ON public.blessings FOR UPDATE USING (true);
  *
- * Ejecutar:  node scripts/upload-domains-blessings.cjs
+ * Ejecutar:  node --env-file=.env.local scripts/upload-domains-blessings.cjs
  */
 
 const https = require('https')
 
-const SUPABASE_URL = 'ieuvfkjktivthnpgxxqj.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlldXZma2prdGl2dGhucGd4eHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTM1MjUsImV4cCI6MjA4OTU2OTUyNX0.BT9af6UQ4cB5ae4NlU22UZZUZC2JToZVCUh0MVBM74E'
+const SUPABASE_URL = (process.env.VITE_SUPABASE_URL ?? '').replace(/^https?:\/\//, '')
+const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY ?? ''
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY env vars (run with --env-file=.env.local)')
+  process.exit(1)
+}
 
 // ── Local data (inline, same as src/data/domains.ts + src/data/blessings.ts) ──
 
