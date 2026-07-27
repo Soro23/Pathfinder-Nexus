@@ -148,27 +148,27 @@ export function Spellbook({
           {levels.map((level) => {
             const slot = spellSlots[level]
             const isLocked = !slot || slot.max === 0
-
-            if (isLocked && !isEditing) {
-              return (
-                <div key={level} className={`${styles.slotRow} ${styles.slotRowLocked}`}>
-                  <span className={styles.slotLevel}>
-                    {level === 0 ? 'Cantrip' : `Nv ${level}`}
-                  </span>
-                  <span className={styles.slotLockedLabel}>—</span>
-                </div>
-              )
-            }
-
             const max  = slot?.max  ?? 0
             const used = slot?.used ?? 0
             const available = max - used
 
             return (
-              <div key={level} className={`${styles.slotRow} ${isLocked ? styles.slotRowLocked : ''}`}>
-                <span className={styles.slotLevel}>
-                  {level === 0 ? 'Cantrip' : `Nv ${level}`}
-                </span>
+              <div key={level} className={`${styles.slotRow} ${isLocked && !isEditing ? styles.slotRowLocked : ''}`}>
+                <div className={styles.slotRowTop}>
+                  <span className={styles.slotLevel}>
+                    {level === 0 ? 'Cantrip' : `Nv ${level}`}
+                  </span>
+                  {isLocked && !isEditing ? (
+                    <span className={styles.slotLockedLabel}>—</span>
+                  ) : !isEditing && (
+                    <span className={styles.slotRowMeta}>
+                      <span className={styles.slotCount}>{available}/{max}</span>
+                      {level >= 1 && (
+                        <span className={styles.slotDC} title="CD del conjuro">DC {calculateSpellDC(level, abilityModifier)}</span>
+                      )}
+                    </span>
+                  )}
+                </div>
 
                 {isEditing ? (
                   <div className={styles.slotEditRow}>
@@ -182,24 +182,16 @@ export function Spellbook({
                       onBlur={(e) => onSetSlotMax?.(level, Math.max(0, Math.min(9, parseInt(e.target.value) || 0)))}
                     />
                   </div>
-                ) : (
-                  <div className={styles.slotPipsArea}>
-                    <div className={styles.slotPips}>
-                      {Array.from({ length: max }).map((_, i) => (
-                        <button
-                          key={i}
-                          className={`${styles.slotPip} ${i < used ? styles.slotPipUsed : styles.slotPipAvail}`}
-                          onClick={() => onToggleSlotPip(level, i)}
-                          title={i < used ? 'Clic para recuperar' : 'Clic para gastar'}
-                        />
-                      ))}
-                    </div>
-                    <span className={styles.slotCount}>
-                      {available}/{max}
-                    </span>
-                    {level >= 1 && (
-                      <span className={styles.slotDC} title="CD del conjuro">DC {calculateSpellDC(level, abilityModifier)}</span>
-                    )}
+                ) : !isLocked && (
+                  <div className={styles.slotPips}>
+                    {Array.from({ length: max }).map((_, i) => (
+                      <button
+                        key={i}
+                        className={`${styles.slotPip} ${i < used ? styles.slotPipUsed : styles.slotPipAvail}`}
+                        onClick={() => onToggleSlotPip(level, i)}
+                        title={i < used ? 'Clic para recuperar' : 'Clic para gastar'}
+                      />
+                    ))}
                   </div>
                 )}
               </div>

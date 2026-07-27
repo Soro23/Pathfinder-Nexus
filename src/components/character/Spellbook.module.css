@@ -90,26 +90,32 @@
 
 .slotRow {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 6px;
   padding: var(--space-2);
   background: var(--color-bg-primary);
   border-radius: var(--radius-sm);
 }
 
-.slotLevel {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-  min-width: 48px;
+.slotRowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
-/* Pips */
-.slotPipsArea {
+.slotRowMeta {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
+.slotLevel {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+/* Pips */
 .slotPips {
   display: flex;
   gap: 4px;
