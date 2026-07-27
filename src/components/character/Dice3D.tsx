@@ -81,13 +81,6 @@ function getNumberTexture(label: string): THREE.CanvasTexture {
   canvas.height = 128
   const ctx = canvas.getContext('2d')!
   ctx.fillStyle = '#141210'
-  ctx.beginPath()
-  ctx.arc(64, 64, 56, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.strokeStyle = DIE_COLOR
-  ctx.lineWidth = 5
-  ctx.stroke()
-  ctx.fillStyle = DIE_COLOR
   ctx.font = `bold ${label.length > 2 ? 44 : 60}px "Fira Code", monospace`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
