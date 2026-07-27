@@ -1077,7 +1077,7 @@
   right: var(--space-4);
   display: flex;
   gap: var(--space-2);
-  z-index: 90;
+  z-index: 101;
 }
 
 .fabBtn {
@@ -1177,8 +1177,8 @@
 .tabMenuFloating {
   position: fixed;
   bottom: 80px;
-  left: var(--space-4);
-  right: var(--space-4);
+  left: 0;
+  right: 0;
   background: var(--color-surface-container);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);

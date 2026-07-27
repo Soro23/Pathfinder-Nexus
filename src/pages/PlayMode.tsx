@@ -1695,7 +1695,7 @@ export function PlayMode() {
             <div className={styles.tabMenuFloating}>
               <div className={styles.tabMenuGrid}>
                 {([
-                  { id: 'combat' as TabId, icon: Swords, label: 'COMBATE' },
+                  { id: 'combat' as TabId, icon: Swords, label: 'STATS' },
                   { id: 'actions' as TabId, icon: Crosshair, label: 'ACCIONES' },
                   { id: 'skills' as TabId, icon: Brain, label: 'HABILIDADES' },
                   { id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' },
