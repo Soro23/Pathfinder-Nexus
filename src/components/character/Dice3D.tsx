@@ -26,8 +26,7 @@ function buildDieGeometry(sides: number): THREE.BufferGeometry {
     case 8: return new THREE.OctahedronGeometry(0.95)
     case 12: return new THREE.DodecahedronGeometry(0.85)
     case 20: return new THREE.IcosahedronGeometry(0.9)
-    case 10:
-    case 100: return buildD10Geometry()
+    case 10: return buildD10Geometry()
     default: return new THREE.IcosahedronGeometry(0.9)
   }
 }
@@ -98,12 +97,20 @@ function getNumberTexture(label: string): THREE.CanvasTexture {
   return texture
 }
 
-function FaceLabel({ label, position }: { label: string; position: THREE.Vector3 }) {
+// Plano orientado según la normal de la cara (no un sprite): así la etiqueta
+// gira junto con el dado y se ve de frente solo cuando esa cara concreta
+// queda mirando a cámara, igual que un número real grabado en la cara.
+function FaceLabel({ label, position, normal }: { label: string; position: THREE.Vector3; normal: THREE.Vector3 }) {
   const texture = useMemo(() => getNumberTexture(label), [label])
+  const quaternion = useMemo(
+    () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal.clone().normalize()),
+    [normal]
+  )
   return (
-    <sprite position={position} scale={[0.5, 0.5, 0.5]}>
-      <spriteMaterial map={texture} transparent />
-    </sprite>
+    <mesh position={position} quaternion={quaternion}>
+      <planeGeometry args={[0.5, 0.5]} />
+      <meshBasicMaterial map={texture} transparent depthWrite={false} />
+    </mesh>
   )
 }
 
@@ -144,23 +151,35 @@ function useSettlingRotation(targetQuat: THREE.Quaternion, duration: number) {
   return ref
 }
 
+export type DieVariant = 'percentTens' | 'percentUnits'
+
 interface DieMeshProps {
   sides: number
   value: number
+  variant?: DieVariant
 }
 
-function DieMesh({ sides, value }: DieMeshProps) {
+// Etiqueta y cara-objetivo de cada tipo: la convención normal es 1..N (cara i
+// muestra i+1); para el d100 partido en decenas/unidades, la decena muestra
+// 00,10,20...90 y la unidad 0..9, y el valor ya viene en esas unidades reales.
+function getFaceLabel(index: number, variant: DieVariant | undefined): string {
+  if (variant === 'percentTens') return index === 0 ? '00' : String(index * 10)
+  if (variant === 'percentUnits') return String(index)
+  return String(index + 1)
+}
+
+function getTargetIndex(value: number, faceCount: number, variant: DieVariant | undefined): number {
+  if (variant === 'percentTens') return ((value / 10) % faceCount + faceCount) % faceCount
+  if (variant === 'percentUnits') return (value % faceCount + faceCount) % faceCount
+  return ((value - 1) % faceCount + faceCount) % faceCount
+}
+
+function DieMesh({ sides, value, variant }: DieMeshProps) {
   const geometry = useMemo(() => buildDieGeometry(sides), [sides])
   const faces = useMemo(() => computeFaces(geometry), [geometry])
   const faceCount = faces.length
 
-  // d100 es decorativo: el motor lo tira como un valor plano 1-100 (no como
-  // decenas+unidades), así que no hay una cara "correcta" real que mostrar —
-  // se asienta en una cara al azar pero estable durante toda la tirada.
-  const targetIndex = useMemo(() => {
-    if (sides === 100) return Math.floor(Math.random() * faceCount)
-    return ((value - 1) % faceCount + faceCount) % faceCount
-  }, [sides, value, faceCount])
+  const targetIndex = useMemo(() => getTargetIndex(value, faceCount, variant), [value, faceCount, variant])
 
   const targetQuat = useMemo(
     () => new THREE.Quaternion().setFromUnitVectors(faces[targetIndex].normal.clone().normalize(), new THREE.Vector3(0, 0, 1)),
@@ -174,8 +193,13 @@ function DieMesh({ sides, value }: DieMeshProps) {
       <mesh geometry={geometry}>
         <meshStandardMaterial color={DIE_COLOR} flatShading />
       </mesh>
-      {sides !== 100 && faces.map((f, i) => (
-        <FaceLabel key={i} label={String(i + 1)} position={f.centroid.clone().addScaledVector(f.normal, 0.08)} />
+      {faces.map((f, i) => (
+        <FaceLabel
+          key={i}
+          label={getFaceLabel(i, variant)}
+          position={f.centroid.clone().addScaledVector(f.normal, 0.08)}
+          normal={f.normal}
+        />
       ))}
     </group>
   )
@@ -184,6 +208,7 @@ function DieMesh({ sides, value }: DieMeshProps) {
 export interface DieRoll {
   sides: number
   value: number
+  variant?: DieVariant
 }
 
 interface Dice3DProps {
@@ -213,7 +238,7 @@ export function Dice3D({ dice, onSettled }: Dice3DProps) {
       <directionalLight position={[-3, -2, -4]} intensity={0.5} />
       {visible.map((d, i) => (
         <group key={i} position={[startX + i * spacing, 0, 0]}>
-          <DieMesh sides={d.sides} value={d.value} />
+          <DieMesh sides={d.sides} value={d.value} variant={d.variant} />
         </group>
       ))}
     </Canvas>

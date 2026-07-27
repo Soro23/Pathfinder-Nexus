@@ -277,7 +277,20 @@ export function PlayMode() {
     const result = rollDice(notation)
     const match = notation.match(/(\d+)d(\d+)/)
     const sides = match ? parseInt(match[2], 10) : 20
-    const dice: DieRoll[] = result.rolls.map((value) => ({ sides, value }))
+
+    // d100 no se tira como decenas+unidades en el motor (es un valor plano
+    // 1-100), así que se descompone aquí solo para mostrar 2 d10 reales: uno
+    // de decenas (00,10,20...90) y otro de unidades (0-9); 00+0 se lee como 100.
+    const dice: DieRoll[] = sides === 100
+      ? result.rolls.flatMap((value) => {
+          const units = value === 100 ? 0 : value % 10
+          const tens = value === 100 ? 0 : value - units
+          return [
+            { sides: 10, value: tens, variant: 'percentTens' as const },
+            { sides: 10, value: units, variant: 'percentUnits' as const },
+          ]
+        })
+      : result.rolls.map((value) => ({ sides, value }))
 
     setLastRollType(name)
     setPendingRoll({ name, isAttack, breakdownInput, result, dice })
@@ -310,6 +323,7 @@ export function PlayMode() {
   const handleRoll = () => {
     startRoll(diceNotation, diceNotation)
     setDicePool({})
+    setDicePanelOpen(false)
   }
 
   // Cada clic en un preset del panel flotante suma un dado más de ese tipo al cajón
