@@ -610,9 +610,9 @@ export function PlayMode() {
       {/* ── Overlay centrado: el/los dado(s) 3D ruedan hasta asentarse en el valor real
           ya calculado; solo entonces se revela el resultado y se abre el drawer lateral ── */}
       {pendingRoll && (
-        <div className={styles.diceRollOverlay}>
+        <div className={styles.diceRollOverlay} onClick={commitPendingRoll} title="Clic fuera del dado para ver el resultado ya">
           <span className={styles.rollStripType}>{lastRollType}</span>
-          <div className={styles.dice3dViewport}>
+          <div className={styles.dice3dViewport} onClick={(e) => e.stopPropagation()}>
             <Suspense fallback={null}>
               <Dice3D dice={pendingRoll.dice} onSettled={commitPendingRoll} />
             </Suspense>

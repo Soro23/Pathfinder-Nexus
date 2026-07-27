@@ -1,22 +1,51 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js'
+import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js'
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 
 const DIE_COLOR = '#e0a850'
 const EDGE_COLOR = '#141210'
+const EDGE_WIDTH = 3 // px de pantalla — LineBasicMaterial ignora linewidth en la mayoría de GPUs
 const ROLL_DURATION = 1.4 // segundos
+const SETTLE_PAUSE = 1 // segundos de pausa tras asentarse, antes de abrir el panel
+
+// Invierte el sentido de los triángulos (índices 1↔2 de cada cara) — hace
+// falta tras un reflejo (escala negativa en un eje), que voltea las normales
+// hacia dentro.
+function flipWinding(geometry: THREE.BufferGeometry): THREE.BufferGeometry {
+  const index = geometry.index
+  if (!index) return geometry
+  const arr = index.array as Uint16Array | Uint32Array
+  for (let i = 0; i < arr.length; i += 3) {
+    const tmp = arr[i + 1]
+    arr[i + 1] = arr[i + 2]
+    arr[i + 2] = tmp
+  }
+  index.needsUpdate = true
+  return geometry
+}
 
 // d10: three.js no trae un trapezoedro pentagonal (la forma real de un d10).
 // Se aproxima uniendo dos conos de base pentagonal por su base — dos veces 5
 // caras triangulares = 10 caras reales con normales propias, suficiente para
 // numerarlas y hacer que el dado se asiente en la cara correcta.
+//
+// El cono de abajo se refleja con scale(1,-1,1) en vez de rotateX(180°): rotar
+// también espeja el anillo ecuatorial en XZ (queda desfasado respecto al de
+// arriba y el pentágono sale "retorcido"); escalar solo en Y invierte el
+// ápice manteniendo el anillo en el mismo sitio exacto que el de arriba.
 function buildD10Geometry(): THREE.BufferGeometry {
   const top = new THREE.ConeGeometry(0.75, 0.85, 5, 1, true)
   top.translate(0, 0.425, 0)
+
   const bottom = new THREE.ConeGeometry(0.75, 0.85, 5, 1, true)
-  bottom.rotateX(Math.PI)
-  bottom.translate(0, -0.425, 0)
+  bottom.translate(0, 0.425, 0)
+  bottom.scale(1, -1, 1)
+  flipWinding(bottom)
+
   return mergeGeometries([top, bottom]) ?? top
 }
 
@@ -108,6 +137,27 @@ function FaceLabel({ label, position, normal }: { label: string; position: THREE
   )
 }
 
+// LineBasicMaterial ignora `linewidth` en casi todas las GPU (limitación de
+// WebGL/ANGLE, siempre pinta 1px). Para un grosor real se usan las "fat
+// lines" de three.js (LineSegments2 + LineMaterial), que sí lo respetan.
+function DieEdges({ geometry }: { geometry: THREE.BufferGeometry }) {
+  const { size } = useThree()
+
+  const lineSegments = useMemo(() => {
+    const edges = new THREE.EdgesGeometry(geometry)
+    const lineGeo = new LineSegmentsGeometry()
+    lineGeo.setPositions(Array.from(edges.getAttribute('position').array as Float32Array))
+    const material = new LineMaterial({ color: EDGE_COLOR, linewidth: EDGE_WIDTH })
+    return new LineSegments2(lineGeo, material)
+  }, [geometry])
+
+  useEffect(() => {
+    lineSegments.material.resolution.set(size.width, size.height)
+  }, [lineSegments, size])
+
+  return <primitive object={lineSegments} />
+}
+
 // Gira rápido y decreciente mientras converge (slerp con ease-out) hacia la
 // orientación final que deja `targetNormal` mirando a cámara (+Z) — así el
 // dado termina mostrando la cara correcta, no una al azar.
@@ -181,16 +231,13 @@ function DieMesh({ sides, value, variant }: DieMeshProps) {
   )
 
   const ref = useSettlingRotation(targetQuat, ROLL_DURATION)
-  const edges = useMemo(() => new THREE.EdgesGeometry(geometry), [geometry])
 
   return (
     <group ref={ref}>
       <mesh geometry={geometry}>
         <meshStandardMaterial color={DIE_COLOR} flatShading />
       </mesh>
-      <lineSegments geometry={edges}>
-        <lineBasicMaterial color={EDGE_COLOR} />
-      </lineSegments>
+      <DieEdges geometry={geometry} />
       {faces.map((f, i) => (
         <FaceLabel
           key={i}
@@ -215,12 +262,12 @@ interface Dice3DProps {
 }
 
 // Anima cada dado desde un giro rápido hasta asentarse en su cara correcta.
-// onSettled se dispara una sola vez, cuando termina la duración compartida
-// por todos los dados de la tirada (ROLL_DURATION).
+// onSettled se dispara una sola vez, tras ROLL_DURATION + SETTLE_PAUSE — ese
+// margen extra es para poder ver el dado ya quieto antes de que desaparezca.
 export function Dice3D({ dice, onSettled }: Dice3DProps) {
   useEffect(() => {
     if (!onSettled) return
-    const timeout = setTimeout(onSettled, ROLL_DURATION * 1000)
+    const timeout = setTimeout(onSettled, (ROLL_DURATION + SETTLE_PAUSE) * 1000)
     return () => clearTimeout(timeout)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
