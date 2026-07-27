@@ -612,21 +612,9 @@ export function PlayMode() {
               <ArrowLeft size={16} />
               Volver
             </Link>
-            <div className={styles.headerActions}>
-              <button
-                className={`${styles.statusBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.statusBtnActive : ''}`}
-                onClick={() => setShowStatusEffects(true)}
-                title="Efectos y Condiciones"
-              >
-                <Activity size={16} />
-                {(statusEffects.length + activeConditionsCount) > 0 && (
-                  <span className={styles.statusBadge}>{statusEffects.length + activeConditionsCount}</span>
-                )}
-              </button>
-            </div>
           </div>
-  
-          {/* Banda de identidad: retrato + nombre + raza/clase/nivel + recuadro de PV */}
+
+          {/* Banda de identidad: retrato + nombre + raza/clase/nivel + Efectos + recuadro de PV */}
           <div className={styles.identityBand}>
             <div className={styles.identityMain}>
               <div className={styles.avatar}>
@@ -641,15 +629,27 @@ export function PlayMode() {
                 <p className={styles.identitySubtitle}>{raceLabel} · {classSummary}</p>
               </div>
             </div>
-            <button
-              className={`${styles.hpBadge} ${character.hp.current === 0 ? styles.hpBadgeZero : character.hp.current <= effectiveMaxHp * 0.25 ? styles.hpBadgeCritical : ''}`}
-              onClick={() => setHpDrawerOpen(true)}
-              title="Gestionar PV"
-            >
-              <span className={styles.hpBadgeCurrent}>{character.hp.current}</span>
-              <span className={styles.hpBadgeSep}>/</span>
-              <span className={styles.hpBadgeMax}>{effectiveMaxHp}</span>
-            </button>
+            <div className={styles.identityActions}>
+              <button
+                className={`${styles.statusBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.statusBtnActive : ''}`}
+                onClick={() => setShowStatusEffects(true)}
+                title="Efectos y Condiciones"
+              >
+                <Activity size={16} />
+                {(statusEffects.length + activeConditionsCount) > 0 && (
+                  <span className={styles.statusBadge}>{statusEffects.length + activeConditionsCount}</span>
+                )}
+              </button>
+              <button
+                className={`${styles.hpBadge} ${character.hp.current === 0 ? styles.hpBadgeZero : character.hp.current <= effectiveMaxHp * 0.25 ? styles.hpBadgeCritical : ''}`}
+                onClick={() => setHpDrawerOpen(true)}
+                title="Gestionar PV"
+              >
+                <span className={styles.hpBadgeCurrent}>{character.hp.current}</span>
+                <span className={styles.hpBadgeSep}>/</span>
+                <span className={styles.hpBadgeMax}>{effectiveMaxHp}</span>
+              </button>
+            </div>
           </div>
   
           {/* ── Grupo: Defensa (CA/Toque/Desprevenido/Iniciativa, Salvaciones, CMB/CMD) ── */}
