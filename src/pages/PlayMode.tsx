@@ -1,4 +1,4 @@
-import React, { useState, useMemo, Suspense, lazy } from 'react'
+import React, { useState, useMemo, useEffect, Suspense, lazy } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
@@ -21,7 +21,10 @@ import styles from './PlayMode.module.css'
 
 // Carga perezosa: three.js + @react-three/fiber + @react-three/drei pesan ~1MB
 // minificados y solo hacen falta mientras el drawer de tirada está animando.
-const Dice3D = lazy(() => import('../components/character/Dice3D').then((m) => ({ default: m.Dice3D })))
+// El módulo se precarga al entrar en Modo Juego (ver loadDice3D más abajo) para
+// que la primera tirada no se quede sin animación mientras baja el chunk.
+const loadDice3D = () => import('../components/character/Dice3D')
+const Dice3D = lazy(() => loadDice3D().then((m) => ({ default: m.Dice3D })))
 
 // @mdi/react es un bundle CJS cuyo export por defecto no interopera bien con
 // Rollup/Node ESM: `import Icon from '@mdi/react'` resuelve al objeto
@@ -162,6 +165,15 @@ export function PlayMode() {
     [character]
   )
 
+  // Precarga el chunk de Dice3D nada más entrar en Modo Juego: con lazy() a secas,
+  // la primera tirada real disparaba la descarga del chunk (~230kb gz) DESPUÉS de
+  // pulsar Tirar, y los 280ms de "rolling" se acababan antes de que terminara de
+  // cargar — la animación nunca llegaba a pintarse. Precargando en background hay
+  // margen de sobra para cuando de verdad se lance el primer dado.
+  useEffect(() => {
+    loadDice3D()
+  }, [])
+
   if (!character) {
     return (
       <div className={styles.notFound}>
@@ -250,7 +262,7 @@ export function PlayMode() {
       cb()
       setRolling(false)
       setRollingDice(null)
-    }, 280)
+    }, 650)
   }
 
   const handleRoll = () => {
