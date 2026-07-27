@@ -265,9 +265,9 @@ export function PlayMode() {
   }
 
   // Cada clic en un preset del panel flotante suma un dado más de ese tipo al cajón
-  // (2d4 al primer clic, 3d4 al segundo...); solo se lanzan al pulsar "Tirar".
+  // (1d4 al primer clic, 2d4 al segundo...); solo se lanzan al pulsar "Tirar".
   const bumpDicePreset = (sides: number) => {
-    const nextPool = { ...dicePool, [sides]: (dicePool[sides] ?? 1) + 1 }
+    const nextPool = { ...dicePool, [sides]: (dicePool[sides] ?? 0) + 1 }
     setDicePool(nextPool)
     setDiceNotation(
       Object.entries(nextPool)
