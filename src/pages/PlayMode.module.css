@@ -1454,6 +1454,10 @@
   border-color: var(--color-accent-gold);
 }
 
+.tabMenuItemWide {
+  grid-column: 1 / -1;
+}
+
 /* ── Móvil: dejar hueco para la barra de navegación inferior (64px, Layout.module.css) ── */
 @media (max-width: 640px) {
   .fabCluster {

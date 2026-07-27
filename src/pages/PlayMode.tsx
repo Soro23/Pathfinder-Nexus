@@ -1967,26 +1967,30 @@ export function PlayMode() {
             <div className={styles.tabMenuOverlay} onClick={() => setTabMenuOpen(false)} />
             <div className={styles.tabMenuFloating}>
               <div className={styles.tabMenuGrid}>
-                {([
-                  { id: 'combat' as TabId, icon: Swords, label: 'STATS' },
-                  { id: 'actions' as TabId, icon: Crosshair, label: 'ACCIONES' },
-                  { id: 'skills' as TabId, icon: Brain, label: 'HABILIDADES' },
-                  { id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' },
-                  { id: 'features' as TabId, icon: Layers, label: 'RASGOS' },
-                  { id: 'inventory' as TabId, icon: Backpack, label: 'INVENTARIO' },
-                  { id: 'background' as TabId, icon: ScrollText, label: 'TRASFONDO' },
-                  { id: 'notes' as TabId, icon: NotebookPen, label: 'NOTAS' },
-                  { id: 'encounter' as TabId, icon: Swords, label: 'ENCUENTRO' },
-                ]).map(({ id, icon: Icon, label }) => (
-                  <button
-                    key={id}
-                    className={`${styles.tabMenuItem} ${activeTab === id ? styles.tabMenuItemActive : ''}`}
-                    onClick={() => { setActiveTab(id); setTabMenuOpen(false) }}
-                  >
-                    <Icon size={20} />
-                    <span>{label}</span>
-                  </button>
-                ))}
+                {(() => {
+                  const tabMenuItems = [
+                    { id: 'combat' as TabId, icon: Swords, label: 'STATS' },
+                    { id: 'actions' as TabId, icon: Crosshair, label: 'ACCIONES' },
+                    { id: 'skills' as TabId, icon: Brain, label: 'HABILIDADES' },
+                    { id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' },
+                    { id: 'features' as TabId, icon: Layers, label: 'RASGOS' },
+                    { id: 'inventory' as TabId, icon: Backpack, label: 'INVENTARIO' },
+                    { id: 'background' as TabId, icon: ScrollText, label: 'TRASFONDO' },
+                    { id: 'notes' as TabId, icon: NotebookPen, label: 'NOTAS' },
+                    { id: 'encounter' as TabId, icon: Swords, label: 'ENCUENTRO' },
+                  ]
+                  const isOddCount = tabMenuItems.length % 2 !== 0
+                  return tabMenuItems.map(({ id, icon: Icon, label }) => (
+                    <button
+                      key={id}
+                      className={`${styles.tabMenuItem} ${activeTab === id ? styles.tabMenuItemActive : ''} ${isOddCount && label === 'STATS' ? styles.tabMenuItemWide : ''}`}
+                      onClick={() => { setActiveTab(id); setTabMenuOpen(false) }}
+                    >
+                      <Icon size={20} />
+                      <span>{label}</span>
+                    </button>
+                  ))
+                })()}
               </div>
             </div>
           </>
