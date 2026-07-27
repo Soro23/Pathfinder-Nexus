@@ -65,8 +65,13 @@ export function ConditionPanel({ conditions, onToggle }: ConditionPanelProps) {
               <button
                 className={`${styles.toggleBtn} ${active ? styles.toggleBtnActive : ''}`}
                 onClick={() => onToggle(id, label)}
+                role="switch"
+                aria-checked={active}
+                aria-label={label}
               >
-                {active ? 'ACTIVA' : 'Activar'}
+                <span className={styles.toggleTrack}>
+                  <span className={styles.toggleKnob} />
+                </span>
               </button>
             </div>
             {active && <span className={styles.effectText}>{formatConditionEffect(id)}</span>}
@@ -84,8 +89,13 @@ export function ConditionPanel({ conditions, onToggle }: ConditionPanelProps) {
               <button
                 className={`${styles.toggleBtn} ${active ? styles.toggleBtnActive : ''}`}
                 onClick={() => onToggle(id, label)}
+                role="switch"
+                aria-checked={active}
+                aria-label={label}
               >
-                {active ? 'ACTIVA' : 'Activar'}
+                <span className={styles.toggleTrack}>
+                  <span className={styles.toggleKnob} />
+                </span>
               </button>
             </div>
             {active && <span className={styles.infoText}>Sin penalizador — restringe acciones disponibles.</span>}
