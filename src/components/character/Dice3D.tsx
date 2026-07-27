@@ -197,7 +197,7 @@ function DieMesh({ sides, value, variant }: DieMeshProps) {
         <FaceLabel
           key={i}
           label={getFaceLabel(i, variant)}
-          position={f.centroid.clone().addScaledVector(f.normal, 0.08)}
+          position={f.centroid.clone().addScaledVector(f.normal, 0.015)}
           normal={f.normal}
         />
       ))}
