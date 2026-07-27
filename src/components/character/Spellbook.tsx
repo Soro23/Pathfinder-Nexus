@@ -384,9 +384,11 @@ export function Spellbook({
                   <div className={styles.spellInfo}>
                     <span className={styles.spellName}>{spell.name}</span>
                     {spell.source === 'Homebrew' && <HomebrewBadge />}
-                    <span className={styles.spellMeta}>
-                      {translateSchool(spell.school)} {spell.descriptor && `(${translateDescriptor(spell.descriptor)})`}
-                    </span>
+                    {!compact && (
+                      <span className={styles.spellMeta}>
+                        {translateSchool(spell.school)} {spell.descriptor && `(${translateDescriptor(spell.descriptor)})`}
+                      </span>
+                    )}
                   </div>
                   {!compact && spell.type === 'both' && (
                     <span className={styles.bothBadge} title="Arcano y Divino">A+D</span>
