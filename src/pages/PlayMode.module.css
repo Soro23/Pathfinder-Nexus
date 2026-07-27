@@ -1106,31 +1106,33 @@
   background: color-mix(in srgb, var(--color-surface-container) 92%, transparent);
 }
 
-/* ── Botón flotante de dados: hexágono fijo inferior-izquierda ── */
+/* ── Botón flotante de dados: circular como el del otro lado, pero más destacado ── */
 .diceFab {
   position: fixed;
   bottom: var(--space-4);
   left: var(--space-4);
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--color-surface-container) 80%, transparent);
-  backdrop-filter: blur(6px);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
+  background: var(--color-accent-gold);
+  border: 2px solid var(--color-accent-gold);
+  color: var(--color-bg-primary);
   cursor: pointer;
-  box-shadow: var(--shadow-float);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-accent-gold) 45%, transparent);
   transition: all var(--transition-fast);
-  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
   z-index: 90;
 }
 
-.diceFab:hover {
+.diceFab:hover,
+.diceFab.fabBtnActive {
+  transform: scale(1.05);
+  background: var(--color-accent-gold);
   border-color: var(--color-accent-gold);
-  color: var(--color-accent-gold);
-  background: color-mix(in srgb, var(--color-surface-container) 92%, transparent);
+  color: var(--color-bg-primary);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-accent-gold) 60%, transparent);
 }
 
 .fabBadge {
