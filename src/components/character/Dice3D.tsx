@@ -5,9 +5,14 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js'
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
+import { useTheme } from '../../hooks/useTheme'
 
 const DIE_COLOR = '#e0a850'
-const EDGE_COLOR = '#141210'
+// #141210 es justo el --color-surface del tema oscuro (variables.css): en modo
+// claro contrasta bien de tinta oscura, pero en modo oscuro se confunde con el
+// fondo del overlay. En oscuro se usa un tono claro en su lugar.
+const EDGE_COLOR_LIGHT = '#141210'
+const EDGE_COLOR_DARK = '#f0e6c8'
 const EDGE_WIDTH = 3 // px de pantalla — LineBasicMaterial ignora linewidth en la mayoría de GPUs
 const ROLL_DURATION = 1.4 // segundos
 const SETTLE_PAUSE = 1 // segundos de pausa tras asentarse, antes de abrir el panel
@@ -141,19 +146,29 @@ function FaceLabel({ label, position, normal }: { label: string; position: THREE
 // WebGL/ANGLE, siempre pinta 1px). Para un grosor real se usan las "fat
 // lines" de three.js (LineSegments2 + LineMaterial), que sí lo respetan.
 function DieEdges({ geometry }: { geometry: THREE.BufferGeometry }) {
-  const { size } = useThree()
+  const { gl, size } = useThree()
+  const { theme } = useTheme()
+  const color = theme === 'dark' ? EDGE_COLOR_DARK : EDGE_COLOR_LIGHT
 
   const lineSegments = useMemo(() => {
     const edges = new THREE.EdgesGeometry(geometry)
     const lineGeo = new LineSegmentsGeometry()
     lineGeo.setPositions(Array.from(edges.getAttribute('position').array as Float32Array))
-    const material = new LineMaterial({ color: EDGE_COLOR, linewidth: EDGE_WIDTH })
+    const material = new LineMaterial({ linewidth: EDGE_WIDTH })
     return new LineSegments2(lineGeo, material)
   }, [geometry])
 
   useEffect(() => {
-    lineSegments.material.resolution.set(size.width, size.height)
-  }, [lineSegments, size])
+    lineSegments.material.color.set(color)
+  }, [lineSegments, color])
+
+  useEffect(() => {
+    // El grosor de las fat lines se calcula en pixels a partir de `resolution`
+    // — hay que usar el tamaño real del framebuffer (con dpr ya aplicado), no
+    // el tamaño CSS del canvas (`size`), o el grosor sale más fino de lo
+    // esperado. `size` solo se usa aquí para volver a leerlo si cambia.
+    lineSegments.material.resolution.set(gl.domElement.width, gl.domElement.height)
+  }, [lineSegments, gl, size])
 
   return <primitive object={lineSegments} />
 }
