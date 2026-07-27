@@ -1,37 +1,73 @@
 .hpPanel {
   background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(139, 58, 58, 0.3) 100%) !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
-.hpDisplay {
+/* ── Actual / Máximo / Temp ── */
+.topRow {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  gap: var(--space-6);
-  margin-bottom: var(--space-4);
+  gap: var(--space-4);
 }
 
-.hpValue {
+.currentMaxGroup {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-1);
+  align-items: flex-end;
+  gap: var(--space-2);
 }
 
-.hpValue span:first-child {
+.slash {
   font-family: var(--font-mono);
-  font-size: 5rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  line-height: 1;
-}
-
-.hpMax {
-  font-family: var(--font-mono);
-  font-size: 2rem;
+  font-size: 1.3rem;
   color: var(--color-text-secondary);
+  padding-bottom: var(--space-1);
+}
+
+.fieldBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.numberInput {
+  width: 68px;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.numberInput:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+.numberInput:disabled {
+  color: var(--color-text-secondary);
+  opacity: 0.8;
+  cursor: default;
 }
 
 .critical {
   color: var(--color-accent-red) !important;
+  border-color: var(--color-accent-red) !important;
   animation: pulse 1s ease-in-out infinite;
 }
 
@@ -42,57 +78,125 @@
 
 .zeroHp {
   color: var(--color-accent-red) !important;
+  border-color: var(--color-accent-red) !important;
   text-shadow: 0 0 12px rgba(224, 80, 80, 0.6);
 }
 
-.hpControls {
-  display: flex;
-  gap: var(--space-3);
-  justify-content: center;
-}
-
-.tempRow {
+/* ── Curación / Daño: input coloreado + boton grande ── */
+.actionRow {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
+  gap: var(--space-3);
+}
+
+.actionBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.actionLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.actionInput {
+  width: 80px;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-primary);
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.actionInput:focus {
+  outline: none;
+}
+
+.healingBlock .actionLabel { color: var(--color-accent-green); }
+.healingBlock .actionInput {
+  border: 2px solid var(--color-accent-green);
+  color: var(--color-accent-green);
+}
+
+.damageBlock .actionLabel { color: var(--color-accent-red); }
+.damageBlock .actionInput {
+  border: 2px solid var(--color-accent-red);
+  color: var(--color-accent-red);
+}
+
+.healBtn,
+.damageBtn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: none;
+  color: var(--color-on-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.healBtn { background: var(--color-accent-green); }
+.damageBtn { background: var(--color-accent-red); }
+
+.healBtn:disabled,
+.damageBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.healBtn:hover:not(:disabled),
+.damageBtn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+/* ── Vista previa "Nuevos PV" ── */
+.newHpPreview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.newHpLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.newHpValue {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* ── Modificador / Anular PV Máx. ── */
+.overrideRow {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
   padding-top: var(--space-3);
   border-top: 1px solid var(--color-border);
 }
 
-.tempLabel {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.tempInput {
-  width: 56px;
-  padding: var(--space-1) var(--space-2);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-primary);
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-.tempInput:focus {
-  outline: none;
-  border-color: var(--color-accent-gold);
-}
-
-.tempSuffix {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--color-accent-gold);
-}
-
 @media (max-width: 640px) {
-  .hpValue span:first-child {
-    font-size: 3rem;
+  .topRow {
+    flex-wrap: wrap;
+  }
+
+  .overrideRow {
+    gap: var(--space-4);
   }
 }

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, Suspense, lazy } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, Dices, Shield, Brain,
-  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair, Info, ListChecks
+  Swords, X, Zap, BookOpen, Activity, LayoutGrid, Backpack, ScrollText, NotebookPen, Crosshair, Info, ListChecks, Layers, Palette
 } from 'lucide-react'
 import mdiReact from '@mdi/react'
 import { mdiDiceD20, mdiDiceD12, mdiDiceD10, mdiDiceD8, mdiDiceD6, mdiDiceD4 } from '@mdi/js'
@@ -16,9 +16,10 @@ import { buildArchetypesByClassId } from '../data/resolveArchetype'
 import { RAGE_EFFECT_ID, RAGE_EFFECT_MODIFIERS, MUTAGEN_EFFECT_ID, buildMutagenModifiers, MUTAGEN_ABILITY_LABELS } from '../data/classFeatureEffects'
 import type { PhysicalAbility } from '../data/classFeatureEffects'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
+import { useDiceTemplate } from '../hooks/useDiceTemplate'
 import { translateCastingTime, translateRange, translateDuration, translateSavingThrow, translateSpellResistance, translateSchool, translateUnits } from '../lib/spellTermsEs'
 import { Button, Card, Drawer } from '../components/ui'
-import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager, CombatActionsPanel, Spellbook } from '../components/character'
+import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel, InventoryManager, CombatActionsPanel, Spellbook, FeaturesTraitsPanel } from '../components/character'
 import type { DieRoll } from '../components/character/Dice3D'
 import styles from './PlayMode.module.css'
 
@@ -65,7 +66,7 @@ function rollDice(notation: string): { total: number; rolls: number[] } {
   return { total: subtotal + modifier, rolls }
 }
 
-type TabId = 'combat' | 'actions' | 'skills' | 'spells' | 'encounter' | 'inventory' | 'background' | 'notes'
+type TabId = 'combat' | 'actions' | 'skills' | 'spells' | 'features' | 'encounter' | 'inventory' | 'background' | 'notes'
 
 interface RollBreakdownInput {
   baseComponents: { label: string; value: number }[]
@@ -117,7 +118,7 @@ const INTERACTIVE_FEATURE_NAMES = new Set([
 ])
 
 export function PlayMode() {
-  const { skills: SKILLS, getDomainById, getBlessingById, getArchetypeById } = useSRDStore()
+  const { skills: SKILLS, feats: FEATS, getDomainById, getBlessingById, getArchetypeById } = useSRDStore()
   const { id } = useParams<{ id: string }>()
   const character = useCharacterStore((state) => state.getCharacter(id || ''))
   const updateCharacter = useCharacterStore((state) => state.updateCharacter)
@@ -132,6 +133,8 @@ export function PlayMode() {
   const [rollBreakdown, setRollBreakdown] = useState<RollBreakdown | null>(null)
   const [statExplain, setStatExplain] = useState<StatExplain | null>(null)
   const [dicePanelOpen, setDicePanelOpen] = useState(false)
+  const [diceTemplatePickerOpen, setDiceTemplatePickerOpen] = useState(false)
+  const { template: diceTemplate, templates: diceTemplates, setTemplateId: setDiceTemplateId } = useDiceTemplate()
   const [rollDrawerOpen, setRollDrawerOpen] = useState(false)
   const [tabMenuOpen, setTabMenuOpen] = useState(false)
   const [showStatusEffects, setShowStatusEffects] = useState(false)
@@ -238,7 +241,10 @@ export function PlayMode() {
 
   // PV máximos efectivos: PV base + bonos del motor (dotes/objetos como Toughness), con
   // el suelo de 1 PV y la penalización de nivel negativo ya resueltos por el motor.
-  const effectiveMaxHp = computeEffectiveMaxHp(character, resolvedStats)
+  // `maxOverride` (si está fijado) sustituye por completo el cálculo; si no, `maxModifier`
+  // se suma como ajuste manual — ambos editables desde el drawer de Gestión de PV.
+  const baseEffectiveMaxHp = computeEffectiveMaxHp(character, resolvedStats)
+  const effectiveMaxHp = character.hp.maxOverride ?? (baseEffectiveMaxHp + (character.hp.maxModifier ?? 0))
 
   // Power Attack
   const hasPowerAttack = character.feats.some(f => f.id === 'power-attack')
@@ -367,6 +373,19 @@ export function PlayMode() {
 
   const setTempHP = (value: number) => {
     updateCharacter(character.id, { hp: { ...character.hp, temp: value } })
+  }
+
+  const setCurrentHP = (value: number) => {
+    const newCurrent = Math.max(0, Math.min(effectiveMaxHp, value))
+    updateCharacter(character.id, { hp: { ...character.hp, current: newCurrent } })
+  }
+
+  const setMaxHpModifier = (value: number) => {
+    updateCharacter(character.id, { hp: { ...character.hp, maxModifier: value } })
+  }
+
+  const setMaxHpOverride = (value: number | null) => {
+    updateCharacter(character.id, { hp: { ...character.hp, maxOverride: value } })
   }
 
   const toggleSlot = (level: number, slotIndex: number) => {
@@ -614,7 +633,7 @@ export function PlayMode() {
           <span className={styles.rollStripType}>{lastRollType}</span>
           <div className={styles.dice3dViewport} onClick={(e) => e.stopPropagation()}>
             <Suspense fallback={null}>
-              <Dice3D dice={pendingRoll.dice} onSettled={commitPendingRoll} />
+              <Dice3D dice={pendingRoll.dice} template={diceTemplate} onSettled={commitPendingRoll} />
             </Suspense>
           </div>
         </div>
@@ -670,8 +689,13 @@ export function PlayMode() {
           current={character.hp.current}
           max={effectiveMaxHp}
           temp={character.hp.temp ?? 0}
+          maxModifier={character.hp.maxModifier ?? 0}
+          maxOverride={character.hp.maxOverride ?? null}
           onAdjust={adjustHP}
+          onSetCurrent={setCurrentHP}
           onTempChange={setTempHP}
+          onMaxModifierChange={setMaxHpModifier}
+          onMaxOverrideChange={setMaxHpOverride}
         />
       </Drawer>
 
@@ -1780,6 +1804,22 @@ export function PlayMode() {
             </div>
           )}
 
+          {/* ─── TAB: RASGOS ─── */}
+          {activeTab === 'features' && (
+            <div className={styles.tabContent}>
+              <Card padding="md">
+                <h3 className={styles.sectionTitle}><Layers size={18} />Características y Rasgos</h3>
+                <FeaturesTraitsPanel
+                  classes={character.classes}
+                  race={character.race}
+                  feats={character.feats}
+                  archetypesByClassId={archetypesByClassId}
+                  allFeats={FEATS}
+                />
+              </Card>
+            </div>
+          )}
+
           {/* ─── TAB: TRASFONDO ─── */}
           {activeTab === 'background' && (
             <div className={styles.tabContent}>
@@ -1850,10 +1890,35 @@ export function PlayMode() {
           <div className={styles.dicePanelFloating}>
             <div className={styles.dicePanelHeader}>
               <span className={styles.dicePanelTitle}><Dices size={16} /> Dados</span>
-              <button className={styles.dicePanelClose} onClick={() => setDicePanelOpen(false)}>
-                <X size={16} />
-              </button>
+              <div className={styles.dicePanelHeaderActions}>
+                <button
+                  className={`${styles.dicePanelTool} ${diceTemplatePickerOpen ? styles.dicePanelToolActive : ''}`}
+                  onClick={() => setDiceTemplatePickerOpen((v) => !v)}
+                  title="Plantillas de color del dado"
+                >
+                  <Palette size={15} />
+                </button>
+                <button className={styles.dicePanelClose} onClick={() => setDicePanelOpen(false)}>
+                  <X size={16} />
+                </button>
+              </div>
             </div>
+            {diceTemplatePickerOpen && (
+              <div className={styles.diceTemplateList}>
+                {diceTemplates.map((t) => (
+                  <button
+                    key={t.id}
+                    className={`${styles.diceTemplateSwatch} ${t.id === diceTemplate.id ? styles.diceTemplateSwatchActive : ''}`}
+                    style={{ '--swatch-color': t.dieColor } as React.CSSProperties}
+                    onClick={() => { setDiceTemplateId(t.id); setDiceTemplatePickerOpen(false) }}
+                    title={t.name}
+                  >
+                    <span className={styles.diceTemplateDot} />
+                    <span className={styles.diceTemplateName}>{t.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
             <div className={styles.dicePanelContent}>
               <div className={styles.dicePanelGrid}>
                 {([
@@ -1907,6 +1972,7 @@ export function PlayMode() {
                   { id: 'actions' as TabId, icon: Crosshair, label: 'ACCIONES' },
                   { id: 'skills' as TabId, icon: Brain, label: 'HABILIDADES' },
                   { id: 'spells' as TabId, icon: BookOpen, label: 'CONJUROS' },
+                  { id: 'features' as TabId, icon: Layers, label: 'RASGOS' },
                   { id: 'inventory' as TabId, icon: Backpack, label: 'INVENTARIO' },
                   { id: 'background' as TabId, icon: ScrollText, label: 'TRASFONDO' },
                   { id: 'notes' as TabId, icon: NotebookPen, label: 'NOTAS' },

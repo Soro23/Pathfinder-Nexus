@@ -6,13 +6,8 @@ import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js'
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 import { useTheme } from '../../hooks/useTheme'
+import type { DiceTemplate } from '../../hooks/useDiceTemplate'
 
-const DIE_COLOR = '#e0a850'
-// #141210 es justo el --color-surface del tema oscuro (variables.css): en modo
-// claro contrasta bien de tinta oscura, pero en modo oscuro se confunde con el
-// fondo del overlay. En oscuro se usa un tono claro en su lugar.
-const EDGE_COLOR_LIGHT = '#141210'
-const EDGE_COLOR_DARK = '#f0e6c8'
 const EDGE_WIDTH = 3 // px de pantalla — LineBasicMaterial ignora linewidth en la mayoría de GPUs
 const ROLL_DURATION = 1.4 // segundos
 const SETTLE_PAUSE = 1 // segundos de pausa tras asentarse, antes de abrir el panel
@@ -108,28 +103,29 @@ function computeFaces(geometry: THREE.BufferGeometry): Face[] {
 
 const textureCache = new Map<string, THREE.CanvasTexture>()
 
-function getNumberTexture(label: string): THREE.CanvasTexture {
-  const cached = textureCache.get(label)
+function getNumberTexture(label: string, color: string): THREE.CanvasTexture {
+  const key = `${label}:${color}`
+  const cached = textureCache.get(key)
   if (cached) return cached
   const canvas = document.createElement('canvas')
   canvas.width = 128
   canvas.height = 128
   const ctx = canvas.getContext('2d')!
-  ctx.fillStyle = '#141210'
+  ctx.fillStyle = color
   ctx.font = `bold ${label.length > 2 ? 44 : 60}px "Fira Code", monospace`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(label, 64, 70)
   const texture = new THREE.CanvasTexture(canvas)
-  textureCache.set(label, texture)
+  textureCache.set(key, texture)
   return texture
 }
 
 // Plano orientado según la normal de la cara (no un sprite): así la etiqueta
 // gira junto con el dado y se ve de frente solo cuando esa cara concreta
 // queda mirando a cámara, igual que un número real grabado en la cara.
-function FaceLabel({ label, position, normal }: { label: string; position: THREE.Vector3; normal: THREE.Vector3 }) {
-  const texture = useMemo(() => getNumberTexture(label), [label])
+function FaceLabel({ label, position, normal, color }: { label: string; position: THREE.Vector3; normal: THREE.Vector3; color: string }) {
+  const texture = useMemo(() => getNumberTexture(label, color), [label, color])
   const quaternion = useMemo(
     () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal.clone().normalize()),
     [normal]
@@ -145,10 +141,8 @@ function FaceLabel({ label, position, normal }: { label: string; position: THREE
 // LineBasicMaterial ignora `linewidth` en casi todas las GPU (limitación de
 // WebGL/ANGLE, siempre pinta 1px). Para un grosor real se usan las "fat
 // lines" de three.js (LineSegments2 + LineMaterial), que sí lo respetan.
-function DieEdges({ geometry }: { geometry: THREE.BufferGeometry }) {
+function DieEdges({ geometry, color }: { geometry: THREE.BufferGeometry; color: string }) {
   const { gl, size } = useThree()
-  const { theme } = useTheme()
-  const color = theme === 'dark' ? EDGE_COLOR_DARK : EDGE_COLOR_LIGHT
 
   const lineSegments = useMemo(() => {
     const edges = new THREE.EdgesGeometry(geometry)
@@ -216,6 +210,8 @@ interface DieMeshProps {
   sides: number
   value: number
   variant?: DieVariant
+  dieColor: string
+  inkColor: string
 }
 
 // Etiqueta y cara-objetivo de cada tipo: la convención normal es 1..N (cara i
@@ -233,7 +229,7 @@ function getTargetIndex(value: number, faceCount: number, variant: DieVariant | 
   return ((value - 1) % faceCount + faceCount) % faceCount
 }
 
-function DieMesh({ sides, value, variant }: DieMeshProps) {
+function DieMesh({ sides, value, variant, dieColor, inkColor }: DieMeshProps) {
   const geometry = useMemo(() => buildDieGeometry(sides), [sides])
   const faces = useMemo(() => computeFaces(geometry), [geometry])
   const faceCount = faces.length
@@ -250,15 +246,16 @@ function DieMesh({ sides, value, variant }: DieMeshProps) {
   return (
     <group ref={ref}>
       <mesh geometry={geometry}>
-        <meshStandardMaterial color={DIE_COLOR} flatShading />
+        <meshStandardMaterial color={dieColor} flatShading />
       </mesh>
-      <DieEdges geometry={geometry} />
+      <DieEdges geometry={geometry} color={inkColor} />
       {faces.map((f, i) => (
         <FaceLabel
           key={i}
           label={getFaceLabel(i, variant)}
           position={f.centroid.clone().addScaledVector(f.normal, 0.015)}
           normal={f.normal}
+          color={inkColor}
         />
       ))}
     </group>
@@ -273,13 +270,17 @@ export interface DieRoll {
 
 interface Dice3DProps {
   dice: DieRoll[]
+  template: DiceTemplate
   onSettled?: () => void
 }
 
 // Anima cada dado desde un giro rápido hasta asentarse en su cara correcta.
 // onSettled se dispara una sola vez, tras ROLL_DURATION + SETTLE_PAUSE — ese
 // margen extra es para poder ver el dado ya quieto antes de que desaparezca.
-export function Dice3D({ dice, onSettled }: Dice3DProps) {
+export function Dice3D({ dice, template, onSettled }: Dice3DProps) {
+  const { theme } = useTheme()
+  const inkColor = theme === 'dark' ? template.edgeColorDark : template.edgeColorLight
+
   useEffect(() => {
     if (!onSettled) return
     const timeout = setTimeout(onSettled, (ROLL_DURATION + SETTLE_PAUSE) * 1000)
@@ -298,7 +299,7 @@ export function Dice3D({ dice, onSettled }: Dice3DProps) {
       <directionalLight position={[-3, -2, -4]} intensity={0.5} />
       {visible.map((d, i) => (
         <group key={i} position={[startX + i * spacing, 0, 0]}>
-          <DieMesh sides={d.sides} value={d.value} variant={d.variant} />
+          <DieMesh sides={d.sides} value={d.value} variant={d.variant} dieColor={template.dieColor} inkColor={inkColor} />
         </group>
       ))}
     </Canvas>

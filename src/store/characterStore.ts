@@ -195,7 +195,7 @@ export interface Character {
     wisdom: number
     charisma: number
   }
-  hp: { current: number; max: number; temp: number }
+  hp: { current: number; max: number; temp: number; maxModifier?: number; maxOverride?: number | null }
   feats: CharacterFeat[]
   skills: SkillRank[]
   spells: string[]

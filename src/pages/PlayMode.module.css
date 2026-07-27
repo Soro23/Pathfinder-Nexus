@@ -1492,7 +1492,14 @@
   font-family: var(--font-display);
 }
 
-.dicePanelClose {
+.dicePanelHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.dicePanelClose,
+.dicePanelTool {
   background: none;
   border: none;
   color: var(--color-text-secondary);
@@ -1504,9 +1511,60 @@
   justify-content: center;
 }
 
-.dicePanelClose:hover {
+.dicePanelClose:hover,
+.dicePanelTool:hover {
   color: var(--color-text-primary);
   background: var(--color-surface-container-high);
+}
+
+.dicePanelToolActive {
+  color: var(--color-accent-gold);
+  background: var(--color-surface-container-high);
+}
+
+/* ── Lista de plantillas de color del dado 3D ── */
+.diceTemplateList {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
+.diceTemplateSwatch {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.diceTemplateDot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--swatch-color);
+  border: 2px solid transparent;
+  transition: border-color var(--transition-fast);
+}
+
+.diceTemplateSwatchActive .diceTemplateDot {
+  border-color: var(--color-accent-gold);
+}
+
+.diceTemplateName {
+  font-size: 0.6rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.diceTemplateSwatchActive .diceTemplateName {
+  color: var(--color-accent-gold);
 }
 
 .dicePanelContent {
