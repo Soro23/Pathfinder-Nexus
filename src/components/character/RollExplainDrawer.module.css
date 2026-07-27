@@ -1,0 +1,58 @@
+.critIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+.critIconCrit { background: var(--color-primary-container); color: var(--color-primary); }
+.critIconFumble { background: var(--color-surface-container-high); color: var(--color-on-surface-variant); }
+
+.critSub {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+  text-align: center;
+}
+
+.critDesc {
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+  line-height: 1.5;
+  margin: var(--space-2) auto 0;
+  max-width: 320px;
+  text-align: center;
+}
+
+.critActions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--space-2);
+}
+
+.dieResult {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) 0;
+}
+
+.dieResultNumber {
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+}
+
+.rollsDetail {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}

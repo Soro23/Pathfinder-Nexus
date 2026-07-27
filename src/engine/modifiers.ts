@@ -4,7 +4,7 @@ import { RACES, hasFloatingAbilityBonus } from '../data/races'
 import { homebrewStore } from '../store/homebrewStore'
 import type { Modifier, ModifierTarget, ModifierType, ResolvedStats } from './types'
 
-function stackModifiers(modifiers: Modifier[], target: ModifierTarget): number {
+export function stackModifiers(modifiers: Modifier[], target: ModifierTarget): number {
   const relevant = modifiers.filter((m) => m.target === target)
   if (relevant.length === 0) return 0
 
@@ -62,7 +62,7 @@ function statusEffectToModifiers(effect: StatusEffect): Modifier[] {
 
 // Penalizaciones fijas por condición Pathfinder 1e
 // 'skill:all' es un centinela: se expande a todos los skill IDs del personaje en resolveModifiers
-const CONDITION_MODIFIERS: Record<string, Modifier[]> = {
+export const CONDITION_MODIFIERS: Record<string, Modifier[]> = {
   sickened: [
     { id: 'cond-sickened-atk',   source: 'Sickened',  type: 'untyped', target: 'attack',     value: -2 },
     { id: 'cond-sickened-dmg',   source: 'Sickened',  type: 'untyped', target: 'damage',     value: -2 },

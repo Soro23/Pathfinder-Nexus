@@ -1,0 +1,36 @@
+.weaponRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+
+.weaponInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 120px;
+}
+
+.weaponName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.weaponCrit {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.weaponBtns {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}

@@ -7,6 +7,11 @@ import { resolveClassSkills } from '../data/resolveArchetype'
 import { getCharacterSize, getSizeSkillModifier } from './size'
 import type { ResolvedStats } from './types'
 
+const ABILITY_KEY_ABBR: Record<string, keyof ResolvedStats['abilityBonuses']> = {
+  strength: 'str', dexterity: 'dex', constitution: 'con',
+  intelligence: 'int', wisdom: 'wis', charisma: 'cha',
+}
+
 // Forma mínima necesaria para calcular habilidades — un `Character` completo la satisface
 // estructuralmente, pero también permite pasar el estado en edición de SkillsList (cuyos
 // rangos viven en un prop `ranks` controlado, separado de `character.skills`).
@@ -69,7 +74,8 @@ export function computeSkillTotal(
 ): number {
   const rankEntry = character.skills.find((s) => s.id === skill.id)
   const ranks = rankEntry?.ranks ?? 0
-  const abilityMod = calculateModifier(character.abilities[skill.ability])
+  const abilityBonus = resolvedStats.abilityBonuses[ABILITY_KEY_ABBR[skill.ability]] ?? 0
+  const abilityMod = calculateModifier(character.abilities[skill.ability]) + abilityBonus
   const classBonus = ranks > 0 && isClassSkillForCharacter(character, skill.id) ? 3 : 0
   const acp = skill.hasArmorCheckPenalty ? Math.min(equippedArmorAcp, encumbrancePenalty) : 0
   const misc = rankEntry?.miscBonuses?.reduce((s, b) => s + b.value, 0) ?? 0

@@ -1,4 +1,6 @@
-export { resolveModifiers } from './modifiers'
+export { resolveModifiers, stackModifiers, CONDITION_MODIFIERS } from './modifiers'
+export { buildStatExplain, buildRollBreakdown, buildSkillAllRows, sumSessionModifiers, isSessionModifier } from './rollBreakdown'
+export type { RollBreakdown, RollBreakdownModifier, StatExplain } from './rollBreakdown'
 export { computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus, getIterativeAttackOffsets, getNegativeLevelPenalty } from './combatStats'
 export { getCharacterSize, getSizeACModifier, getSizeCMBModifier, getSizeSkillModifier, normalizeSizeString } from './size'
 export { computeSkillPointsAvailable, computeSkillTotal, isClassSkillForCharacter } from './skills'

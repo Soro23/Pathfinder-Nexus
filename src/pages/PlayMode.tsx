@@ -1,15 +1,19 @@
 import React, { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
-  ArrowLeft, Plus, Minus, Dices, Shield, Heart, Brain,
-  Swords, Flame, X, Zap, BookOpen, Activity, Power, Pencil, Check
+  ArrowLeft, Dices, Shield, Heart, Brain,
+  Swords, X, Zap, BookOpen, Activity
 } from 'lucide-react'
-import { useCharacterStore, calculateModifier, getModifierString, StatusEffect, BonusTarget } from '../store'
+import { useCharacterStore, calculateModifier, getModifierString } from '../store'
 import { getClassById, useSRDStore, calculateSpellDC } from '../data'
-import { resolveModifiers, computeCombatStats, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets, getEncumbranceLevel, getEncumbranceSkillPenalty } from '../engine'
+import { resolveModifiers, computeCombatStats, computeEffectiveMaxHp, computeWeaponAttackBonus, computeSkillTotal, isClassSkillForCharacter, getStrDamageBonus, getPowerAttackDamageBonus, getIterativeAttackOffsets, getEncumbranceLevel, getEncumbranceSkillPenalty, buildRollBreakdown, buildStatExplain, sumSessionModifiers } from '../engine'
+import type { ModifierTarget, RollBreakdown, StatExplain } from '../engine'
 import { buildArchetypesByClassId } from '../data/resolveArchetype'
+import { RAGE_EFFECT_ID, RAGE_EFFECT_MODIFIERS, MUTAGEN_EFFECT_ID, buildMutagenModifiers, MUTAGEN_ABILITY_LABELS } from '../data/classFeatureEffects'
+import type { PhysicalAbility } from '../data/classFeatureEffects'
 import { useSpellsByIds } from '../hooks/useSpellsByIds'
-import { Button, Card } from '../components/ui'
+import { Button, Card, Drawer } from '../components/ui'
+import { HpTracker, StatPill, WeaponAttackRow, StatusEffectsPanel, ConditionPanel, ClassFeatureRow, RollExplainDrawer, StatExplainPanel } from '../components/character'
 import styles from './PlayMode.module.css'
 
 function addModifierToNotation(notation: string, extra: number): string {
@@ -21,18 +25,6 @@ function addModifierToNotation(notation: string, extra: number): string {
   const total = existing + extra
   if (total === 0) return base
   return `${base}${total > 0 ? '+' : ''}${total}`
-}
-
-const BONUS_TARGET_LABELS: Record<string, string> = {
-  attack: 'Ataque',
-  damage: 'Daño',
-  ac: 'CA',
-  fort: 'Fortaleza',
-  ref: 'Reflejos',
-  will: 'Voluntad',
-  initiative: 'Iniciativa',
-  cmb: 'CMB',
-  cmd: 'CMD',
 }
 
 function rollDice(notation: string): { total: number; rolls: number[] } {
@@ -52,8 +44,12 @@ function rollDice(notation: string): { total: number; rolls: number[] } {
   return { total: subtotal + modifier, rolls }
 }
 
-type CritEvent = { type: 'crit' | 'fumble'; name: string; roll: number }
 type TabId = 'combat' | 'skills' | 'spells' | 'dice' | 'encounter'
+
+interface RollBreakdownInput {
+  baseComponents: { label: string; value: number }[]
+  targets: ModifierTarget[]
+}
 
 interface Combatant {
   id: string
@@ -99,23 +95,11 @@ export function PlayMode() {
   const [rollResult, setRollResult] = useState<{ total: number; rolls: number[]; key: number } | null>(null)
   const [lastRollType, setLastRollType] = useState('')
   const [history, setHistory] = useState<{ notation: string; result: number; isCrit?: boolean; isFumble?: boolean }[]>([])
-  const [critEvent, setCritEvent] = useState<CritEvent | null>(null)
+  const [rollBreakdown, setRollBreakdown] = useState<RollBreakdown | null>(null)
+  const [statExplain, setStatExplain] = useState<StatExplain | null>(null)
   const [rolling, setRolling] = useState(false)
   const [dicePanelOpen, setDicePanelOpen] = useState(false)
   const [showStatusEffects, setShowStatusEffects] = useState(false)
-  const [newEffectName, setNewEffectName] = useState('')
-  const [newEffectDesc, setNewEffectDesc] = useState('')
-  const [newEffectDuration, setNewEffectDuration] = useState('')
-  const [newEffectTarget, setNewEffectTarget] = useState<BonusTarget | 'skill' | ''>('')
-  const [newEffectSkillId, setNewEffectSkillId] = useState('')
-  const [newEffectValue, setNewEffectValue] = useState<number>(0)
-  const [editingEffectId, setEditingEffectId] = useState<string | null>(null)
-  const [editName, setEditName] = useState('')
-  const [editDesc, setEditDesc] = useState('')
-  const [editDuration, setEditDuration] = useState('')
-  const [editTarget, setEditTarget] = useState<BonusTarget | 'skill' | ''>('')
-  const [editSkillId, setEditSkillId] = useState('')
-  const [editValue, setEditValue] = useState<number>(0)
 
   // ── Encounter tracker state ──
   const [combatants, setCombatants] = useState<Combatant[]>([])
@@ -129,6 +113,9 @@ export function PlayMode() {
 
   // ── Rage state ──
   const [raging, setRaging] = useState(false)
+
+  // ── Mutagen state ──
+  const [mutagenActive, setMutagenActive] = useState(false)
 
   // ── Power Attack toggle ──
   const [powerAttackActive, setPowerAttackActive] = useState(false)
@@ -178,13 +165,22 @@ export function PlayMode() {
   const refSave = combat.reflex
   const willSave = combat.will
 
+  // Desglose de StaticValue (drawer tipo B) — nota: la Destreza mostrada aquí es la
+  // bruta, sin el tope de armadura/carga que sí aplica `combatStats.ts` al total real;
+  // el total del pill siempre es el correcto, este desglose es solo orientativo.
+  const explainStat = (label: string, total: number, baseComponents: { label: string; value: number }[], targets: ModifierTarget[]) => {
+    setStatExplain(buildStatExplain(label, total, baseComponents, resolvedStats.allModifiers, targets))
+  }
+  const isAltered = (targets: ModifierTarget[]) => sumSessionModifiers(resolvedStats.allModifiers, targets) !== 0
+
   const equippedArmorAcp = (character.armor ?? [])
     .filter((a) => a.equipped && a.type !== 'shield')
     .reduce((sum, a) => sum + (a.armorCheckPenalty ?? 0), 0)
   const encumbrancePenalty = getEncumbranceSkillPenalty(getEncumbranceLevel(totalWeight, character.abilities.strength))
 
-  // PV máximos efectivos: PV base + bonos del motor (dotes/objetos como Toughness).
-  const effectiveMaxHp = character.hp.max + resolvedStats.hpBonus
+  // PV máximos efectivos: PV base + bonos del motor (dotes/objetos como Toughness), con
+  // el suelo de 1 PV y la penalización de nivel negativo ya resueltos por el motor.
+  const effectiveMaxHp = computeEffectiveMaxHp(character, resolvedStats)
 
   // Power Attack
   const hasPowerAttack = character.feats.some(f => f.id === 'power-attack')
@@ -192,6 +188,16 @@ export function PlayMode() {
   const powerAttackDmgBonus = powerAttackPenalty * 2
 
   const statusEffects = character.statusEffects ?? []
+  const conditions = character.conditions ?? []
+  const activeConditionsCount = conditions.filter((c) => c.active).length
+
+  const toggleCondition = (id: string, label: string) => {
+    const found = conditions.find((c) => c.id === id)
+    const next = found
+      ? conditions.map((c) => c.id === id ? { ...c, active: !c.active } : c)
+      : [...conditions, { id, label, active: true }]
+    updateCharacter(character.id, { conditions: next })
+  }
 
   function triggerRollAnimation(cb: () => void) {
     setRolling(true)
@@ -210,7 +216,7 @@ export function PlayMode() {
     })
   }
 
-  const handleQuickRoll = (notation: string, name: string, isAttack = false) => {
+  const handleQuickRoll = (notation: string, name: string, isAttack = false, breakdownInput?: RollBreakdownInput) => {
     triggerRollAnimation(() => {
       const result = rollDice(notation)
       const d20 = result.rolls[0]
@@ -221,14 +227,34 @@ export function PlayMode() {
       setLastRollType(name)
       setHistory((prev) => [{ notation: name, result: result.total, isCrit, isFumble }, ...prev.slice(0, 19)])
 
-      if (isCrit) setCritEvent({ type: 'crit', name, roll: result.total })
-      else if (isFumble) setCritEvent({ type: 'fumble', name, roll: result.total })
+      if (breakdownInput) {
+        setRollBreakdown(buildRollBreakdown(
+          name, d20, result.rolls, result.total,
+          breakdownInput.baseComponents, resolvedStats.allModifiers, breakdownInput.targets,
+          { isCrit, isFumble },
+        ))
+      }
     })
   }
 
   const adjustHP = (amount: number) => {
-    const newHP = Math.max(0, Math.min(effectiveMaxHp, character.hp.current + amount))
-    updateCharacter(character.id, { hp: { ...character.hp, current: newHP } })
+    if (amount >= 0) {
+      const newCurrent = Math.min(effectiveMaxHp, character.hp.current + amount)
+      updateCharacter(character.id, { hp: { ...character.hp, current: newCurrent } })
+      return
+    }
+    // Daño: se resta primero de los PV temporales, y solo el resto de los PV actuales.
+    const damage = -amount
+    const temp = character.hp.temp ?? 0
+    const absorbedByTemp = Math.min(temp, damage)
+    const remainingDamage = damage - absorbedByTemp
+    const newTemp = temp - absorbedByTemp
+    const newCurrent = Math.max(0, character.hp.current - remainingDamage)
+    updateCharacter(character.id, { hp: { ...character.hp, current: newCurrent, temp: newTemp } })
+  }
+
+  const setTempHP = (value: number) => {
+    updateCharacter(character.id, { hp: { ...character.hp, temp: value } })
   }
 
   const toggleSlot = (level: number, slotIndex: number) => {
@@ -326,6 +352,51 @@ export function PlayMode() {
     updateCharacter(character.id, { classFeatureUses: { ...featureUses, [key]: current - 1 } })
   }
 
+  // CF-01: todo poder con usos limitados permite también devolver un uso manualmente
+  // (para corregir errores en mesa), no solo gastarlo.
+  const restoreFeature = (key: string, max: number) => {
+    const current = featureUses[key] ?? max
+    if (current >= max) return
+    updateCharacter(character.id, { classFeatureUses: { ...featureUses, [key]: current + 1 } })
+  }
+
+  // ── Efectos temporales de poderes de clase (CF-02: Rabia, Mutágeno) ──
+  const temporaryEffects = character.temporaryEffects ?? []
+
+  const applyTemporaryEffect = (effectId: string, name: string, modifiers: typeof RAGE_EFFECT_MODIFIERS) => {
+    const withoutExisting = temporaryEffects.filter((te) => te.id !== effectId)
+    updateCharacter(character.id, {
+      temporaryEffects: [...withoutExisting, { id: effectId, name, modifiers, active: true }],
+    })
+  }
+
+  const removeTemporaryEffect = (effectId: string) => {
+    updateCharacter(character.id, { temporaryEffects: temporaryEffects.filter((te) => te.id !== effectId) })
+  }
+
+  const toggleRage = () => {
+    if (!raging && rageUses > 0) {
+      useFeature('rage', rageMaxUses)
+      applyTemporaryEffect(RAGE_EFFECT_ID, 'Rabia', RAGE_EFFECT_MODIFIERS)
+      setRaging(true)
+    } else {
+      removeTemporaryEffect(RAGE_EFFECT_ID)
+      setRaging(false)
+    }
+  }
+
+  const activateMutagen = (physical: PhysicalAbility) => {
+    if (mutaUses <= 0) return
+    useFeature('mutagen', 1)
+    applyTemporaryEffect(MUTAGEN_EFFECT_ID, 'Mutágeno', buildMutagenModifiers(physical, alchemistClass?.level ?? 1))
+    setMutagenActive(true)
+  }
+
+  const endMutagen = () => {
+    removeTemporaryEffect(MUTAGEN_EFFECT_ID)
+    setMutagenActive(false)
+  }
+
   // ── Encounter helpers ──
   const startEncounter = () => {
     const playerCombatant: Combatant = {
@@ -392,272 +463,43 @@ export function PlayMode() {
 
   return (
     <div className={styles.container}>
-      {/* ── Critical / Fumble Modal ── */}
-      {critEvent && (
-        <div className={styles.critOverlay} onClick={() => setCritEvent(null)}>
-          <div
-            className={`${styles.critModal} ${critEvent.type === 'crit' ? styles.critModalCrit : styles.critModalFumble}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button className={styles.critClose} onClick={() => setCritEvent(null)}>
-              <X size={18} />
-            </button>
-            {critEvent.type === 'crit' ? (
-              <>
-                <div className={styles.critIcon}><Flame size={44} /></div>
-                <h2 className={styles.critTitle}>¡CRÍTICO!</h2>
-                <p className={styles.critSub}>{critEvent.name}</p>
-                <p className={styles.critDesc}>
-                  20 natural. Confirma el crítico tirando de nuevo con el mismo bonificador.
-                  Si superas la CA del objetivo, el daño se <strong>duplica</strong>.
-                </p>
-                <div className={styles.critActions}>
-                  <Button variant="primary" onClick={() => {
-                    handleQuickRoll('1d20', 'Confirmar Crítico')
-                    setCritEvent(null)
-                  }}>
-                    Confirmar Crítico
-                  </Button>
-                  <Button variant="secondary" onClick={() => setCritEvent(null)}>Cerrar</Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className={styles.critIcon}><Swords size={44} /></div>
-                <h2 className={styles.critTitle}>¡PIFIA!</h2>
-                <p className={styles.critSub}>{critEvent.name}</p>
-                <p className={styles.critDesc}>
-                  1 natural — fallo automático. El DM puede aplicar una consecuencia dramática.
-                </p>
-                <div className={styles.critActions}>
-                  <Button variant="danger" onClick={() => setCritEvent(null)}>Aceptar mi destino</Button>
-                </div>
-              </>
-            )}
-          </div>
+      {/* ── Drawer tipo A: resultado de tirada (incluye crítico/pifia como caso especial) ── */}
+      <Drawer open={rollBreakdown !== null} onClose={() => setRollBreakdown(null)} title="Resultado">
+        {rollBreakdown && (
+          <RollExplainDrawer
+            breakdown={rollBreakdown}
+            onConfirmCrit={() => {
+              handleQuickRoll('1d20', 'Confirmar Crítico')
+              setRollBreakdown(null)
+            }}
+          />
+        )}
+      </Drawer>
+
+      {/* ── Drawer tipo B: explicación de StaticValue (CA, Toque, CMB, CMD, BAB, INI...) ── */}
+      <Drawer open={statExplain !== null} onClose={() => setStatExplain(null)} title={statExplain?.label ?? ''}>
+        {statExplain && <StatExplainPanel explain={statExplain} />}
+      </Drawer>
+
+      {/* ── Efectos y Condiciones Drawer ── */}
+      <Drawer open={showStatusEffects} onClose={() => setShowStatusEffects(false)} title="Efectos y Condiciones">
+        <div>
+          <h4 className={styles.drawerSectionTitle}>Condiciones</h4>
+          <ConditionPanel conditions={conditions} onToggle={toggleCondition} />
         </div>
-      )}
-
-      {/* ── Status Effects Drawer ── */}
-      {showStatusEffects && (
-        <div className={styles.effectsOverlay} onClick={() => setShowStatusEffects(false)}>
-          <div className={styles.effectsDrawer} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.effectsHeader}>
-              <h3>Efectos</h3>
-              <button className={styles.critClose} onClick={() => setShowStatusEffects(false)}>
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Add effect form */}
-            <div className={styles.effectForm}>
-              <input
-                className={styles.effectInput}
-                placeholder="Nombre del efecto"
-                value={newEffectName}
-                onChange={e => setNewEffectName(e.target.value)}
-              />
-              <input
-                className={styles.effectInput}
-                placeholder="Descripción (opcional)"
-                value={newEffectDesc}
-                onChange={e => setNewEffectDesc(e.target.value)}
-              />
-              <input
-                className={styles.effectInput}
-                placeholder="Duración (ej: 3 rondas)"
-                value={newEffectDuration}
-                onChange={e => setNewEffectDuration(e.target.value)}
-              />
-              <div className={styles.effectBonusRow}>
-                <select
-                  className={styles.effectSelect}
-                  value={newEffectTarget}
-                  onChange={e => { setNewEffectTarget(e.target.value as BonusTarget | 'skill' | ''); setNewEffectSkillId('') }}
-                >
-                  <option value="">Sin bonificador</option>
-                  <option value="attack">Ataque</option>
-                  <option value="damage">Daño</option>
-                  <option value="ac">CA</option>
-                  <option value="fort">Fortaleza</option>
-                  <option value="ref">Reflejos</option>
-                  <option value="will">Voluntad</option>
-                  <option value="initiative">Iniciativa</option>
-                  <option value="cmb">CMB</option>
-                  <option value="cmd">CMD</option>
-                  <option value="skill">Habilidad específica…</option>
-                </select>
-                {newEffectTarget === 'skill' && (
-                  <select
-                    className={styles.effectSelect}
-                    value={newEffectSkillId}
-                    onChange={e => setNewEffectSkillId(e.target.value)}
-                  >
-                    <option value="">Selecciona habilidad</option>
-                    {SKILLS.sort((a, b) => a.name.localeCompare(b.name)).map(s => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
-                  </select>
-                )}
-                {newEffectTarget && (
-                  <input
-                    className={styles.effectValueInput}
-                    type="number"
-                    placeholder="+2"
-                    value={newEffectValue === 0 ? '' : newEffectValue}
-                    onChange={e => setNewEffectValue(parseInt(e.target.value) || 0)}
-                  />
-                )}
-              </div>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => {
-                  if (!newEffectName.trim()) return
-                  const resolvedTarget: BonusTarget | undefined =
-                    newEffectTarget === 'skill'
-                      ? newEffectSkillId ? (`skill:${newEffectSkillId}` as BonusTarget) : undefined
-                      : newEffectTarget || undefined
-                  const effect: StatusEffect = {
-                    id: Date.now().toString(),
-                    name: newEffectName.trim(),
-                    description: newEffectDesc.trim(),
-                    duration: newEffectDuration.trim() || undefined,
-                    bonusTarget: resolvedTarget,
-                    bonusValue: resolvedTarget !== undefined ? newEffectValue : undefined,
-                  }
-                  updateCharacter(character.id, { statusEffects: [...statusEffects, effect] })
-                  setNewEffectName('')
-                  setNewEffectDesc('')
-                  setNewEffectDuration('')
-                  setNewEffectTarget('')
-                  setNewEffectSkillId('')
-                  setNewEffectValue(0)
-                }}
-              >
-                <Plus size={14} /> Añadir efecto
-              </Button>
-            </div>
-
-            {statusEffects.length === 0 ? (
-              <p className={styles.emptyHistory}>Sin efectos</p>
-            ) : (
-              <ul className={styles.effectsList}>
-                {statusEffects.map((eff) => {
-                  const isActive = eff.active !== false
-                  const targetLabel = eff.bonusTarget
-                    ? eff.bonusTarget.startsWith('skill:')
-                      ? `Habilidad: ${SKILLS.find(s => s.id === eff.bonusTarget!.replace('skill:', ''))?.name ?? eff.bonusTarget.replace('skill:', '')}`
-                      : BONUS_TARGET_LABELS[eff.bonusTarget] ?? eff.bonusTarget
-                    : null
-                  const isEditing = editingEffectId === eff.id
-
-                  const startEdit = () => {
-                    setEditingEffectId(eff.id)
-                    setEditName(eff.name)
-                    setEditDesc(eff.description ?? '')
-                    setEditDuration(eff.duration ?? '')
-                    if (eff.bonusTarget?.startsWith('skill:')) {
-                      setEditTarget('skill')
-                      setEditSkillId(eff.bonusTarget.replace('skill:', ''))
-                    } else {
-                      setEditTarget(eff.bonusTarget ?? '')
-                      setEditSkillId('')
-                    }
-                    setEditValue(eff.bonusValue ?? 0)
-                  }
-
-                  const saveEdit = () => {
-                    const resolvedTarget: BonusTarget | undefined =
-                      editTarget === 'skill'
-                        ? editSkillId ? (`skill:${editSkillId}` as BonusTarget) : undefined
-                        : editTarget || undefined
-                    updateCharacter(character.id, {
-                      statusEffects: statusEffects.map(e => e.id !== eff.id ? e : {
-                        ...e,
-                        name: editName.trim() || e.name,
-                        description: editDesc.trim(),
-                        duration: editDuration.trim() || undefined,
-                        bonusTarget: resolvedTarget,
-                        bonusValue: resolvedTarget !== undefined ? editValue : undefined,
-                      })
-                    })
-                    setEditingEffectId(null)
-                  }
-
-                  return (
-                    <li key={eff.id} className={`${styles.effectItem} ${!isActive ? styles.effectItemDisabled : ''}`}>
-                      {isEditing ? (
-                        <div className={styles.effectEditForm}>
-                          <input className={styles.effectInput} value={editName} onChange={e => setEditName(e.target.value)} placeholder="Nombre" />
-                          <input className={styles.effectInput} value={editDesc} onChange={e => setEditDesc(e.target.value)} placeholder="Descripción" />
-                          <input className={styles.effectInput} value={editDuration} onChange={e => setEditDuration(e.target.value)} placeholder="Duración" />
-                          <div className={styles.effectBonusRow}>
-                            <select className={styles.effectSelect} value={editTarget} onChange={e => { setEditTarget(e.target.value as BonusTarget | 'skill' | ''); setEditSkillId('') }}>
-                              <option value="">Sin bonificador</option>
-                              <option value="attack">Ataque</option>
-                              <option value="damage">Daño</option>
-                              <option value="ac">CA</option>
-                              <option value="fort">Fortaleza</option>
-                              <option value="ref">Reflejos</option>
-                              <option value="will">Voluntad</option>
-                              <option value="initiative">Iniciativa</option>
-                              <option value="cmb">CMB</option>
-                              <option value="cmd">CMD</option>
-                              <option value="skill">Habilidad específica…</option>
-                            </select>
-                            {editTarget === 'skill' && (
-                              <select className={styles.effectSelect} value={editSkillId} onChange={e => setEditSkillId(e.target.value)}>
-                                <option value="">Selecciona habilidad</option>
-                                {SKILLS.sort((a, b) => a.name.localeCompare(b.name)).map(s => (
-                                  <option key={s.id} value={s.id}>{s.name}</option>
-                                ))}
-                              </select>
-                            )}
-                            {editTarget && (
-                              <input className={styles.effectValueInput} type="number" value={editValue === 0 ? '' : editValue} onChange={e => setEditValue(parseInt(e.target.value) || 0)} placeholder="+2" />
-                            )}
-                          </div>
-                          <div className={styles.effectEditActions}>
-                            <button className={styles.effectSaveBtn} onClick={saveEdit} title="Guardar"><Check size={14} /> Guardar</button>
-                            <button className={styles.effectRemoveBtn} onClick={() => setEditingEffectId(null)} title="Cancelar"><X size={14} /></button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className={styles.effectItemHeader}>
-                            <button
-                              className={`${styles.effectToggleBtn} ${isActive ? styles.effectToggleOn : styles.effectToggleOff}`}
-                              onClick={() => updateCharacter(character.id, {
-                                statusEffects: statusEffects.map(e => e.id === eff.id ? { ...e, active: !isActive } : e)
-                              })}
-                              title={isActive ? 'Desactivar' : 'Activar'}
-                            >
-                              <Power size={13} />
-                            </button>
-                            <span className={styles.effectName}>{eff.name}</span>
-                            <div className={styles.effectItemActions}>
-                              <button className={styles.effectEditBtn} onClick={startEdit} title="Editar"><Pencil size={13} /></button>
-                              <button className={styles.effectRemoveBtn} onClick={() => updateCharacter(character.id, { statusEffects: statusEffects.filter(e => e.id !== eff.id) })} title="Eliminar"><X size={14} /></button>
-                            </div>
-                          </div>
-                          {targetLabel && eff.bonusValue !== undefined && (
-                            <div className={`${styles.effectBonus} ${eff.bonusValue >= 0 ? styles.effectBonusPos : styles.effectBonusNeg}`}>
-                              {eff.bonusValue >= 0 ? `+${eff.bonusValue}` : eff.bonusValue} a {targetLabel}
-                            </div>
-                          )}
-                          {eff.duration && <div className={styles.effectDuration}>Duración: {eff.duration}</div>}
-                          {eff.description && <div className={styles.effectDesc}>{eff.description}</div>}
-                        </>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
+        <div>
+          <h4 className={styles.drawerSectionTitle}>Efectos de estado</h4>
+          <StatusEffectsPanel
+            statusEffects={statusEffects}
+            skills={SKILLS}
+            onAdd={(effect) => updateCharacter(character.id, { statusEffects: [...statusEffects, effect] })}
+            onUpdate={(id, updates) => updateCharacter(character.id, {
+              statusEffects: statusEffects.map((e) => e.id === id ? { ...e, ...updates } : e)
+            })}
+            onRemove={(id) => updateCharacter(character.id, { statusEffects: statusEffects.filter((e) => e.id !== id) })}
+          />
         </div>
-      )}
+      </Drawer>
 
       {/* ── Header ── */}
       <header className={styles.header}>
@@ -668,12 +510,12 @@ export function PlayMode() {
         <div className={styles.headerRight}>
           <h1>Modo Juego — {character.name}</h1>
           <button
-            className={`${styles.statusBtn} ${statusEffects.length > 0 ? styles.statusBtnActive : ''}`}
+            className={`${styles.statusBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.statusBtnActive : ''}`}
             onClick={() => setShowStatusEffects(true)}
           >
             <Activity size={16} />
-            {statusEffects.length > 0 && (
-              <span className={styles.statusBadge}>{statusEffects.length}</span>
+            {(statusEffects.length + activeConditionsCount) > 0 && (
+              <span className={styles.statusBadge}>{statusEffects.length + activeConditionsCount}</span>
             )}
           </button>
           <button
@@ -689,28 +531,13 @@ export function PlayMode() {
         {/* ── Tab Shell ── */}
         <div className={styles.tabShell}>
           {/* HP Tracker — always visible */}
-          <Card padding="lg" className={styles.hpPanel}>
-            <div className={styles.hpDisplay}>
-              <Button variant="danger" size="lg" onClick={() => adjustHP(-1)}>
-                <Minus size={20} />
-              </Button>
-              <div className={styles.hpValue}>
-                <span className={character.hp.current <= effectiveMaxHp * 0.25 ? styles.critical : ''}>
-                  {character.hp.current}
-                </span>
-                <span className={styles.hpMax}>/ {effectiveMaxHp}</span>
-              </div>
-              <Button variant="primary" size="lg" onClick={() => adjustHP(1)}>
-                <Plus size={20} />
-              </Button>
-            </div>
-            <div className={styles.hpControls}>
-              <Button variant="danger" size="sm" onClick={() => adjustHP(-Math.ceil(effectiveMaxHp / 4))}>-1/4</Button>
-              <Button variant="secondary" size="sm" onClick={() => adjustHP(-5)}>-5</Button>
-              <Button variant="secondary" size="sm" onClick={() => adjustHP(5)}>+5</Button>
-              <Button variant="primary" size="sm" onClick={() => adjustHP(Math.ceil(effectiveMaxHp / 4))}>+1/4</Button>
-            </div>
-          </Card>
+          <HpTracker
+            current={character.hp.current}
+            max={effectiveMaxHp}
+            temp={character.hp.temp ?? 0}
+            onAdjust={adjustHP}
+            onTempChange={setTempHP}
+          />
 
           {/* Roll Result Strip */}
           {rollResult !== null && (
@@ -768,25 +595,48 @@ export function PlayMode() {
             <div className={styles.tabContent}>
               {/* Combat Stats Bar */}
               <div className={styles.combatStats}>
-                {([
-                  { label: 'CA', value: ac, bonus: 0, fmt: (v: number) => `${v}` },
-                  { label: 'Toque', value: touchAC, bonus: 0, fmt: (v: number) => `${v}` },
-                  { label: 'Desprev', value: flatFootedAC, bonus: 0, fmt: (v: number) => `${v}` },
-                  { label: 'INI', value: initiative, bonus: 0, fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
-                  { label: 'CMB', value: cmb, bonus: 0, fmt: (v: number) => v >= 0 ? `+${v}` : `${v}` },
-                  { label: 'CMD', value: cmd, bonus: 0, fmt: (v: number) => `${v}` },
-                  { label: 'BAB', value: bab, bonus: 0, fmt: (v: number) => `+${v}` },
-                ] as { label: string; value: number; bonus: number; fmt: (v: number) => string }[]).map(({ label, value, bonus, fmt }) => (
-                  <div key={label} className={styles.statPill}>
-                    <span className={styles.statPillLabel}>{label}</span>
-                    <span className={styles.statPillValue}>{fmt(value)}</span>
-                    {bonus !== 0 && (
-                      <span className={bonus > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
-                        {bonus > 0 ? `+${bonus}` : bonus}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                <StatPill
+                  label="CA" value={`${ac}`}
+                  altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
+                  onExplain={() => explainStat('CA', ac,
+                    [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
+                    ['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
+                />
+                <StatPill
+                  label="Toque" value={`${touchAC}`}
+                  altered={isAltered(['ac', 'ac_deflection', 'ac_dodge'])}
+                  onExplain={() => explainStat('CA de Toque', touchAC,
+                    [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
+                    ['ac', 'ac_deflection', 'ac_dodge'])}
+                />
+                <StatPill
+                  label="Desprev" value={`${flatFootedAC}`}
+                  altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
+                  onExplain={() => explainStat('CA Desprevenido', flatFootedAC,
+                    [{ label: 'Base', value: 10 }, { label: 'Tamaño', value: combat.sizeMod }],
+                    ['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
+                />
+                <StatPill
+                  label="INI" value={initiative >= 0 ? `+${initiative}` : `${initiative}`}
+                  altered={isAltered(['initiative'])}
+                  onExplain={() => explainStat('Iniciativa', initiative, [{ label: 'Destreza', value: dexMod }], ['initiative'])}
+                />
+                <StatPill
+                  label="CMB" value={cmb >= 0 ? `+${cmb}` : `${cmb}`}
+                  altered={isAltered(['cmb'])}
+                  onExplain={() => explainStat('CMB', cmb, [{ label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }], ['cmb'])}
+                />
+                <StatPill
+                  label="CMD" value={`${cmd}`}
+                  altered={isAltered(['cmd'])}
+                  onExplain={() => explainStat('CMD', cmd,
+                    [{ label: 'Base', value: 10 }, { label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }, { label: 'Destreza', value: dexMod }],
+                    ['cmd'])}
+                />
+                <StatPill
+                  label="BAB" value={`+${bab}`}
+                  onExplain={() => explainStat('BAB', bab, [{ label: 'Suma de BAB por clase', value: bab }], [])}
+                />
               </div>
 
               {/* Weapons */}
@@ -813,38 +663,33 @@ export function PlayMode() {
                       const dmgNotation = addModifierToNotation(weapon.damage, resolvedStats.damageBonus + dmgMod + paDmgBonus)
                       const iterativeOffsets = getIterativeAttackOffsets(bab)
                       return (
-                        <div key={weapon.id} className={styles.weaponRow}>
-                          <div className={styles.weaponInfo}>
-                            <span className={styles.weaponName}>{weapon.name}</span>
-                            <span className={styles.weaponCrit}>×{weapon.critical || '20/×2'}</span>
-                          </div>
-                          <div className={styles.weaponBtns}>
-                            {iterativeOffsets.map((offset, i) => {
-                              const iterAtk = atkBase - offset
-                              return (
-                                <Button
-                                  key={i}
-                                  variant="secondary"
-                                  size="sm"
-                                  onClick={() => handleQuickRoll(
-                                    `1d20+${iterAtk}`,
-                                    `${weapon.name} (Ataque${i > 0 ? ` ${i + 1}` : ''})`,
-                                    true
-                                  )}
-                                >
-                                  {i === 0 ? 'Atacar' : `Atq.${i + 1}`} {iterAtk >= 0 ? `+${iterAtk}` : iterAtk}
-                                </Button>
-                              )
-                            })}
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => handleQuickRoll(dmgNotation, `${weapon.name} (Daño)`)}
-                            >
-                              Daño {dmgNotation}
-                            </Button>
-                          </div>
-                        </div>
+                        <WeaponAttackRow
+                          key={weapon.id}
+                          name={weapon.name}
+                          critical={weapon.critical}
+                          iterativeOffsets={iterativeOffsets}
+                          attackBase={atkBase}
+                          damageNotation={dmgNotation}
+                          onRollAttack={(iterAtk, i) => {
+                            const offset = iterativeOffsets[i]
+                            const baseComponents = [
+                              { label: 'BAB', value: bab },
+                              { label: isRanged ? 'Destreza' : 'Fuerza', value: isRanged ? dexMod : strMod },
+                              { label: 'Arma', value: weapon.attackBonus },
+                            ]
+                            if (combat.sizeMod !== 0) baseComponents.push({ label: 'Tamaño', value: combat.sizeMod })
+                            if (paAtkPenalty !== 0) baseComponents.push({ label: 'Ataque Poderoso', value: paAtkPenalty })
+                            if (combat.negativeLevelPenalty > 0) baseComponents.push({ label: 'Nivel negativo', value: -combat.negativeLevelPenalty })
+                            if (offset !== 0) baseComponents.push({ label: 'Ataque iterativo', value: -offset })
+                            handleQuickRoll(
+                              `1d20+${iterAtk}`,
+                              `${weapon.name} (Ataque${i > 0 ? ` ${i + 1}` : ''})`,
+                              true,
+                              { baseComponents, targets: ['attack'] }
+                            )
+                          }}
+                          onRollDamage={() => handleQuickRoll(dmgNotation, `${weapon.name} (Daño)`)}
+                        />
                       )
                     })
                   ) : (
@@ -859,13 +704,28 @@ export function PlayMode() {
                           <>
                             {iterOffsets.map((offset, i) => {
                               const atk = meleeAtk - offset
+                              const baseComponents = [{ label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }]
+                              if (combat.sizeMod !== 0) baseComponents.push({ label: 'Tamaño', value: combat.sizeMod })
+                              if (paAtkPenalty !== 0) baseComponents.push({ label: 'Ataque Poderoso', value: paAtkPenalty })
+                              if (combat.negativeLevelPenalty > 0) baseComponents.push({ label: 'Nivel negativo', value: -combat.negativeLevelPenalty })
+                              if (offset !== 0) baseComponents.push({ label: 'Ataque iterativo', value: -offset })
                               return (
-                                <Button key={`melee-${i}`} variant="secondary" onClick={() => handleQuickRoll(`1d20+${atk}`, `Melee Atq.${i + 1} (${atk >= 0 ? `+${atk}` : atk})`, true)}>
+                                <Button
+                                  key={`melee-${i}`}
+                                  variant="secondary"
+                                  onClick={() => handleQuickRoll(`1d20+${atk}`, `Melee Atq.${i + 1} (${atk >= 0 ? `+${atk}` : atk})`, true, { baseComponents, targets: ['attack'] })}
+                                >
                                   Melee {i > 0 ? `Atq.${i + 1} ` : ''}{atk >= 0 ? `+${atk}` : atk}
                                 </Button>
                               )
                             })}
-                            <Button variant="secondary" onClick={() => handleQuickRoll(`1d20+${rangedAtk}`, `Ranged (+${rangedAtk})`, true)}>
+                            <Button
+                              variant="secondary"
+                              onClick={() => handleQuickRoll(`1d20+${rangedAtk}`, `Ranged (+${rangedAtk})`, true, {
+                                baseComponents: [{ label: 'BAB', value: bab }, { label: 'Destreza', value: dexMod }],
+                                targets: ['attack'],
+                              })}
+                            >
                               Ranged +{rangedAtk}
                             </Button>
                             <Button variant="danger" onClick={() => handleQuickRoll(addModifierToNotation(`1d6+${strMod}`, resolvedStats.damageBonus + paDmgBonus), 'Daño Melee')}>
@@ -887,11 +747,14 @@ export function PlayMode() {
                 <h3 className={styles.sectionTitle}><Heart size={18} />Tiros de Salvación</h3>
                 <div className={styles.savesRow}>
                   {([
-                    { label: 'Fortaleza', base: fortSave, eff: 0 },
-                    { label: 'Reflejos', base: refSave, eff: 0 },
-                    { label: 'Voluntad', base: willSave, eff: 0 },
-                  ] as { label: string; base: number; eff: number }[]).map(({ label, base, eff }) => {
-                    const total = base + eff
+                    { label: 'Fortaleza', total: fortSave, target: 'save_fort' as ModifierTarget },
+                    { label: 'Reflejos', total: refSave, target: 'save_ref' as ModifierTarget },
+                    { label: 'Voluntad', total: willSave, target: 'save_will' as ModifierTarget },
+                  ]).map(({ label, total, target }) => {
+                    // `eff` es solo la porción del total ya incluido que viene de
+                    // condiciones/efectos de sesión activos — es informativo (AlteredValue),
+                    // no se vuelve a sumar (el motor ya lo integró en `total`).
+                    const eff = sumSessionModifiers(resolvedStats.allModifiers, [target])
                     return (
                       <Button key={label} variant="secondary" onClick={() => handleQuickRoll(`1d20+${total}`, `${label} (+${total})`)}>
                         {label} {total >= 0 ? `+${total}` : total}
@@ -914,51 +777,41 @@ export function PlayMode() {
 
                     {/* Barbarian Rage */}
                     {barbarianClass && (
-                      <div className={`${styles.featureRow} ${raging ? styles.featureRowActive : ''}`}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Rabia {raging && <span className={styles.featureActiveTag}>ACTIVA</span>}</span>
-                          <span className={styles.featureMeta}>+4 FUE/CON, +2 Voluntad, −2 CA</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{rageUses}/{rageMaxUses}</span>
-                          <Button
-                            variant={raging ? 'danger' : 'secondary'}
-                            size="sm"
-                            onClick={() => {
-                              if (!raging && rageUses > 0) { useFeature('rage', rageMaxUses); setRaging(true) }
-                              else { setRaging(false) }
-                            }}
-                            disabled={!raging && rageUses <= 0}
-                          >
-                            {raging ? 'Fin Rabia' : 'Rabia'}
-                          </Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Rabia"
+                        meta="+4 FUE/CON, +2 Voluntad, −2 CA (mientras esté activa)"
+                        active={raging}
+                        uses={rageUses}
+                        max={rageMaxUses}
+                      >
+                        <Button variant={raging ? 'danger' : 'secondary'} size="sm" onClick={toggleRage} disabled={!raging && rageUses <= 0}>
+                          {raging ? 'Fin Rabia' : 'Rabia'}
+                        </Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Cleric Channel Energy */}
                     {clericClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Canalizar Energía</span>
-                          <span className={styles.featureMeta}>
-                            {Math.ceil(clericClass.level / 2)}d6 —{' '}
-                            {character.channelType === 'negative' ? 'Negativa (daña vivos)' : 'Positiva (cura vivos)'}{' '}
-                            — CD {10 + Math.floor(clericClass.level / 2) + chaMod}
-                          </span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{channelUses}/{channelMaxUses}</span>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => { useFeature('channel', channelMaxUses); handleQuickRoll(`${Math.ceil(clericClass.level / 2)}d6`, 'Canalizar Energía') }}
-                            disabled={channelUses <= 0}
-                          >
-                            Canalizar
-                          </Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Canalizar Energía"
+                        meta={<>
+                          {Math.ceil(clericClass.level / 2)}d6 —{' '}
+                          {character.channelType === 'negative' ? 'Negativa (daña vivos)' : 'Positiva (cura vivos)'}{' '}
+                          — CD {10 + Math.floor(clericClass.level / 2) + chaMod}
+                        </>}
+                        uses={channelUses}
+                        max={channelMaxUses}
+                      >
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => { useFeature('channel', channelMaxUses); handleQuickRoll(`${Math.ceil(clericClass.level / 2)}d6`, 'Canalizar Energía') }}
+                          disabled={channelUses <= 0}
+                        >
+                          Canalizar
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => restoreFeature('channel', channelMaxUses)} disabled={channelUses >= channelMaxUses}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Cleric Domain Powers */}
@@ -974,31 +827,33 @@ export function PlayMode() {
                       const p2Uses = featureUses[`domain_${domainId}_p2`] ?? p2Max
                       return (
                         <React.Fragment key={domainId}>
-                          <div className={styles.featureRow}>
-                            <div className={styles.featureInfo}>
-                              <span className={styles.featureName}>{domain.name} — {p1.name}</span>
-                              <span className={styles.featureMeta}>{p1.usesFormula === 'unlimited' ? 'A voluntad' : `${p1Max}/día`}</span>
-                            </div>
+                          <ClassFeatureRow
+                            name={`${domain.name} — ${p1.name}`}
+                            meta={p1.usesFormula === 'unlimited' ? 'A voluntad' : `${p1Max}/día`}
+                            uses={p1.usesFormula !== 'unlimited' ? p1Uses : undefined}
+                            max={p1.usesFormula !== 'unlimited' ? p1Max : undefined}
+                          >
                             {p1.usesFormula !== 'unlimited' && (
-                              <div className={styles.featureActions}>
-                                <span className={styles.featureUses}>{p1Uses}/{p1Max}</span>
+                              <>
                                 <Button variant="secondary" size="sm" onClick={() => useFeature(`domain_${domainId}_p1`, p1Max)} disabled={p1Uses <= 0}>Usar</Button>
-                              </div>
+                                <Button variant="ghost" size="sm" onClick={() => restoreFeature(`domain_${domainId}_p1`, p1Max)} disabled={p1Uses >= p1Max}>+1</Button>
+                              </>
                             )}
-                          </div>
+                          </ClassFeatureRow>
                           {hasP2 && p2 && (
-                            <div className={styles.featureRow}>
-                              <div className={styles.featureInfo}>
-                                <span className={styles.featureName}>{domain.name} — {p2.name}</span>
-                                <span className={styles.featureMeta}>{p2.usesFormula === 'unlimited' ? 'A voluntad' : `${p2Max}/día`}</span>
-                              </div>
+                            <ClassFeatureRow
+                              name={`${domain.name} — ${p2.name}`}
+                              meta={p2.usesFormula === 'unlimited' ? 'A voluntad' : `${p2Max}/día`}
+                              uses={p2.usesFormula !== 'unlimited' ? p2Uses : undefined}
+                              max={p2.usesFormula !== 'unlimited' ? p2Max : undefined}
+                            >
                               {p2.usesFormula !== 'unlimited' && (
-                                <div className={styles.featureActions}>
-                                  <span className={styles.featureUses}>{p2Uses}/{p2Max}</span>
+                                <>
                                   <Button variant="secondary" size="sm" onClick={() => useFeature(`domain_${domainId}_p2`, p2Max)} disabled={p2Uses <= 0}>Usar</Button>
-                                </div>
+                                  <Button variant="ghost" size="sm" onClick={() => restoreFeature(`domain_${domainId}_p2`, p2Max)} disabled={p2Uses >= p2Max}>+1</Button>
+                                </>
                               )}
-                            </div>
+                            </ClassFeatureRow>
                           )}
                         </React.Fragment>
                       )
@@ -1006,23 +861,22 @@ export function PlayMode() {
 
                     {/* Warpriest Fervor */}
                     {warpriestClass && warpriestClass.level >= 2 && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Fervor</span>
-                          <span className={styles.featureMeta}>{fervorDice}d6 — Acción veloz (auto) o estándar (aliado)</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{fervorUses}/{fervorMax}</span>
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={() => { useFeature('fervor', fervorMax); handleQuickRoll(`${fervorDice}d6`, 'Fervor') }}
-                            disabled={fervorUses <= 0}
-                          >
-                            Usar Fervor
-                          </Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Fervor"
+                        meta={`${fervorDice}d6 — Acción veloz (auto) o estándar (aliado)`}
+                        uses={fervorUses}
+                        max={fervorMax}
+                      >
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => { useFeature('fervor', fervorMax); handleQuickRoll(`${fervorDice}d6`, 'Fervor') }}
+                          disabled={fervorUses <= 0}
+                        >
+                          Usar Fervor
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => restoreFeature('fervor', fervorMax)} disabled={fervorUses >= fervorMax}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Warpriest Blessing Powers */}
@@ -1035,31 +889,28 @@ export function PlayMode() {
                       const majorUnlocked = major && warpriestClass.level >= 10
                       return (
                         <React.Fragment key={blessingId}>
-                          <div className={styles.featureRow}>
-                            <div className={styles.featureInfo}>
-                              <span className={styles.featureName}>{blessing.name} — {minor.name} <span style={{ fontSize: '0.7em', opacity: 0.6 }}>(Menor)</span></span>
-                              <span className={styles.featureMeta}>
-                                {minor.actionType === 'swift' ? 'Acción veloz' : 'Acción estándar'}
-                                {minor.costsFervor ? ' · cuesta Fervor' : ' · a voluntad'}
-                              </span>
-                            </div>
-                            {hasMinorUses && (
-                              <div className={styles.featureActions}>
-                                <span className={styles.featureUses}>{fervorUses}/{fervorMax} Fervor</span>
-                              </div>
-                            )}
-                          </div>
+                          <ClassFeatureRow
+                            name={<>{blessing.name} — {minor.name} <span style={{ fontSize: '0.7em', opacity: 0.6 }}>(Menor)</span></>}
+                            meta={<>
+                              {minor.actionType === 'swift' ? 'Acción veloz' : 'Acción estándar'}
+                              {minor.costsFervor ? ' · cuesta Fervor' : ' · a voluntad'}
+                            </>}
+                            uses={hasMinorUses ? fervorUses : undefined}
+                            max={hasMinorUses ? fervorMax : undefined}
+                            usesLabel={hasMinorUses ? 'Fervor' : undefined}
+                          >
+                            <></>
+                          </ClassFeatureRow>
                           {major && (
-                            <div className={styles.featureRow} style={{ opacity: majorUnlocked ? 1 : 0.45 }}>
-                              <div className={styles.featureInfo}>
-                                <span className={styles.featureName}>{blessing.name} — {major.name} <span style={{ fontSize: '0.7em', opacity: 0.6 }}>(Mayor)</span></span>
-                                <span className={styles.featureMeta}>
-                                  {majorUnlocked
-                                    ? (major.actionType === 'swift' ? 'Acción veloz' : 'Acción estándar')
-                                    : 'Requiere nivel 10'}
-                                </span>
-                              </div>
-                            </div>
+                            <ClassFeatureRow
+                              name={<>{blessing.name} — {major.name} <span style={{ fontSize: '0.7em', opacity: 0.6 }}>(Mayor)</span></>}
+                              meta={majorUnlocked
+                                ? (major.actionType === 'swift' ? 'Acción veloz' : 'Acción estándar')
+                                : 'Requiere nivel 10'}
+                              style={{ opacity: majorUnlocked ? 1 : 0.45 }}
+                            >
+                              <></>
+                            </ClassFeatureRow>
                           )}
                         </React.Fragment>
                       )
@@ -1067,257 +918,211 @@ export function PlayMode() {
 
                     {/* Rogue Sneak Attack (passive) */}
                     {rogueClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Ataque Furtivo</span>
-                          <span className={styles.featureMeta}>+{sneakDice}d6 daño (flanqueo / negado DES)</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <Button variant="danger" size="sm" onClick={() => handleQuickRoll(`${sneakDice}d6`, 'Ataque Furtivo (daño extra)')}>
-                            Tirar {sneakDice}d6
-                          </Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow name="Ataque Furtivo" meta={`+${sneakDice}d6 daño (flanqueo / negado DES)`}>
+                        <Button variant="danger" size="sm" onClick={() => handleQuickRoll(`${sneakDice}d6`, 'Ataque Furtivo (daño extra)')}>
+                          Tirar {sneakDice}d6
+                        </Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Paladin Lay on Hands */}
                     {paladinClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Imponer Manos</span>
-                          <span className={styles.featureMeta}>{Math.floor(paladinClass.level / 2)}d6 curación</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{layUses}/{layMaxUses}</span>
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={() => { useFeature('lay', layMaxUses); handleQuickRoll(`${Math.max(1, Math.floor(paladinClass.level / 2))}d6`, 'Imponer Manos') }}
-                            disabled={layUses <= 0}
-                          >
-                            Curar
-                          </Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow name="Imponer Manos" meta={`${Math.floor(paladinClass.level / 2)}d6 curación`} uses={layUses} max={layMaxUses}>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => { useFeature('lay', layMaxUses); handleQuickRoll(`${Math.max(1, Math.floor(paladinClass.level / 2))}d6`, 'Imponer Manos') }}
+                          disabled={layUses <= 0}
+                        >
+                          Curar
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => restoreFeature('lay', layMaxUses)} disabled={layUses >= layMaxUses}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Monk Stunning Fist */}
                     {monkClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Puño Aturdidor</span>
-                          <span className={styles.featureMeta}>CD {10 + Math.floor(monkClass.level / 2) + wisMod} Fortaleza</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{stunUses}/{stunMaxUses}</span>
-                          <Button variant="secondary" size="sm" onClick={() => useFeature('stun', stunMaxUses)} disabled={stunUses <= 0}>Usar</Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow name="Puño Aturdidor" meta={`CD ${10 + Math.floor(monkClass.level / 2) + wisMod} Fortaleza`} uses={stunUses} max={stunMaxUses}>
+                        <Button variant="secondary" size="sm" onClick={() => useFeature('stun', stunMaxUses)} disabled={stunUses <= 0}>Usar</Button>
+                        <Button variant="ghost" size="sm" onClick={() => restoreFeature('stun', stunMaxUses)} disabled={stunUses >= stunMaxUses}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Bard — Actuación Bárdica */}
                     {bardClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Actuación Bárdica</span>
-                          <span className={styles.featureMeta}>+{1 + Math.floor(bardClass.level / 6)} ataque/daño aliados (Inspirar Valor)</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{bardPerfUses}/{bardPerfMaxRounds} rondas</span>
-                          <Button variant="secondary" size="sm" onClick={() => useFeature('bardperf', bardPerfMaxRounds)} disabled={bardPerfUses <= 0}>−1 ronda</Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Actuación Bárdica"
+                        meta={`+${1 + Math.floor(bardClass.level / 6)} ataque/daño aliados (Inspirar Valor)`}
+                        uses={bardPerfUses}
+                        max={bardPerfMaxRounds}
+                        usesLabel="rondas"
+                      >
+                        <Button variant="secondary" size="sm" onClick={() => useFeature('bardperf', bardPerfMaxRounds)} disabled={bardPerfUses <= 0}>−1 ronda</Button>
+                        <Button variant="ghost" size="sm" onClick={() => restoreFeature('bardperf', bardPerfMaxRounds)} disabled={bardPerfUses >= bardPerfMaxRounds}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Druid — Forma Salvaje */}
                     {druidClass && druidClass.level >= 4 && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Forma Salvaje</span>
-                          <span className={styles.featureMeta}>{druidClass.level}h duración · Pequeño-{druidClass.level >= 6 ? 'Grande' : 'Mediano'}</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{wildShapeUses}/{wildShapeMaxUses}</span>
-                          <Button variant="secondary" size="sm" onClick={() => useFeature('wildshape', wildShapeMaxUses)} disabled={wildShapeUses <= 0}>Usar</Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Forma Salvaje"
+                        meta={`${druidClass.level}h duración · Pequeño-${druidClass.level >= 6 ? 'Grande' : 'Mediano'}`}
+                        uses={wildShapeUses}
+                        max={wildShapeMaxUses}
+                      >
+                        <Button variant="secondary" size="sm" onClick={() => useFeature('wildshape', wildShapeMaxUses)} disabled={wildShapeUses <= 0}>Usar</Button>
+                        <Button variant="ghost" size="sm" onClick={() => restoreFeature('wildshape', wildShapeMaxUses)} disabled={wildShapeUses >= wildShapeMaxUses}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Fighter — passive info */}
                     {fighterClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Entrenamiento con Armas</span>
-                          <span className={styles.featureMeta}>+{Math.floor((fighterClass.level - 1) / 4) + 1} ataque/daño (grupo principal)</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureMeta}>Pasivo</span>
-                        </div>
-                      </div>
+                      <ClassFeatureRow name="Entrenamiento con Armas" meta={`+${Math.floor((fighterClass.level - 1) / 4) + 1} ataque/daño (grupo principal)`}>
+                        <span className={styles.featureMeta}>Pasivo</span>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Ranger — Favored Enemy */}
                     {rangerClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Enemigo Predilecto</span>
-                          <span className={styles.featureMeta}>+{2 + 2 * Math.floor((rangerClass.level - 1) / 5)} ataque/daño/habilidades</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureMeta}>Pasivo</span>
-                        </div>
-                      </div>
+                      <ClassFeatureRow name="Enemigo Predilecto" meta={`+${2 + 2 * Math.floor((rangerClass.level - 1) / 5)} ataque/daño/habilidades`}>
+                        <span className={styles.featureMeta}>Pasivo</span>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Alchemist — Bombs */}
                     {alchemistClass && (
                       <>
-                        <div className={styles.featureRow}>
-                          <div className={styles.featureInfo}>
-                            <span className={styles.featureName}>Bomba</span>
-                            <span className={styles.featureMeta}>{Math.ceil(alchemistClass.level / 2)}d6+{intMod} fuego · salpicadura {Math.ceil(alchemistClass.level / 2)} daño</span>
-                          </div>
-                          <div className={styles.featureActions}>
-                            <span className={styles.featureUses}>{bombUses}/{bombMaxUses}</span>
-                            <Button variant="danger" size="sm" onClick={() => { useFeature('bomb', bombMaxUses); handleQuickRoll(`${Math.ceil(alchemistClass.level / 2)}d6+${intMod}`, 'Bomba') }} disabled={bombUses <= 0}>Lanzar</Button>
-                          </div>
-                        </div>
-                        <div className={styles.featureRow}>
-                          <div className={styles.featureInfo}>
-                            <span className={styles.featureName}>Mutágeno</span>
-                            <span className={styles.featureMeta}>+{2 + Math.floor(alchemistClass.level / 4)} armadura natural, +4 atributo físico, −2 mental · {alchemistClass.level} min</span>
-                          </div>
-                          <div className={styles.featureActions}>
-                            <span className={styles.featureUses}>{mutaUses}/1</span>
-                            <Button variant="secondary" size="sm" onClick={() => useFeature('mutagen', 1)} disabled={mutaUses <= 0}>Usar</Button>
-                          </div>
-                        </div>
+                        <ClassFeatureRow
+                          name="Bomba"
+                          meta={`${Math.ceil(alchemistClass.level / 2)}d6+${intMod} fuego · salpicadura ${Math.ceil(alchemistClass.level / 2)} daño`}
+                          uses={bombUses}
+                          max={bombMaxUses}
+                        >
+                          <Button variant="danger" size="sm" onClick={() => { useFeature('bomb', bombMaxUses); handleQuickRoll(`${Math.ceil(alchemistClass.level / 2)}d6+${intMod}`, 'Bomba') }} disabled={bombUses <= 0}>Lanzar</Button>
+                          <Button variant="ghost" size="sm" onClick={() => restoreFeature('bomb', bombMaxUses)} disabled={bombUses >= bombMaxUses}>+1</Button>
+                        </ClassFeatureRow>
+                        <ClassFeatureRow
+                          name="Mutágeno"
+                          active={mutagenActive}
+                          meta={`+${2 + Math.floor(alchemistClass.level / 4)} armadura natural, +4 atributo físico, −2 mental (mientras esté activo)`}
+                          uses={mutaUses}
+                          max={1}
+                        >
+                          {mutagenActive ? (
+                            <Button variant="danger" size="sm" onClick={endMutagen}>Fin Mutágeno</Button>
+                          ) : (
+                            (['str', 'dex', 'con'] as PhysicalAbility[]).map((ability) => (
+                              <Button key={ability} variant="secondary" size="sm" onClick={() => activateMutagen(ability)} disabled={mutaUses <= 0}>
+                                {MUTAGEN_ABILITY_LABELS[ability]}
+                              </Button>
+                            ))
+                          )}
+                        </ClassFeatureRow>
                       </>
                     )}
 
                     {/* Inquisitor — Sentencia */}
                     {inquisitorClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Sentencia</span>
-                          <span className={styles.featureMeta}>+{1 + Math.floor((inquisitorClass.level - 1) / 5)} ataque/daño/salvaciones en combate</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{judgementUses}/{judgementMaxUses}</span>
-                          <Button variant="secondary" size="sm" onClick={() => useFeature('judgement', judgementMaxUses)} disabled={judgementUses <= 0}>Iniciar</Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Sentencia"
+                        meta={`+${1 + Math.floor((inquisitorClass.level - 1) / 5)} ataque/daño/salvaciones en combate`}
+                        uses={judgementUses}
+                        max={judgementMaxUses}
+                      >
+                        <Button variant="secondary" size="sm" onClick={() => useFeature('judgement', judgementMaxUses)} disabled={judgementUses <= 0}>Iniciar</Button>
+                        <Button variant="ghost" size="sm" onClick={() => restoreFeature('judgement', judgementMaxUses)} disabled={judgementUses >= judgementMaxUses}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Cavalier — Desafío + Táctico */}
                     {cavalierClass && (
                       <>
-                        <div className={styles.featureRow}>
-                          <div className={styles.featureInfo}>
-                            <span className={styles.featureName}>Desafío</span>
-                            <span className={styles.featureMeta}>+{cavalierClass.level} daño al objetivo desafiado</span>
-                          </div>
-                          <div className={styles.featureActions}>
-                            <span className={styles.featureUses}>{challengeUses}/{challengeMaxUses}</span>
-                            <Button variant="secondary" size="sm" onClick={() => useFeature('challenge', challengeMaxUses)} disabled={challengeUses <= 0}>Desafiar</Button>
-                          </div>
-                        </div>
+                        <ClassFeatureRow name="Desafío" meta={`+${cavalierClass.level} daño al objetivo desafiado`} uses={challengeUses} max={challengeMaxUses}>
+                          <Button variant="secondary" size="sm" onClick={() => useFeature('challenge', challengeMaxUses)} disabled={challengeUses <= 0}>Desafiar</Button>
+                          <Button variant="ghost" size="sm" onClick={() => restoreFeature('challenge', challengeMaxUses)} disabled={challengeUses >= challengeMaxUses}>+1</Button>
+                        </ClassFeatureRow>
                         {cavalierClass.level >= 5 && (
-                          <div className={styles.featureRow}>
-                            <div className={styles.featureInfo}>
-                              <span className={styles.featureName}>Táctico</span>
-                              <span className={styles.featureMeta}>Aliados usan tu dote de trabajo en equipo · {Math.floor(cavalierClass.level / 5) + 1} min</span>
-                            </div>
-                            <div className={styles.featureActions}>
-                              <span className={styles.featureUses}>{tacticianUses}/1</span>
-                              <Button variant="secondary" size="sm" onClick={() => useFeature('tactician', 1)} disabled={tacticianUses <= 0}>Activar</Button>
-                            </div>
-                          </div>
+                          <ClassFeatureRow
+                            name="Táctico"
+                            meta={`Aliados usan tu dote de trabajo en equipo · ${Math.floor(cavalierClass.level / 5) + 1} min`}
+                            uses={tacticianUses}
+                            max={1}
+                          >
+                            <Button variant="secondary" size="sm" onClick={() => useFeature('tactician', 1)} disabled={tacticianUses <= 0}>Activar</Button>
+                            <Button variant="ghost" size="sm" onClick={() => restoreFeature('tactician', 1)} disabled={tacticianUses >= 1}>+1</Button>
+                          </ClassFeatureRow>
                         )}
                       </>
                     )}
 
                     {/* Magus — Reserva Arcana */}
                     {maguClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Reserva Arcana</span>
-                          <span className={styles.featureMeta}>Potenciar arma (+{1 + Math.floor(maguClass.level / 4)}) o recuperar hechizo</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{arcanePoolUses}/{arcanePoolMax}</span>
-                          <Button variant="secondary" size="sm" onClick={() => useFeature('arcanepool', arcanePoolMax)} disabled={arcanePoolUses <= 0}>Gastar</Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Reserva Arcana"
+                        meta={`Potenciar arma (+${1 + Math.floor(maguClass.level / 4)}) o recuperar hechizo`}
+                        uses={arcanePoolUses}
+                        max={arcanePoolMax}
+                      >
+                        <Button variant="secondary" size="sm" onClick={() => useFeature('arcanepool', arcanePoolMax)} disabled={arcanePoolUses <= 0}>Gastar</Button>
+                        <Button variant="ghost" size="sm" onClick={() => restoreFeature('arcanepool', arcanePoolMax)} disabled={arcanePoolUses >= arcanePoolMax}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Gunslinger — Valor */}
                     {gunslingerClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Valor (Grit)</span>
-                          <span className={styles.featureMeta}>Se recupera: matar con arma de fuego / crítico con arma de fuego</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{gritUses}/{gritMax}</span>
-                          <Button variant="secondary" size="sm" onClick={() => useFeature('grit', gritMax)} disabled={gritUses <= 0}>Gastar</Button>
-                          <Button variant="primary" size="sm" onClick={() => updateCharacter(character.id, { classFeatureUses: { ...featureUses, grit: Math.min((featureUses['grit'] ?? gritMax) + 1, gritMax) } })} disabled={gritUses >= gritMax}>+1</Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Valor (Grit)"
+                        meta="Se recupera: matar con arma de fuego / crítico con arma de fuego"
+                        uses={gritUses}
+                        max={gritMax}
+                      >
+                        <Button variant="secondary" size="sm" onClick={() => useFeature('grit', gritMax)} disabled={gritUses <= 0}>Gastar</Button>
+                        <Button variant="primary" size="sm" onClick={() => restoreFeature('grit', gritMax)} disabled={gritUses >= gritMax}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Shifter — Aspecto */}
                     {shifterClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Aspecto</span>
-                          <span className={styles.featureMeta}>Garras {Math.ceil(shifterClass.level / 4)}d6 + bonos de aspecto animal</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{aspectUses}/{aspectRoundsMax} rondas</span>
-                          <Button variant="secondary" size="sm" onClick={() => useFeature('aspect', aspectRoundsMax)} disabled={aspectUses <= 0}>−1 ronda</Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Aspecto"
+                        meta={`Garras ${Math.ceil(shifterClass.level / 4)}d6 + bonos de aspecto animal`}
+                        uses={aspectUses}
+                        max={aspectRoundsMax}
+                        usesLabel="rondas"
+                      >
+                        <Button variant="secondary" size="sm" onClick={() => useFeature('aspect', aspectRoundsMax)} disabled={aspectUses <= 0}>−1 ronda</Button>
+                        <Button variant="ghost" size="sm" onClick={() => restoreFeature('aspect', aspectRoundsMax)} disabled={aspectUses >= aspectRoundsMax}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Oracle — Canal de Energía */}
                     {oracleClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Canal de Energía (Oráculo)</span>
-                          <span className={styles.featureMeta}>{Math.ceil(oracleClass.level / 2)}d6 — CD {10 + Math.floor(oracleClass.level / 2) + chaMod}</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureUses}>{oracleChannelUses}/{oracleChannelMax}</span>
-                          <Button variant="secondary" size="sm" onClick={() => { useFeature('ochannel', oracleChannelMax); handleQuickRoll(`${Math.ceil(oracleClass.level / 2)}d6`, 'Canal de Energía') }} disabled={oracleChannelUses <= 0}>Canalizar</Button>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Canal de Energía (Oráculo)"
+                        meta={`${Math.ceil(oracleClass.level / 2)}d6 — CD ${10 + Math.floor(oracleClass.level / 2) + chaMod}`}
+                        uses={oracleChannelUses}
+                        max={oracleChannelMax}
+                      >
+                        <Button variant="secondary" size="sm" onClick={() => { useFeature('ochannel', oracleChannelMax); handleQuickRoll(`${Math.ceil(oracleClass.level / 2)}d6`, 'Canal de Energía') }} disabled={oracleChannelUses <= 0}>Canalizar</Button>
+                        <Button variant="ghost" size="sm" onClick={() => restoreFeature('ochannel', oracleChannelMax)} disabled={oracleChannelUses >= oracleChannelMax}>+1</Button>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Witch — Hexo (genérico) */}
                     {witchClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Hexos</span>
-                          <span className={styles.featureMeta}>1 vez/objetivo/día · CD {10 + Math.floor(witchClass.level / 2) + intMod}</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureMeta}>Ver lista</span>
-                        </div>
-                      </div>
+                      <ClassFeatureRow name="Hexos" meta={`1 vez/objetivo/día · CD ${10 + Math.floor(witchClass.level / 2) + intMod}`}>
+                        <span className={styles.featureMeta}>Ver lista</span>
+                      </ClassFeatureRow>
                     )}
 
                     {/* Summoner — Eidolón passive info */}
                     {summonerClass && (
-                      <div className={styles.featureRow}>
-                        <div className={styles.featureInfo}>
-                          <span className={styles.featureName}>Eídolón</span>
-                          <span className={styles.featureMeta}>PV: {summonerClass.level * 10 + chaMod} · BBA: {summonerClass.level} · {Math.floor(summonerClass.level / 2) + 4} puntos de evolución</span>
-                        </div>
-                        <div className={styles.featureActions}>
-                          <span className={styles.featureMeta}>Compañero</span>
-                        </div>
-                      </div>
+                      <ClassFeatureRow
+                        name="Eídolón"
+                        meta={`PV: ${summonerClass.level * 10 + chaMod} · BBA: ${summonerClass.level} · ${Math.floor(summonerClass.level / 2) + 4} puntos de evolución`}
+                      >
+                        <span className={styles.featureMeta}>Compañero</span>
+                      </ClassFeatureRow>
                     )}
 
                   </div>
@@ -1651,6 +1456,27 @@ export function PlayMode() {
             </div>
           </div>
         )}
+
+        {/* ── Control fijo inferior-derecha: acceso a Dados/Efectos con el pulgar ── */}
+        <div className={styles.fabCluster}>
+          <button
+            className={`${styles.fabBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.fabBtnActive : ''}`}
+            onClick={() => setShowStatusEffects(true)}
+            title="Efectos y Condiciones"
+          >
+            <Activity size={18} />
+            {(statusEffects.length + activeConditionsCount) > 0 && (
+              <span className={styles.fabBadge}>{statusEffects.length + activeConditionsCount}</span>
+            )}
+          </button>
+          <button
+            className={`${styles.fabBtn} ${dicePanelOpen ? styles.fabBtnActive : ''}`}
+            onClick={() => setDicePanelOpen(!dicePanelOpen)}
+            title="Dados"
+          >
+            <Dices size={18} />
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -52,12 +52,13 @@ function getDexForAC(character: Character, dexMod: number, encumbranceDexCap: nu
 // por llevar carga media/pesada, combinándolos con los de la armadura equipada.
 export function computeCombatStats(character: Character, resolvedStats: ResolvedStats, totalWeight = 0): CombatStats {
   const { abilities } = character
-  const strMod = calculateModifier(abilities.strength)
-  const dexMod = calculateModifier(abilities.dexterity)
-  const conMod = calculateModifier(abilities.constitution)
-  const intMod = calculateModifier(abilities.intelligence)
-  const wisMod = calculateModifier(abilities.wisdom)
-  const chaMod = calculateModifier(abilities.charisma)
+  const { abilityBonuses } = resolvedStats
+  const strMod = calculateModifier(abilities.strength) + abilityBonuses.str
+  const dexMod = calculateModifier(abilities.dexterity) + abilityBonuses.dex
+  const conMod = calculateModifier(abilities.constitution) + abilityBonuses.con
+  const intMod = calculateModifier(abilities.intelligence) + abilityBonuses.int
+  const wisMod = calculateModifier(abilities.wisdom) + abilityBonuses.wis
+  const chaMod = calculateModifier(abilities.charisma) + abilityBonuses.cha
 
   const mcStats = getMulticlassStats(character.classes)
   const bab = mcStats.bab

@@ -15,7 +15,13 @@
 
 /* ── Header ── */
 .header {
-  margin-bottom: var(--space-6);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-bg-primary);
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-2);
 }
 
 .backLink {
@@ -95,39 +101,7 @@
   gap: var(--space-4);
 }
 
-/* ── HP Panel ── */
-.hpPanel {
-  background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(139, 58, 58, 0.3) 100%) !important;
-}
-
-.hpDisplay {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-6);
-  margin-bottom: var(--space-4);
-}
-
-.hpValue {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-1);
-}
-
-.hpValue span:first-child {
-  font-family: var(--font-mono);
-  font-size: 5rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  line-height: 1;
-}
-
-.hpMax {
-  font-family: var(--font-mono);
-  font-size: 2rem;
-  color: var(--color-text-secondary);
-}
-
+/* ── HP crítico (también usado en la lista de combatientes del Encuentro) ── */
 .critical {
   color: var(--color-accent-red) !important;
   animation: pulse 1s ease-in-out infinite;
@@ -136,12 +110,6 @@
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
-}
-
-.hpControls {
-  display: flex;
-  gap: var(--space-3);
-  justify-content: center;
 }
 
 /* ── Tab Nav ── */
@@ -275,75 +243,11 @@
   flex-wrap: wrap;
 }
 
-.statPill {
-  flex: 1;
-  min-width: 52px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-}
-
-.statPillLabel {
-  font-size: 0.6rem;
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.statPillValue {
-  font-family: var(--font-mono);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-accent-gold);
-}
-
 /* ── Weapons ── */
 .weaponList {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-}
-
-.weaponRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  flex-wrap: wrap;
-}
-
-.weaponInfo {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-width: 120px;
-}
-
-.weaponName {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.weaponCrit {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-}
-
-.weaponBtns {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
 }
 
 .quickRolls {
@@ -570,27 +474,6 @@
   border: 1px solid var(--color-border);
 }
 
-/* ── Side Panel ── */
-.sidePanel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  position: sticky;
-  top: var(--space-4);
-}
-
-.resultCard {
-  background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(212, 164, 76, 0.2) 100%) !important;
-}
-
-.result {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-6);
-}
-
 .resultNumber {
   font-family: var(--font-mono);
   font-size: 4rem;
@@ -620,17 +503,6 @@
   100% { transform: scale(1) rotate(0deg);     opacity: 1; }
 }
 
-.resultPlaceholder {
-  font-family: var(--font-mono);
-  font-size: 4rem;
-  color: var(--color-text-secondary);
-  opacity: 0.3;
-}
-
-.historyCard {
-  flex: 1;
-}
-
 .emptyHistory {
   color: var(--color-text-secondary);
   font-style: italic;
@@ -639,282 +511,16 @@
   padding: var(--space-4);
 }
 
-.historyList {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.historyItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-2);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-sm);
-}
-
-.historyNotation {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-}
-
-.historyResult {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  font-weight: 700;
+/* ── Título de sección dentro del drawer (Condiciones / Efectos de estado) ── */
+.drawerSectionTitle {
   color: var(--color-accent-gold);
-}
-
-.statsCard {
-  background: var(--color-bg-secondary) !important;
-}
-
-.miniStats {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.miniStats > div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.miniStats span {
-  font-size: 0.6rem;
-  color: var(--color-text-secondary);
+  font-size: 0.85rem;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-2);
 }
 
-.miniStats strong {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  color: var(--color-accent-gold);
-}
-
-/* ── Status Effects Drawer ── */
-.effectsOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 8, 6, 0.6);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  z-index: 1000;
-  animation: fadeIn 0.15s ease-out;
-}
-
-.effectsDrawer {
-  background: var(--color-surface-container);
-  width: 320px;
-  max-width: 90vw;
-  height: 100vh;
-  overflow-y: auto;
-  padding: var(--space-6);
-  animation: slideIn 0.2s ease-out;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-@keyframes slideIn {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
-}
-
-.effectsHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.effectsHeader h3 {
-  color: var(--color-accent-gold);
-  font-size: 1rem;
-}
-
-.effectsList {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.effectItem {
-  padding: var(--space-3);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-sm);
-  border-left: 3px solid var(--color-accent-gold);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.effectName {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.effectBonus {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-.effectBonusPos { color: var(--color-accent-gold); }
-.effectBonusNeg { color: #e05050; }
-
-/* ── Effect form ── */
-.effectForm {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-sm);
-}
-
-.effectInput {
-  background: var(--color-surface-container-high);
-  border: 1px solid var(--color-outline-variant);
-  border-radius: var(--radius-sm);
-  color: var(--color-on-surface);
-  padding: var(--space-2) var(--space-3);
-  font-size: 0.85rem;
-  width: 100%;
-  outline: none;
-}
-.effectInput:focus { border-color: var(--color-accent-gold); }
-
-.effectBonusRow {
-  display: flex;
-  gap: var(--space-2);
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.effectSelect {
-  flex: 1;
-  min-width: 0;
-  background: var(--color-surface-container-high);
-  border: 1px solid var(--color-outline-variant);
-  border-radius: var(--radius-sm);
-  color: var(--color-on-surface);
-  padding: var(--space-2) var(--space-3);
-  font-size: 0.85rem;
-  outline: none;
-  cursor: pointer;
-}
-.effectSelect:focus { border-color: var(--color-accent-gold); }
-
-.effectValueInput {
-  width: 64px;
-  background: var(--color-surface-container-high);
-  border: 1px solid var(--color-outline-variant);
-  border-radius: var(--radius-sm);
-  color: var(--color-on-surface);
-  padding: var(--space-2) var(--space-3);
-  font-size: 0.85rem;
-  font-family: var(--font-mono);
-  text-align: center;
-  outline: none;
-}
-.effectValueInput:focus { border-color: var(--color-accent-gold); }
-
-.effectItemDisabled {
-  opacity: 0.4;
-}
-
-.effectItemHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.effectItemActions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  margin-left: auto;
-}
-
-.effectToggleBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 2px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  transition: color var(--transition-fast);
-}
-.effectToggleOn  { color: #4caf7d; }
-.effectToggleOff { color: var(--color-on-surface-variant); }
-.effectToggleBtn:hover { background: rgba(255,255,255,0.06); }
-
-.effectEditBtn {
-  background: none;
-  border: none;
-  color: var(--color-on-surface-variant);
-  cursor: pointer;
-  padding: 2px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  transition: color var(--transition-fast);
-}
-.effectEditBtn:hover { color: var(--color-accent-gold); }
-
-.effectRemoveBtn {
-  background: none;
-  border: none;
-  color: var(--color-on-surface-variant);
-  cursor: pointer;
-  padding: var(--space-1);
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  transition: color var(--transition-fast);
-}
-.effectRemoveBtn:hover { color: #e05050; }
-
-.effectEditForm {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.effectEditActions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.effectSaveBtn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  background: var(--color-primary-container);
-  border: none;
-  border-radius: var(--radius-sm);
-  color: var(--color-on-primary-container);
-  cursor: pointer;
-  font-size: 0.8rem;
-  padding: var(--space-1) var(--space-3);
-  transition: opacity var(--transition-fast);
-}
-.effectSaveBtn:hover { opacity: 0.85; }
-
-/* ── Effect bonus badges (on stat pills / skill buttons) ── */
+/* ── Effect bonus badges (on saves row / skill buttons) ── */
 .effectBadgePos,
 .effectBadgeNeg {
   display: inline-block;
@@ -938,117 +544,6 @@
   border: 1px solid rgba(224, 80, 80, 0.35);
 }
 
-.effectDuration {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-}
-
-.effectDesc {
-  font-size: 0.8rem;
-  color: var(--color-text-secondary);
-  line-height: 1.4;
-}
-
-/* ── Critical / Fumble Modal ── */
-.critOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 8, 6, 0.72);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.15s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.critModal {
-  position: relative;
-  background: var(--color-surface-container);
-  border-radius: var(--radius-md);
-  padding: var(--space-8) var(--space-6);
-  max-width: 420px;
-  width: 90%;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  animation: critPop 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  box-shadow: var(--shadow-float);
-}
-
-@keyframes critPop {
-  from { transform: scale(0.6) rotate(-6deg); opacity: 0; }
-  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
-}
-
-.critModalCrit { border-top: 4px solid var(--color-primary); }
-.critModalFumble { border-top: 4px solid var(--color-tertiary, #7b580b); }
-
-.critClose {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-  background: none;
-  border: none;
-  color: var(--color-on-surface-variant);
-  cursor: pointer;
-  padding: var(--space-1);
-  border-radius: var(--radius-sm);
-  transition: color var(--transition-fast);
-}
-.critClose:hover { color: var(--color-on-surface); }
-
-.critIcon {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.critModalCrit .critIcon { background: var(--color-primary-container); color: var(--color-primary); }
-.critModalFumble .critIcon { background: var(--color-surface-container-high); color: var(--color-on-surface-variant); }
-
-.critTitle {
-  font-family: var(--font-display);
-  font-size: var(--text-headline-sm, 1.5rem);
-  margin: 0;
-  letter-spacing: 0.04em;
-}
-.critModalCrit .critTitle { color: var(--color-primary); }
-.critModalFumble .critTitle { color: var(--color-on-surface); }
-
-.critSub {
-  font-size: var(--text-label-sm);
-  color: var(--color-on-surface-variant);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0;
-}
-
-.critDesc {
-  font-size: var(--text-body-md);
-  color: var(--color-on-surface-variant);
-  line-height: 1.5;
-  margin: 0;
-  max-width: 320px;
-}
-
-.critActions {
-  display: flex;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: var(--space-2);
-}
-
 /* ── Dice shake animation ── */
 @keyframes diceShake {
   0%   { transform: rotate(0deg) scale(1); }
@@ -1062,20 +557,11 @@
 .presetShaking { animation: diceShake 0.28s ease-in-out; }
 
 /* ── History crit/fumble highlights ── */
-.historyItemCrit { background: var(--color-primary-container) !important; }
-.historyItemCrit .historyResult { color: var(--color-primary) !important; }
+.historyItemCrit { background: var(--color-primary-container) !important; color: var(--color-primary) !important; opacity: 1 !important; }
 .historyItemFumble { background: var(--color-surface-container-highest) !important; }
 
-/* ── Mobile ── */
+/* ── Mobile: layout (cuándo cambian los grids a una columna) ── */
 @media (max-width: 768px) {
-  .pageLayout {
-    grid-template-columns: 1fr;
-  }
-
-  .sidePanel {
-    display: none;
-  }
-
   .inlineResult {
     display: flex;
   }
@@ -1088,10 +574,6 @@
     grid-template-columns: 1fr;
   }
 
-  .hpValue span:first-child {
-    font-size: 3rem;
-  }
-
   .tabBtn {
     font-size: 0.65rem;
     padding: var(--space-2);
@@ -1100,28 +582,31 @@
   .combatStats {
     gap: var(--space-1);
   }
-
-  .statPill {
-    padding: var(--space-2);
-  }
-
-  .statPillValue {
-    font-size: 1rem;
-  }
 }
 
 @media (max-width: 480px) {
   .savesRow {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* ── Mobile: mínimo táctil 44×44 px (G-06), mismo breakpoint que Button.module.css ── */
+@media (max-width: 640px) {
+  .tabBtn {
+    min-height: 44px;
+  }
+
+  .skillBtn {
+    min-height: 44px;
+  }
 
   .slotPip {
-    width: 24px;
-    height: 24px;
+    width: 44px;
+    height: 44px;
   }
 
   .presetBtn {
-    min-height: 36px;
+    min-height: 44px;
   }
 }
 
@@ -1132,67 +617,9 @@
   gap: var(--space-2);
 }
 
-.featureRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-}
-
-.featureRowActive {
-  border-color: var(--color-accent-gold);
-  background: rgba(212, 164, 76, 0.06);
-}
-
-.featureInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-
-.featureName {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.featureActiveTag {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--color-accent-gold);
-  background: rgba(212, 164, 76, 0.15);
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
-}
-
 .featureMeta {
   font-size: 0.75rem;
   color: var(--color-text-secondary);
-}
-
-.featureActions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-shrink: 0;
-}
-
-.featureUses {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--color-accent-gold);
-  min-width: 32px;
-  text-align: right;
 }
 
 /* ── Passive Class Features ── */
@@ -1375,10 +802,58 @@
   border-color: var(--color-accent-gold);
 }
 
+/* ── FAB cluster: acceso fijo inferior-derecha a Dados/Efectos ── */
+.fabCluster {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  display: flex;
+  gap: var(--space-2);
+  z-index: 90;
+}
+
+.fabBtn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-container);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  box-shadow: var(--shadow-float);
+  transition: all var(--transition-fast);
+}
+
+.fabBtn:hover,
+.fabBtnActive {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+}
+
+.fabBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--color-accent-gold);
+  color: var(--color-bg-primary);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ── Dice Panel Floating ── */
 .dicePanelFloating {
   position: fixed;
-  bottom: var(--space-4);
+  bottom: 76px;
   right: var(--space-4);
   width: 280px;
   background: var(--color-surface-container);

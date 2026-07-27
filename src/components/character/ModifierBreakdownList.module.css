@@ -1,0 +1,71 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  font-size: 0.85rem;
+}
+
+.rowDiscarded {
+  opacity: 0.5;
+}
+
+.label {
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.rowDiscarded .label,
+.rowDiscarded .value {
+  text-decoration: line-through;
+}
+
+.sessionTag {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #e0a850;
+  border: 1px solid rgba(224, 168, 80, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 0 3px;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-accent-gold);
+  flex-shrink: 0;
+}
+
+.discardReason {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-top: -4px;
+}
+
+.total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-top: var(--space-2);
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.totalValue {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  color: var(--color-accent-gold);
+}

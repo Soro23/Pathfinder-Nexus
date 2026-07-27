@@ -1,0 +1,202 @@
+.emptyState {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--space-4);
+}
+
+.effectsList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.effectItem {
+  padding: var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-accent-gold);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.effectName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.effectBonus {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.effectBonusPos { color: var(--color-accent-gold); }
+.effectBonusNeg { color: #e05050; }
+
+/* ── Effect form ── */
+.effectForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.effectInput {
+  background: var(--color-surface-container-high);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface);
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.85rem;
+  width: 100%;
+  outline: none;
+}
+.effectInput:focus { border-color: var(--color-accent-gold); }
+
+.effectBonusRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.effectSelect {
+  flex: 1;
+  min-width: 0;
+  background: var(--color-surface-container-high);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface);
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+.effectSelect:focus { border-color: var(--color-accent-gold); }
+
+.effectValueInput {
+  width: 64px;
+  background: var(--color-surface-container-high);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface);
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  text-align: center;
+  outline: none;
+}
+.effectValueInput:focus { border-color: var(--color-accent-gold); }
+
+.effectItemDisabled {
+  opacity: 0.4;
+}
+
+.effectItemHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.effectItemActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: auto;
+}
+
+.effectToggleBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+.effectToggleOn  { color: #4caf7d; }
+.effectToggleOff { color: var(--color-on-surface-variant); }
+.effectToggleBtn:hover { background: rgba(255,255,255,0.06); }
+
+.effectEditBtn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  transition: color var(--transition-fast);
+}
+.effectEditBtn:hover { color: var(--color-accent-gold); }
+
+.effectRemoveBtn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  transition: color var(--transition-fast);
+}
+.effectRemoveBtn:hover { color: #e05050; }
+
+.effectEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.effectEditActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.effectSaveBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--color-primary-container);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-primary-container);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: var(--space-1) var(--space-3);
+  transition: opacity var(--transition-fast);
+}
+.effectSaveBtn:hover { opacity: 0.85; }
+
+.effectDuration {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.effectDesc {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .effectToggleBtn,
+  .effectEditBtn,
+  .effectRemoveBtn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

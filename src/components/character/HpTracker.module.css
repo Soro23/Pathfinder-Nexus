@@ -1,0 +1,98 @@
+.hpPanel {
+  background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(139, 58, 58, 0.3) 100%) !important;
+}
+
+.hpDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-4);
+}
+
+.hpValue {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.hpValue span:first-child {
+  font-family: var(--font-mono);
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.hpMax {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  color: var(--color-text-secondary);
+}
+
+.critical {
+  color: var(--color-accent-red) !important;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.zeroHp {
+  color: var(--color-accent-red) !important;
+  text-shadow: 0 0 12px rgba(224, 80, 80, 0.6);
+}
+
+.hpControls {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
+.tempRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.tempLabel {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tempInput {
+  width: 56px;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.tempInput:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+}
+
+.tempSuffix {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-accent-gold);
+}
+
+@media (max-width: 640px) {
+  .hpValue span:first-child {
+    font-size: 3rem;
+  }
+}
