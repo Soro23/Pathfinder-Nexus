@@ -92,6 +92,7 @@ export function PlayMode() {
 
   const [activeTab, setActiveTab] = useState<TabId>('combat')
   const [diceNotation, setDiceNotation] = useState('1d20')
+  const [dicePool, setDicePool] = useState<Record<number, number>>({})
   const [rollResult, setRollResult] = useState<{ total: number; rolls: number[]; key: number } | null>(null)
   const [lastRollType, setLastRollType] = useState('')
   const [history, setHistory] = useState<{ notation: string; result: number; isCrit?: boolean; isFumble?: boolean }[]>([])
@@ -177,6 +178,8 @@ export function PlayMode() {
     setStatExplain(buildStatExplain(label, total, baseComponents, resolvedStats.allModifiers, targets))
   }
   const isAltered = (targets: ModifierTarget[]) => sumSessionModifiers(resolvedStats.allModifiers, targets) !== 0
+  const cmbEffect = sumSessionModifiers(resolvedStats.allModifiers, ['cmb'])
+  const cmdEffect = sumSessionModifiers(resolvedStats.allModifiers, ['cmd'])
 
   const equippedArmorAcp = (character.armor ?? [])
     .filter((a) => a.equipped && a.type !== 'shield')
@@ -219,6 +222,20 @@ export function PlayMode() {
       setLastRollType(diceNotation)
       setHistory((prev) => [{ notation: diceNotation, result: result.total }, ...prev.slice(0, 19)])
     })
+    setDicePool({})
+  }
+
+  // Cada clic en un preset del panel flotante suma un dado más de ese tipo al cajón
+  // (2d4 al primer clic, 3d4 al segundo...); solo se lanzan al pulsar "Tirar".
+  const bumpDicePreset = (sides: number) => {
+    const nextPool = { ...dicePool, [sides]: (dicePool[sides] ?? 1) + 1 }
+    setDicePool(nextPool)
+    setDiceNotation(
+      Object.entries(nextPool)
+        .filter(([, count]) => count > 0)
+        .map(([s, count]) => `${count}d${s}`)
+        .join('+')
+    )
   }
 
   const handleQuickRoll = (notation: string, name: string, isAttack = false, breakdownInput?: RollBreakdownInput) => {
@@ -571,61 +588,103 @@ export function PlayMode() {
           </button>
         </div>
 
-        {/* Banda de defensas: CA/Toque/Desprevenido (informativos) + Iniciativa (tirable) */}
-        <div className={styles.defenseBand}>
-          <StatPill
-            label="CA" value={`${ac}`}
-            altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
-            onExplain={() => explainStat('CA', ac,
-              [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
-              ['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
-          />
-          <StatPill
-            label="Toque" value={`${touchAC}`}
-            altered={isAltered(['ac', 'ac_deflection', 'ac_dodge'])}
-            onExplain={() => explainStat('CA de Toque', touchAC,
-              [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
-              ['ac', 'ac_deflection', 'ac_dodge'])}
-          />
-          <StatPill
-            label="Desprev" value={`${flatFootedAC}`}
-            altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
-            onExplain={() => explainStat('CA Desprevenido', flatFootedAC,
-              [{ label: 'Base', value: 10 }, { label: 'Tamaño', value: combat.sizeMod }],
-              ['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
-          />
-          <Button
-            variant="secondary" size="sm" className={styles.headerRollBtn}
-            onClick={() => handleQuickRoll(
-              `1d20+${initiative}`, `Iniciativa (${initiative >= 0 ? '+' : ''}${initiative})`, false,
-              { baseComponents: [{ label: 'Destreza', value: dexMod }], targets: ['initiative'] },
-            )}
-          >
-            <span className={styles.headerRollLabel}>INI</span>
-            <span className={styles.headerRollValue}>{initiative >= 0 ? `+${initiative}` : initiative}</span>
-          </Button>
+        {/* ── Grupo: Defensa (CA/Toque/Desprevenido/Iniciativa + CMB/CMD) ── */}
+        <div className={styles.headerGroup}>
+          <span className={styles.headerGroupLabel}>Defensa</span>
+          <div className={styles.defenseBand}>
+            <StatPill
+              label="CA" value={`${ac}`}
+              altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
+              onExplain={() => explainStat('CA', ac,
+                [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
+                ['ac', 'ac_natural', 'ac_deflection', 'ac_dodge', 'ac_armor', 'ac_shield'])}
+            />
+            <StatPill
+              label="Toque" value={`${touchAC}`}
+              altered={isAltered(['ac', 'ac_deflection', 'ac_dodge'])}
+              onExplain={() => explainStat('CA de Toque', touchAC,
+                [{ label: 'Base', value: 10 }, { label: 'Destreza', value: dexMod }, { label: 'Tamaño', value: combat.sizeMod }],
+                ['ac', 'ac_deflection', 'ac_dodge'])}
+            />
+            <StatPill
+              label="Desprev" value={`${flatFootedAC}`}
+              altered={isAltered(['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
+              onExplain={() => explainStat('CA Desprevenido', flatFootedAC,
+                [{ label: 'Base', value: 10 }, { label: 'Tamaño', value: combat.sizeMod }],
+                ['ac', 'ac_natural', 'ac_deflection', 'ac_armor', 'ac_shield'])}
+            />
+            <Button
+              variant="secondary" size="sm" className={styles.headerRollBtn}
+              onClick={() => handleQuickRoll(
+                `1d20+${initiative}`, `Iniciativa (${initiative >= 0 ? '+' : ''}${initiative})`, false,
+                { baseComponents: [{ label: 'Destreza', value: dexMod }], targets: ['initiative'] },
+              )}
+            >
+              <span className={styles.headerRollLabel}>INI</span>
+              <span className={styles.headerRollValue}>{initiative >= 0 ? `+${initiative}` : initiative}</span>
+            </Button>
+          </div>
+
+          <div className={styles.defenseBand}>
+            <Button
+              variant="secondary" size="sm" className={styles.headerRollBtn}
+              onClick={() => handleQuickRoll(
+                `1d20+${cmb}`, `CMB (${cmb >= 0 ? '+' : ''}${cmb})`, false,
+                { baseComponents: [{ label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }], targets: ['cmb'] },
+              )}
+            >
+              <span className={styles.headerRollLabel}>CMB</span>
+              <span className={styles.headerRollValue}>
+                {cmb >= 0 ? `+${cmb}` : cmb}
+                {cmbEffect !== 0 && (
+                  <span className={cmbEffect > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
+                    {cmbEffect > 0 ? `+${cmbEffect}` : cmbEffect}
+                  </span>
+                )}
+              </span>
+            </Button>
+            <Button
+              variant="secondary" size="sm" className={styles.headerRollBtn}
+              onClick={() => explainStat('CMD', cmd,
+                [{ label: 'Base', value: 10 }, { label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }, { label: 'Destreza', value: dexMod }],
+                ['cmd'])}
+            >
+              <span className={styles.headerRollLabel}>CMD</span>
+              <span className={styles.headerRollValue}>
+                {cmd}
+                {cmdEffect !== 0 && (
+                  <span className={cmdEffect > 0 ? styles.effectBadgePos : styles.effectBadgeNeg}>
+                    {cmdEffect > 0 ? `+${cmdEffect}` : cmdEffect}
+                  </span>
+                )}
+              </span>
+            </Button>
+          </div>
         </div>
 
-        {/* Banda de características: FUE/DES/CON/INT/SAB/CAR con modificador y puntuación */}
-        <div className={styles.headerAbilityGrid}>
-          {([
-            { label: 'FUE', score: abilities.strength },
-            { label: 'DES', score: abilities.dexterity },
-            { label: 'CON', score: abilities.constitution },
-            { label: 'INT', score: abilities.intelligence },
-            { label: 'SAB', score: abilities.wisdom },
-            { label: 'CAR', score: abilities.charisma },
-          ]).map(({ label, score }) => (
-            <button
-              key={label}
-              className={styles.headerAbilityCard}
-              onClick={() => handleQuickRoll(`1d20+${calculateModifier(score)}`, `Prueba ${label}`)}
-            >
-              <span className={styles.headerAbilityLabel}>{label}</span>
-              <span className={styles.headerAbilityMod}>{getModifierString(score)}</span>
-              <span className={styles.headerAbilityScore}>{score}</span>
-            </button>
-          ))}
+        {/* ── Grupo: Stats (FUE/DES/CON/INT/SAB/CAR con modificador y puntuación) ── */}
+        <div className={styles.headerGroup}>
+          <span className={styles.headerGroupLabel}>Stats</span>
+          <div className={styles.headerAbilityGrid}>
+            {([
+              { label: 'FUE', score: abilities.strength },
+              { label: 'DES', score: abilities.dexterity },
+              { label: 'CON', score: abilities.constitution },
+              { label: 'INT', score: abilities.intelligence },
+              { label: 'SAB', score: abilities.wisdom },
+              { label: 'CAR', score: abilities.charisma },
+            ]).map(({ label, score }) => (
+              <button
+                key={label}
+                className={styles.headerAbilityCard}
+                onClick={() => handleQuickRoll(`1d20+${calculateModifier(score)}`, `Prueba ${label}`)}
+              >
+                <span className={styles.headerAbilityLabel}>{label}</span>
+                <span className={styles.headerAbilityMod}>{getModifierString(score)}</span>
+                <span className={styles.headerAbilityScore}>{score}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Banda de salvaciones — se tiran en el turno de cualquiera, siempre visibles */}
@@ -715,18 +774,6 @@ export function PlayMode() {
             <div className={styles.tabContent}>
               {/* Combat Stats Bar — CA/Toque/Desprevenido/Iniciativa/Salvaciones viven en la cabecera */}
               <div className={styles.combatStats}>
-                <StatPill
-                  label="CMB" value={cmb >= 0 ? `+${cmb}` : `${cmb}`}
-                  altered={isAltered(['cmb'])}
-                  onExplain={() => explainStat('CMB', cmb, [{ label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }], ['cmb'])}
-                />
-                <StatPill
-                  label="CMD" value={`${cmd}`}
-                  altered={isAltered(['cmd'])}
-                  onExplain={() => explainStat('CMD', cmd,
-                    [{ label: 'Base', value: 10 }, { label: 'BAB', value: bab }, { label: 'Fuerza', value: strMod }, { label: 'Destreza', value: dexMod }],
-                    ['cmd'])}
-                />
                 <StatPill
                   label="BAB" value={`+${bab}`}
                   onExplain={() => explainStat('BAB', bab, [{ label: 'Suma de BAB por clase', value: bab }], [])}
@@ -1519,13 +1566,13 @@ export function PlayMode() {
                 </Button>
               </div>
               <div className={styles.dicePanelPresets}>
-                {['1d4', '1d6', '1d8', '1d10', '1d12', '1d20', '2d6', '2d10', '1d100'].map((d) => (
+                {[4, 6, 8, 10, 12, 20, 100].map((sides) => (
                   <button
-                    key={d}
+                    key={sides}
                     className={styles.dicePanelPresetBtn}
-                    onClick={() => { setDiceNotation(d); handleQuickRoll(d, d) }}
+                    onClick={() => bumpDicePreset(sides)}
                   >
-                    {d}
+                    1d{sides}
                   </button>
                 ))}
               </div>
@@ -1541,7 +1588,7 @@ export function PlayMode() {
           </div>
         )}
 
-        {/* ── Control fijo inferior-derecha: acceso a Dados/Efectos con el pulgar ── */}
+        {/* ── Control fijo inferior-derecha: acceso a Efectos con el pulgar ── */}
         <div className={styles.fabCluster}>
           <button
             className={`${styles.fabBtn} ${(statusEffects.length + activeConditionsCount) > 0 ? styles.fabBtnActive : ''}`}
@@ -1553,14 +1600,16 @@ export function PlayMode() {
               <span className={styles.fabBadge}>{statusEffects.length + activeConditionsCount}</span>
             )}
           </button>
-          <button
-            className={`${styles.fabBtn} ${dicePanelOpen ? styles.fabBtnActive : ''}`}
-            onClick={() => setDicePanelOpen(!dicePanelOpen)}
-            title="Dados"
-          >
-            <Dices size={18} />
-          </button>
         </div>
+
+        {/* ── Control fijo inferior-izquierda: acceso a Dados con el pulgar ── */}
+        <button
+          className={`${styles.diceFab} ${dicePanelOpen ? styles.fabBtnActive : ''}`}
+          onClick={() => setDicePanelOpen(!dicePanelOpen)}
+          title="Dados"
+        >
+          <Dices size={18} />
+        </button>
       </div>
     </div>
   )

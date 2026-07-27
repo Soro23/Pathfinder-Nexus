@@ -192,7 +192,22 @@
   white-space: nowrap;
 }
 
-/* ── Banda de defensas (CA/Toque/Desprevenido informativos + Iniciativa tirable) ── */
+/* ── Grupo de cabecera con etiqueta (Defensa / Stats) ── */
+.headerGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.headerGroupLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  opacity: 0.8;
+}
+
+/* ── Banda de defensas (CA/Toque/Desprevenido informativos + Iniciativa tirable; también CMB/CMD) ── */
 .defenseBand {
   display: flex;
   gap: var(--space-2);
@@ -1094,6 +1109,33 @@
   background: color-mix(in srgb, var(--color-surface-container) 92%, transparent);
 }
 
+/* ── Botón flotante de dados: hexágono fijo inferior-izquierda ── */
+.diceFab {
+  position: fixed;
+  bottom: var(--space-4);
+  left: var(--space-4);
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--color-surface-container) 80%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  box-shadow: var(--shadow-float);
+  transition: all var(--transition-fast);
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  z-index: 90;
+}
+
+.diceFab:hover {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+  background: color-mix(in srgb, var(--color-surface-container) 92%, transparent);
+}
+
 .fabBadge {
   position: absolute;
   top: -4px;
@@ -1113,8 +1155,8 @@
 /* ── Dice Panel Floating ── */
 .dicePanelFloating {
   position: fixed;
-  bottom: 76px;
-  right: var(--space-4);
+  bottom: 80px;
+  left: var(--space-4);
   width: 280px;
   background: var(--color-surface-container);
   border: 1px solid var(--color-border);
