@@ -7,12 +7,12 @@ import {
   Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle, Menu, Layers, LayoutGrid
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId, FEAT_ORIGIN_LABELS, getFeatOrigin } from '../store'
-import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
+import type { StatusEffect, BonusTarget, JournalEntry, FavoredClassChoice } from '../store'
 import { getClassById, getRaceById, hasFloatingAbilityBonus, SpellLevel, useSRDStore } from '../data'
 import { resolveClassSkills, buildArchetypesByClassId } from '../data/resolveArchetype'
 import { resolveModifiers, canLevelUpFromXp, computeCombatStats, computeEffectiveMaxHp, computeSkillPointsAvailable, computeSkillTotal, getExpectedFeatCount, getXpToNextLevel, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, getEncumbranceSkillPenalty, computeSpeed, computeSyncedSpellSlots, validateProgressionAgainstCharacter, XP_SPEED_LABELS } from '../engine'
 import { Card, Button } from '../components/ui'
-import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker, FeaturesTraitsPanel } from '../components/character'
+import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker, FeaturesTraitsPanel, FavoredClassResolverModal } from '../components/character'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
 import type { LevelUpUpdates } from '../components/character'
 import styles from './CharacterView.module.css'
@@ -25,6 +25,10 @@ type CharacterNotification = {
   detail: string
   severity: 'warning' | 'info'
   tab: Tab
+  // Cuando está presente, la notificación abre el resolutor de clase predilecta de ese
+  // nivel en vez de solo navegar a una pestaña — no hay campo en la ficha donde elegir
+  // ese beneficio retroactivamente, así que necesita su propio flujo.
+  resolveFavoredLevel?: number
 }
 
 const ABILITY_ABBR: Record<string, string> = {
@@ -44,6 +48,7 @@ export function CharacterView() {
   const [tabMenuOpen, setTabMenuOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [showLevelUp, setShowLevelUp] = useState(false)
+  const [resolvingFavoredLevel, setResolvingFavoredLevel] = useState<number | null>(null)
   // En móvil, Modo Juego/Subir de nivel/Editar/Eliminar y el panel de notificaciones
   // se ocultan detrás de un menú hamburguesa y una campanita respectivamente, en vez de
   // ocupar espacio fijo en la cabecera todo el tiempo (en desktop siguen siempre visibles).
@@ -327,6 +332,7 @@ export function CharacterView() {
         detail: 'Elige el beneficio de clase predilecta para ese nivel.',
         severity: 'warning',
         tab: 'combat',
+        resolveFavoredLevel: choice.characterLevel,
       })
     }
 
@@ -342,6 +348,45 @@ export function CharacterView() {
   }
 
   const warningCount = notifications.filter((n) => n.severity === 'warning').length
+
+  const handleNotificationClick = (notice: CharacterNotification) => {
+    if (notice.resolveFavoredLevel !== undefined) {
+      setResolvingFavoredLevel(notice.resolveFavoredLevel)
+      return
+    }
+    setActiveTab(notice.tab)
+    setIsEditing(true)
+  }
+
+  const resolvingFavoredLevelChoice = (character.levelHistory ?? []).find(
+    (lc) => lc.characterLevel === resolvingFavoredLevel
+  )
+
+  const handleResolveFavoredClass = (result: { choice: FavoredClassChoice; skillId?: string }) => {
+    if (resolvingFavoredLevel === null) return
+    const updatedHistory = (character.levelHistory ?? []).map((lc) => {
+      if (lc.characterLevel !== resolvingFavoredLevel) return lc
+      const { favoredClass: _favoredClass, ...restPending } = lc.pendingChoices ?? {}
+      return {
+        ...lc,
+        favoredClassChoice: result.choice,
+        pendingChoices: Object.keys(restPending).length > 0 ? restPending : undefined,
+      }
+    })
+
+    updateCharacter(character.id, {
+      levelHistory: updatedHistory,
+      ...(result.choice === 'hp' && {
+        hp: { ...character.hp, max: character.hp.max + 1, current: character.hp.current + 1 },
+      }),
+      ...(result.choice === 'skill' && result.skillId && {
+        skills: character.skills.some((s) => s.id === result.skillId)
+          ? character.skills.map((s) => s.id === result.skillId ? { ...s, ranks: s.ranks + 1 } : s)
+          : [...character.skills, { id: result.skillId, ranks: 1 }],
+      }),
+    })
+    setResolvingFavoredLevel(null)
+  }
 
   const handleDelete = () => {
     if (confirm(`¿Estás seguro de eliminar a ${character.name}?`)) {
@@ -527,10 +572,7 @@ export function CharacterView() {
                 key={notice.id}
                 type="button"
                 className={`${styles.notificationItem} ${notice.severity === 'warning' ? styles.notificationWarning : styles.notificationInfo}`}
-                onClick={() => {
-                  setActiveTab(notice.tab)
-                  setIsEditing(true)
-                }}
+                onClick={() => handleNotificationClick(notice)}
               >
                 <AlertTriangle size={16} />
                 <span className={styles.notificationText}>
@@ -721,10 +763,7 @@ export function CharacterView() {
                   key={notice.id}
                   type="button"
                   className={`${styles.sideNavNotifItem} ${notice.severity === 'warning' ? styles.notificationWarning : styles.notificationInfo}`}
-                  onClick={() => {
-                    setActiveTab(notice.tab)
-                    setIsEditing(true)
-                  }}
+                  onClick={() => handleNotificationClick(notice)}
                 >
                   <AlertTriangle size={14} />
                   <span className={styles.sideNavNotifText}>
@@ -766,6 +805,15 @@ export function CharacterView() {
             })
             setShowLevelUp(false)
           }}
+        />
+      )}
+
+      {/* ── Resolutor de clase predilecta pendiente ── */}
+      {resolvingFavoredLevelChoice && (
+        <FavoredClassResolverModal
+          levelChoice={resolvingFavoredLevelChoice}
+          onConfirm={handleResolveFavoredClass}
+          onClose={() => setResolvingFavoredLevel(null)}
         />
       )}
 

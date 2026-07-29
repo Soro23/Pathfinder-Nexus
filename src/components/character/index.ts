@@ -1,6 +1,7 @@
 export { FeatsSelector } from './FeatsSelector'
 export { LevelUpModal } from './LevelUpModal'
 export type { LevelUpUpdates } from './LevelUpModal'
+export { FavoredClassResolverModal } from './FavoredClassResolverModal'
 export { ClassProgressionTable } from './ClassProgressionTable'
 export { SkillsList } from './SkillsList'
 export { InventoryManager } from './InventoryManager'
