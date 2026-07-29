@@ -159,6 +159,22 @@
   color: var(--color-accent-red);
 }
 
+.originRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+}
+
+.originLabel {
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
 .repeatableAdd {
   display: flex;
   gap: var(--space-2);

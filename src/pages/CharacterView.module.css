@@ -1629,6 +1629,7 @@
 
 .featReadHeader {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
   gap: var(--space-2);
@@ -1636,6 +1637,8 @@
 }
 
 .featReadName {
+  flex: 1;
+  min-width: 0;
   font-family: var(--font-display);
   font-size: var(--text-label-lg);
   font-weight: 700;
@@ -1648,6 +1651,17 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   flex-shrink: 0;
+}
+
+.featReadOrigin {
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  padding: 2px var(--space-2);
+  background: var(--color-surface-container-highest);
+  border-radius: var(--radius-sm);
 }
 
 .featReadBenefit {

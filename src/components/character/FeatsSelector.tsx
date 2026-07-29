@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { Card, Select, HomebrewBadge } from '../ui'
 import { FEAT_TYPES, useAllFeats, type FeatType } from '../../data'
 import { isFeatRepeatable } from '../../data/feats'
-import type { CharacterFeat } from '../../store/characterStore'
+import { FEAT_ORIGIN_LABELS, type CharacterFeat, type FeatOrigin } from '../../store/characterStore'
 import styles from './FeatsSelector.module.css'
+
+const ORIGIN_OPTIONS = Object.entries(FEAT_ORIGIN_LABELS).map(([value, label]) => ({ value, label }))
 
 const TYPE_LABELS: Record<FeatType, string> = {
   combat: 'Combate',
@@ -21,10 +23,11 @@ interface FeatsSelectorProps {
   selectedFeats: CharacterFeat[]
   onAdd: (featId: string, specification?: string) => void
   onRemove: (index: number) => void
+  onSetOrigin?: (index: number, origin: FeatOrigin) => void
   maxFeats?: number
 }
 
-export function FeatsSelector({ selectedFeats, onAdd, onRemove, maxFeats }: FeatsSelectorProps) {
+export function FeatsSelector({ selectedFeats, onAdd, onRemove, onSetOrigin, maxFeats }: FeatsSelectorProps) {
   const FEATS = useAllFeats()
   const [filter, setFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
@@ -105,6 +108,15 @@ export function FeatsSelector({ selectedFeats, onAdd, onRemove, maxFeats }: Feat
                   <span className={styles.instanceSpec}>
                     {selectedFeats[idx].specification || '—'}
                   </span>
+                  {onSetOrigin && (
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <Select
+                        value={selectedFeats[idx].origin ?? 'other'}
+                        onChange={(e) => onSetOrigin(idx, e.target.value as FeatOrigin)}
+                        options={ORIGIN_OPTIONS}
+                      />
+                    </div>
+                  )}
                   <button
                     className={styles.removeBtn}
                     onClick={(e) => { e.stopPropagation(); onRemove(idx) }}
@@ -118,6 +130,16 @@ export function FeatsSelector({ selectedFeats, onAdd, onRemove, maxFeats }: Feat
               {!repeatable && isSelected && (
                 <div className={styles.selectedBadge}>
                   <span>Seleccionado</span>
+                </div>
+              )}
+              {!repeatable && isSelected && onSetOrigin && (
+                <div className={styles.originRow} onClick={(e) => e.stopPropagation()}>
+                  <span className={styles.originLabel}>Origen:</span>
+                  <Select
+                    value={selectedFeats[indices[0]].origin ?? 'other'}
+                    onChange={(e) => onSetOrigin(indices[0], e.target.value as FeatOrigin)}
+                    options={ORIGIN_OPTIONS}
+                  />
                 </div>
               )}
 

@@ -6,7 +6,7 @@ import {
   Heart, Eye, PlusCircle, X, PawPrint, BookOpen, Download,
   Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle, Menu, Layers, LayoutGrid
 } from 'lucide-react'
-import { useCharacterStore, calculateModifier, getModifierString, generateId } from '../store'
+import { useCharacterStore, calculateModifier, getModifierString, generateId, FEAT_ORIGIN_LABELS, getFeatOrigin } from '../store'
 import type { StatusEffect, BonusTarget, JournalEntry } from '../store'
 import { getClassById, getRaceById, hasFloatingAbilityBonus, SpellLevel, useSRDStore } from '../data'
 import { resolveClassSkills, buildArchetypesByClassId } from '../data/resolveArchetype'
@@ -1254,6 +1254,11 @@ export function CharacterView() {
                 onRemove={(index) => {
                   updateCharacter(character.id, { feats: character.feats.filter((_, i) => i !== index) })
                 }}
+                onSetOrigin={(index, origin) => {
+                  updateCharacter(character.id, {
+                    feats: character.feats.map((f, i) => i === index ? { ...f, origin } : f),
+                  })
+                }}
               />
             ) : (
               character.feats.length === 0 ? (
@@ -1270,6 +1275,7 @@ export function CharacterView() {
                             {feat.name}{cf.specification ? ` (${cf.specification})` : ''}
                           </span>
                           <span className={styles.featReadType}>{feat.type}</span>
+                          <span className={styles.featReadOrigin}>{FEAT_ORIGIN_LABELS[getFeatOrigin(cf)]}</span>
                         </div>
                         <p className={styles.featReadBenefit}>{feat.benefit}</p>
                       </div>

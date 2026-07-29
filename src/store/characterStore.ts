@@ -122,9 +122,23 @@ export interface StatusEffect {
   active?: boolean  // undefined/true = active, false = disabled
 }
 
+export type FeatOrigin = 'level' | 'race' | 'class' | 'other'
+
 export interface CharacterFeat {
   id: string
   specification?: string
+  origin?: FeatOrigin
+}
+
+export const FEAT_ORIGIN_LABELS: Record<FeatOrigin, string> = {
+  level: 'Nivel',
+  race: 'Racial',
+  class: 'Clase',
+  other: 'Otro',
+}
+
+export function getFeatOrigin(cf: CharacterFeat): FeatOrigin {
+  return cf.origin ?? 'other'
 }
 
 export type AbilityKey = 'strength' | 'dexterity' | 'constitution' | 'intelligence' | 'wisdom' | 'charisma'

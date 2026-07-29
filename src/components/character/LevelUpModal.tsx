@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { X, Dice6, Shield, Swords, Zap, Award, Sparkles } from 'lucide-react'
 import type {
-  Character, CharacterClass, CharacterFeat, SkillRank,
+  Character, CharacterClass, CharacterFeat, FeatOrigin, SkillRank,
   AbilityKey, HpGainMode, FavoredClassChoice, LevelChoice,
 } from '../../store'
 import { calculateModifier } from '../../store'
@@ -779,7 +779,9 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
                 maxFeats={character.feats.length + featSlotsRequired}
                 onAdd={(featId, specification) => {
                   if (pendingFeats.length >= featSlotsRequired) return
-                  setPendingFeats([...pendingFeats, { id: featId, specification }])
+                  const slotIndex = pendingFeats.length
+                  const origin: FeatOrigin = slotIndex < genericFeatSlots.length ? 'level' : 'class'
+                  setPendingFeats([...pendingFeats, { id: featId, specification, origin }])
                 }}
                 onRemove={(index) => {
                   if (index >= character.feats.length) {
