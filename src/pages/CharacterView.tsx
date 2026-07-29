@@ -429,7 +429,7 @@ export function CharacterView() {
           <div className={styles.titleText}>
             <h1>{character.name}</h1>
             <p className={styles.subtitle}>
-              {character.race} · {character.classes.map(c => `${c.id} ${c.level}`).join('/')} · Nivel {character.level}
+              {character.race} · {character.classes.map(c => `${getClassById(c.id)?.name ?? c.id} ${c.level}`).join('/')} · Nivel {character.level}
             </p>
           </div>
           <div className={styles.mobileHeaderControls}>
