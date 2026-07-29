@@ -610,7 +610,28 @@ export function CharacterView() {
                       defaultValue={character.hp.max}
                       onBlur={(e) => {
                         const newMax = Math.max(1, parseInt(e.target.value) || 1)
-                        updateCharacter(character.id, { hp: { ...character.hp, max: newMax, current: Math.min(character.hp.current, newMax) } })
+
+                        // Al subir los PG máximos, salda la deuda de "PG sin resolver" del
+                        // nivel más antiguo que aún la tenga — mismo patrón que conjuros y
+                        // aumento de característica, para que la notificación no quede fija.
+                        const levelHistory = character.levelHistory ?? []
+                        const pendingIdx = newMax > character.hp.max
+                          ? levelHistory.findIndex((lc) => lc.pendingChoices?.hp)
+                          : -1
+
+                        updateCharacter(character.id, {
+                          hp: { ...character.hp, max: newMax, current: Math.min(character.hp.current, newMax) },
+                          ...(pendingIdx >= 0 && {
+                            levelHistory: levelHistory.map((lc, i) => {
+                              if (i !== pendingIdx) return lc
+                              const { hp: _hp, ...restPending } = lc.pendingChoices ?? {}
+                              return {
+                                ...lc,
+                                pendingChoices: Object.keys(restPending).length > 0 ? restPending : undefined,
+                              }
+                            }),
+                          }),
+                        })
                       }}
                     />
                     <span className={styles.hpEditHint}>PV actual / máximo</span>
@@ -842,7 +863,30 @@ export function CharacterView() {
                           defaultValue={value}
                           onBlur={(e) => {
                             const v = Math.max(1, Math.min(30, parseInt(e.target.value) || 1))
-                            updateCharacter(character.id, { abilities: { ...character.abilities, [attr]: v } })
+
+                            // Al subir una característica, salda la deuda de "aumento de
+                            // característica pendiente" del nivel más antiguo que aún la tenga —
+                            // igual que con los conjuros, si no se limpia la notificación se
+                            // queda fija aunque el jugador ya haya hecho la subida.
+                            const levelHistory = character.levelHistory ?? []
+                            const pendingIdx = v > value
+                              ? levelHistory.findIndex((lc) => lc.pendingChoices?.abilityIncrease)
+                              : -1
+
+                            updateCharacter(character.id, {
+                              abilities: { ...character.abilities, [attr]: v },
+                              ...(pendingIdx >= 0 && {
+                                levelHistory: levelHistory.map((lc, i) => {
+                                  if (i !== pendingIdx) return lc
+                                  const { abilityIncrease: _abilityIncrease, ...restPending } = lc.pendingChoices ?? {}
+                                  return {
+                                    ...lc,
+                                    abilityIncrease: lc.abilityIncrease ?? attr,
+                                    pendingChoices: Object.keys(restPending).length > 0 ? restPending : undefined,
+                                  }
+                                }),
+                              }),
+                            })
                           }}
                         />
                       ) : (
