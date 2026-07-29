@@ -542,7 +542,9 @@
 }
 
 /* ── Columna fija de secciones (solo PC) — sustituye al botón flotante + menú
-   emergente por una barra de navegación siempre visible en el lateral derecho. ── */
+   emergente por una barra de navegación siempre visible en el lateral derecho.
+   Ocupa toda la altura de la pantalla y también aloja las notificaciones, que en
+   este breakpoint dejan de mostrarse en `.notificationPanel` dentro de la ficha. ── */
 .sideNav {
   display: none;
 }
@@ -550,27 +552,138 @@
 @media (min-width: 901px) {
   .fabCluster,
   .tabMenuOverlay,
-  .tabMenuFloating {
+  .tabMenuFloating,
+  .notificationPanel {
     display: none;
+  }
+
+  .container {
+    max-width: calc(100% - 300px);
   }
 
   .sideNav {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: var(--space-2);
     position: fixed;
-    top: 50%;
+    top: var(--space-4);
+    bottom: var(--space-4);
     right: var(--space-4);
-    transform: translateY(-50%);
+    width: 260px;
     z-index: 50;
-    max-height: calc(100vh - var(--space-8) * 2);
-    overflow-y: auto;
-    padding: var(--space-2);
+    padding: var(--space-3);
     background: color-mix(in srgb, var(--color-surface-container) 92%, transparent);
     backdrop-filter: blur(6px);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-float);
+    overflow: hidden;
+  }
+
+  .sideNavTabs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    flex-shrink: 0;
+  }
+
+  .sideNavDivider {
+    height: 1px;
+    flex-shrink: 0;
+    margin: var(--space-1) 0;
+    background: var(--color-border);
+  }
+
+  .sideNavNotifications {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .sideNavNotifSummary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0 var(--space-1);
+  }
+
+  .sideNavNotifIcon {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-container-high);
+    color: var(--color-primary);
+  }
+
+  .sideNavNotifTitle {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-label-lg);
+    color: var(--color-on-surface);
+  }
+
+  .sideNavNotifSubtitle {
+    margin: 2px 0 0;
+    font-size: var(--text-label-sm);
+    color: var(--color-on-surface-variant);
+    line-height: 1.3;
+  }
+
+  .sideNavNotifList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    overflow-y: auto;
+  }
+
+  .sideNavNotifItem {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-container);
+    color: var(--color-on-surface);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  .sideNavNotifItem:hover {
+    background: var(--color-surface-container-high);
+  }
+
+  .sideNavNotifItem svg {
+    flex: 0 0 auto;
+    margin-top: 2px;
+  }
+
+  .sideNavNotifText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .sideNavNotifText strong {
+    font-size: var(--text-label-md);
+    color: var(--color-on-surface);
+    line-height: 1.3;
+  }
+
+  .sideNavNotifText span {
+    font-size: var(--text-label-sm);
+    color: var(--color-on-surface-variant);
+    line-height: 1.3;
   }
 }
 

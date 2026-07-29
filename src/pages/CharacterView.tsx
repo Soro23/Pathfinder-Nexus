@@ -674,18 +674,68 @@ export function CharacterView() {
         </button>
       </div>
 
-      {/* ── Columna fija al lado derecho con las secciones (solo PC) ── */}
+      {/* ── Columna fija al lado derecho con las secciones y las notificaciones (solo PC) ──
+          Ocupa toda la altura disponible; las notificaciones viven aquí en vez de en la
+          ficha, así que en desktop `.notificationPanel` queda oculto por CSS. ── */}
       <nav className={styles.sideNav} aria-label="Secciones del personaje">
-        {tabs.map(({ id: tabId, label, icon: Icon }) => (
-          <button
-            key={tabId}
-            className={`${styles.sideNavItem} ${activeTab === tabId ? styles.sideNavItemActive : ''}`}
-            onClick={() => setActiveTab(tabId)}
-          >
-            <Icon size={18} />
-            <span>{label}</span>
-          </button>
-        ))}
+        <div className={styles.sideNavTabs}>
+          {tabs.map(({ id: tabId, label, icon: Icon }) => (
+            <button
+              key={tabId}
+              className={`${styles.sideNavItem} ${activeTab === tabId ? styles.sideNavItemActive : ''}`}
+              onClick={() => setActiveTab(tabId)}
+            >
+              <Icon size={18} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.sideNavDivider} />
+
+        <div className={styles.sideNavNotifications}>
+          <div className={styles.sideNavNotifSummary}>
+            <div className={styles.sideNavNotifIcon}>
+              {notifications.length === 0 ? <Check size={16} /> : <Bell size={16} />}
+            </div>
+            <div>
+              <h2 className={styles.sideNavNotifTitle}>
+                {notifications.length === 0
+                  ? 'Ficha completa'
+                  : `${notifications.length} ${notifications.length === 1 ? 'pendiente' : 'pendientes'}`}
+              </h2>
+              <p className={styles.sideNavNotifSubtitle}>
+                {notifications.length === 0
+                  ? 'Sin dotes, habilidades ni rasgos pendientes.'
+                  : warningCount > 0
+                  ? `${warningCount} requieren atención.`
+                  : 'Solo ajustes informativos.'}
+              </p>
+            </div>
+          </div>
+
+          {notifications.length > 0 && (
+            <div className={styles.sideNavNotifList}>
+              {notifications.map((notice) => (
+                <button
+                  key={notice.id}
+                  type="button"
+                  className={`${styles.sideNavNotifItem} ${notice.severity === 'warning' ? styles.notificationWarning : styles.notificationInfo}`}
+                  onClick={() => {
+                    setActiveTab(notice.tab)
+                    setIsEditing(true)
+                  }}
+                >
+                  <AlertTriangle size={14} />
+                  <span className={styles.sideNavNotifText}>
+                    <strong>{notice.title}</strong>
+                    <span>{notice.detail}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* ── Level Up Modal ── */}
@@ -1297,11 +1347,12 @@ export function CharacterView() {
         {activeTab === 'feats' && (
           <Card padding="md">
             <div className={styles.sectionHeaderRow}>
-              <h3 className={styles.sectionTitle}>Dotes ({character.feats.length}/{expectedFeats})</h3>
+              <h3 className={styles.sectionTitle}>Dotes ({character.feats.filter((f) => getFeatOrigin(f) === 'level').length}/{expectedFeats})</h3>
             </div>
             {isEditing ? (
               <FeatsSelector
                 selectedFeats={character.feats}
+                countOrigin="level"
                 onAdd={(featId, specification) => {
                   updateCharacter(character.id, { feats: [...character.feats, { id: featId, specification }] })
                 }}
