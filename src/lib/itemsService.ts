@@ -1,4 +1,6 @@
 import { supabase } from './supabase'
+import { pickLocalized } from './localization'
+import { escapeForOrFilter } from './postgrest'
 
 // Unión de los valores de item_type_enum realmente usados en la BD ampliada
 // más los que ya manejaba el editor de Admin (por si quedan filas legacy).
@@ -57,15 +59,30 @@ export interface CatalogItem {
 
 export async function searchCatalogItems(query: string): Promise<CatalogItem[]> {
   if (!query.trim()) return []
+  const term = escapeForOrFilter(query)
   const { data, error } = await supabase
     .from('items')
-    .select('id, name, item_type, subtype, slot, price_gp, weight, magical, consumable, description')
-    .ilike('name', `%${query}%`)
+    .select('id, name, name_es, item_type, subtype, slot, price_gp, weight, magical, consumable, description, description_es')
+    .or(`name.ilike.%${term}%,name_es.ilike.%${term}%`)
     .order('name')
     .limit(20)
   if (error) {
     console.warn('[itemsService] searchCatalogItems:', error.message)
     return []
   }
-  return data ?? []
+  return (data ?? []).map((row) => {
+    const r = row as unknown as Record<string, unknown>
+    return {
+      id: r.id as string,
+      name: pickLocalized(r.name_es as string | null, r.name as string),
+      item_type: r.item_type as string,
+      subtype: (r.subtype as string) ?? undefined,
+      slot: (r.slot as string) ?? undefined,
+      price_gp: (r.price_gp as number) ?? undefined,
+      weight: (r.weight as number) ?? undefined,
+      magical: (r.magical as boolean) ?? false,
+      consumable: (r.consumable as boolean) ?? false,
+      description: pickLocalized(r.description_es as string | null, (r.description as string) ?? ''),
+    }
+  })
 }
