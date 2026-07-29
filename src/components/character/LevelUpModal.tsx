@@ -21,6 +21,7 @@ import { Button, Select } from '../ui'
 import { SkillsList } from './SkillsList'
 import { FeatsSelector } from './FeatsSelector'
 import { useSpells } from '../../hooks/useSpells'
+import { translateCastingTime, translateRange, translateDuration, translateSavingThrow, translateSpellResistance, translateSchool, translateUnits } from '../../lib/spellTermsEs'
 import styles from './LevelUpModal.module.css'
 
 // Reglas de conjuros ganados por nivel: los lanzadores espontáneos (con `spellsKnown`) eligen
@@ -87,7 +88,7 @@ function SpellLearnPicker({
                 onClick={() => onToggle(spell.id)}
               >
                 <span>{spell.name} <span className={styles.mono}>(nivel {spell.level})</span></span>
-                <small>{spell.school}</small>
+                <small>{translateSchool(spell.school)}</small>
               </button>
               <button
                 type="button"
@@ -114,15 +115,15 @@ function SpellLearnPicker({
                 <X size={18} />
               </button>
             </div>
-            <p className={styles.archetypeHint}>{infoSpell.school} · nivel {infoSpell.level}</p>
+            <p className={styles.archetypeHint}>{translateSchool(infoSpell.school)} · nivel {infoSpell.level}</p>
             <div className={styles.spellDetails}>
-              <p className={styles.infoItem}><strong>Tiempo de lanzamiento:</strong> {infoSpell.castingTime}</p>
-              <p className={styles.infoItem}><strong>Alcance:</strong> {infoSpell.range}</p>
-              <p className={styles.infoItem}><strong>Duración:</strong> {infoSpell.duration}</p>
-              {infoSpell.target && <p className={styles.infoItem}><strong>Objetivo:</strong> {infoSpell.target}</p>}
-              {infoSpell.area && <p className={styles.infoItem}><strong>Área:</strong> {infoSpell.area}</p>}
-              {infoSpell.savingThrow && <p className={styles.infoItem}><strong>TS:</strong> {infoSpell.savingThrow}</p>}
-              {infoSpell.spellResistance && <p className={styles.infoItem}><strong>RC:</strong> {infoSpell.spellResistance}</p>}
+              <p className={styles.infoItem}><strong>Tiempo de lanzamiento:</strong> {translateCastingTime(infoSpell.castingTime)}</p>
+              <p className={styles.infoItem}><strong>Alcance:</strong> {translateRange(infoSpell.range)}</p>
+              <p className={styles.infoItem}><strong>Duración:</strong> {translateDuration(infoSpell.duration)}</p>
+              {infoSpell.target && <p className={styles.infoItem}><strong>Objetivo:</strong> {translateUnits(infoSpell.target)}</p>}
+              {infoSpell.area && <p className={styles.infoItem}><strong>Área:</strong> {translateUnits(infoSpell.area)}</p>}
+              {infoSpell.savingThrow && <p className={styles.infoItem}><strong>TS:</strong> {translateSavingThrow(infoSpell.savingThrow)}</p>}
+              {infoSpell.spellResistance && <p className={styles.infoItem}><strong>RC:</strong> {translateSpellResistance(infoSpell.spellResistance)}</p>}
               <p className={styles.infoItem}>{infoSpell.description}</p>
             </div>
           </div>
