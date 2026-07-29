@@ -608,7 +608,7 @@ export function CharacterView() {
         </>
       )}
 
-      {/* ── Control fijo inferior-derecha: acceso al menú de secciones ── */}
+      {/* ── Control fijo inferior-derecha: acceso al menú de secciones (solo tablet/móvil) ── */}
       <div className={styles.fabCluster}>
         <button
           className={`${styles.fabBtn} ${tabMenuOpen ? styles.fabBtnActive : ''}`}
@@ -618,6 +618,20 @@ export function CharacterView() {
           <LayoutGrid size={18} />
         </button>
       </div>
+
+      {/* ── Columna fija al lado derecho con las secciones (solo PC) ── */}
+      <nav className={styles.sideNav} aria-label="Secciones del personaje">
+        {tabs.map(({ id: tabId, label, icon: Icon }) => (
+          <button
+            key={tabId}
+            className={`${styles.sideNavItem} ${activeTab === tabId ? styles.sideNavItemActive : ''}`}
+            onClick={() => setActiveTab(tabId)}
+          >
+            <Icon size={18} />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
 
       {/* ── Level Up Modal ── */}
       {showLevelUp && (
