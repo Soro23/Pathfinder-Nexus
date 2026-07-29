@@ -1495,10 +1495,36 @@ export function CharacterView() {
               classIds={character.classes.map((c) => c.id)}
               classes={character.classes}
               onToggleKnown={(spellId) => {
-                const newSpells = character.spells.includes(spellId)
+                const alreadyKnown = character.spells.includes(spellId)
+                const newSpells = alreadyKnown
                   ? character.spells.filter((s) => s !== spellId)
                   : [...character.spells, spellId]
-                updateCharacter(character.id, { spells: newSpells })
+
+                // Al añadir un conjuro nuevo, salda la deuda de "conjuros pendientes" del
+                // nivel más antiguo que aún la tenga — si no, la notificación de subida de
+                // nivel se queda fija para siempre aunque el jugador ya la haya resuelto.
+                const levelHistory = character.levelHistory ?? []
+                const pendingIdx = alreadyKnown
+                  ? -1
+                  : levelHistory.findIndex((lc) => (lc.pendingChoices?.missingSpells ?? 0) > 0)
+
+                updateCharacter(character.id, {
+                  spells: newSpells,
+                  ...(pendingIdx >= 0 && {
+                    levelHistory: levelHistory.map((lc, i) => {
+                      if (i !== pendingIdx) return lc
+                      const { missingSpells, ...restPending } = lc.pendingChoices ?? {}
+                      const remaining = (missingSpells ?? 1) - 1
+                      return {
+                        ...lc,
+                        spellsLearned: [...(lc.spellsLearned ?? []), spellId],
+                        pendingChoices: remaining > 0
+                          ? { ...restPending, missingSpells: remaining }
+                          : (Object.keys(restPending).length > 0 ? restPending : undefined),
+                      }
+                    }),
+                  }),
+                })
               }}
               onTogglePrepared={(spellId) => {
                 const prepared = character.preparedSpells ?? []
