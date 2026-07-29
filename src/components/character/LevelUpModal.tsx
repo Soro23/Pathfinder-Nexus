@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { X, Dice6, Shield, Swords, Zap, Award, Sparkles } from 'lucide-react'
 import type {
   Character, CharacterClass, CharacterFeat, FeatOrigin, SkillRank,
-  AbilityKey, HpGainMode, FavoredClassChoice, LevelChoice,
+  AbilityKey, HpGainMode, FavoredClassChoice, LevelChoice, PendingLevelChoices,
 } from '../../store'
 import { calculateModifier } from '../../store'
 import { getClassById, useAllClasses, useAllFeats, getMulticlassStats, SPELL_SCHOOLS } from '../../data'
@@ -365,10 +365,17 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
     spellsTabIncomplete ? `Elige ${spellsToLearnCount - pendingSpellsLearned.length} conjuro(s) nuevo(s).` : null,
   ].filter((message): message is string => Boolean(message))
 
-  const canConfirm = validationMessages.length === 0
-
   const handleConfirm = () => {
-    if (!canConfirm || hpGained === null) return
+    const finalHpGained = hpGained ?? 0
+
+    const pendingChoices: PendingLevelChoices = {
+      ...(hpGained === null && { hp: true }),
+      ...(abilityIncreaseRequired && abilityIncrease === null && { abilityIncrease: true }),
+      ...(isFavoredClassLevel && favoredClassChoice === undefined && { favoredClass: true }),
+      ...(pendingFeats.length < featSlotsRequired && { missingFeats: featSlotsRequired - pendingFeats.length }),
+      ...(spellsTabIncomplete && { missingSpells: spellsToLearnCount - pendingSpellsLearned.length }),
+      ...(skillPointsAvailable < 0 && { overspentSkillPoints: Math.abs(skillPointsAvailable) }),
+    }
 
     const newClassLevels: CharacterClass[] = classChoice.type === 'existing'
       ? character.classes.map((c) =>
@@ -398,12 +405,13 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
       archetypeIds: newArchetypeIds,
       hpMode,
       hpRolled: hpMode === 'roll' ? rolledValue : null,
-      hpGained,
+      hpGained: finalHpGained,
       abilityIncrease: abilityIncrease ?? undefined,
       featIds: pendingFeats.map((feat) => feat.id),
       favoredClassChoice: isFavoredClassLevel ? favoredClassChoice : undefined,
       skillRanksSpent,
       spellsLearned: pendingSpellsLearned.length > 0 ? pendingSpellsLearned : undefined,
+      pendingChoices: Object.keys(pendingChoices).length > 0 ? pendingChoices : undefined,
       source: 'level-up',
       createdAt: new Date().toISOString(),
     }
@@ -411,7 +419,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
     onConfirm({
       newLevel,
       newClassLevels,
-      hpGained,
+      hpGained: finalHpGained,
       hpRolled: hpMode === 'roll' ? rolledValue : null,
       hpMode,
       newAbilities,
@@ -847,6 +855,9 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
         {/* Confirm */}
         {validationMessages.length > 0 && (
           <div className={styles.validationBox}>
+            <p className={styles.archetypeHint}>
+              Puedes confirmar igualmente — esto quedará pendiente y podrás completarlo después en la ficha:
+            </p>
             {validationMessages.map((message) => (
               <p key={message}>{message}</p>
             ))}
@@ -854,7 +865,7 @@ export function LevelUpModal({ character, onConfirm, onClose }: LevelUpModalProp
         )}
         <div className={styles.modalFooter}>
           <Button variant="ghost" onClick={onClose}>Cancelar</Button>
-          <Button variant="primary" onClick={handleConfirm} disabled={!canConfirm}>
+          <Button variant="primary" onClick={handleConfirm}>
             Confirmar subida de nivel
           </Button>
         </div>

@@ -240,6 +240,16 @@ export function CharacterView() {
     })
   }
 
+  if (skillPointsAvailable < 0) {
+    notifications.push({
+      id: 'skill-points-overspent',
+      title: `Gastaste ${Math.abs(skillPointsAvailable)} punto(s) de habilidad de más`,
+      detail: 'Ajusta los rangos asignados en la pestaña Habilidades.',
+      severity: 'warning',
+      tab: 'skills',
+    })
+  }
+
   const skillsOverCap = character.skills
     .filter((s) => s.ranks > character.level)
     .map((s) => SKILLS.find((skill) => skill.id === s.id)?.name ?? s.id)
@@ -284,6 +294,51 @@ export function CharacterView() {
       severity: 'warning',
       tab: 'combat',
     })
+  }
+
+  for (const choice of character.levelHistory ?? []) {
+    const pending = choice.pendingChoices
+    if (!pending) continue
+
+    if (pending.hp) {
+      notifications.push({
+        id: `level-${choice.characterLevel}-hp`,
+        title: `Nivel ${choice.characterLevel}: PG sin resolver`,
+        detail: 'Resuelve los puntos de golpe ganados en ese nivel.',
+        severity: 'warning',
+        tab: 'combat',
+      })
+    }
+
+    if (pending.abilityIncrease) {
+      notifications.push({
+        id: `level-${choice.characterLevel}-ability`,
+        title: `Nivel ${choice.characterLevel}: aumento de característica pendiente`,
+        detail: 'Elige la característica a subir en Atributos.',
+        severity: 'warning',
+        tab: 'combat',
+      })
+    }
+
+    if (pending.favoredClass) {
+      notifications.push({
+        id: `level-${choice.characterLevel}-favored`,
+        title: `Nivel ${choice.characterLevel}: clase predilecta pendiente`,
+        detail: 'Elige el beneficio de clase predilecta para ese nivel.',
+        severity: 'warning',
+        tab: 'combat',
+      })
+    }
+
+    if (pending.missingSpells) {
+      notifications.push({
+        id: `level-${choice.characterLevel}-spells`,
+        title: `Nivel ${choice.characterLevel}: ${pending.missingSpells} conjuro(s) nuevo(s) pendiente(s)`,
+        detail: 'Añádelos en la pestaña Hechizos.',
+        severity: 'warning',
+        tab: 'spells',
+      })
+    }
   }
 
   const warningCount = notifications.filter((n) => n.severity === 'warning').length
@@ -1247,7 +1302,6 @@ export function CharacterView() {
             {isEditing ? (
               <FeatsSelector
                 selectedFeats={character.feats}
-                maxFeats={expectedFeats}
                 onAdd={(featId, specification) => {
                   updateCharacter(character.id, { feats: [...character.feats, { id: featId, specification }] })
                 }}

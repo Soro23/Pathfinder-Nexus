@@ -1,5 +1,5 @@
 export { useCharacterStore, generateId, calculateModifier, getModifierString, FEAT_ORIGIN_LABELS, getFeatOrigin } from './characterStore'
-export type { Character, CharacterClass, InventoryItem, SkillRank, AnimalCompanion, JournalEntry, StatusEffect, BonusTarget, Condition, TemporaryEffect, MiscBonus, Armor, Weapon, EquipmentSlot, CustomSlot, CharacterFeat, FeatOrigin, AbilityKey, HpGainMode, FavoredClassChoice, LevelChoice, XpProgressionSpeed } from './characterStore'
+export type { Character, CharacterClass, InventoryItem, SkillRank, AnimalCompanion, JournalEntry, StatusEffect, BonusTarget, Condition, TemporaryEffect, MiscBonus, Armor, Weapon, EquipmentSlot, CustomSlot, CharacterFeat, FeatOrigin, AbilityKey, HpGainMode, FavoredClassChoice, LevelChoice, PendingLevelChoices, XpProgressionSpeed } from './characterStore'
 export { useCampaignStore } from './campaignStore'
 export type { Campaign, CampaignNote, CampaignNPC, CampaignSession, CampaignLocation, CampaignQuest, CampaignEncounter, CampaignLoot, EncounterEnemy, CampaignCharacter } from './campaignStore'
 export { useSRDStore, srdStore } from './srdStore'

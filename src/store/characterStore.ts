@@ -154,6 +154,17 @@ export type FavoredClassChoice = 'hp' | 'skill' | 'racial'
 // Los personajes creados antes de esta funcionalidad no tienen entradas para sus niveles ya
 // vividos (no se fabrica historial retroactivo); `levelHistory` empieza a registrar desde la
 // primera subida de nivel posterior a la migración.
+// Elecciones que quedaron sin resolver al confirmar la subida de nivel (el confirmar nunca
+// se bloquea; esto solo deja constancia de qué falta para poder avisar en la ficha).
+export interface PendingLevelChoices {
+  hp?: boolean
+  abilityIncrease?: boolean
+  favoredClass?: boolean
+  missingFeats?: number
+  missingSpells?: number
+  overspentSkillPoints?: number
+}
+
 export interface LevelChoice {
   characterLevel: number
   classId: string
@@ -168,6 +179,7 @@ export interface LevelChoice {
   skillRanksSpent: Record<string, number>
   spellsLearned?: string[]
   spellsExchanged?: { removed: string; added: string }[]
+  pendingChoices?: PendingLevelChoices
   inferred?: boolean
   source?: 'creation' | 'level-up' | 'retroactive' | 'manual-correction'
   createdAt: string
