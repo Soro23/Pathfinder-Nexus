@@ -25,32 +25,44 @@ interface FeatsSelectorProps {
   onRemove: (index: number) => void
   onSetOrigin?: (index: number, origin: FeatOrigin) => void
   maxFeats?: number
+  countOrigin?: FeatOrigin
 }
 
-export function FeatsSelector({ selectedFeats, onAdd, onRemove, onSetOrigin, maxFeats }: FeatsSelectorProps) {
+export function FeatsSelector({ selectedFeats, onAdd, onRemove, onSetOrigin, maxFeats, countOrigin }: FeatsSelectorProps) {
   const FEATS = useAllFeats()
   const [filter, setFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
+  const [showSelected, setShowSelected] = useState(true)
   // featId → pending specification text for repeatable feats
   const [pendingSpec, setPendingSpec] = useState<Record<string, string>>({})
 
-  const filteredFeats = FEATS.filter((feat) => {
+  const instancesOf = (featId: string) =>
+    selectedFeats.reduce<number[]>((acc, f, i) => { if (f.id === featId) acc.push(i); return acc }, [])
+
+  const matchedFeats = FEATS.filter((feat) => {
     const matchesType = filter === 'all' || feat.type.includes(filter as FeatType)
     const matchesSearch = feat.name.toLowerCase().includes(search.toLowerCase()) || feat.id.toLowerCase().includes(search.toLowerCase())
     return matchesType && matchesSearch
   })
 
+  const sortedFeats = [...matchedFeats].sort((a, b) => {
+    const aSelected = instancesOf(a.id).length > 0
+    const bSelected = instancesOf(b.id).length > 0
+    if (aSelected === bSelected) return 0
+    return aSelected ? -1 : 1
+  })
+
+  const filteredFeats = showSelected ? sortedFeats : sortedFeats.filter((feat) => instancesOf(feat.id).length === 0)
+
   const canAddMore = maxFeats === undefined || selectedFeats.length < maxFeats
   const availableFeats = maxFeats ? maxFeats - selectedFeats.length : null
-
-  const instancesOf = (featId: string) =>
-    selectedFeats.reduce<number[]>((acc, f, i) => { if (f.id === featId) acc.push(i); return acc }, [])
+  const displayedCount = countOrigin ? selectedFeats.filter((f) => (f.origin ?? 'other') === countOrigin).length : selectedFeats.length
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.stats}>
-          <span>Dotes: {selectedFeats.length}{maxFeats ? `/${maxFeats}` : ''}{availableFeats !== null ? ` (${availableFeats} disponibles)` : ''}</span>
+          <span>Dotes: {displayedCount}{maxFeats ? `/${maxFeats}` : ''}{availableFeats !== null ? ` (${availableFeats} disponibles)` : ''}</span>
         </div>
         <div className={styles.filters}>
           <input
@@ -68,6 +80,15 @@ export function FeatsSelector({ selectedFeats, onAdd, onRemove, onSetOrigin, max
               ...FEAT_TYPES.map((t: FeatType) => ({ value: t, label: TYPE_LABELS[t] }))
             ]}
           />
+          {selectedFeats.length > 0 && (
+            <button
+              type="button"
+              className={styles.toggleSelectedBtn}
+              onClick={() => setShowSelected((prev) => !prev)}
+            >
+              {showSelected ? `Ocultar seleccionadas (${selectedFeats.length})` : `Mostrar seleccionadas (${selectedFeats.length})`}
+            </button>
+          )}
         </div>
       </div>
 
