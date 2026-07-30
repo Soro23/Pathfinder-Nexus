@@ -10,7 +10,7 @@ import { useCharacterStore, calculateModifier, getModifierString, generateId, FE
 import type { StatusEffect, BonusTarget, JournalEntry, FavoredClassChoice } from '../store'
 import { getClassById, getRaceById, hasFloatingAbilityBonus, SpellLevel, useSRDStore } from '../data'
 import { resolveClassSkills, buildArchetypesByClassId } from '../data/resolveArchetype'
-import { resolveModifiers, canLevelUpFromXp, computeCombatStats, computeEffectiveMaxHp, computeSkillPointsAvailable, computeSkillTotal, getExpectedFeatCount, getXpToNextLevel, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, getEncumbranceSkillPenalty, computeSpeed, computeSyncedSpellSlots, validateProgressionAgainstCharacter, XP_SPEED_LABELS } from '../engine'
+import { resolveModifiers, canLevelUpFromXp, computeCombatStats, computeEffectiveMaxHp, computeSkillPointsAvailable, computeSkillTotal, getExpectedFeatCount, getXpToNextLevel, isClassSkillForCharacter, getCarryingCapacity, getEncumbranceLevel, getEncumbranceSkillPenalty, computeSpeed, computeSyncedSpellSlots, XP_SPEED_LABELS } from '../engine'
 import { Card, Button } from '../components/ui'
 import { FeatsSelector, SkillsList, InventoryManager, Spellbook, AnimalCompanion, ArsenalManager, ClassProgressionTable, LevelUpModal, DomainPicker, BlessingPicker, FeaturesTraitsPanel, FavoredClassResolverModal } from '../components/character'
 import { ArchetypeSelector } from '../components/character/ArchetypeSelector'
@@ -149,7 +149,6 @@ export function CharacterView() {
   const expectedFeats = getExpectedFeatCount(character.level, character.classes, character.race)
   const xpToNextLevel = getXpToNextLevel(character.level, character.xp, xpSpeed)
   const inferredHistoryCount = (character.levelHistory ?? []).filter((choice) => choice.inferred).length
-  const progressionMismatches = validateProgressionAgainstCharacter(character)
 
   const notifications: CharacterNotification[] = []
   const totalClassLevels = character.classes.reduce((sum, c) => sum + c.level, 0)
@@ -196,15 +195,7 @@ export function CharacterView() {
     })
   }
 
-  if (progressionMismatches.length > 0) {
-    notifications.push({
-      id: 'level-history-mismatch',
-      title: 'Historial de niveles desajustado',
-      detail: 'La progresion nivel a nivel no coincide con los totales actuales de la ficha.',
-      severity: 'warning',
-      tab: 'combat',
-    })
-  } else if (inferredHistoryCount > 0) {
+  if (inferredHistoryCount > 0) {
     notifications.push({
       id: 'level-history-inferred',
       title: 'Historial retroactivo inferido',
