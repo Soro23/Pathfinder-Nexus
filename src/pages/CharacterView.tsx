@@ -610,12 +610,16 @@ export function CharacterView() {
                       defaultValue={character.hp.max}
                       onBlur={(e) => {
                         const newMax = Math.max(1, parseInt(e.target.value) || 1)
+                        const delta = newMax - character.hp.max
 
                         // Al subir los PG máximos, salda la deuda de "PG sin resolver" del
                         // nivel más antiguo que aún la tenga — mismo patrón que conjuros y
                         // aumento de característica, para que la notificación no quede fija.
+                        // El incremento también se suma a hpGained de ese nivel: el historial
+                        // deriva hpMax como la suma de hpGained de cada nivel, así que si no
+                        // se actualiza aquí se dispara "Historial de niveles desajustado".
                         const levelHistory = character.levelHistory ?? []
-                        const pendingIdx = newMax > character.hp.max
+                        const pendingIdx = delta > 0
                           ? levelHistory.findIndex((lc) => lc.pendingChoices?.hp)
                           : -1
 
@@ -627,6 +631,7 @@ export function CharacterView() {
                               const { hp: _hp, ...restPending } = lc.pendingChoices ?? {}
                               return {
                                 ...lc,
+                                hpGained: lc.hpGained + delta,
                                 pendingChoices: Object.keys(restPending).length > 0 ? restPending : undefined,
                               }
                             }),
