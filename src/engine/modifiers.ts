@@ -1,7 +1,5 @@
 import type { Character, StatusEffect } from '../store/characterStore'
 import { getFeatById } from '../data/feats'
-import { RACES, hasFloatingAbilityBonus } from '../data/races'
-import { homebrewStore } from '../store/homebrewStore'
 import type { Modifier, ModifierTarget, ModifierType, ResolvedStats } from './types'
 
 export function stackModifiers(modifiers: Modifier[], target: ModifierTarget): number {
@@ -103,15 +101,6 @@ export const CONDITION_MODIFIERS: Record<string, Modifier[]> = {
   // staggered y stunned no tienen penalizaciones numéricas — son restricciones de acción (solo UI)
 }
 
-const ABILITY_KEY_TO_TARGET: Record<string, ModifierTarget> = {
-  strength: 'str',
-  dexterity: 'dex',
-  constitution: 'con',
-  intelligence: 'int',
-  wisdom: 'wis',
-  charisma: 'cha',
-}
-
 export function resolveModifiers(character: Character): ResolvedStats {
   const rawModifiers: Modifier[] = []
 
@@ -153,40 +142,9 @@ export function resolveModifiers(character: Character): ResolvedStats {
     }
   }
 
-  // 4. Bonificadores raciales
-  const raceData = RACES.find((r) => r.id === character.race?.toLowerCase())
-    ?? homebrewStore.getState().races.find((r) => r.id === character.race?.toLowerCase())
-  if (raceData?.bonuses) {
-    for (const [ability, bonus] of Object.entries(raceData.bonuses)) {
-      if (bonus && bonus !== 0) {
-        const target = ABILITY_KEY_TO_TARGET[ability]
-        if (target) {
-          rawModifiers.push({
-            id: `race-${ability}`,
-            source: raceData.label,
-            type: 'racial',
-            target,
-            value: bonus,
-          })
-        }
-      }
-    }
-  }
-
-  // 4b. Bonificador racial flotante de +2 (Humano, Medio Elfo, Medio Orco): el jugador
-  // elige a qué característica se aplica.
-  if (raceData && hasFloatingAbilityBonus(character.race) && character.raceAbilityChoice) {
-    const target = ABILITY_KEY_TO_TARGET[character.raceAbilityChoice]
-    if (target) {
-      rawModifiers.push({
-        id: 'race-floating',
-        source: raceData.label,
-        type: 'racial',
-        target,
-        value: 2,
-      })
-    }
-  }
+  // Los bonificadores raciales de característica (fijos y el +2 flotante de Humano/Medio
+  // Elfo/Medio Orco) ya vienen horneados en `character.abilities` desde la creación del
+  // personaje — no se recalculan aquí para no contarlos dos veces.
 
   // 5. StatusEffects → Modifiers (conversión al vuelo)
   for (const effect of character.statusEffects ?? []) {

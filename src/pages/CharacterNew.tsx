@@ -294,9 +294,29 @@ export function CharacterNew() {
 
     const classData = getClassById(form.class)
     const hitDie = classData?.hitDie ?? 8
-    const conMod = Math.floor((form.constitution - 10) / 2)
-    const startingHp = Math.max(1, hitDie + conMod)
     const id = generateId()
+
+    // Los bonificadores raciales (fijos y el +2 flotante de Humano/Medio Elfo/Medio Orco)
+    // se hornean una única vez aquí, al crear el personaje. A partir de este punto
+    // `character.abilities` guarda la puntuación EFECTIVA — el motor (resolveModifiers)
+    // ya no vuelve a aplicarlos, para no contarlos dos veces.
+    const abilities = {
+      strength: form.strength,
+      dexterity: form.dexterity,
+      constitution: form.constitution,
+      intelligence: form.intelligence,
+      wisdom: form.wisdom,
+      charisma: form.charisma,
+    }
+    for (const [key, bonus] of Object.entries(selectedRace?.bonuses ?? {})) {
+      abilities[key as keyof typeof abilities] += bonus ?? 0
+    }
+    if (hasFloatingRaceBonus && form.raceAbilityChoice) {
+      abilities[form.raceAbilityChoice] += 2
+    }
+
+    const conMod = Math.floor((abilities.constitution - 10) / 2)
+    const startingHp = Math.max(1, hitDie + conMod)
 
     const newCharacter = {
       id,
@@ -308,14 +328,7 @@ export function CharacterNew() {
       xp: 0,
       xpProgression: form.xpProgression,
       alignment: form.alignment,
-      abilities: {
-        strength: form.strength,
-        dexterity: form.dexterity,
-        constitution: form.constitution,
-        intelligence: form.intelligence,
-        wisdom: form.wisdom,
-        charisma: form.charisma,
-      },
+      abilities,
       hp: { current: startingHp, max: startingHp, temp: 0 },
       feats: [],
       skills: [],
