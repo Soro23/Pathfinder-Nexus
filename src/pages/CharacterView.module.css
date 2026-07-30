@@ -558,7 +558,7 @@
   }
 
   .container {
-    max-width: calc(100% - 300px);
+    max-width: calc(100% - 260px - var(--space-4));
   }
 
   .sideNav {
@@ -566,16 +566,15 @@
     flex-direction: column;
     gap: var(--space-2);
     position: fixed;
-    top: var(--space-4);
-    bottom: var(--space-4);
-    right: var(--space-4);
+    top: 0;
+    bottom: 0;
+    right: 0;
     width: 260px;
     z-index: 50;
     padding: var(--space-3);
     background: color-mix(in srgb, var(--color-surface-container) 92%, transparent);
     backdrop-filter: blur(6px);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    border-left: 1px solid var(--color-border);
     box-shadow: var(--shadow-float);
     overflow: hidden;
   }
