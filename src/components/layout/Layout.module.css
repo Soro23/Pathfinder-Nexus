@@ -9,7 +9,11 @@
   background: var(--color-surface);
 }
 
-/* ── Sidebar ── */
+/* ── Sidebar ──
+   position: fixed (not sticky) so it never moves with the page/main-content
+   scroll, regardless of how tall .main's content grows — same approach as
+   CharacterView's .sideNav. .main gets a matching margin-left instead of
+   relying on flex to reserve the space. */
 .sidebar {
   width: 240px;
   min-width: 240px;
@@ -19,10 +23,12 @@
   flex-direction: column;
   padding: var(--space-6) var(--space-4);
   gap: var(--space-4);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
   height: 100vh;
   overflow-y: auto;
+  z-index: 40;
 }
 
 /* ── Brand ── */
@@ -258,6 +264,7 @@
 /* ── Main Content ── */
 .main {
   flex: 1;
+  margin-left: 240px;
   overflow-y: auto;
   background: var(--color-surface);
   padding: var(--space-8) var(--space-12);
@@ -363,6 +370,7 @@
   }
 
   .main {
+    margin-left: 200px;
     padding: var(--space-6);
   }
 }
@@ -375,6 +383,10 @@
   /* Hide desktop sidebar completely on mobile */
   .sidebar {
     display: none;
+  }
+
+  .main {
+    margin-left: 0;
   }
 
   .compendiumOverlay {
