@@ -4,7 +4,7 @@ import {
   ArrowLeft, Play, Edit2, Trash2,
   Sword, Shield, Scroll, Package, Star,
   Heart, Eye, PlusCircle, X, PawPrint, BookOpen, Download,
-  Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle, Menu, Layers, LayoutGrid
+  Zap, TrendingUp, Power, Pencil, Check, Bell, AlertTriangle, Menu, Layers, LayoutGrid, Settings
 } from 'lucide-react'
 import { useCharacterStore, calculateModifier, getModifierString, generateId, FEAT_ORIGIN_LABELS, getFeatOrigin } from '../store'
 import type { StatusEffect, BonusTarget, JournalEntry, FavoredClassChoice } from '../store'
@@ -54,6 +54,9 @@ export function CharacterView() {
   // ocupar espacio fijo en la cabecera todo el tiempo (en desktop siguen siempre visibles).
   const [mobileActionsOpen, setMobileActionsOpen] = useState(false)
   const [mobileNotifOpen, setMobileNotifOpen] = useState(false)
+  // Editar/Descargar/Eliminar viven agrupados bajo el icono de tuerca en vez de como
+  // botones sueltos — Modo Juego y Subir de nivel son las únicas acciones de uso frecuente.
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(false)
   // Fuera del flujo normal: cambia el nivel de una clase sin otorgar PG, puntos de
   // habilidad, dotes ni aumentos de característica. Solo para corregir errores de ficha,
   // por eso queda oculto tras un toggle explícito en vez de estar siempre a mano.
@@ -515,19 +518,48 @@ export function CharacterView() {
                 Subir de nivel
               </Button>
             )}
-            <Button variant="secondary" onClick={handleExport} title="Exportar personaje como JSON">
-              <Download size={18} />
-            </Button>
-            <Button
-              variant={isEditing ? 'primary' : 'secondary'}
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              <Edit2 size={18} />
-              {isEditing ? 'Guardar' : 'Editar'}
-            </Button>
-            <Button variant="danger" onClick={handleDelete}>
-              <Trash2 size={18} />
-            </Button>
+            <div className={styles.settingsMenuWrap}>
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={() => setSettingsMenuOpen((v) => !v)}
+                aria-label="Más acciones del personaje"
+                aria-expanded={settingsMenuOpen}
+              >
+                <Settings size={18} />
+              </Button>
+              {settingsMenuOpen && (
+                <>
+                  <div className={styles.settingsMenuOverlay} onClick={() => setSettingsMenuOpen(false)} />
+                  <div className={styles.settingsMenu}>
+                    <button
+                      type="button"
+                      className={styles.settingsMenuItem}
+                      onClick={() => { setIsEditing(!isEditing); setSettingsMenuOpen(false) }}
+                    >
+                      <Edit2 size={16} />
+                      {isEditing ? 'Guardar' : 'Editar'}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.settingsMenuItem}
+                      onClick={() => { handleExport(); setSettingsMenuOpen(false) }}
+                    >
+                      <Download size={16} />
+                      Descargar
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.settingsMenuItem} ${styles.settingsMenuItemDanger}`}
+                      onClick={() => { setSettingsMenuOpen(false); handleDelete() }}
+                    >
+                      <Trash2 size={16} />
+                      Eliminar
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -645,14 +677,6 @@ export function CharacterView() {
                 <div className={styles.hpBarFill} style={{ width: `${hpPercent}%` }} />
               </div>
             </div>
-            {!isEditing && (
-              <div className={styles.hpControls}>
-                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.max(0, character.hp.current - 1) } })}>−1</button>
-                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.max(0, character.hp.current - 5) } })}>−5</button>
-                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.min(effectiveMaxHp, character.hp.current + 1) } })}>+1</button>
-                <button className={styles.hpBtn} onClick={() => updateCharacter(character.id, { hp: { ...character.hp, current: Math.min(effectiveMaxHp, character.hp.current + 5) } })}>+5</button>
-              </div>
-            )}
           </div>
         </Card>
 

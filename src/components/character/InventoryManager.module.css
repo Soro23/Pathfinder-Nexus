@@ -649,6 +649,21 @@
   background: rgba(139, 58, 58, 0.2);
 }
 
+/* Objetivos táctiles más grandes en tablet — en escritorio el tamaño reducido (20-24px)
+   funciona bien con ratón, pero en un táctil hace que equipar/borrar falle al tocar. */
+@media (max-width: 900px) {
+  .qtyBtn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .deleteBtn,
+  .equipBtn {
+    width: 32px;
+    height: 32px;
+  }
+}
+
 @media (max-width: 600px) {
   .formGrid {
     grid-template-columns: 1fr;

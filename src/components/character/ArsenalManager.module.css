@@ -216,16 +216,20 @@
 
 .split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-6);
   align-items: start;
 }
 
-/* ── Panel ── */
+/* ── Panel ──
+   min-width: 0 evita que las columnas del grid se nieguen a encoger por debajo del
+   contenido no flexible de .weaponRow/.armorRow (weaponStats, botones) — sin esto,
+   el grid fuerza overflow horizontal en vez de dejar que la fila se comprima. */
 .panel {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  min-width: 0;
 }
 
 .panelHeader {
@@ -303,6 +307,7 @@
 /* ── Weapon row ── */
 .weaponRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3);
@@ -367,6 +372,7 @@
 /* ── Armor row ── */
 .armorRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-3);
@@ -517,6 +523,29 @@
 }
 
 /* ── Responsive ── */
+/* Objetivos táctiles más grandes para editar/borrar/equipar — en tablet se usan con el
+   dedo, y el tamaño de escritorio (icono + 4px de padding) es demasiado pequeño para
+   acertar el toque de forma fiable. */
+@media (max-width: 900px) {
+  .editBtn,
+  .removeBtn {
+    padding: var(--space-2);
+  }
+
+  .equipBtn {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .slotUnassignBtn,
+  .slotCancelBtn {
+    padding: var(--space-2);
+  }
+
+  .slotAssignBtn {
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
 @media (max-width: 700px) {
   .split { grid-template-columns: 1fr; }
   .weaponStats { display: none; }

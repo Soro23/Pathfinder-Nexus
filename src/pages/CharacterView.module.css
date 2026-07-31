@@ -4,7 +4,7 @@
    ============================================================ */
 
 .container {
-  max-width: calc(100% - 140px);
+  max-width: 100%;
 }
 
 .notFound {
@@ -60,6 +60,58 @@
   display: flex;
   gap: var(--space-2);
   flex-shrink: 0;
+}
+
+/* ── Desplegable de ajustes (Editar/Descargar/Eliminar) tras el icono de tuerca ── */
+.settingsMenuWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.settingsMenuOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+}
+
+.settingsMenu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 71;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 180px;
+  padding: var(--space-2);
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+}
+
+.settingsMenuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface);
+  font: inherit;
+  font-size: var(--text-body-md);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.settingsMenuItem:hover {
+  background: var(--color-surface-container-high);
+}
+
+.settingsMenuItemDanger {
+  color: var(--color-error, #b3261e);
 }
 
 /* Botones de hamburguesa/campanita — ocultos en desktop, sustituyen a .actions y al
@@ -314,30 +366,6 @@
   background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
   border-radius: var(--radius-full);
   transition: width var(--transition-normal);
-}
-
-.hpControls {
-  display: flex;
-  gap: var(--space-2);
-  margin-left: auto;
-}
-
-.hpBtn {
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-surface-container);
-  border: none;
-  border-radius: var(--radius-sm);
-  color: var(--color-on-surface);
-  font-family: var(--font-body);
-  font-size: var(--text-body-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
-
-.hpBtn:hover {
-  background: var(--color-surface-container-high);
-  color: var(--color-primary);
 }
 
 /* Quick stats row */
@@ -1876,13 +1904,6 @@
     justify-content: center;
   }
 
-  .hpControls {
-    width: 100%;
-    justify-content: center;
-    margin-left: 0;
-    margin-top: var(--space-3);
-  }
-
   .quickStats {
     width: 100%;
     justify-content: space-around;
@@ -1915,11 +1936,6 @@
     gap: var(--space-1);
   }
 
-  .hpBtn {
-    width: 44px;
-    height: 44px;
-  }
-
   .classLevelBtn {
     width: 44px;
     height: 44px;
@@ -1941,6 +1957,10 @@
   .actions a,
   .actions button {
     flex: none;
+    width: 100%;
+  }
+
+  .settingsMenuWrap {
     width: 100%;
   }
 
