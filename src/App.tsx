@@ -29,6 +29,7 @@ const Skills = lazy(() => import('./pages/Skills').then(m => ({ default: m.Skill
 const Spells = lazy(() => import('./pages/Spells').then(m => ({ default: m.Spells })))
 const Items = lazy(() => import('./pages/Items').then(m => ({ default: m.Items })))
 const Feats = lazy(() => import('./pages/Feats').then(m => ({ default: m.Feats })))
+const FeatsV1Example = lazy(() => import('./pages/FeatsV1Example').then(m => ({ default: m.FeatsV1Example })))
 const Bestiary = lazy(() => import('./pages/Bestiary').then(m => ({ default: m.Bestiary })))
 const Classes = lazy(() => import('./pages/Classes').then(m => ({ default: m.Classes })))
 const Races = lazy(() => import('./pages/Races').then(m => ({ default: m.Races })))
@@ -62,6 +63,7 @@ function App() {
                 <Route path="spells" element={<Spells />} />
                 <Route path="items" element={<Items />} />
                 <Route path="feats" element={<Feats />} />
+                <Route path="feats-v1" element={<FeatsV1Example />} />
                 <Route path="bestiary" element={<Bestiary />} />
                 <Route path="classes" element={<Classes />} />
                 <Route path="classes/:classId" element={<Classes />} />
