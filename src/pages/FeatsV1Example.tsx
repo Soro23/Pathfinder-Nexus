@@ -5,6 +5,7 @@ import { Drawer } from '../components/ui/Drawer'
 import { FeatsV1CardBody, type FeatV1Row, type FeatTypeRef } from './FeatsV1CardBody'
 import { FeatsV1Tree } from './FeatsV1Tree'
 import { buildFeatNameIndex, extractPrerequisiteFeatIds, transitiveReduceRequires, type FeatRef } from './featsV1PrerequisiteLinks'
+import { useSkillsV1Drawer } from './SkillsV1Detail'
 import styles from './Feats.module.css'
 import demoStyles from './FeatsV1Example.module.css'
 import mobile from '../styles/compendiumMobile.module.css'
@@ -18,7 +19,10 @@ import mobile from '../styles/compendiumMobile.module.css'
 // v1.feats.prerequisites_structured está vacío, así que el vínculo dote→dote se
 // infiere comparando el texto de prerequisites_es contra los nombres de las demás
 // dotes (ver featsV1PrerequisiteLinks.ts). Algunos prerrequisitos reales no van a
-// enlazar si el nombre citado no coincide exactamente con el de la dote.
+// enlazar si el nombre citado no coincide exactamente con el de la dote. Los
+// prerrequisitos que mencionan una habilidad (ej. "Diplomacia 3 rangos") también
+// enlazan, abriendo el mismo Drawer de detalle que usa /skills-v1 (ver
+// SkillsV1Detail.tsx, compartido entre ambas páginas de ejemplo).
 
 const FEAT_SELECT = `id, name_es, name_en, prerequisites_es, benefit_es, normal_es, special_es,
   publishers ( name ),
@@ -80,6 +84,9 @@ export function FeatsV1Example() {
   // ── Panel de detalle (clic en dote-prerrequisito, desde card o árbol) ──
   const [selectedFeatId, setSelectedFeatId] = useState<string | null>(null)
   const [selectedFeat, setSelectedFeat] = useState<FeatV1Row | null>(null)
+
+  // ── Panel de detalle de habilidad (clic en prerrequisito de habilidad) ──
+  const skillDrawer = useSkillsV1Drawer()
 
   useEffect(() => {
     supabase
@@ -360,7 +367,13 @@ export function FeatsV1Example() {
                 <div className={styles.featsGrid}>
                   {feats.map((feat) => (
                     <div key={feat.id} id={feat.id} className={styles.featCard}>
-                      <FeatsV1CardBody feat={feat} nameIndex={nameIndex} onSelectFeat={handleSelectFeat} />
+                      <FeatsV1CardBody
+                        feat={feat}
+                        nameIndex={nameIndex}
+                        skills={skillDrawer.skills}
+                        onSelectFeat={handleSelectFeat}
+                        onSelectSkill={skillDrawer.open}
+                      />
                     </div>
                   ))}
                 </div>
@@ -404,11 +417,19 @@ export function FeatsV1Example() {
         title={selectedFeat?.name_es ?? 'Cargando dote...'}
       >
         {selectedFeat ? (
-          <FeatsV1CardBody feat={selectedFeat} nameIndex={nameIndex} onSelectFeat={handleSelectFeat} />
+          <FeatsV1CardBody
+            feat={selectedFeat}
+            nameIndex={nameIndex}
+            skills={skillDrawer.skills}
+            onSelectFeat={handleSelectFeat}
+            onSelectSkill={skillDrawer.open}
+          />
         ) : (
           <p className={styles.subtitle}>Cargando...</p>
         )}
       </Drawer>
+
+      {skillDrawer.drawer}
     </div>
   )
 }

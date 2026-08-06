@@ -1,0 +1,59 @@
+.subNav {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-3);
+}
+
+.subNavBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.subNavBtn:hover {
+  color: var(--color-text-primary);
+}
+
+.subNavBtnActive {
+  color: var(--color-bg-primary);
+  background: var(--color-accent-gold);
+  border-color: var(--color-accent-gold);
+}
+
+.listPane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.detailPane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  margin: 0;
+}

@@ -6,6 +6,9 @@
  * por `marked`.
  */
 
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
+
 function forceCloseLastOpen(result: string): string {
   const lastOpen = result.lastIndexOf('**')
   return result.slice(0, lastOpen) + result.slice(lastOpen + 2)
@@ -88,4 +91,15 @@ export function cleanupUnparsedTableArtifacts(html: string): string {
     .replace(/\|/g, ' ')
     .replace(/(^|\s)-{2,}(?=\s|$)/g, ' ')
     .replace(/[ \t]{2,}/g, ' ')
+}
+
+/**
+ * Pipeline compartido para renderizar los campos `_es` en Markdown crudo del
+ * schema `v1` (dotes, habilidades, clases, características...): repara
+ * negritas mal colocadas, parsea a HTML, limpia artefactos de tabla sin
+ * parsear y sanea el resultado antes de volcarlo con `dangerouslySetInnerHTML`.
+ */
+export function renderMarkdown(markdown: string): string {
+  const html = marked.parse(repairMisplacedBold(markdown), { async: false, breaks: true }) as string
+  return cleanupUnparsedTableArtifacts(DOMPurify.sanitize(html))
 }

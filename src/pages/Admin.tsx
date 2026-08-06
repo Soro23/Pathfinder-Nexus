@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users, Wand2, ChevronLeft, ChevronRight, Package, Plus } from 'lucide-react'
+import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users, Wand2, ChevronLeft, ChevronRight, Package, Plus, FileEdit } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '../components/ui'
 import type { Spell } from '../data/spells'
@@ -18,6 +18,7 @@ import type { Archetype, ReplacementType } from '../data/archetypes'
 import { ITEM_TYPES } from '../lib/itemsService'
 import type { CatalogItem } from '../lib/itemsService'
 import { CLASSES } from '../data/classes'
+import { V1ContentEditor } from './AdminV1Editor'
 import styles from './Admin.module.css'
 
 // ── Proxy helpers ─────────────────────────────────────────────────────────────
@@ -89,7 +90,7 @@ async function findDuplicateInDB(name: string, customSpells: Spell[]): Promise<S
 
 // ── Admin page ────────────────────────────────────────────────────────────────
 
-type TabId = 'spells' | 'skills' | 'feats' | 'classes' | 'races' | 'archetypes' | 'items'
+type TabId = 'spells' | 'skills' | 'feats' | 'classes' | 'races' | 'archetypes' | 'items' | 'v1'
 type ImportStatus = 'idle' | 'loading' | 'done' | 'error'
 
 // Coincide con el email admitido en la política "admin write" de Supabase — la comprobación
@@ -196,6 +197,12 @@ function AdminPanel() {
           >
             <Package size={16} /> Objetos
           </button>
+          <button
+            className={`${styles.tabBtn} ${activeTab === 'v1' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('v1')}
+          >
+            <FileEdit size={16} /> Contenido v1
+          </button>
         </nav>
         {showRightArrow && (
           <button className={`${styles.tabArrow} ${styles.right}`} onClick={() => scrollTabs('right')}>
@@ -212,6 +219,7 @@ function AdminPanel() {
         {activeTab === 'races' && <RacesEditor />}
         {activeTab === 'archetypes' && <ArchetypesEditor />}
         {activeTab === 'items' && <ItemsEditor />}
+        {activeTab === 'v1' && <V1ContentEditor />}
       </div>
     </div>
   )

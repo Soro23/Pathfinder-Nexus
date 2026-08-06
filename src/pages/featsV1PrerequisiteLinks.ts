@@ -10,9 +10,22 @@ export interface FeatRef {
   name_es: string
 }
 
+export interface SkillRef {
+  id: string
+  name_es: string
+}
+
+export interface SkillSubtypeRef {
+  id: string
+  name_es: string
+  skillId: string
+}
+
 export interface PrerequisiteSegment {
   text: string
   feat?: FeatRef
+  skill?: SkillRef
+  skillSubtype?: SkillSubtypeRef
 }
 
 const DIACRITIC_PATTERN = /\p{Diacritic}/gu
@@ -34,6 +47,59 @@ export function buildFeatNameIndex(feats: FeatRef[]): Map<string, FeatRef> {
   return index
 }
 
+const OR_AND_SPLIT = /(\s+(?:o|y)\s+)/i
+const OR_AND_TOKEN = /^\s+(?:o|y)\s+$/i
+
+// Intenta hacer coincidir `text` entero (recortado y sin punto final) con una dote
+// del índice. Se prueba SIEMPRE como frase completa antes de fragmentar por "o"/"y"
+// — así una dote cuyo propio nombre contiene esas palabras (ej. "Muerte o Gloria",
+// "Prosperidad y Orgullo") se resuelve aquí y nunca llega a fragmentarse.
+function matchWholePhrase(text: string, index: Map<string, FeatRef>): PrerequisiteSegment[] | null {
+  const trimmed = text.trim()
+  if (!trimmed) return null
+
+  const withoutTrailingDot = trimmed.replace(/\.$/, '')
+  const hasTrailingDot = withoutTrailingDot.length !== trimmed.length
+  const match = index.get(normalizeFeatName(withoutTrailingDot))
+  if (!match) return null
+
+  const segments: PrerequisiteSegment[] = [{ text: withoutTrailingDot, feat: match }]
+  if (hasTrailingDot) segments.push({ text: '.' })
+  return segments
+}
+
+// Una dote de Pathfinder a veces cita varios prerrequisitos alternativos con "o"
+// (o conjuntos con "y") dentro de una misma cláusula separada por comas, ej.
+// "Conjuros perforantes o Engañar 3 rangos". Si la cláusula entera no coincide con
+// ninguna dote, se fragmenta por "o"/"y" y se prueba cada fragmento por separado;
+// si tampoco así hay coincidencia, se deja la cláusula tal cual (sin fragmentar
+// visualmente sin motivo).
+function parseClause(text: string, index: Map<string, FeatRef>): PrerequisiteSegment[] {
+  const trimmed = text.trim()
+  if (!trimmed) return []
+
+  const whole = matchWholePhrase(trimmed, index)
+  if (whole) return whole
+
+  const parts = trimmed.split(OR_AND_SPLIT)
+  if (parts.length === 1) return [{ text: trimmed }]
+
+  const hasAnyMatch = parts.some((p) => !OR_AND_TOKEN.test(p) && matchWholePhrase(p, index))
+  if (!hasAnyMatch) return [{ text: trimmed }]
+
+  const segments: PrerequisiteSegment[] = []
+  for (const part of parts) {
+    if (OR_AND_TOKEN.test(part)) {
+      segments.push({ text: part })
+      continue
+    }
+    const matched = matchWholePhrase(part, index)
+    if (matched) segments.push(...matched)
+    else if (part.trim()) segments.push({ text: part.trim() })
+  }
+  return segments
+}
+
 export function parsePrerequisiteLinks(text: string, index: Map<string, FeatRef>): PrerequisiteSegment[] {
   if (!text) return []
 
@@ -44,20 +110,7 @@ export function parsePrerequisiteLinks(text: string, index: Map<string, FeatRef>
       segments.push({ text: part + ' ' })
       continue
     }
-
-    const trimmed = part.trim()
-    if (!trimmed) continue
-
-    const withoutTrailingDot = trimmed.replace(/\.$/, '')
-    const hasTrailingDot = withoutTrailingDot.length !== trimmed.length
-    const match = index.get(normalizeFeatName(withoutTrailingDot))
-
-    if (match) {
-      segments.push({ text: withoutTrailingDot, feat: match })
-      if (hasTrailingDot) segments.push({ text: '.' })
-    } else {
-      segments.push({ text: trimmed })
-    }
+    segments.push(...parseClause(part, index))
   }
 
   return segments
@@ -118,4 +171,68 @@ export function transitiveReduceRequires(requires: Map<string, string[]>): Map<s
   }
 
   return reduced
+}
+
+// ── Enlace dote → habilidad ──────────────────────────────────────────────────
+// A diferencia de los prerrequisitos de dote (donde la cláusula entera coincide
+// con el nombre de otra dote), un prerrequisito de habilidad va seguido de
+// "N rango(s)" y a veces de un subtipo entre paréntesis — ej. "Diplomacia 3
+// rangos" o "Saber (planos) 3 rangos". No se puede reutilizar matchWholePhrase
+// (exige que la cláusula ENTERA sea el nombre); aquí se busca el nombre de
+// habilidad más largo que coincide con el INICIO de la cláusula, y opcionalmente
+// un subtipo suyo justo a continuación entre paréntesis.
+//
+// Se ordenan los nombres por longitud descendente para que un nombre compuesto
+// ("Trato con animales") no quede eclipsado por uno más corto que también
+// encajara como prefijo.
+export function buildSkillPrefixList(skills: SkillRef[]): SkillRef[] {
+  return [...skills].sort((a, b) => b.name_es.length - a.name_es.length)
+}
+
+function matchSkillAtStart(text: string, skillsByLengthDesc: SkillRef[]): { skill: SkillRef; length: number } | null {
+  const lower = text.toLowerCase()
+  for (const skill of skillsByLengthDesc) {
+    const name = skill.name_es.toLowerCase()
+    if (!lower.startsWith(name)) continue
+    const nextChar = text[name.length]
+    if (nextChar === undefined || nextChar === ' ' || nextChar === '(') {
+      return { skill, length: name.length }
+    }
+  }
+  return null
+}
+
+// Reparte un segmento de texto SIN dote asociada (ya descartado como
+// prerrequisito de otra dote) en sub-segmentos que enlazan la mención de una
+// habilidad y, si el paréntesis que la sigue coincide con uno de sus subtipos
+// reales, también el subtipo por separado (ej. el "(planos)" de "Saber
+// (planos)" enlaza directo al subtipo Planos, no solo a Saber en general).
+export function linkSkillMention(
+  text: string,
+  skillsByLengthDesc: SkillRef[],
+  subtypesBySkillId: Map<string, SkillSubtypeRef[]>
+): PrerequisiteSegment[] {
+  const match = matchSkillAtStart(text, skillsByLengthDesc)
+  if (!match) return [{ text }]
+
+  const { skill, length } = match
+  const skillSegment: PrerequisiteSegment = { text: text.slice(0, length), skill }
+  const rest = text.slice(length)
+
+  const parenMatch = rest.match(/^(\s*)\(([^)]+)\)/)
+  if (parenMatch) {
+    const subtype = (subtypesBySkillId.get(skill.id) ?? [])
+      .find((s) => s.name_es.toLowerCase() === parenMatch[2].trim().toLowerCase())
+    if (subtype) {
+      const afterParen = rest.slice(parenMatch[0].length)
+      return [
+        skillSegment,
+        { text: parenMatch[1] },
+        { text: `(${parenMatch[2]})`, skillSubtype: subtype },
+        { text: afterParen },
+      ].filter((s) => s.text !== '' || s.skill || s.skillSubtype)
+    }
+  }
+
+  return [skillSegment, { text: rest }].filter((s) => s.text !== '' || s.skill)
 }

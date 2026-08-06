@@ -1,6 +1,15 @@
+import { useMemo } from 'react'
 import styles from './Feats.module.css'
 import demoStyles from './FeatsV1Example.module.css'
-import { parsePrerequisiteLinks, type FeatRef } from './featsV1PrerequisiteLinks'
+import {
+  parsePrerequisiteLinks,
+  buildSkillPrefixList,
+  linkSkillMention,
+  type FeatRef,
+  type SkillRef,
+  type SkillSubtypeRef,
+} from './featsV1PrerequisiteLinks'
+import type { SkillV1Row } from './SkillsV1Detail'
 
 export interface FeatTypeRef {
   id: string
@@ -23,29 +32,54 @@ export interface FeatV1Row {
 interface PrerequisiteTextProps {
   text: string
   nameIndex: Map<string, FeatRef>
+  skillsByLengthDesc: SkillRef[]
+  subtypesBySkillId: Map<string, SkillSubtypeRef[]>
   onSelectFeat: (id: string) => void
+  onSelectSkill: (skillId: string, subtypeId?: string) => void
 }
 
-// Enlaza solo los fragmentos que coinciden con el nombre exacto de otra dote —
-// ver featsV1PrerequisiteLinks.ts sobre por qué es best-effort.
-function PrerequisiteText({ text, nameIndex, onSelectFeat }: PrerequisiteTextProps) {
-  const segments = parsePrerequisiteLinks(text, nameIndex)
+// Enlaza los fragmentos que coinciden con el nombre exacto de otra dote, y —
+// para los que no— los que mencionan una habilidad (ej. "Diplomacia 3
+// rangos", "Saber (planos) 3 rangos") — ver featsV1PrerequisiteLinks.ts sobre
+// por qué ambos enlaces son best-effort.
+function PrerequisiteText({
+  text, nameIndex, skillsByLengthDesc, subtypesBySkillId, onSelectFeat, onSelectSkill,
+}: PrerequisiteTextProps) {
+  const segments = parsePrerequisiteLinks(text, nameIndex).flatMap((segment) =>
+    segment.feat ? [segment] : linkSkillMention(segment.text, skillsByLengthDesc, subtypesBySkillId)
+  )
+
   return (
     <>
-      {segments.map((segment, i) =>
-        segment.feat ? (
-          <button
-            key={i}
-            type="button"
-            className={demoStyles.prereqLink}
-            onClick={() => onSelectFeat(segment.feat!.id)}
-          >
-            {segment.text}
-          </button>
-        ) : (
-          <span key={i}>{segment.text}</span>
-        )
-      )}
+      {segments.map((segment, i) => {
+        if (segment.feat) {
+          return (
+            <button key={i} type="button" className={demoStyles.prereqLink} onClick={() => onSelectFeat(segment.feat!.id)}>
+              {segment.text}
+            </button>
+          )
+        }
+        if (segment.skillSubtype) {
+          return (
+            <button
+              key={i}
+              type="button"
+              className={demoStyles.prereqLink}
+              onClick={() => onSelectSkill(segment.skillSubtype!.skillId, segment.skillSubtype!.id)}
+            >
+              {segment.text}
+            </button>
+          )
+        }
+        if (segment.skill) {
+          return (
+            <button key={i} type="button" className={demoStyles.prereqLink} onClick={() => onSelectSkill(segment.skill!.id)}>
+              {segment.text}
+            </button>
+          )
+        }
+        return <span key={i}>{segment.text}</span>
+      })}
     </>
   )
 }
@@ -53,10 +87,24 @@ function PrerequisiteText({ text, nameIndex, onSelectFeat }: PrerequisiteTextPro
 interface FeatsV1CardBodyProps {
   feat: FeatV1Row
   nameIndex: Map<string, FeatRef>
+  skills: SkillV1Row[]
   onSelectFeat: (id: string) => void
+  onSelectSkill: (skillId: string, subtypeId?: string) => void
 }
 
-export function FeatsV1CardBody({ feat, nameIndex, onSelectFeat }: FeatsV1CardBodyProps) {
+export function FeatsV1CardBody({ feat, nameIndex, skills, onSelectFeat, onSelectSkill }: FeatsV1CardBodyProps) {
+  const skillsByLengthDesc = useMemo(
+    () => buildSkillPrefixList(skills.map((s) => ({ id: s.id, name_es: s.name_es }))),
+    [skills]
+  )
+  const subtypesBySkillId = useMemo(() => {
+    const map = new Map<string, SkillSubtypeRef[]>()
+    for (const skill of skills) {
+      map.set(skill.id, skill.skill_subtypes.map((st) => ({ id: st.id, name_es: st.name_es, skillId: skill.id })))
+    }
+    return map
+  }, [skills])
+
   return (
     <>
       <div className={styles.featHeader}>
@@ -73,7 +121,14 @@ export function FeatsV1CardBody({ feat, nameIndex, onSelectFeat }: FeatsV1CardBo
       {feat.prerequisites_es && (
         <p className={styles.featPrereq}>
           <strong>Prerrequisito:</strong>{' '}
-          <PrerequisiteText text={feat.prerequisites_es} nameIndex={nameIndex} onSelectFeat={onSelectFeat} />
+          <PrerequisiteText
+            text={feat.prerequisites_es}
+            nameIndex={nameIndex}
+            skillsByLengthDesc={skillsByLengthDesc}
+            subtypesBySkillId={subtypesBySkillId}
+            onSelectFeat={onSelectFeat}
+            onSelectSkill={onSelectSkill}
+          />
         </p>
       )}
 

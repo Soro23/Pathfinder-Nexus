@@ -1,0 +1,83 @@
+/* ── Drawer de detalle de habilidad (compartido entre /skills-v1 y /feats-v1) ──
+   El Drawer.module.css compartido usa 360px de ancho pensado para paneles
+   cortos (Modo Juego); la descripción Markdown de una skill (con tablas) no
+   cabe bien ahí, así que en escritorio se ensancha vía panelClassName, sin
+   tocar el ancho por defecto que usan las demás pantallas que comparten el
+   mismo Drawer. */
+@media (min-width: 901px) {
+  .wideDrawerPanel {
+    width: 640px;
+    max-width: 90vw;
+  }
+}
+
+.drawerMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+/* ── Subtipos como navegación (ej. Saber → Arcano) ── */
+.subtypeChip {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--color-accent-gold);
+}
+
+.subtypeChip:hover {
+  background: rgba(212, 164, 76, 0.18);
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.backBtn:hover {
+  color: var(--color-accent-gold);
+}
+
+.skillDescription :global(h1),
+.skillDescription :global(h2),
+.skillDescription :global(h3),
+.skillDescription :global(h4) {
+  font-family: var(--font-display);
+  color: var(--color-accent-gold);
+  margin: var(--space-4) 0 var(--space-2);
+}
+
+.skillDescription :global(p) {
+  margin-bottom: var(--space-3);
+}
+
+.skillDescription :global(ul),
+.skillDescription :global(ol) {
+  margin: 0 0 var(--space-3) var(--space-5);
+}
+
+.skillDescription :global(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-4);
+  font-size: 0.85rem;
+}
+
+.skillDescription :global(th),
+.skillDescription :global(td) {
+  border: 1px solid var(--color-border);
+  padding: var(--space-2);
+  text-align: left;
+}
+
+.skillDescription :global(th) {
+  background: var(--color-bg-primary);
+}

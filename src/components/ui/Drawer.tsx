@@ -9,9 +9,10 @@ interface DrawerProps {
   title: string
   children: ReactNode
   footer?: ReactNode
+  panelClassName?: string
 }
 
-export function Drawer({ open, onClose, title, children, footer }: DrawerProps) {
+export function Drawer({ open, onClose, title, children, footer, panelClassName }: DrawerProps) {
   useEffect(() => {
     if (!open) return
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -25,7 +26,7 @@ export function Drawer({ open, onClose, title, children, footer }: DrawerProps) 
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
+      <div className={`${styles.panel} ${panelClassName ?? ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h3>{title}</h3>
           <button className={styles.closeBtn} onClick={onClose}>
