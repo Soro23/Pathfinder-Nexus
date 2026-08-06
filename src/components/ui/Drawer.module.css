@@ -20,7 +20,6 @@
   width: 360px;
   max-width: 90vw;
   height: 100vh;
-  overflow-y: auto;
   padding: var(--space-6);
   animation: slideIn 0.2s ease-out;
   display: flex;
@@ -64,6 +63,8 @@
   flex-direction: column;
   gap: var(--space-4);
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .footer {
