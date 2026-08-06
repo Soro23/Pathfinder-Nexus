@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { ArrowLeft, ChevronRight, Search, Star, BookOpen, Shield } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { ArrowLeft, ChevronRight, Search } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { updateV1Field } from '../lib/adminV1'
 import { MarkdownFieldEditor } from '../components/ui/MarkdownFieldEditor'
@@ -19,38 +19,13 @@ import adminStyles from './Admin.module.css'
 import styles from './AdminV1Editor.module.css'
 
 // ── Edición de contenido Markdown del schema v1 ──────────────────────────────
-// Sub-panel de Admin (montado por Admin.tsx cuando activeTab === 'v1').
-// Reutiliza el guardado genérico (updateV1Field) y el editor de un solo
-// campo (MarkdownFieldEditor, con su Drawer a pantalla completa) en cada
-// punto donde v1 tiene un campo `_es` en Markdown: dotes, habilidades y
-// subtipos, y clases con sus características, arquetipos y mecánicas de
-// elección (ver CLASS_CHOICE_MECHANICS en ClassesV1Detail.tsx).
-
-type V1TabId = 'feats' | 'skills' | 'classes'
-
-export function V1ContentEditor() {
-  const [tab, setTab] = useState<V1TabId>('feats')
-
-  return (
-    <div className={adminStyles.editorCard}>
-      <nav className={styles.subNav}>
-        <button className={`${styles.subNavBtn} ${tab === 'feats' ? styles.subNavBtnActive : ''}`} onClick={() => setTab('feats')}>
-          <Star size={16} /> Dotes v1
-        </button>
-        <button className={`${styles.subNavBtn} ${tab === 'skills' ? styles.subNavBtnActive : ''}`} onClick={() => setTab('skills')}>
-          <BookOpen size={16} /> Habilidades v1
-        </button>
-        <button className={`${styles.subNavBtn} ${tab === 'classes' ? styles.subNavBtnActive : ''}`} onClick={() => setTab('classes')}>
-          <Shield size={16} /> Clases v1
-        </button>
-      </nav>
-
-      {tab === 'feats' && <V1FeatsEditor />}
-      {tab === 'skills' && <V1SkillsEditor />}
-      {tab === 'classes' && <V1ClassesEditor />}
-    </div>
-  )
-}
+// Los tres editores de abajo se montan directamente como entradas del menú
+// lateral de Admin.tsx (grupo "Contenido v1"). Reutilizan el guardado
+// genérico (updateV1Field) y el editor de un solo campo (MarkdownFieldEditor,
+// con su Drawer a pantalla completa) en cada punto donde v1 tiene un campo
+// `_es` en Markdown: dotes, habilidades y subtipos, y clases con sus
+// características, arquetipos y mecánicas de elección (ver
+// CLASS_CHOICE_MECHANICS en ClassesV1Detail.tsx).
 
 // ── Dotes v1 ──────────────────────────────────────────────────────────────
 
@@ -65,7 +40,7 @@ interface FeatV1AdminRow {
 
 const FEAT_ADMIN_SELECT = 'id, name_es, prerequisites_es, benefit_es, normal_es, special_es'
 
-function V1FeatsEditor() {
+export function V1FeatsEditor() {
   const [search, setSearch] = useState('')
   const [results, setResults] = useState<FeatV1AdminRow[]>([])
   const [loading, setLoading] = useState(false)
@@ -92,7 +67,7 @@ function V1FeatsEditor() {
 
   if (selected) {
     return (
-      <div className={styles.detailPane}>
+      <div className={`${adminStyles.editorCard} ${styles.detailPane}`}>
         <div className={adminStyles.editFormHeader}>
           <button className={adminStyles.backBtn} onClick={() => setSelected(null)}><ArrowLeft size={16} /> Volver</button>
           <h2 className={adminStyles.editFormTitle}>{selected.name_es}</h2>
@@ -126,7 +101,7 @@ function V1FeatsEditor() {
   }
 
   return (
-    <div className={styles.listPane}>
+    <div className={`${adminStyles.editorCard} ${styles.listPane}`}>
       <div className={adminStyles.editorSearchRow}>
         <Search size={16} className={adminStyles.editorSearchIcon} />
         <input
@@ -151,7 +126,7 @@ function V1FeatsEditor() {
 
 // ── Habilidades v1 ────────────────────────────────────────────────────────
 
-function V1SkillsEditor() {
+export function V1SkillsEditor() {
   const [skills, setSkills] = useState<SkillV1Row[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -179,7 +154,7 @@ function V1SkillsEditor() {
 
   if (selected) {
     return (
-      <div className={styles.detailPane}>
+      <div className={`${adminStyles.editorCard} ${styles.detailPane}`}>
         <div className={adminStyles.editFormHeader}>
           <button className={adminStyles.backBtn} onClick={() => setSelectedId(null)}><ArrowLeft size={16} /> Volver</button>
           <h2 className={adminStyles.editFormTitle}>{selected.name_es}</h2>
@@ -209,7 +184,7 @@ function V1SkillsEditor() {
   }
 
   return (
-    <div className={styles.listPane}>
+    <div className={`${adminStyles.editorCard} ${styles.listPane}`}>
       {loading && <p className={adminStyles.noResults}>Cargando…</p>}
       <ul className={adminStyles.searchResults}>
         {skills.map((skill) => (
@@ -224,7 +199,7 @@ function V1SkillsEditor() {
 
 // ── Clases v1 (descripción, características, arquetipos, mecánicas de elección) ──
 
-function V1ClassesEditor() {
+export function V1ClassesEditor() {
   const [classes, setClasses] = useState<ClassV1Row[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -241,6 +216,20 @@ function V1ClassesEditor() {
       setLoading(false)
     })
   }, [])
+
+  // Agrupa por class_groups (núcleo, base, híbrida, alternativa, desencadenada)
+  // en vez de listar las 39 clases en plano — mismo criterio que /classes-v1
+  // (ver ClassesV1Example.tsx), mucho más fácil de escanear para encontrar una clase.
+  const groupedClasses = useMemo(() => {
+    const map = new Map<string, { id: string; name_es: string; classes: ClassV1Row[] }>()
+    for (const c of classes) {
+      if (!c.class_groups) continue
+      const key = c.class_groups.id
+      if (!map.has(key)) map.set(key, { id: key, name_es: c.class_groups.name_es, classes: [] })
+      map.get(key)!.classes.push(c)
+    }
+    return [...map.values()].sort((a, b) => a.name_es.localeCompare(b.name_es, 'es'))
+  }, [classes])
 
   function updateClass(id: string, patch: Partial<ClassV1Row>) {
     setClasses((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)))
@@ -312,7 +301,7 @@ function V1ClassesEditor() {
     const mechanic = mechanicView.mechanic
     const { item, detail } = mechanicDetail
     return (
-      <div className={styles.detailPane}>
+      <div className={`${adminStyles.editorCard} ${styles.detailPane}`}>
         <div className={adminStyles.editFormHeader}>
           <button className={adminStyles.backBtn} onClick={() => setMechanicDetail(null)}><ArrowLeft size={16} /> Volver a {mechanic.label.toLowerCase()}</button>
           <h2 className={adminStyles.editFormTitle}>{item.name_es}</h2>
@@ -346,7 +335,7 @@ function V1ClassesEditor() {
 
   if (selected && mechanicView) {
     return (
-      <div className={styles.detailPane}>
+      <div className={`${adminStyles.editorCard} ${styles.detailPane}`}>
         <div className={adminStyles.editFormHeader}>
           <button className={adminStyles.backBtn} onClick={() => setMechanicView(null)}><ArrowLeft size={16} /> Volver a {selected.name_es}</button>
           <h2 className={adminStyles.editFormTitle}>{mechanicView.mechanic.label}</h2>
@@ -366,7 +355,7 @@ function V1ClassesEditor() {
 
   if (selected && archetypeView) {
     return (
-      <div className={styles.detailPane}>
+      <div className={`${adminStyles.editorCard} ${styles.detailPane}`}>
         <div className={adminStyles.editFormHeader}>
           <button className={adminStyles.backBtn} onClick={() => setArchetypeView(null)}><ArrowLeft size={16} /> Volver a {selected.name_es}</button>
           <h2 className={adminStyles.editFormTitle}>{archetypeView.archetype.name_es}</h2>
@@ -391,7 +380,7 @@ function V1ClassesEditor() {
   if (selected) {
     const choiceMechanics = CLASS_CHOICE_MECHANICS[selected.id] ?? []
     return (
-      <div className={styles.detailPane}>
+      <div className={`${adminStyles.editorCard} ${styles.detailPane}`}>
         <div className={adminStyles.editFormHeader}>
           <button className={adminStyles.backBtn} onClick={() => setSelectedId(null)}><ArrowLeft size={16} /> Volver</button>
           <h2 className={adminStyles.editFormTitle}>{selected.name_es}</h2>
@@ -451,15 +440,20 @@ function V1ClassesEditor() {
   }
 
   return (
-    <div className={styles.listPane}>
+    <div className={`${adminStyles.editorCard} ${styles.listPane}`}>
       {loading && <p className={adminStyles.noResults}>Cargando…</p>}
-      <ul className={adminStyles.searchResults}>
-        {classes.map((cls) => (
-          <li key={cls.id} className={adminStyles.searchResultItem} onClick={() => selectClass(cls.id)}>
-            <span className={adminStyles.searchResultName}>{cls.name_es}</span>
-          </li>
-        ))}
-      </ul>
+      {groupedClasses.map((group) => (
+        <div key={group.id} className={styles.sectionBlock}>
+          <p className={styles.sectionTitle}>{group.name_es}</p>
+          <ul className={adminStyles.searchResults}>
+            {group.classes.map((cls) => (
+              <li key={cls.id} className={adminStyles.searchResultItem} onClick={() => selectClass(cls.id)}>
+                <span className={adminStyles.searchResultName}>{cls.name_es}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   )
 }

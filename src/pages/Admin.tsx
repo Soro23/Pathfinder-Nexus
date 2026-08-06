@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users, Wand2, ChevronLeft, ChevronRight, Package, Plus, FileEdit } from 'lucide-react'
+import { Download, Trash2, AlertTriangle, CheckCircle, Pencil, Search, ArrowLeft, Save, BookOpen, Star, Sword, Users, Wand2, Package, Plus, type LucideIcon } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '../components/ui'
 import type { Spell } from '../data/spells'
@@ -18,7 +18,7 @@ import type { Archetype, ReplacementType } from '../data/archetypes'
 import { ITEM_TYPES } from '../lib/itemsService'
 import type { CatalogItem } from '../lib/itemsService'
 import { CLASSES } from '../data/classes'
-import { V1ContentEditor } from './AdminV1Editor'
+import { V1FeatsEditor, V1SkillsEditor, V1ClassesEditor } from './AdminV1Editor'
 import styles from './Admin.module.css'
 
 // ── Proxy helpers ─────────────────────────────────────────────────────────────
@@ -90,8 +90,36 @@ async function findDuplicateInDB(name: string, customSpells: Spell[]): Promise<S
 
 // ── Admin page ────────────────────────────────────────────────────────────────
 
-type TabId = 'spells' | 'skills' | 'feats' | 'classes' | 'races' | 'archetypes' | 'items' | 'v1'
+type TabId =
+  | 'spells' | 'skills' | 'feats' | 'classes' | 'races' | 'archetypes' | 'items'
+  | 'v1-feats' | 'v1-skills' | 'v1-classes'
 type ImportStatus = 'idle' | 'loading' | 'done' | 'error'
+
+interface NavEntry { id: TabId; label: string; icon: LucideIcon }
+interface NavGroup { label: string; items: NavEntry[] }
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: 'Contenido Public',
+    items: [
+      { id: 'spells', label: 'Conjuros', icon: Wand2 },
+      { id: 'skills', label: 'Skills', icon: BookOpen },
+      { id: 'feats', label: 'Feats', icon: Star },
+      { id: 'classes', label: 'Clases', icon: Sword },
+      { id: 'races', label: 'Razas', icon: Users },
+      { id: 'archetypes', label: 'Arquetipos', icon: Sword },
+      { id: 'items', label: 'Objetos', icon: Package },
+    ],
+  },
+  {
+    label: 'Contenido v1',
+    items: [
+      { id: 'v1-feats', label: 'Dotes v1', icon: Star },
+      { id: 'v1-skills', label: 'Habilidades v1', icon: BookOpen },
+      { id: 'v1-classes', label: 'Clases v1', icon: Sword },
+    ],
+  },
+]
 
 // Coincide con el email admitido en la política "admin write" de Supabase — la comprobación
 // real vive en RLS (el cliente nunca puede editar el catálogo sin ser ese usuario, sin importar
@@ -121,25 +149,6 @@ export function Admin() {
 
 function AdminPanel() {
   const [activeTab, setActiveTab] = useState<TabId>('spells')
-  const [showLeftArrow, setShowLeftArrow] = useState(false)
-  const [showRightArrow, setShowRightArrow] = useState(true)
-  const tabNavRef = useRef<HTMLDivElement>(null)
-
-  const updateArrows = () => {
-    if (!tabNavRef.current) return
-    const { scrollLeft, scrollWidth, clientWidth } = tabNavRef.current
-    setShowLeftArrow(scrollLeft > 0)
-    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10)
-  }
-
-  const scrollTabs = (direction: 'left' | 'right') => {
-    if (!tabNavRef.current) return
-    const scrollAmount = tabNavRef.current.clientWidth * 0.7
-    tabNavRef.current.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth'
-    })
-  }
 
   return (
     <div className={styles.page}>
@@ -148,78 +157,36 @@ function AdminPanel() {
         <p className={styles.subtitle}>Gestiona y amplía la biblioteca de hechizos de la aplicación.</p>
       </header>
 
-      <div className={styles.tabNavWrapper}>
-        {showLeftArrow && (
-          <button className={`${styles.tabArrow} ${styles.left}`} onClick={() => scrollTabs('left')}>
-            <ChevronLeft size={20} />
-          </button>
-        )}
-        <nav className={styles.tabNav} ref={tabNavRef} onScroll={updateArrows}>
-          <button
-            className={`${styles.tabBtn} ${activeTab === 'spells' ? styles.tabBtnActive : ''}`}
-            onClick={() => setActiveTab('spells')}
-          >
-            <Wand2 size={16} /> Conjuros
-          </button>
-          <button
-            className={`${styles.tabBtn} ${activeTab === 'skills' ? styles.tabBtnActive : ''}`}
-            onClick={() => setActiveTab('skills')}
-          >
-            <BookOpen size={16} /> Skills
-          </button>
-          <button
-            className={`${styles.tabBtn} ${activeTab === 'feats' ? styles.tabBtnActive : ''}`}
-            onClick={() => setActiveTab('feats')}
-          >
-            <Star size={16} /> Feats
-          </button>
-          <button
-            className={`${styles.tabBtn} ${activeTab === 'classes' ? styles.tabBtnActive : ''}`}
-            onClick={() => setActiveTab('classes')}
-          >
-            <Sword size={16} /> Clases
-          </button>
-          <button
-            className={`${styles.tabBtn} ${activeTab === 'races' ? styles.tabBtnActive : ''}`}
-            onClick={() => setActiveTab('races')}
-          >
-            <Users size={16} /> Razas
-          </button>
-          <button
-            className={`${styles.tabBtn} ${activeTab === 'archetypes' ? styles.tabBtnActive : ''}`}
-            onClick={() => setActiveTab('archetypes')}
-          >
-            <Sword size={16} /> Arquetipos
-          </button>
-          <button
-            className={`${styles.tabBtn} ${activeTab === 'items' ? styles.tabBtnActive : ''}`}
-            onClick={() => setActiveTab('items')}
-          >
-            <Package size={16} /> Objetos
-          </button>
-          <button
-            className={`${styles.tabBtn} ${activeTab === 'v1' ? styles.tabBtnActive : ''}`}
-            onClick={() => setActiveTab('v1')}
-          >
-            <FileEdit size={16} /> Contenido v1
-          </button>
+      <div className={styles.layout}>
+        <nav className={styles.sideNav}>
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label} className={styles.sideNavGroup}>
+              <span className={styles.sideNavGroupLabel}>{group.label}</span>
+              {group.items.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  className={`${styles.sideNavItem} ${activeTab === id ? styles.sideNavItemActive : ''}`}
+                  onClick={() => setActiveTab(id)}
+                >
+                  <Icon size={16} /> {label}
+                </button>
+              ))}
+            </div>
+          ))}
         </nav>
-        {showRightArrow && (
-          <button className={`${styles.tabArrow} ${styles.right}`} onClick={() => scrollTabs('right')}>
-            <ChevronRight size={20} />
-          </button>
-        )}
-      </div>
 
-      <div className={styles.tabContent}>
-        {activeTab === 'spells' && <SpellsEditor />}
-        {activeTab === 'skills' && <SkillsEditor />}
-        {activeTab === 'feats' && <FeatsEditor />}
-        {activeTab === 'classes' && <ClassesEditor />}
-        {activeTab === 'races' && <RacesEditor />}
-        {activeTab === 'archetypes' && <ArchetypesEditor />}
-        {activeTab === 'items' && <ItemsEditor />}
-        {activeTab === 'v1' && <V1ContentEditor />}
+        <div className={styles.tabContent}>
+          {activeTab === 'spells' && <SpellsEditor />}
+          {activeTab === 'skills' && <SkillsEditor />}
+          {activeTab === 'feats' && <FeatsEditor />}
+          {activeTab === 'classes' && <ClassesEditor />}
+          {activeTab === 'races' && <RacesEditor />}
+          {activeTab === 'archetypes' && <ArchetypesEditor />}
+          {activeTab === 'items' && <ItemsEditor />}
+          {activeTab === 'v1-feats' && <V1FeatsEditor />}
+          {activeTab === 'v1-skills' && <V1SkillsEditor />}
+          {activeTab === 'v1-classes' && <V1ClassesEditor />}
+        </div>
       </div>
     </div>
   )
