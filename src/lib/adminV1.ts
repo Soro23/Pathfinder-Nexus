@@ -28,3 +28,45 @@ export async function updateV1Field(
     throw new Error(`No se guardó ningún registro en v1.${table} (permiso o política RLS insuficiente)`)
   }
 }
+
+// v1.class_levels no tiene un id propio embebido en CLASS_SELECT — se
+// referencia por su clave real (class_id, level).
+export async function updateClassLevel(
+  classId: string,
+  level: number,
+  patch: { bab: number; fort: number; ref: number; will: number; special_es: string | null }
+): Promise<void> {
+  const { data, error } = await supabase
+    .schema('v1')
+    .from('class_levels')
+    .update(patch)
+    .eq('class_id', classId)
+    .eq('level', level)
+    .select('level')
+  if (error) throw error
+  if (!data || data.length === 0) {
+    throw new Error(`No se guardó el nivel ${level} (permiso o política RLS insuficiente)`)
+  }
+}
+
+// v1.class_skills es una tabla intermedia sin id propio (class_id, skill_id) —
+// marcar/desmarcar una habilidad de clase es insertar o borrar la fila del par,
+// no un UPDATE de columna.
+export async function setClassSkill(classId: string, skillId: string, isClassSkill: boolean): Promise<void> {
+  if (isClassSkill) {
+    const { error } = await supabase.schema('v1').from('class_skills').insert({ class_id: classId, skill_id: skillId })
+    if (error) throw error
+    return
+  }
+  const { data, error } = await supabase
+    .schema('v1')
+    .from('class_skills')
+    .delete()
+    .eq('class_id', classId)
+    .eq('skill_id', skillId)
+    .select('class_id')
+  if (error) throw error
+  if (!data || data.length === 0) {
+    throw new Error('No se pudo quitar la habilidad de clase (permiso o política RLS insuficiente)')
+  }
+}

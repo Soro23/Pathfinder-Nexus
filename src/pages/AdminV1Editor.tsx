@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, ChevronRight, Search } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Search, AlertTriangle, CheckCircle, Save } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { updateV1Field } from '../lib/adminV1'
+import { updateV1Field, updateClassLevel, setClassSkill } from '../lib/adminV1'
 import { MarkdownFieldEditor } from '../components/ui/MarkdownFieldEditor'
 import {
   CLASS_SELECT,
@@ -13,6 +13,8 @@ import {
   type ChoiceMechanic,
   type ChoiceListItem,
   type ChoiceDetail,
+  type ClassLevelRow,
+  type ClassSkillRef,
 } from './ClassesV1Detail'
 import { SKILL_SELECT, type SkillV1Row } from './SkillsV1Detail'
 import adminStyles from './Admin.module.css'
@@ -197,10 +199,166 @@ export function V1SkillsEditor() {
   )
 }
 
-// ── Clases v1 (descripción, características, arquetipos, mecánicas de elección) ──
+// ── Clases v1 — tabla de progresión (BBA/salvaciones/especial por nivel) ────
+
+interface ClassLevelsTableProps {
+  classId: string
+  levels: ClassLevelRow[]
+  onSaved: (levels: ClassLevelRow[]) => void
+}
+
+function ClassLevelsTable({ classId, levels, onSaved }: ClassLevelsTableProps) {
+  const [rows, setRows] = useState(levels)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => { setRows(levels) }, [levels])
+
+  function setCell(level: number, key: 'bab' | 'fort' | 'ref' | 'will', raw: string) {
+    const value = Number(raw)
+    setRows((prev) => prev.map((r) => (r.level === level ? { ...r, [key]: Number.isNaN(value) ? 0 : value } : r)))
+    setSaved(false)
+  }
+
+  function setSpecial(level: number, value: string) {
+    setRows((prev) => prev.map((r) => (r.level === level ? { ...r, special_es: value } : r)))
+    setSaved(false)
+  }
+
+  async function handleSave() {
+    setSaving(true)
+    setError('')
+    setSaved(false)
+    try {
+      const changed = rows.filter((r) => {
+        const original = levels.find((o) => o.level === r.level)
+        return original && (
+          original.bab !== r.bab || original.fort !== r.fort || original.ref !== r.ref ||
+          original.will !== r.will || original.special_es !== r.special_es
+        )
+      })
+      for (const r of changed) {
+        await updateClassLevel(classId, r.level, { bab: r.bab, fort: r.fort, ref: r.ref, will: r.will, special_es: r.special_es || null })
+      }
+      onSaved(rows)
+      setSaved(true)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error al guardar')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className={styles.sectionBlock}>
+      <p className={styles.sectionTitle}>Progresión</p>
+      <div className={styles.tableScroll}>
+        <table className={styles.levelsTable}>
+          <thead>
+            <tr>
+              <th>Nv</th>
+              <th>BBA</th>
+              <th>Fort.</th>
+              <th>Reflejos</th>
+              <th>Voluntad</th>
+              <th>Especial</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.level}>
+                <td className={styles.levelCell}>{r.level}</td>
+                <td><input type="number" value={r.bab} onChange={(e) => setCell(r.level, 'bab', e.target.value)} /></td>
+                <td><input type="number" value={r.fort} onChange={(e) => setCell(r.level, 'fort', e.target.value)} /></td>
+                <td><input type="number" value={r.ref} onChange={(e) => setCell(r.level, 'ref', e.target.value)} /></td>
+                <td><input type="number" value={r.will} onChange={(e) => setCell(r.level, 'will', e.target.value)} /></td>
+                <td>
+                  <input
+                    type="text"
+                    className={styles.specialInput}
+                    value={r.special_es ?? ''}
+                    onChange={(e) => setSpecial(r.level, e.target.value)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {error && <div className={adminStyles.errorAlert}><AlertTriangle size={16} /><span>{error}</span></div>}
+      {saved && !error && <div className={adminStyles.successBanner}><CheckCircle size={16} />Progresión guardada.</div>}
+      <div className={adminStyles.saveRow}>
+        <button className={adminStyles.saveBtn} onClick={handleSave} disabled={saving}>
+          {saving ? <span className={adminStyles.spinner} /> : <><Save size={16} /> Guardar progresión</>}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ── Clases v1 — habilidades de clase (checklist sobre v1.class_skills) ──────
+
+interface ClassSkillsChecklistProps {
+  classId: string
+  allSkills: { id: string; name_es: string }[]
+  current: ClassSkillRef[]
+  onSaved: (skills: ClassSkillRef[]) => void
+}
+
+function ClassSkillsChecklist({ classId, allSkills, current, onSaved }: ClassSkillsChecklistProps) {
+  const [selectedIds, setSelectedIds] = useState(() => new Set(current.map((cs) => cs.skills.id)))
+  const [pendingId, setPendingId] = useState<string | null>(null)
+  const [error, setError] = useState('')
+
+  useEffect(() => { setSelectedIds(new Set(current.map((cs) => cs.skills.id))) }, [current])
+
+  async function toggle(skill: { id: string; name_es: string }) {
+    const wasSelected = selectedIds.has(skill.id)
+    setPendingId(skill.id)
+    setError('')
+    try {
+      await setClassSkill(classId, skill.id, !wasSelected)
+      const next = new Set(selectedIds)
+      if (wasSelected) next.delete(skill.id)
+      else next.add(skill.id)
+      setSelectedIds(next)
+      onSaved(allSkills.filter((s) => next.has(s.id)).map((s) => ({ skills: s })))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error al guardar')
+    } finally {
+      setPendingId(null)
+    }
+  }
+
+  const sortedSkills = [...allSkills].sort((a, b) => a.name_es.localeCompare(b.name_es, 'es'))
+
+  return (
+    <div className={styles.sectionBlock}>
+      <p className={styles.sectionTitle}>Habilidades de clase ({selectedIds.size})</p>
+      {error && <div className={adminStyles.errorAlert}><AlertTriangle size={16} /><span>{error}</span></div>}
+      <div className={styles.skillCheckGrid}>
+        {sortedSkills.map((skill) => (
+          <label key={skill.id} className={styles.skillCheckItem}>
+            <input
+              type="checkbox"
+              checked={selectedIds.has(skill.id)}
+              disabled={pendingId === skill.id}
+              onChange={() => toggle(skill)}
+            />
+            {skill.name_es}
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Clases v1 (descripción, progresión, habilidades, características, arquetipos, mecánicas) ──
 
 export function V1ClassesEditor() {
   const [classes, setClasses] = useState<ClassV1Row[]>([])
+  const [allSkills, setAllSkills] = useState<{ id: string; name_es: string }[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [archetypeView, setArchetypeView] = useState<{ archetype: ArchetypeRef; features: ArchetypeFeatureRow[] } | null>(null)
@@ -214,6 +372,9 @@ export function V1ClassesEditor() {
     supabase.schema('v1').from('classes').select(CLASS_SELECT).order('name_es').then(({ data }) => {
       setClasses((data ?? []) as unknown as ClassV1Row[])
       setLoading(false)
+    })
+    supabase.schema('v1').from('skills').select('id, name_es').order('name_es').then(({ data }) => {
+      setAllSkills((data ?? []) as { id: string; name_es: string }[])
     })
   }, [])
 
@@ -241,6 +402,14 @@ export function V1ClassesEditor() {
         ? { ...c, class_features: c.class_features.map((f) => (f.id === featureId ? { ...f, description_es } : f)) }
         : c
     )))
+  }
+
+  function updateLevels(classId: string, class_levels: ClassLevelRow[]) {
+    setClasses((prev) => prev.map((c) => (c.id === classId ? { ...c, class_levels } : c)))
+  }
+
+  function updateClassSkills(classId: string, class_skills: ClassSkillRef[]) {
+    setClasses((prev) => prev.map((c) => (c.id === classId ? { ...c, class_skills } : c)))
   }
 
   function selectClass(id: string) {
@@ -392,6 +561,23 @@ export function V1ClassesEditor() {
           onSave={(v) => updateV1Field('classes', selected.id, 'description_es', v)}
           onSaved={(v) => updateClass(selected.id, { description_es: v })}
         />
+
+        {selected.class_levels.length > 0 && (
+          <ClassLevelsTable
+            classId={selected.id}
+            levels={selected.class_levels}
+            onSaved={(levels) => updateLevels(selected.id, levels)}
+          />
+        )}
+
+        {allSkills.length > 0 && (
+          <ClassSkillsChecklist
+            classId={selected.id}
+            allSkills={allSkills}
+            current={selected.class_skills}
+            onSaved={(class_skills) => updateClassSkills(selected.id, class_skills)}
+          />
+        )}
 
         {selected.class_features.length > 0 && (
           <div className={styles.sectionBlock}>
