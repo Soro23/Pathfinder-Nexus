@@ -26,6 +26,10 @@ export interface PrerequisiteSegment {
   feat?: FeatRef
   skill?: SkillRef
   skillSubtype?: SkillSubtypeRef
+  // Solo lo usa bestiaryV1TextLinks.ts (enlace conjuro→v1.spells en la ficha
+  // de criatura) — se declara aquí en vez de en un tipo aparte para poder
+  // reutilizar el mismo renderer de segmentos que dotes/habilidades.
+  spell?: { id: string; name_es: string }
 }
 
 const DIACRITIC_PATTERN = /\p{Diacritic}/gu

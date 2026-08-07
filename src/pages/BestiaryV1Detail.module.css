@@ -48,6 +48,26 @@
   font-size: 0.85rem;
 }
 
+/* ── Enlaces de dote/habilidad/conjuro dentro de statistics.dotes,
+   statistics.habilidades y las entradas de frecuencia de offense (ver
+   renderLinkedSegments en BestiaryV1Detail.tsx) ── */
+.textLink {
+  display: inline;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--color-accent-gold);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  cursor: pointer;
+}
+
+.textLink:hover {
+  color: var(--color-primary);
+}
+
 /* ── Navegación entre variantes (forma base ↔ formas alternativas) ── */
 .variantBtn {
   display: inline-flex;
@@ -125,16 +145,22 @@
 }
 
 .statGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-1) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .statRow {
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  font-size: 0.85rem;
+}
+
+.statPair {
+  display: flex;
   gap: var(--space-2);
   align-items: baseline;
-  font-size: 0.85rem;
 }
 
 .statLabel {
