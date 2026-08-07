@@ -5,7 +5,8 @@
    igual que hace SkillsV1Detail.module.css. */
 @media (min-width: 901px) {
   .wideDrawerPanel {
-    width: 680px;
+    width: 50vw;
+    min-width: 680px;
     max-width: 90vw;
   }
 }

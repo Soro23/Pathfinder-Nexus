@@ -6,7 +6,8 @@
    mismo Drawer. */
 @media (min-width: 901px) {
   .wideDrawerPanel {
-    width: 640px;
+    width: 50vw;
+    min-width: 640px;
     max-width: 90vw;
   }
 }
