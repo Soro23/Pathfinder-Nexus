@@ -32,6 +32,7 @@ const Feats = lazy(() => import('./pages/Feats').then(m => ({ default: m.Feats }
 const FeatsV1Example = lazy(() => import('./pages/FeatsV1Example').then(m => ({ default: m.FeatsV1Example })))
 const SkillsV1Example = lazy(() => import('./pages/SkillsV1Example').then(m => ({ default: m.SkillsV1Example })))
 const ClassesV1Example = lazy(() => import('./pages/ClassesV1Example').then(m => ({ default: m.ClassesV1Example })))
+const BestiaryV1Example = lazy(() => import('./pages/BestiaryV1Example').then(m => ({ default: m.BestiaryV1Example })))
 const Bestiary = lazy(() => import('./pages/Bestiary').then(m => ({ default: m.Bestiary })))
 const Classes = lazy(() => import('./pages/Classes').then(m => ({ default: m.Classes })))
 const Races = lazy(() => import('./pages/Races').then(m => ({ default: m.Races })))
@@ -69,6 +70,7 @@ function App() {
                 <Route path="skills-v1" element={<SkillsV1Example />} />
                 <Route path="classes-v1" element={<ClassesV1Example />} />
                 <Route path="bestiary" element={<Bestiary />} />
+                <Route path="bestiary-v1" element={<BestiaryV1Example />} />
                 <Route path="classes" element={<Classes />} />
                 <Route path="classes/:classId" element={<Classes />} />
                 <Route path="races" element={<Races />} />

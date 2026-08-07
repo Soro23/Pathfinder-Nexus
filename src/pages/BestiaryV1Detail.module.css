@@ -1,0 +1,241 @@
+/* ── Drawer de ficha de criatura/PNJ (schema v1) ──
+   El Drawer.module.css compartido usa 360px de ancho pensado para paneles
+   cortos (Modo Juego); una ficha completa (secciones de estadísticas +
+   habilidades especiales + ataques) no cabe bien ahí, así que en escritorio
+   se ensancha vía panelClassName, igual que SkillsV1Detail/ClassesV1Detail. */
+@media (min-width: 901px) {
+  .wideDrawerPanel {
+    width: 50vw;
+    min-width: 680px;
+    max-width: 90vw;
+  }
+}
+
+.drawerMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.crBadge {
+  display: inline-flex;
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+}
+
+.badge {
+  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-primary);
+}
+
+.sourceLine {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.errorText {
+  color: #e74c3c;
+  font-size: 0.85rem;
+}
+
+/* ── Navegación entre variantes (forma base ↔ formas alternativas) ── */
+.variantBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding: 6px var(--space-3);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent-gold);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.variantBtn:hover {
+  background: rgba(212, 164, 76, 0.12);
+}
+
+.variantChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px var(--space-2);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.variantChip:hover {
+  color: var(--color-accent-gold);
+  border-color: var(--color-accent-gold);
+}
+
+.creatureDescription {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  line-height: 1.6;
+  margin-bottom: var(--space-4);
+  padding: var(--space-3);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-accent-gold);
+}
+
+.creatureDescription :global(p) {
+  margin-bottom: var(--space-2);
+}
+
+.creatureDescription :global(p:last-child) {
+  margin-bottom: 0;
+}
+
+/* ── Secciones de estadísticas (Sentidos/Defensa/Ofensiva/Estadísticas/
+   Ecología) — pares clave→valor derivados dinámicamente de cada jsonb, ver
+   BestiaryV1Detail.tsx. ── */
+.statSection {
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+}
+
+.statSectionTitle {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent-gold);
+  margin-bottom: var(--space-2);
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-1) var(--space-4);
+}
+
+.statRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  font-size: 0.85rem;
+}
+
+.statLabel {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.statValue {
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+/* ── Ataques (creature_attacks) ── */
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.attackTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.attackTable th,
+.attackTable td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.attackTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.attackTable th {
+  background: var(--color-bg-secondary);
+  color: var(--color-accent-gold);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* ── Habilidades especiales ── */
+.abilityList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.abilityRow {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.abilityRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.abilityName {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.abilityDesc {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Idiomas / inmunidades / dotes ── */
+.usesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  display: inline-block;
+  padding: 4px var(--space-2);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  color: var(--color-text-primary);
+}
+
+/* ── Equipo ── */
+.gearList {
+  margin: 0;
+  padding-left: var(--space-5);
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
