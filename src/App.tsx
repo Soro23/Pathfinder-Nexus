@@ -33,6 +33,7 @@ const FeatsV1Example = lazy(() => import('./pages/FeatsV1Example').then(m => ({ 
 const SkillsV1Example = lazy(() => import('./pages/SkillsV1Example').then(m => ({ default: m.SkillsV1Example })))
 const ClassesV1Example = lazy(() => import('./pages/ClassesV1Example').then(m => ({ default: m.ClassesV1Example })))
 const BestiaryV1Example = lazy(() => import('./pages/BestiaryV1Example').then(m => ({ default: m.BestiaryV1Example })))
+const RacesV1Example = lazy(() => import('./pages/RacesV1Example').then(m => ({ default: m.RacesV1Example })))
 const Bestiary = lazy(() => import('./pages/Bestiary').then(m => ({ default: m.Bestiary })))
 const Classes = lazy(() => import('./pages/Classes').then(m => ({ default: m.Classes })))
 const Races = lazy(() => import('./pages/Races').then(m => ({ default: m.Races })))
@@ -75,6 +76,7 @@ function App() {
                 <Route path="classes/:classId" element={<Classes />} />
                 <Route path="races" element={<Races />} />
                 <Route path="races/:raceId" element={<Races />} />
+                <Route path="races-v1" element={<RacesV1Example />} />
                 <Route path="npcs" element={<NPCs />} />
                 <Route path="campaigns" element={<CampaignList />} />
                 <Route path="campaigns/new" element={<CampaignNew />} />

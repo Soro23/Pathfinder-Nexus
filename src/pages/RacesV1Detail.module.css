@@ -1,0 +1,148 @@
+/* ── Drawer de detalle de raza (schema v1) ──
+   El Drawer.module.css compartido usa 360px de ancho pensado para paneles
+   cortos (Modo Juego); la descripción larga y las secciones de rasgos no
+   caben bien ahí, así que en escritorio se ensancha vía panelClassName,
+   igual que ClassesV1Detail.module.css/SkillsV1Detail.module.css. */
+@media (min-width: 901px) {
+  .wideDrawerPanel {
+    width: 50vw;
+    min-width: 680px;
+    max-width: 90vw;
+  }
+}
+
+.drawerMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.badge {
+  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-primary);
+}
+
+.sourceLine {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+.errorText {
+  color: #e74c3c;
+  font-size: 0.85rem;
+}
+
+/* Dote racial sin coincidencia exacta en v1.feats (match_confidence
+   'fuzzy'|'unmatched') — mismo estilo que skillPill pero sin el hover
+   interactivo, ya que no abre nada al hacer clic. */
+.featChip {
+  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+}
+
+.raceDescription :global(h1),
+.raceDescription :global(h2),
+.raceDescription :global(h3),
+.raceDescription :global(h4) {
+  font-family: var(--font-display);
+  color: var(--color-accent-gold);
+  margin: var(--space-4) 0 var(--space-2);
+}
+
+.raceDescription :global(p) {
+  margin-bottom: var(--space-3);
+}
+
+.raceDescription :global(ul),
+.raceDescription :global(ol) {
+  margin: 0 0 var(--space-3) var(--space-5);
+}
+
+.raceDescription :global(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-4);
+  font-size: 0.85rem;
+}
+
+.raceDescription :global(th),
+.raceDescription :global(td) {
+  border: 1px solid var(--color-border);
+  padding: var(--space-2);
+  text-align: left;
+}
+
+.raceDescription :global(th) {
+  background: var(--color-bg-primary);
+}
+
+/* 12/82 razas no tienen rasgos parseables desde el .md fuente (ver
+   comentario de cabecera de RacesV1Detail.tsx) — aviso explícito en vez de
+   dejar la sección vacía, que se leería como un bug. */
+.emptyNotice {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* ── Variantes y herencias (race_variants, solo 8/82 razas) ── */
+.variantList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.variantCard {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-primary);
+}
+
+.variantHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.variantName {
+  font-family: var(--font-display);
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+}
+
+/* benefits (jsonb catch-all, ver comentario de cabecera) se pinta como una
+   sucesión de subgrupos clave→valor, cada uno con su propio título
+   humanizado — no hay un shape fijo que justifique una tabla. */
+.benefitGroup {
+  margin-top: var(--space-3);
+}
+
+.benefitTitle {
+  font-family: var(--font-display);
+  color: var(--color-accent-gold);
+  font-size: 0.8rem;
+  margin-bottom: var(--space-1);
+}
+
+.benefitList {
+  margin: 0 0 0 var(--space-4);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.benefitObject p {
+  margin-bottom: var(--space-1);
+}
